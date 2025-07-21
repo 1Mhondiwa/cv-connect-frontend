@@ -1,0 +1,164 @@
+/* Add this to hide preloader by default */
+#preloader {
+  display: none !important;
+}
+
+/* Ensure the page is visible */
+body {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Hide the loading spinner that might be stuck */
+.loading-spinner {
+  display: none !important;
+}
+
+/* Form validation styling */
+.form-control.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+}
+
+/* Success and error message styling */
+.sent-message {
+  display: block !important;
+  color: #ffffff;
+  background: #059652;
+  text-align: center;
+  padding: 15px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+.error-message {
+  display: block !important;
+  background: #df1529;
+  color: #ffffff;
+  text-align: left;
+  padding: 15px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+/* Loading state styling - hidden by default */
+.loading {
+  display: none !important;
+}
+
+/* Button disabled state */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Logout button styling */
+.btn-get-started {
+  font-family: var(--heading-font);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding: 12px 30px;
+  border-radius: 50px;
+  transition: 0.5s;
+  color: var(--contrast-color);
+  background: var(--accent-color);
+  border: 2px solid var(--accent-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-get-started:hover {
+  background: transparent;
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+/* Card styling for dashboard */
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-header {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 0.75rem 1.25rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+/* Badge styling */
+.badge {
+  display: inline-block;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.375rem;
+}
+
+.bg-success {
+  background-color: #198754 !important;
+}
+
+.bg-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+.bg-info {
+  background-color: #0dcaf0 !important;
+}
+
+.bg-primary {
+  background-color: #0d6efd !important;
+}
+
+/* Table styling */
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  vertical-align: top;
+  border-color: #dee2e6;
+  }
+
+.table th,
+.table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table thead th {
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  }
+
+/* Responsive table */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}

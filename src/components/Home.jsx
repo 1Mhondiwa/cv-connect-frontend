@@ -1,0 +1,177 @@
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+const features = [
+  { icon: 'bi bi-cpu', label: 'AI-Powered CV Parsing' },
+  { icon: 'bi bi-people', label: 'Smart Talent Matching' },
+  { icon: 'bi bi-chat-dots', label: 'Real-time Messaging' }
+];
+
+const stats = [
+  { value: '1000+', label: 'Active Freelancers' },
+  { value: '500+', label: 'Trusted Associates' },
+  { value: '98%', label: 'Match Success Rate' }
+];
+
+const taglines = [
+  "Where Talent Meets Opportunity",
+  "Automated CV Parsing. Instant Profiles.",
+  "Smart Matching for Freelancers & Associates",
+  "Connect. Collaborate. Succeed.",
+  "Your Next Opportunity Starts Here"
+];
+
+const Home = () => {
+  const [taglineIndex, setTaglineIndex] = useState(0);
+  const [animate, setAnimate] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimate(false);
+      setTimeout(() => {
+        setTaglineIndex((prev) => (prev + 1) % taglines.length);
+        setAnimate(true);
+      }, 400);
+    }, 3200);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section
+      className="hero d-flex align-items-center justify-content-center"
+      style={{
+        minHeight: '100vh',
+        background: 'url(/assets/img/hero-bg.jpg) center center/cover no-repeat',
+        position: 'relative'
+      }}
+    >
+      {/* Overlay for better contrast */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0,0,0,0.45)',
+          zIndex: 1
+        }}
+      />
+      <div
+        className="container text-center"
+        style={{
+          position: 'relative',
+          zIndex: 2,
+          color: '#fff',
+          maxWidth: 700,
+          padding: '40px 20px',
+          borderRadius: 16
+        }}
+      >
+        <h1 style={{ fontWeight: 700, fontSize: '2.8rem', marginBottom: 12 }}>
+          Welcome to <span style={{ color: '#fd680e' }}>CV‑Connect</span>
+            </h1>
+        {/* Sliding Tagline */}
+        <div
+          style={{
+            minHeight: 40,
+            marginBottom: 18,
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-block',
+              fontWeight: 400,
+              fontSize: '1.4rem',
+              transition: 'transform 0.4s cubic-bezier(.4,2,.6,1), opacity 0.4s',
+              transform: animate ? 'translateY(0)' : 'translateY(-30px)',
+              opacity: animate ? 1 : 0
+            }}
+            key={taglineIndex}
+          >
+            {taglines[taglineIndex]}
+                </span>
+            </div>
+        <p style={{ fontSize: '1.1rem', marginBottom: 28 }}>
+          Connect with top freelancers and trusted associates through advanced CV parsing and smart matching. Upload your CV, get discovered, and unlock new opportunities in the digital marketplace.
+            </p>
+        {/* Features */}
+        <div className="d-flex justify-content-center gap-3 mb-4 flex-wrap">
+          {features.map((f) => (
+            <span
+              key={f.label}
+              className="badge"
+              style={{
+                background: 'rgba(255,255,255,0.12)',
+                color: '#fff',
+                fontSize: 16,
+                padding: '10px 18px',
+                borderRadius: 30,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontWeight: 500
+              }}
+            >
+              <i className={f.icon} style={{ fontSize: 20, color: '#fd680e' }}></i>
+              {f.label}
+            </span>
+          ))}
+                </div>
+        {/* CTA Buttons with animation */}
+        <div className="d-flex justify-content-center gap-3 mb-4 flex-wrap">
+          <Link
+            to="/register"
+            className="btn btn-primary hero-cta"
+            style={{
+              background: '#fd680e',
+              border: 'none',
+              borderRadius: 30,
+              padding: '12px 32px',
+              fontSize: 18,
+              fontWeight: 600,
+              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+              transition: 'transform 0.18s, box-shadow 0.18s'
+            }}
+          >
+                Join as Freelancer
+          </Link>
+          <Link
+            to="/login"
+            className="btn btn-outline-light hero-cta"
+            style={{
+              borderRadius: 30,
+              padding: '12px 32px',
+              fontSize: 18,
+              fontWeight: 600,
+              border: '2px solid #fd680e',
+              color: '#fd680e',
+              background: 'rgba(255,255,255,0.08)',
+              transition: 'transform 0.18s, box-shadow 0.18s'
+            }}
+          >
+            Login
+          </Link>
+            </div>
+        {/* Stats */}
+        <div className="d-flex justify-content-center gap-4 mt-4 flex-wrap">
+          {stats.map((s) => (
+            <div key={s.label} style={{ minWidth: 120 }}>
+              <div style={{ fontWeight: 700, fontSize: 22, color: '#fd680e' }}>{s.value}</div>
+              <div style={{ fontSize: 15, color: '#fff', opacity: 0.85 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Button animation styles */}
+      <style>{`
+        .hero-cta:hover, .hero-cta:focus {
+          transform: scale(1.07);
+          box-shadow: 0 4px 24px rgba(253,104,14,0.18);
+          z-index: 2;
+        }
+      `}</style>
+    </section>
+  );
+};
+
+export default Home;
