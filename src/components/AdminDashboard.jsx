@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
 
 const accent = '#fd680e';
@@ -25,10 +25,22 @@ const AdminDashboard = () => {
   const [associateLoading, setAssociateLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [associates, setAssociates] = useState([]);
+  const [associatesLoading, setAssociatesLoading] = useState(false);
+  const [associatesError, setAssociatesError] = useState('');
+  const [toggleLoading, setToggleLoading] = useState({});
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  // Fetch associates on mount
+  useEffect(() => {
+    if (!loading && !error) {
+      fetchAssociates();
+    }
+    // eslint-disable-next-line
+  }, [loading, error]);
 
   const checkAuth = () => {
     const token = localStorage.getItem('token');
@@ -133,7 +145,7 @@ const AdminDashboard = () => {
         website: associateFormData.website.trim() || null
       };
 
-      const response = await axios.post('/api/auth/add-associate', requestData, {
+      const response = await api.post('/auth/add-associate', requestData, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -184,6 +196,40 @@ const AdminDashboard = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/');
+  };
+
+  const fetchAssociates = async () => {
+    setAssociatesLoading(true);
+    setAssociatesError('');
+    try {
+      const res = await api.get('/admin/associates');
+      if (res.data.success) {
+        setAssociates(res.data.associates);
+      } else {
+        setAssociatesError(res.data.message || 'Failed to fetch associates');
+      }
+    } catch (err) {
+      setAssociatesError(err.response?.data?.message || 'Failed to fetch associates');
+    } finally {
+      setAssociatesLoading(false);
+    }
+  };
+
+  const handleToggleActive = async (userId) => {
+    setToggleLoading((prev) => ({ ...prev, [userId]: true }));
+    try {
+      const res = await api.put(`/admin/users/${userId}/toggle-active`);
+      if (res.data.success) {
+        // Update associate in state
+        setAssociates((prev) => prev.map(a => a.user_id === userId ? { ...a, is_active: res.data.is_active } : a));
+      } else {
+        alert(res.data.message || 'Failed to toggle status');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to toggle status');
+    } finally {
+      setToggleLoading((prev) => ({ ...prev, [userId]: false }));
+    }
   };
 
   if (loading) {
@@ -268,37 +314,6 @@ const AdminDashboard = () => {
         </div>
         {/* Main Dashboard Content */}
         <div style={{ flex: 1, padding: '40px 32px', background: 'transparent', minHeight: 0, overflowY: 'auto' }}>
-          {/* Stats Cards */}
-          <div className="row gy-4 mb-4">
-            <div className="col-lg-3 col-md-6">
-              <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-people"></i></div>
-                <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Users</div>
-                <div style={{ color: '#888', fontSize: 15 }}>Manage all system users</div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-md-6">
-              <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-building"></i></div>
-                <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Associates</div>
-                <div style={{ color: '#888', fontSize: 15 }}>Manage associate accounts</div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-md-6">
-              <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-person-workspace"></i></div>
-                <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Freelancers</div>
-                <div style={{ color: '#888', fontSize: 15 }}>Manage freelancer accounts</div>
-              </div>
-            </div>
-            <div className="col-lg-3 col-md-6">
-              <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-graph-up"></i></div>
-                <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Analytics</div>
-                <div style={{ color: '#888', fontSize: 15 }}>View system analytics</div>
-              </div>
-            </div>
-          </div>
           {/* Add Associate Form */}
           <div className="row">
             <div className="col-lg-7 mb-4 mb-lg-0">
@@ -405,6 +420,55 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </form>
+              </div>
+              {/* Associates Table */}
+              <div className="bg-white rounded-4 shadow-sm p-4 mt-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>All Associates</h5>
+                {associatesLoading ? (
+                  <div>Loading associates...</div>
+                ) : associatesError ? (
+                  <div style={{ color: '#df1529', fontWeight: 500 }}>{associatesError}</div>
+                ) : (
+                  <div style={{ overflowX: 'auto' }}>
+                    <table className="table table-bordered" style={{ minWidth: 700 }}>
+                      <thead style={{ background: '#f8f9fa' }}>
+                        <tr>
+                          <th>Email</th>
+                          <th>Contact Person</th>
+                          <th>Industry</th>
+                          <th>Phone</th>
+                          <th>Status</th>
+                          <th>Created</th>
+                          <th>Last Login</th>
+                          <th>Active</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {associates.map(a => (
+                          <tr key={a.associate_id}>
+                            <td>{a.email}</td>
+                            <td>{a.contact_person}</td>
+                            <td>{a.industry}</td>
+                            <td>{a.phone}</td>
+                            <td>{a.verified ? 'Verified' : 'Unverified'}</td>
+                            <td>{a.created_at ? new Date(a.created_at).toLocaleDateString() : ''}</td>
+                            <td>{a.last_login ? new Date(a.last_login).toLocaleDateString() : ''}</td>
+                            <td>
+                              <button
+                                className="btn btn-sm dashboard-btn"
+                                style={{ background: a.is_active ? '#059652' : '#df1529', color: '#fff', borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px', minWidth: 90, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                                onClick={() => handleToggleActive(a.user_id)}
+                                disabled={toggleLoading[a.user_id]}
+                              >
+                                {toggleLoading[a.user_id] ? '...' : a.is_active ? 'Deactivate' : 'Activate'}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           </div>
