@@ -405,7 +405,7 @@ const FreelancerProfile = () => {
                         </span>
                       </div>
                     </div>
-                    <Link
+                   {/* <Link
                       to="/freelancer/edit-profile"
                       className="btn"
                       style={{
@@ -420,7 +420,7 @@ const FreelancerProfile = () => {
                     >
                       <i className="bi bi-pencil me-2"></i>
                       Edit Profile
-                    </Link>
+                    </Link> */}
                   </div>
                   
                   {/* Social Links */}
@@ -586,7 +586,7 @@ const FreelancerProfile = () => {
                   <i className="bi bi-tools" style={{ fontSize: 48, color: '#ddd', marginBottom: 16 }}></i>
                   <p>No skills listed yet.</p>
                   <Link
-                    to="/freelancer/edit-profile"
+                    to="/freelancer/edit"
                     className="btn btn-outline-primary"
                     style={{
                       borderRadius: 25,
@@ -780,7 +780,7 @@ const FreelancerProfile = () => {
               </div>
               {profileCompletion < 100 && (
                 <Link
-                  to="/freelancer/edit-profile"
+                  to="/freelancer/edit"
                   className="btn w-100"
                   style={{
                     background: accent,
@@ -819,7 +819,7 @@ const FreelancerProfile = () => {
               </h5>
               <div className="d-grid gap-2">
                 <Link
-                  to="/freelancer/edit-profile"
+                  to="/freelancer/edit"
                   className="btn btn-outline-primary"
                   style={{
                     borderRadius: 25,
@@ -833,7 +833,7 @@ const FreelancerProfile = () => {
                   Edit Profile
                 </Link>
                 <Link
-                  to="/freelancer/cv-upload"
+                  to="/freelancer/upload"
                   className="btn btn-outline-success"
                   style={{
                     borderRadius: 25,
