@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,6 +36,11 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState('');
+  const [adminImage, setAdminImage] = useState(null);
+  const [adminImageUploading, setAdminImageUploading] = useState(false);
+  const [adminImageError, setAdminImageError] = useState('');
+  const [adminImageSuccess, setAdminImageSuccess] = useState('');
+  const adminImageInputRef = useRef(null);
 
   useEffect(() => {
     checkAuth();
@@ -64,6 +69,75 @@ const AdminDashboard = () => {
     }
     // eslint-disable-next-line
   }, [activeTab]);
+
+  // Fetch admin image on user load
+  useEffect(() => {
+    if (user && user.profile_picture_url) {
+      setAdminImage(user.profile_picture_url);
+    }
+  }, [user]);
+
+  // Helper to get image URL
+  const getAdminImageUrl = () => {
+    if (adminImage) {
+      if (adminImage.startsWith('http')) return adminImage;
+      return adminImage;
+    }
+    return null;
+  };
+
+  // Upload handler
+  const handleAdminImageChange = async (e) => {
+    setAdminImageError('');
+    setAdminImageSuccess('');
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setAdminImageError('Please select a valid image file.');
+      return;
+    }
+    setAdminImageUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await api.post('/admin/profile-image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (res.data.success) {
+        setAdminImage(res.data.image_url);
+        setAdminImageSuccess('Profile picture updated!');
+        setUser((prev) => ({ ...prev, profile_picture_url: res.data.image_url }));
+      } else {
+        setAdminImageError(res.data.message || 'Failed to upload image.');
+      }
+    } catch (err) {
+      setAdminImageError(err.response?.data?.message || 'Failed to upload image.');
+    } finally {
+      setAdminImageUploading(false);
+      if (adminImageInputRef.current) adminImageInputRef.current.value = '';
+    }
+  };
+
+  // Delete handler
+  const handleDeleteAdminImage = async () => {
+    setAdminImageError('');
+    setAdminImageSuccess('');
+    setAdminImageUploading(true);
+    try {
+      const res = await api.delete('/admin/profile-image');
+      if (res.data.success) {
+        setAdminImage(null);
+        setAdminImageSuccess('Profile picture deleted.');
+        setUser((prev) => ({ ...prev, profile_picture_url: null }));
+      } else {
+        setAdminImageError(res.data.message || 'Failed to delete image.');
+      }
+    } catch (err) {
+      setAdminImageError(err.response?.data?.message || 'Failed to delete image.');
+    } finally {
+      setAdminImageUploading(false);
+    }
+  };
 
   const checkAuth = () => {
     const token = localStorage.getItem('token');
@@ -358,16 +432,68 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <div style={{ flex: 1, minHeight: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' }}>
         {/* Top Bar */}
-        <div style={{ width: '100%', background: '#fff', boxShadow: '0 2px 12px rgba(253,104,14,0.08)', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 70 }}>
+        <div style={{ width: '100%', background: '#fff', boxShadow: '0 2px 12px rgba(253,104,14,0.08)', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 70, position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontWeight: 700, color: '#444', fontSize: 17 }}>{user?.first_name || 'Admin'} {user?.last_name || ''}</div>
               <div style={{ color: '#888', fontSize: 13 }}>Administrator</div>
             </div>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', overflow: 'hidden', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <i className="bi bi-person-circle" style={{ fontSize: 32, color: accent }}></i>
+            <div style={{ position: 'relative', width: 44, height: 44 }}>
+              {getAdminImageUrl() ? (
+                <img
+                  src={getAdminImageUrl()}
+                  alt="Profile"
+                  className="rounded-circle"
+                  style={{ width: 44, height: 44, objectFit: 'cover', border: '2.5px solid #fd680e', background: '#eee' }}
+                />
+              ) : (
+                <i className="bi bi-person-circle" style={{ fontSize: 32, color: accent, background: '#eee', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}></i>
+              )}
+              {/* Upload button */}
+              <button
+                type="button"
+                className="btn btn-sm btn-light"
+                style={{ position: 'absolute', bottom: -6, right: -6, borderRadius: '50%', border: '2px solid #fff', background: accent, color: '#fff', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, boxShadow: '0 2px 8px rgba(253,104,14,0.12)', zIndex: 2, padding: 0 }}
+                onClick={() => adminImageInputRef.current && adminImageInputRef.current.click()}
+                title="Upload/Change Profile Picture"
+                disabled={adminImageUploading}
+              >
+                <i className="bi bi-plus"></i>
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                ref={adminImageInputRef}
+                style={{ display: 'none' }}
+                onChange={handleAdminImageChange}
+                disabled={adminImageUploading}
+              />
+              {/* Delete button */}
+              {getAdminImageUrl() && (
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  style={{ position: 'absolute', top: -6, right: -6, borderRadius: '50%', border: '2px solid #fff', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, zIndex: 2, padding: 0 }}
+                  onClick={handleDeleteAdminImage}
+                  title="Delete Profile Picture"
+                  disabled={adminImageUploading}
+                >
+                  <i className="bi bi-trash"></i>
+                </button>
+              )}
             </div>
           </div>
+          {/* Feedback messages */}
+          {(adminImageSuccess || adminImageError || adminImageUploading) && (
+            <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, minWidth: 180 }}>
+              <div className={`toast show align-items-center text-white bg-${adminImageSuccess ? 'success' : adminImageError ? 'danger' : 'primary'} border-0`} role="alert" aria-live="assertive" aria-atomic="true" style={{ borderRadius: 16, boxShadow: '0 2px 16px rgba(253,104,14,0.18)', fontWeight: 600, fontSize: 15, padding: '12px 24px' }}>
+                <div className="d-flex align-items-center">
+                  <i className={`bi me-2 ${adminImageSuccess ? 'bi-check-circle' : adminImageError ? 'bi-exclamation-triangle' : 'bi-info-circle'}`}></i>
+                  <div>{adminImageUploading ? 'Uploading...' : adminImageSuccess || adminImageError}</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         {/* Main Dashboard Content */}
         <div style={{ flex: 1, padding: '40px 32px', background: 'transparent', minHeight: 0, overflowY: 'auto' }}>
