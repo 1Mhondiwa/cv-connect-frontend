@@ -29,7 +29,10 @@ const AdminDashboard = () => {
   const [associatesLoading, setAssociatesLoading] = useState(false);
   const [associatesError, setAssociatesError] = useState('');
   const [toggleLoading, setToggleLoading] = useState({});
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' or 'associates'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associates', or 'freelancers'
+  const [freelancers, setFreelancers] = useState([]);
+  const [freelancersLoading, setFreelancersLoading] = useState(false);
+  const [freelancersError, setFreelancersError] = useState('');
 
   useEffect(() => {
     checkAuth();
@@ -42,6 +45,14 @@ const AdminDashboard = () => {
     }
     // eslint-disable-next-line
   }, [loading, error]);
+
+  // Fetch freelancers when freelancers tab is activated
+  useEffect(() => {
+    if (activeTab === 'freelancers') {
+      fetchFreelancers();
+    }
+    // eslint-disable-next-line
+  }, [activeTab]);
 
   const checkAuth = () => {
     const token = localStorage.getItem('token');
@@ -233,6 +244,23 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchFreelancers = async () => {
+    setFreelancersLoading(true);
+    setFreelancersError('');
+    try {
+      const res = await api.get('/admin/freelancers');
+      if (res.data.success) {
+        setFreelancers(res.data.freelancers);
+      } else {
+        setFreelancersError(res.data.message || 'Failed to fetch freelancers');
+      }
+    } catch (err) {
+      setFreelancersError(err.response?.data?.message || 'Failed to fetch freelancers');
+    } finally {
+      setFreelancersLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <section className="contact section">
@@ -281,9 +309,9 @@ const AdminDashboard = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/admin/freelancers" style={{ display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none', padding: '14px 32px', fontWeight: 600, fontSize: 16 }}>
+                <button onClick={() => setActiveTab('freelancers')} style={{ background: 'none', border: 'none', color: '#fff', textAlign: 'left', width: '100%', display: 'flex', alignItems: 'center', padding: '14px 32px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>
                   <i className="bi bi-person-workspace me-2"></i> Freelancers
-                </Link>
+                </button>
               </li>
               <li>
                 <Link to="/admin/analytics" style={{ display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none', padding: '14px 32px', fontWeight: 600, fontSize: 16 }}>
@@ -468,6 +496,52 @@ const AdminDashboard = () => {
                             >
                               {toggleLoading[a.user_id] ? '...' : a.is_active ? 'Deactivate' : 'Activate'}
                             </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+          {/* Freelancers Table (Freelancers Tab) */}
+          {activeTab === 'freelancers' && (
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>All Freelancers</h5>
+              {freelancersLoading ? (
+                <div>Loading freelancers...</div>
+              ) : freelancersError ? (
+                <div style={{ color: '#df1529', fontWeight: 500 }}>{freelancersError}</div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="table table-bordered" style={{ minWidth: 700 }}>
+                    <thead style={{ background: '#f8f9fa' }}>
+                      <tr>
+                        <th>Email</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Last Login</th>
+                        <th>Active</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {freelancers.map(f => (
+                        <tr key={f.freelancer_id}>
+                          <td>{f.email}</td>
+                          <td>{f.first_name}</td>
+                          <td>{f.last_name}</td>
+                          <td>{f.phone}</td>
+                          <td>{f.is_verified ? 'Verified' : 'Unverified'}</td>
+                          <td>{f.created_at ? new Date(f.created_at).toLocaleDateString() : ''}</td>
+                          <td>{f.last_login ? new Date(f.last_login).toLocaleDateString() : ''}</td>
+                          <td>
+                            <span className="badge" style={{ background: f.is_active ? '#059652' : '#df1529', color: '#fff', borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px', minWidth: 90 }}>
+                              {f.is_active ? 'Active' : 'Inactive'}
+                            </span>
                           </td>
                         </tr>
                       ))}
