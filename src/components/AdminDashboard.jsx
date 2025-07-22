@@ -33,6 +33,9 @@ const AdminDashboard = () => {
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsError, setStatsError] = useState('');
 
   useEffect(() => {
     checkAuth();
@@ -50,6 +53,14 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (activeTab === 'freelancers') {
       fetchFreelancers();
+    }
+    // eslint-disable-next-line
+  }, [activeTab]);
+
+  // Fetch system stats on dashboard tab
+  useEffect(() => {
+    if (activeTab === 'dashboard') {
+      fetchStats();
     }
     // eslint-disable-next-line
   }, [activeTab]);
@@ -261,6 +272,23 @@ const AdminDashboard = () => {
     }
   };
 
+  const fetchStats = async () => {
+    setStatsLoading(true);
+    setStatsError('');
+    try {
+      const res = await api.get('/admin/stats');
+      if (res.data.success) {
+        setStats(res.data.stats);
+      } else {
+        setStatsError(res.data.message || 'Failed to fetch stats');
+      }
+    } catch (err) {
+      setStatsError(err.response?.data?.message || 'Failed to fetch stats');
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <section className="contact section">
@@ -294,30 +322,30 @@ const AdminDashboard = () => {
           <nav style={{ marginTop: 32 }}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li>
-                <button onClick={() => setActiveTab('dashboard')} style={{ background: 'none', border: 'none', color: '#fff', textAlign: 'left', width: '100%', display: 'flex', alignItems: 'center', padding: '14px 32px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>
+                <button onClick={() => setActiveTab('dashboard')} className="admin-sidebar-btn">
                   <i className="bi bi-house-door me-2"></i> Dashboard
                 </button>
               </li>
               <li>
-                <button onClick={() => setActiveTab('associates')} style={{ background: 'none', border: 'none', color: '#fff', textAlign: 'left', width: '100%', display: 'flex', alignItems: 'center', padding: '14px 32px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>
+                <button onClick={() => setActiveTab('associates')} className="admin-sidebar-btn">
                   <i className="bi bi-building me-2"></i> Associates
                 </button>
               </li>
-              <li>
-                <Link to="/admin/users" style={{ display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none', padding: '14px 32px', fontWeight: 600, fontSize: 16 }}>
+             { /*<li>
+                <Link to="/admin/users" className="admin-sidebar-btn" style={{ textDecoration: 'none' }}>
                   <i className="bi bi-people me-2"></i> Manage Users
                 </Link>
-              </li>
+              </li>*/}
               <li>
-                <button onClick={() => setActiveTab('freelancers')} style={{ background: 'none', border: 'none', color: '#fff', textAlign: 'left', width: '100%', display: 'flex', alignItems: 'center', padding: '14px 32px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>
+                <button onClick={() => setActiveTab('freelancers')} className="admin-sidebar-btn">
                   <i className="bi bi-person-workspace me-2"></i> Freelancers
                 </button>
               </li>
-              <li>
-                <Link to="/admin/analytics" style={{ display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none', padding: '14px 32px', fontWeight: 600, fontSize: 16 }}>
+             {/* <li>
+                <Link to="/admin/analytics" className="admin-sidebar-btn" style={{ textDecoration: 'none' }}>
                   <i className="bi bi-graph-up me-2"></i> Analytics
                 </Link>
-              </li>
+              </li>*/}
             </ul>
           </nav>
         </div>
@@ -345,114 +373,146 @@ const AdminDashboard = () => {
         <div style={{ flex: 1, padding: '40px 32px', background: 'transparent', minHeight: 0, overflowY: 'auto' }}>
           {/* Add Associate Form (Dashboard Tab) */}
           {activeTab === 'dashboard' && (
-            <div className="row">
-              <div className="col-lg-7 mb-4 mb-lg-0">
-                <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                  <h4 style={{ color: accent, fontWeight: 700, marginBottom: 24 }}>Add New Associate</h4>
-                  {successMessage && (
-                    <div className="sent-message mb-3">{successMessage}</div>
-                  )}
-                  {errorMessage && (
-                    <div className="error-message mb-3">{errorMessage}</div>
-                  )}
-                  <form onSubmit={handleAssociateSubmit} className="php-email-form">
-                    <div className="row gy-4">
-                      <div className="col-md-12">
-                        <input 
-                          type="email" 
-                          name="email" 
-                          className={`form-control ${associateErrors.email ? 'is-invalid' : ''}`}
-                          placeholder="Associate Email" 
-                          value={associateFormData.email}
-                          onChange={handleAssociateChange}
-                        />
-                        {associateErrors.email && <div className="invalid-feedback">{associateErrors.email}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <input 
-                          type="password" 
-                          name="password" 
-                          className={`form-control ${associateErrors.password ? 'is-invalid' : ''}`}
-                          placeholder="Password" 
-                          value={associateFormData.password}
-                          onChange={handleAssociateChange}
-                        />
-                        {associateErrors.password && <div className="invalid-feedback">{associateErrors.password}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <input 
-                          type="password" 
-                          name="confirm_password" 
-                          className={`form-control ${associateErrors.confirm_password ? 'is-invalid' : ''}`}
-                          placeholder="Confirm Password" 
-                          value={associateFormData.confirm_password}
-                          onChange={handleAssociateChange}
-                        />
-                        {associateErrors.confirm_password && <div className="invalid-feedback">{associateErrors.confirm_password}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <input 
-                          type="text" 
-                          name="industry" 
-                          className={`form-control ${associateErrors.industry ? 'is-invalid' : ''}`}
-                          placeholder="Industry" 
-                          value={associateFormData.industry}
-                          onChange={handleAssociateChange}
-                        />
-                        {associateErrors.industry && <div className="invalid-feedback">{associateErrors.industry}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <input 
-                          type="text" 
-                          name="contact_person" 
-                          className={`form-control ${associateErrors.contact_person ? 'is-invalid' : ''}`}
-                          placeholder="Contact Person" 
-                          value={associateFormData.contact_person}
-                          onChange={handleAssociateChange}
-                        />
-                        {associateErrors.contact_person && <div className="invalid-feedback">{associateErrors.contact_person}</div>}
-                      </div>
-                      <div className="col-md-12">
-                        <input 
-                          type="tel" 
-                          name="phone" 
-                          className={`form-control ${associateErrors.phone ? 'is-invalid' : ''}`}
-                          placeholder="Phone Number" 
-                          value={associateFormData.phone}
-                          onChange={handleAssociateChange}
-                        />
-                        {associateErrors.phone && <div className="invalid-feedback">{associateErrors.phone}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <input 
-                          type="text" 
-                          name="address" 
-                          className="form-control"
-                          placeholder="Address (Optional)" 
-                          value={associateFormData.address}
-                          onChange={handleAssociateChange}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <input 
-                          type="url" 
-                          name="website" 
-                          className="form-control"
-                          placeholder="Website (Optional)" 
-                          value={associateFormData.website}
-                          onChange={handleAssociateChange}
-                        />
-                      </div>
-                      <div className="col-md-12 text-center">
-                        <button type="submit" disabled={associateLoading} className="btn dashboard-btn" style={{ background: accent, color: '#fff', border: 'none', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '12px 32px', transition: 'transform 0.18s, box-shadow 0.18s' }}>
-                          {associateLoading ? 'Adding Associate...' : 'Add Associate'}
-                        </button>
-                      </div>
+            <>
+              {/* System Stats Row */}
+              <div className="row gy-4 mb-4">
+                <div className="col-lg-4 col-md-6">
+                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
+                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-people"></i></div>
+                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Users</div>
+                    <div style={{ color: '#888', fontSize: 15 }}>
+                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.users ? Object.values(stats.users).reduce((a, b) => a + b, 0) : '--'}
                     </div>
-                  </form>
+                  </div>
+                </div>
+                <div className="col-lg-4 col-md-6">
+                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
+                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-file-earmark-text"></i></div>
+                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>CVs</div>
+                    <div style={{ color: '#888', fontSize: 15 }}>
+                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.total_cvs ?? '--'}
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-4 col-md-6">
+                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
+                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-chat-dots"></i></div>
+                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Messages</div>
+                    <div style={{ color: '#888', fontSize: 15 }}>
+                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.total_messages ?? '--'}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+              <div className="row">
+                <div className="col-lg-7 mb-4 mb-lg-0">
+                  <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <h4 style={{ color: accent, fontWeight: 700, marginBottom: 24 }}>Add New Associate</h4>
+                    {successMessage && (
+                      <div className="sent-message mb-3">{successMessage}</div>
+                    )}
+                    {errorMessage && (
+                      <div className="error-message mb-3">{errorMessage}</div>
+                    )}
+                    <form onSubmit={handleAssociateSubmit} className="php-email-form">
+                      <div className="row gy-4">
+                        <div className="col-md-12">
+                          <input 
+                            type="email" 
+                            name="email" 
+                            className={`form-control ${associateErrors.email ? 'is-invalid' : ''}`}
+                            placeholder="Associate Email" 
+                            value={associateFormData.email}
+                            onChange={handleAssociateChange}
+                          />
+                          {associateErrors.email && <div className="invalid-feedback">{associateErrors.email}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <input 
+                            type="password" 
+                            name="password" 
+                            className={`form-control ${associateErrors.password ? 'is-invalid' : ''}`}
+                            placeholder="Password" 
+                            value={associateFormData.password}
+                            onChange={handleAssociateChange}
+                          />
+                          {associateErrors.password && <div className="invalid-feedback">{associateErrors.password}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <input 
+                            type="password" 
+                            name="confirm_password" 
+                            className={`form-control ${associateErrors.confirm_password ? 'is-invalid' : ''}`}
+                            placeholder="Confirm Password" 
+                            value={associateFormData.confirm_password}
+                            onChange={handleAssociateChange}
+                          />
+                          {associateErrors.confirm_password && <div className="invalid-feedback">{associateErrors.confirm_password}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <input 
+                            type="text" 
+                            name="industry" 
+                            className={`form-control ${associateErrors.industry ? 'is-invalid' : ''}`}
+                            placeholder="Industry" 
+                            value={associateFormData.industry}
+                            onChange={handleAssociateChange}
+                          />
+                          {associateErrors.industry && <div className="invalid-feedback">{associateErrors.industry}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <input 
+                            type="text" 
+                            name="contact_person" 
+                            className={`form-control ${associateErrors.contact_person ? 'is-invalid' : ''}`}
+                            placeholder="Contact Person" 
+                            value={associateFormData.contact_person}
+                            onChange={handleAssociateChange}
+                          />
+                          {associateErrors.contact_person && <div className="invalid-feedback">{associateErrors.contact_person}</div>}
+                        </div>
+                        <div className="col-md-12">
+                          <input 
+                            type="tel" 
+                            name="phone" 
+                            className={`form-control ${associateErrors.phone ? 'is-invalid' : ''}`}
+                            placeholder="Phone Number" 
+                            value={associateFormData.phone}
+                            onChange={handleAssociateChange}
+                          />
+                          {associateErrors.phone && <div className="invalid-feedback">{associateErrors.phone}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <input 
+                            type="text" 
+                            name="address" 
+                            className="form-control"
+                            placeholder="Address (Optional)" 
+                            value={associateFormData.address}
+                            onChange={handleAssociateChange}
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <input 
+                            type="url" 
+                            name="website" 
+                            className="form-control"
+                            placeholder="Website (Optional)" 
+                            value={associateFormData.website}
+                            onChange={handleAssociateChange}
+                          />
+                        </div>
+                        <div className="col-md-12 text-center">
+                          <button type="submit" disabled={associateLoading} className="btn dashboard-btn" style={{ background: accent, color: '#fff', border: 'none', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '12px 32px', transition: 'transform 0.18s, box-shadow 0.18s' }}>
+                            {associateLoading ? 'Adding Associate...' : 'Add Associate'}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
           {/* Associates Table (Associates Tab) */}
           {activeTab === 'associates' && (
@@ -566,6 +626,60 @@ const AdminDashboard = () => {
         }
         .invalid-feedback {
           color: #df1529;
+        }
+        .dashboard-stat-card {
+          transition: transform 0.22s cubic-bezier(.4,2,.6,1), box-shadow 0.22s cubic-bezier(.4,2,.6,1);
+          will-change: transform, box-shadow;
+        }
+        .dashboard-stat-card:hover, .dashboard-stat-card:focus {
+          transform: translateY(-8px) scale(1.045);
+          box-shadow: 0 8px 32px rgba(253,104,14,0.18);
+          z-index: 2;
+        }
+        .animate-fade-in {
+          animation: fadeInUp 0.7s cubic-bezier(.4,2,.6,1);
+        }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(32px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .admin-sidebar-btn {
+          background: none;
+          border: none;
+          color: #fff;
+          text-align: left;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          padding: 14px 32px;
+          font-weight: 600;
+          font-size: 16px;
+          cursor: pointer;
+          position: relative;
+          transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s;
+          outline: none;
+        }
+        .admin-sidebar-btn:hover, .admin-sidebar-btn:focus {
+          background: rgba(253,104,14,0.12);
+          color: #fd680e;
+          box-shadow: 0 2px 16px rgba(253,104,14,0.18);
+          transform: translateX(6px) scale(1.04);
+          z-index: 2;
+        }
+        .orange-border {
+          border: 2.5px solid rgba(253,104,14,0.18);
+          box-shadow: 0 2px 16px rgba(253,104,14,0.08);
+          transition: border-color 0.22s cubic-bezier(.4,2,.6,1), box-shadow 0.22s cubic-bezier(.4,2,.6,1);
+        }
+        .dashboard-stat-card.orange-border:hover, .dashboard-stat-card.orange-border:focus {
+          border-color: #fd680e;
+          box-shadow: 0 8px 32px rgba(253,104,14,0.18), 0 0 0 4px rgba(253,104,14,0.10);
         }
       `}</style>
     </div>
