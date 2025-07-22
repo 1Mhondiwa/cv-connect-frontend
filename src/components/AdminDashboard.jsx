@@ -29,6 +29,7 @@ const AdminDashboard = () => {
   const [associatesLoading, setAssociatesLoading] = useState(false);
   const [associatesError, setAssociatesError] = useState('');
   const [toggleLoading, setToggleLoading] = useState({});
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' or 'associates'
 
   useEffect(() => {
     checkAuth();
@@ -265,18 +266,18 @@ const AdminDashboard = () => {
           <nav style={{ marginTop: 32 }}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li>
-                <Link to="/admin/dashboard" style={{ display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none', padding: '14px 32px', fontWeight: 600, fontSize: 16 }}>
+                <button onClick={() => setActiveTab('dashboard')} style={{ background: 'none', border: 'none', color: '#fff', textAlign: 'left', width: '100%', display: 'flex', alignItems: 'center', padding: '14px 32px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>
                   <i className="bi bi-house-door me-2"></i> Dashboard
-                </Link>
+                </button>
+              </li>
+              <li>
+                <button onClick={() => setActiveTab('associates')} style={{ background: 'none', border: 'none', color: '#fff', textAlign: 'left', width: '100%', display: 'flex', alignItems: 'center', padding: '14px 32px', fontWeight: 600, fontSize: 16, cursor: 'pointer' }}>
+                  <i className="bi bi-building me-2"></i> Associates
+                </button>
               </li>
               <li>
                 <Link to="/admin/users" style={{ display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none', padding: '14px 32px', fontWeight: 600, fontSize: 16 }}>
                   <i className="bi bi-people me-2"></i> Manage Users
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin/associates" style={{ display: 'flex', alignItems: 'center', color: '#fff', textDecoration: 'none', padding: '14px 32px', fontWeight: 600, fontSize: 16 }}>
-                  <i className="bi bi-building me-2"></i> Associates
                 </Link>
               </li>
               <li>
@@ -314,164 +315,168 @@ const AdminDashboard = () => {
         </div>
         {/* Main Dashboard Content */}
         <div style={{ flex: 1, padding: '40px 32px', background: 'transparent', minHeight: 0, overflowY: 'auto' }}>
-          {/* Add Associate Form */}
-          <div className="row">
-            <div className="col-lg-7 mb-4 mb-lg-0">
-              <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                <h4 style={{ color: accent, fontWeight: 700, marginBottom: 24 }}>Add New Associate</h4>
-                {successMessage && (
-                  <div className="sent-message mb-3">{successMessage}</div>
-                )}
-                {errorMessage && (
-                  <div className="error-message mb-3">{errorMessage}</div>
-                )}
-                <form onSubmit={handleAssociateSubmit} className="php-email-form">
-                  <div className="row gy-4">
-                    <div className="col-md-12">
-                      <input 
-                        type="email" 
-                        name="email" 
-                        className={`form-control ${associateErrors.email ? 'is-invalid' : ''}`}
-                        placeholder="Associate Email" 
-                        value={associateFormData.email}
-                        onChange={handleAssociateChange}
-                      />
-                      {associateErrors.email && <div className="invalid-feedback">{associateErrors.email}</div>}
+          {/* Add Associate Form (Dashboard Tab) */}
+          {activeTab === 'dashboard' && (
+            <div className="row">
+              <div className="col-lg-7 mb-4 mb-lg-0">
+                <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                  <h4 style={{ color: accent, fontWeight: 700, marginBottom: 24 }}>Add New Associate</h4>
+                  {successMessage && (
+                    <div className="sent-message mb-3">{successMessage}</div>
+                  )}
+                  {errorMessage && (
+                    <div className="error-message mb-3">{errorMessage}</div>
+                  )}
+                  <form onSubmit={handleAssociateSubmit} className="php-email-form">
+                    <div className="row gy-4">
+                      <div className="col-md-12">
+                        <input 
+                          type="email" 
+                          name="email" 
+                          className={`form-control ${associateErrors.email ? 'is-invalid' : ''}`}
+                          placeholder="Associate Email" 
+                          value={associateFormData.email}
+                          onChange={handleAssociateChange}
+                        />
+                        {associateErrors.email && <div className="invalid-feedback">{associateErrors.email}</div>}
+                      </div>
+                      <div className="col-md-6">
+                        <input 
+                          type="password" 
+                          name="password" 
+                          className={`form-control ${associateErrors.password ? 'is-invalid' : ''}`}
+                          placeholder="Password" 
+                          value={associateFormData.password}
+                          onChange={handleAssociateChange}
+                        />
+                        {associateErrors.password && <div className="invalid-feedback">{associateErrors.password}</div>}
+                      </div>
+                      <div className="col-md-6">
+                        <input 
+                          type="password" 
+                          name="confirm_password" 
+                          className={`form-control ${associateErrors.confirm_password ? 'is-invalid' : ''}`}
+                          placeholder="Confirm Password" 
+                          value={associateFormData.confirm_password}
+                          onChange={handleAssociateChange}
+                        />
+                        {associateErrors.confirm_password && <div className="invalid-feedback">{associateErrors.confirm_password}</div>}
+                      </div>
+                      <div className="col-md-6">
+                        <input 
+                          type="text" 
+                          name="industry" 
+                          className={`form-control ${associateErrors.industry ? 'is-invalid' : ''}`}
+                          placeholder="Industry" 
+                          value={associateFormData.industry}
+                          onChange={handleAssociateChange}
+                        />
+                        {associateErrors.industry && <div className="invalid-feedback">{associateErrors.industry}</div>}
+                      </div>
+                      <div className="col-md-6">
+                        <input 
+                          type="text" 
+                          name="contact_person" 
+                          className={`form-control ${associateErrors.contact_person ? 'is-invalid' : ''}`}
+                          placeholder="Contact Person" 
+                          value={associateFormData.contact_person}
+                          onChange={handleAssociateChange}
+                        />
+                        {associateErrors.contact_person && <div className="invalid-feedback">{associateErrors.contact_person}</div>}
+                      </div>
+                      <div className="col-md-12">
+                        <input 
+                          type="tel" 
+                          name="phone" 
+                          className={`form-control ${associateErrors.phone ? 'is-invalid' : ''}`}
+                          placeholder="Phone Number" 
+                          value={associateFormData.phone}
+                          onChange={handleAssociateChange}
+                        />
+                        {associateErrors.phone && <div className="invalid-feedback">{associateErrors.phone}</div>}
+                      </div>
+                      <div className="col-md-6">
+                        <input 
+                          type="text" 
+                          name="address" 
+                          className="form-control"
+                          placeholder="Address (Optional)" 
+                          value={associateFormData.address}
+                          onChange={handleAssociateChange}
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <input 
+                          type="url" 
+                          name="website" 
+                          className="form-control"
+                          placeholder="Website (Optional)" 
+                          value={associateFormData.website}
+                          onChange={handleAssociateChange}
+                        />
+                      </div>
+                      <div className="col-md-12 text-center">
+                        <button type="submit" disabled={associateLoading} className="btn dashboard-btn" style={{ background: accent, color: '#fff', border: 'none', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '12px 32px', transition: 'transform 0.18s, box-shadow 0.18s' }}>
+                          {associateLoading ? 'Adding Associate...' : 'Add Associate'}
+                        </button>
+                      </div>
                     </div>
-                    <div className="col-md-6">
-                      <input 
-                        type="password" 
-                        name="password" 
-                        className={`form-control ${associateErrors.password ? 'is-invalid' : ''}`}
-                        placeholder="Password" 
-                        value={associateFormData.password}
-                        onChange={handleAssociateChange}
-                      />
-                      {associateErrors.password && <div className="invalid-feedback">{associateErrors.password}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <input 
-                        type="password" 
-                        name="confirm_password" 
-                        className={`form-control ${associateErrors.confirm_password ? 'is-invalid' : ''}`}
-                        placeholder="Confirm Password" 
-                        value={associateFormData.confirm_password}
-                        onChange={handleAssociateChange}
-                      />
-                      {associateErrors.confirm_password && <div className="invalid-feedback">{associateErrors.confirm_password}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <input 
-                        type="text" 
-                        name="industry" 
-                        className={`form-control ${associateErrors.industry ? 'is-invalid' : ''}`}
-                        placeholder="Industry" 
-                        value={associateFormData.industry}
-                        onChange={handleAssociateChange}
-                      />
-                      {associateErrors.industry && <div className="invalid-feedback">{associateErrors.industry}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <input 
-                        type="text" 
-                        name="contact_person" 
-                        className={`form-control ${associateErrors.contact_person ? 'is-invalid' : ''}`}
-                        placeholder="Contact Person" 
-                        value={associateFormData.contact_person}
-                        onChange={handleAssociateChange}
-                      />
-                      {associateErrors.contact_person && <div className="invalid-feedback">{associateErrors.contact_person}</div>}
-                    </div>
-                    <div className="col-md-12">
-                      <input 
-                        type="tel" 
-                        name="phone" 
-                        className={`form-control ${associateErrors.phone ? 'is-invalid' : ''}`}
-                        placeholder="Phone Number" 
-                        value={associateFormData.phone}
-                        onChange={handleAssociateChange}
-                      />
-                      {associateErrors.phone && <div className="invalid-feedback">{associateErrors.phone}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <input 
-                        type="text" 
-                        name="address" 
-                        className="form-control"
-                        placeholder="Address (Optional)" 
-                        value={associateFormData.address}
-                        onChange={handleAssociateChange}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <input 
-                        type="url" 
-                        name="website" 
-                        className="form-control"
-                        placeholder="Website (Optional)" 
-                        value={associateFormData.website}
-                        onChange={handleAssociateChange}
-                      />
-                    </div>
-                    <div className="col-md-12 text-center">
-                      <button type="submit" disabled={associateLoading} className="btn dashboard-btn" style={{ background: accent, color: '#fff', border: 'none', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '12px 32px', transition: 'transform 0.18s, box-shadow 0.18s' }}>
-                        {associateLoading ? 'Adding Associate...' : 'Add Associate'}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-              {/* Associates Table */}
-              <div className="bg-white rounded-4 shadow-sm p-4 mt-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>All Associates</h5>
-                {associatesLoading ? (
-                  <div>Loading associates...</div>
-                ) : associatesError ? (
-                  <div style={{ color: '#df1529', fontWeight: 500 }}>{associatesError}</div>
-                ) : (
-                  <div style={{ overflowX: 'auto' }}>
-                    <table className="table table-bordered" style={{ minWidth: 700 }}>
-                      <thead style={{ background: '#f8f9fa' }}>
-                        <tr>
-                          <th>Email</th>
-                          <th>Contact Person</th>
-                          <th>Industry</th>
-                          <th>Phone</th>
-                          <th>Status</th>
-                          <th>Created</th>
-                          <th>Last Login</th>
-                          <th>Active</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {associates.map(a => (
-                          <tr key={a.associate_id}>
-                            <td>{a.email}</td>
-                            <td>{a.contact_person}</td>
-                            <td>{a.industry}</td>
-                            <td>{a.phone}</td>
-                            <td>{a.verified ? 'Verified' : 'Unverified'}</td>
-                            <td>{a.created_at ? new Date(a.created_at).toLocaleDateString() : ''}</td>
-                            <td>{a.last_login ? new Date(a.last_login).toLocaleDateString() : ''}</td>
-                            <td>
-                              <button
-                                className="btn btn-sm dashboard-btn"
-                                style={{ background: a.is_active ? '#059652' : '#df1529', color: '#fff', borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px', minWidth: 90, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                                onClick={() => handleToggleActive(a.user_id)}
-                                disabled={toggleLoading[a.user_id]}
-                              >
-                                {toggleLoading[a.user_id] ? '...' : a.is_active ? 'Deactivate' : 'Activate'}
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+          {/* Associates Table (Associates Tab) */}
+          {activeTab === 'associates' && (
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>All Associates</h5>
+              {associatesLoading ? (
+                <div>Loading associates...</div>
+              ) : associatesError ? (
+                <div style={{ color: '#df1529', fontWeight: 500 }}>{associatesError}</div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="table table-bordered" style={{ minWidth: 700 }}>
+                    <thead style={{ background: '#f8f9fa' }}>
+                      <tr>
+                        <th>Email</th>
+                        <th>Contact Person</th>
+                        <th>Industry</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Last Login</th>
+                        <th>Active</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {associates.map(a => (
+                        <tr key={a.associate_id}>
+                          <td>{a.email}</td>
+                          <td>{a.contact_person}</td>
+                          <td>{a.industry}</td>
+                          <td>{a.phone}</td>
+                          <td>{a.verified ? 'Verified' : 'Unverified'}</td>
+                          <td>{a.created_at ? new Date(a.created_at).toLocaleDateString() : ''}</td>
+                          <td>{a.last_login ? new Date(a.last_login).toLocaleDateString() : ''}</td>
+                          <td>
+                            <button
+                              className="btn btn-sm dashboard-btn"
+                              style={{ background: a.is_active ? '#059652' : '#df1529', color: '#fff', borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px', minWidth: 90, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                              onClick={() => handleToggleActive(a.user_id)}
+                              disabled={toggleLoading[a.user_id]}
+                            >
+                              {toggleLoading[a.user_id] ? '...' : a.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
           {/* Optionally, add more admin widgets or info here */}
         </div>
       </div>
