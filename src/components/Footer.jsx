@@ -15,7 +15,6 @@ const Footer = () => (
         <a href="#" title="Email"><i className="bi bi-envelope"></i></a>
       </div>
       <div className="copyright">
-        Designed with <span style={{color: '#fd680e'}}>Siimple</span> template.
       </div>
     </div>
   </footer>

@@ -50,6 +50,7 @@ const AssociateDashboard = () => {
 
   const [activities, setActivities] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
+  const [toast, setToast] = useState({ message: '', type: '' });
 
   // REMOVE: const socket = io('http://localhost:5000'); // Adjust if backend URL is different
 
@@ -85,6 +86,28 @@ const AssociateDashboard = () => {
   }, []);
 
   // REMOVE: useEffect for socket.io real-time status updates
+
+  useEffect(() => {
+    // Show toast for upload success
+    if (assocUploadSuccess) {
+      setToast({ message: assocUploadSuccess, type: 'success' });
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
+    }
+  }, [assocUploadSuccess]);
+  // Show toast for delete
+  useEffect(() => {
+    if (assocDeleteMsg) {
+      setToast({ message: assocDeleteMsg, type: 'info' });
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
+    }
+  }, [assocDeleteMsg]);
+  // Show toast for upload error
+  useEffect(() => {
+    if (assocUploadError) {
+      setToast({ message: assocUploadError, type: 'danger' });
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
+    }
+  }, [assocUploadError]);
 
   const checkAuth = () => {
     const token = localStorage.getItem('token');
@@ -400,167 +423,125 @@ const AssociateDashboard = () => {
           </button>
         </div>
       </nav>
-      {/* Section Title */}
-      <div className="container section-title" data-aos="fade-up">
-        <h2>Associate Dashboard</h2>
-        <p>
-          Search for top freelancers, review profiles, and connect with talent that matches your needs.
-        </p>
-      </div>
-
-      {/* User Type Display */}
-      <div className="container mb-4" data-aos="fade-up" data-aos-delay="50">
-        <div className="row justify-content-center">
-          <div className="col-lg-6">
-            <div className="card text-center">
-              <div className="card-body">
-                <i className="bi bi-building fs-1 text-primary mb-3"></i>
-                <h4 className="card-title">Account Type</h4>
-                <p className="card-text">
-                  <span className="badge bg-success fs-6">Associate</span>
-                </p>
-                <p className="text-muted small">Industry: {user?.industry || 'Not specified'}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Global Unread Badge */}
-      <div className="container" style={{marginTop: '-20px'}}>
-        {globalUnread > 0 && (
-          <div className="text-end">
-            <span className="badge bg-danger fs-6">
-              <i className="bi bi-envelope-fill me-1"></i> {globalUnread} new message{globalUnread > 1 ? 's' : ''}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Profile Image Upload/Delete Section */}
-      <div className="container mb-4" data-aos="fade-up" data-aos-delay="50">
-        <div className="row justify-content-center">
-          <div className="col-lg-6 text-center">
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <img
-                src={getAssociateAvatarUrl()}
-                alt="Profile"
-                className="rounded-circle shadow"
-                style={{
-                  width: 120,
-                  height: 120,
-                  objectFit: 'cover',
-                  border: '4px solid #fff',
-                  background: '#eee',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-                }}
-                onError={e => {
-                  e.target.onerror = null;
-                  e.target.src =
-                    "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=120&bold=true";
-                }}
-              />
-              <button
-                type="button"
-                className="btn btn-primary rounded-circle"
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  width: 40,
-                  height: 40,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 24,
-                  border: '3px solid #fff',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  padding: 0
-                }}
-                onClick={() => assocFileInputRef.current && assocFileInputRef.current.click()}
-                title="Upload/Change Profile Picture"
-                disabled={assocUploading}
-              >
-                <i className="bi bi-plus"></i>
-              </button>
-              {associateProfile?.profile_picture_url && (
+      {/* Main Layout */}
+      <div className="container-fluid py-4">
+        <div className="row">
+          {/* Left Panel */}
+          <div className="col-lg-3 mb-4 mb-lg-0">
+            <div className="bg-white rounded-4 shadow-lg p-4 h-100 d-flex flex-column align-items-center" style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.07)', position: 'relative' }}>
+              {/* Toast popup notification */}
+              {toast.message && (
+                <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, minWidth: 180 }}>
+                  <div className={`toast show align-items-center text-white bg-${toast.type === 'success' ? 'success' : toast.type === 'info' ? 'primary' : 'danger'} border-0`} role="alert" aria-live="assertive" aria-atomic="true" style={{ borderRadius: 16, boxShadow: '0 2px 16px rgba(253,104,14,0.18)', fontWeight: 600, fontSize: 15, padding: '12px 24px' }}>
+                    <div className="d-flex align-items-center">
+                      <i className={`bi me-2 ${toast.type === 'success' ? 'bi-check-circle' : toast.type === 'info' ? 'bi-info-circle' : 'bi-exclamation-triangle'}`}></i>
+                      <div>{toast.message}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {/* Profile image and overlay buttons */}
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <img
+                  src={getAssociateAvatarUrl()}
+                  alt="Profile"
+                  className="rounded-circle mb-3"
+                  style={{ width: 90, height: 90, objectFit: 'cover', border: '3px solid #fff', boxShadow: '0 4px 16px rgba(253,104,14,0.15)' }}
+                  onError={e => {
+                    e.target.onerror = null;
+                    e.target.src = "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=90&bold=true";
+                  }}
+                />
+                {/* Delete button overlays top-right of image */}
+                {associateProfile?.profile_picture_url && (
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-sm"
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      borderRadius: "50%",
+                      padding: "6px 8px",
+                      fontSize: 18,
+                      zIndex: 2
+                    }}
+                    title="Delete Profile Picture"
+                    onClick={handleDeleteAssociateProfileImage}
+                  >
+                    <i className="bi bi-trash"></i>
+                  </button>
+                )}
+                {/* Upload button overlays bottom-right of image */}
                 <button
                   type="button"
-                  className="btn btn-danger btn-sm"
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    borderRadius: "50%",
-                    padding: "6px 8px",
-                    fontSize: 18,
-                    zIndex: 2
-                  }}
-                  title="Delete Profile Picture"
-                  onClick={handleDeleteAssociateProfileImage}
+                  className="btn rounded-circle profile-upload-btn position-absolute"
+                  style={{ bottom: 0, right: 0, width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', padding: 0, background: accent, color: '#fff', transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => assocFileInputRef.current && assocFileInputRef.current.click()}
+                  title="Upload/Change Profile Picture"
+                  disabled={assocUploading}
                 >
-                  <i className="bi bi-trash"></i>
+                  <i className="bi bi-plus"></i>
                 </button>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                ref={assocFileInputRef}
-                style={{ display: 'none' }}
-                onChange={handleAssociateProfileImageChange}
-                disabled={assocUploading}
-              />
-            </div>
-            {assocUploadSuccess && <div className="sent-message mt-2">{assocUploadSuccess}</div>}
-            {assocUploadError && <div className="error-message mt-2">{assocUploadError}</div>}
-            {assocDeleteMsg && <div className="mt-2 alert alert-info text-center">{assocDeleteMsg}</div>}
-            {assocUploading && (
-              <div className="mt-2">
-                <span className="spinner-border spinner-border-sm text-primary" role="status" />
-                <span className="ms-2">Uploading...</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={assocFileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleAssociateProfileImageChange}
+                  disabled={assocUploading}
+                />
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="container" data-aos="fade-up" data-aos-delay="100">
-        <div className="row mb-4">
-          <div className="col-12">
-            <ul className="nav nav-tabs" id="dashboardTabs" role="tablist">
-              <li className="nav-item" role="presentation">
-                <button 
-                  className={`nav-link ${activeTab === 'search' ? 'active' : ''}`}
+              <h5 className="mt-3 mb-1" style={{ color: '#444', fontWeight: 700 }}>{associateProfile?.contact_person || user?.email}</h5>
+              <span className="badge bg-success mb-2">Associate</span>
+              <div className="d-grid gap-3 w-100 mt-4">
+                <button
+                  className={`btn dashboard-btn w-100 ${activeTab === 'search' ? '' : 'btn-outline-primary'}`}
+                  style={{ background: activeTab === 'search' ? accent : 'transparent', color: activeTab === 'search' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('search')}
                 >
                   <i className="bi bi-search me-2"></i>Search Freelancers
                 </button>
-              </li>
-              <li className="nav-item" role="presentation">
-                <button 
-                  className={`nav-link ${activeTab === 'messages' ? 'active' : ''}`}
+                <button
+                  className={`btn dashboard-btn w-100 ${activeTab === 'messages' ? '' : 'btn-outline-primary'} position-relative`}
+                  style={{ background: activeTab === 'messages' ? accent : 'transparent', color: activeTab === 'messages' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('messages')}
                 >
                   <i className="bi bi-chat-dots me-2"></i>Messages
-                  {conversations.filter(c => c.unread_count > 0).length > 0 && (
-                    <span className="badge bg-danger ms-2">
-                      {conversations.filter(c => c.unread_count > 0).length}
+                  {globalUnread > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill" style={{ background: '#df1529' }}>
+                      {globalUnread}
                     </span>
                   )}
                 </button>
-              </li>
-            </ul>
+              </div>
+              {assocUploading && (
+                <div className="mt-2">
+                  <span className="spinner-border spinner-border-sm text-primary" role="status" />
+                  <span className="ms-2">Uploading...</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-
-        {/* Search Tab */}
-        {activeTab === 'search' && (
-          <div className="tab-content">
-            {/* Skill Search */}
-            <div className="row mb-4">
-              <div className="col-12">
-                <div className="card p-4 shadow-sm">
+          {/* Main Content Area */}
+          <div className="col-lg-9">
+            <div className="section-title mb-4">
+              <h2 style={{ color: accent, fontWeight: 700 }}>Associate Dashboard</h2>
+              <p style={{ color: '#888' }}>Search for top freelancers, review profiles, and connect with talent that matches your needs.</p>
+            </div>
+            {/* Global Unread Badge */}
+            {globalUnread > 0 && (
+              <div className="text-end mb-3">
+                <span className="badge fs-6" style={{ background: '#df1529' }}>
+                  <i className="bi bi-envelope-fill me-1"></i> {globalUnread} new message{globalUnread > 1 ? 's' : ''}
+                </span>
+              </div>
+            )}
+            {/* Tab Content */}
+            {activeTab === 'search' && (
+              <div className="tab-content">
+                {/* Skill Search */}
+                <div className="card p-4 shadow-lg mb-4 rounded-4">
                   <form className="row g-3 align-items-end" onSubmit={handleSearch}>
                     <div className="col-md-4">
                       <label className="form-label">Skill</label>
@@ -603,7 +584,7 @@ const AssociateDashboard = () => {
                       />
                     </div>
                     <div className="col-md-2 d-grid">
-                      <button type="submit" className="btn btn-primary" disabled={searchLoading}>
+                      <button type="submit" className="btn dashboard-btn" style={{ background: accent, color: '#fff', border: 'none', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '12px 24px', transition: 'transform 0.18s, box-shadow 0.18s' }} disabled={searchLoading}>
                         {searchLoading ? (
                           <span>
                             <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -617,15 +598,10 @@ const AssociateDashboard = () => {
                   </form>
                   {searchError && <div className="alert alert-danger mt-3 text-center">{searchError}</div>}
                 </div>
-              </div>
-            </div>
-
-            {/* Search Results */}
-            <div className="row">
-              <div className="col-12">
+                {/* Search Results */}
                 {searchLoading ? (
                   <div className="text-center py-5">
-                    <div className="spinner-border text-primary" role="status">
+                    <div className="spinner-border" style={{ color: accent }} role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
                     <div className="mt-3">Searching freelancers...</div>
@@ -634,9 +610,9 @@ const AssociateDashboard = () => {
                   <div className="row gy-4">
                     {searchResults.map((freelancer, idx) => (
                       <div className="col-lg-4 col-md-6" key={freelancer.freelancer_id || idx}>
-                        <div className="card h-100 shadow-sm">
+                        <div className="card h-100 shadow-lg rounded-4">
                           <div className="card-body">
-                            <h5 className="card-title mb-2">
+                            <h5 className="card-title mb-2" style={{ color: accent, fontWeight: 700 }}>
                               {freelancer.first_name} {freelancer.last_name}
                             </h5>
                             <p className="mb-1"><strong>Job Title:</strong> {freelancer.headline || <span className="text-muted">N/A</span>}</p>
@@ -658,7 +634,8 @@ const AssociateDashboard = () => {
                             </div>
                             <button 
                               onClick={() => handleSendMessage(freelancer.freelancer_id)}
-                              className="btn-get-started mt-2"
+                              className="btn dashboard-btn mt-2"
+                              style={{ background: accent, color: '#fff', border: 'none', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '10px 24px', transition: 'transform 0.18s, box-shadow 0.18s' }}
                             >
                               <i className="bi bi-chat me-2"></i>Message
                             </button>
@@ -674,144 +651,175 @@ const AssociateDashboard = () => {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Messages Tab */}
-        {activeTab === 'messages' && (
-          <div className="container" data-aos="fade-up" data-aos-delay="100">
-            <div className="row">
-              {/* Conversations List */}
-              <div className="col-lg-4">
-                <div className="card">
-                  <div className="card-header">
-                    <h5>Conversations</h5>
-                  </div>
-                  <div className="card-body p-0">
-                    {conversations.length === 0 ? (
-                      <div className="p-3 text-center text-muted">
-                        No conversations yet
+            )}
+            {activeTab === 'messages' && (
+              <div className="container-fluid px-0">
+                <div className="row">
+                  {/* Conversations List */}
+                  <div className="col-lg-4">
+                    <div className="card border-0 shadow-lg rounded-4">
+                      <div className="card-header" style={{ background: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                        <h5 className="mb-0" style={{ color: '#444', fontWeight: 700 }}>Conversations</h5>
                       </div>
-                    ) : (
-                      <div className="list-group list-group-flush">
-                        {conversations.map(conversation => (
-                          <button
-                            key={conversation.conversation_id}
-                            className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${
-                              selectedConversation === conversation.conversation_id ? 'active' : ''
-                            }`}
-                            onClick={() => loadConversation(conversation.conversation_id)}
-                          >
-                            <div className="ms-2 me-auto">
-                              <div className="fw-bold">
-                                {conversation.freelancer_name}
-                                {conversation.unread_count > 0 && (
-                                  <span className="badge bg-danger ms-2">{conversation.unread_count}</span>
-                                )}
-                              </div>
-                              <small className="text-muted">
-                                {conversation.last_message ? 
-                                  conversation.last_message.substring(0, 50) + '...' : 
-                                  'No messages yet'
-                                }
-                              </small>
-                            </div>
-                            <small className="text-muted">
-                              {conversation.last_message_time ? 
-                                new Date(conversation.last_message_time).toLocaleDateString() : 
-                                ''
-                              }
-                            </small>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Messages */}
-              <div className="col-lg-8">
-                <div className="card">
-                  <div className="card-header">
-                    <h5>
-                      {selectedConversation ? 
-                        conversations.find(c => c.conversation_id === selectedConversation)?.freelancer_name || 'Messages' : 
-                        'Select a conversation'
-                      }
-                    </h5>
-                  </div>
-                  <div className="card-body">
-                    {selectedConversation ? (
-                      <>
-                        {/* Messages List */}
-                        <div className="messages-container" style={{ height: '400px', overflowY: 'auto' }}>
-                          {messages.map(message => (
-                            <div key={message.message_id} className={`mb-3 ${message.sender_id === user.user_id ? 'text-end' : 'text-start'}`}>
-                              <div className={`d-inline-block p-3 rounded ${message.sender_id === user.user_id ? 'bg-primary text-white' : 'bg-light'}`}>
-                                <div className="d-flex align-items-center">
-                                  <div className="flex-grow-1">{message.content}</div>
-                                  {message.sender_id === user.user_id && (
-                                    <button
-                                      type="button"
-                                      className="btn btn-sm btn-link text-danger ms-2 p-0"
-                                      title="Delete message"
-                                      onClick={() => handleDeleteMessage(message.message_id)}
-                                      style={{fontSize: '1.1rem'}}
-                                    >
-                                      <i className="bi bi-trash"></i>
-                                    </button>
-                                  )}
-                                </div>
-                                <small className={message.sender_id === user.user_id ? 'text-white-50' : 'text-muted'}>
-                                  {new Date(message.sent_at).toLocaleString()}
-                                </small>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Send Message Form */}
-                        <form onSubmit={sendMessage} className="mt-3">
-                          <div className="input-group">
-                            <input
-                              type="text"
-                              className="form-control"
-                              placeholder="Type your message..."
-                              value={newMessage}
-                              onChange={(e) => setNewMessage(e.target.value)}
-                              disabled={messagingLoading}
-                            />
-                            <button type="submit" className="btn-get-started" disabled={messagingLoading || !newMessage.trim()}>
-                              {messagingLoading ? 'Sending...' : 'Send'}
-                            </button>
+                      <div className="card-body p-0">
+                        {conversations.length === 0 ? (
+                          <div className="p-3 text-center" style={{ color: '#888' }}>
+                            No conversations yet
                           </div>
-                        </form>
-                      </>
-                    ) : (
-                      <div className="text-center text-muted">
-                        <i className="bi bi-chat-dots fs-1"></i>
-                        <p>Select a conversation to start messaging</p>
+                        ) : (
+                          <div className="list-group list-group-flush">
+                            {conversations.map(conversation => (
+                              <button
+                                key={conversation.conversation_id}
+                                className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${
+                                  selectedConversation === conversation.conversation_id ? 'active' : ''
+                                }`}
+                                onClick={() => loadConversation(conversation.conversation_id)}
+                                style={{
+                                  border: 'none',
+                                  background: selectedConversation === conversation.conversation_id ? accent : 'transparent',
+                                  color: selectedConversation === conversation.conversation_id ? '#fff' : '#444',
+                                  transition: 'all 0.18s ease'
+                                }}
+                              >
+                                <div className="ms-2 me-auto">
+                                  <div className="fw-bold">
+                                    {conversation.freelancer_name}
+                                    {conversation.unread_count > 0 && (
+                                      <span className="badge ms-2" style={{ background: '#df1529' }}>{conversation.unread_count}</span>
+                                    )}
+                                  </div>
+                                  <small style={{ color: selectedConversation === conversation.conversation_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
+                                    {conversation.last_message ? 
+                                      conversation.last_message.substring(0, 50) + '...' : 
+                                      'No messages yet'
+                                    }
+                                  </small>
+                                </div>
+                                <small style={{ color: selectedConversation === conversation.conversation_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
+                                  {conversation.last_message_time ? 
+                                    new Date(conversation.last_message_time).toLocaleDateString() : 
+                                    ''
+                                  }
+                                </small>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+                  </div>
+                  {/* Messages */}
+                  <div className="col-lg-8">
+                    <div className="card border-0 shadow-lg rounded-4">
+                      <div className="card-header" style={{ background: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                        <h5 className="mb-0" style={{ color: '#444', fontWeight: 700 }}>
+                          {selectedConversation ? 
+                            conversations.find(c => c.conversation_id === selectedConversation)?.freelancer_name || 'Messages' : 
+                            'Select a conversation'
+                          }
+                        </h5>
+                      </div>
+                      <div className="card-body">
+                        {selectedConversation ? (
+                          <>
+                            {/* Messages List */}
+                            <div className="messages-container" style={{ height: '400px', overflowY: 'auto' }}>
+                              {messages.map(message => (
+                                <div key={message.message_id} className={`mb-3 ${message.sender_id === user.user_id ? 'text-end' : 'text-start'}`}>
+                                  <div className={`d-inline-block p-3 rounded ${message.sender_id === user.user_id ? 'text-white' : 'bg-light'}`}
+                                       style={{ 
+                                         background: message.sender_id === user.user_id ? accent : '#f8f9fa',
+                                         maxWidth: '70%'
+                                       }}>
+                                    <div className="d-flex align-items-center">
+                                      <div className="flex-grow-1">{message.content}</div>
+                                      {message.sender_id === user.user_id && (
+                                        <button
+                                          type="button"
+                                          className="btn btn-sm btn-link ms-2 p-0 message-delete-btn"
+                                          title="Delete message"
+                                          onClick={() => handleDeleteMessage(message.message_id)}
+                                          style={{fontSize: '1.1rem', color: 'rgba(255,255,255,0.8)', transition: 'all 0.18s ease'}}
+                                        >
+                                          <i className="bi bi-trash"></i>
+                                        </button>
+                                      )}
+                                    </div>
+                                    <small style={{ color: message.sender_id === user.user_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
+                                      {new Date(message.sent_at).toLocaleString()}
+                                    </small>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            {/* Send Message Form */}
+                            <form onSubmit={sendMessage} className="mt-3">
+                              <div className="input-group">
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Type your message..."
+                                  value={newMessage}
+                                  onChange={(e) => setNewMessage(e.target.value)}
+                                  disabled={messagingLoading}
+                                  style={{ borderRadius: '20px 0 0 20px', border: '1.5px solid #eee' }}
+                                />
+                                <button type="submit" className="btn dashboard-btn" disabled={messagingLoading || !newMessage.trim()} style={{ background: accent, color: '#fff', border: 'none', borderRadius: '0 20px 20px 0', fontWeight: 600, transition: 'transform 0.18s, box-shadow 0.18s' }}>
+                                  {messagingLoading ? 'Sending...' : 'Send'}
+                                </button>
+                              </div>
+                            </form>
+                          </>
+                        ) : (
+                          <div className="text-center py-5" style={{ color: '#888' }}>
+                            <i className="bi bi-chat-dots fs-1" style={{ color: accent }}></i>
+                            <p>Select a conversation to start messaging</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+            )}
+            {/* Recent Activity */}
+            <div className="mt-5">
+              <h5 className="mb-3" style={{ color: '#444', fontWeight: 700 }}>Recent Activity</h5>
+              {activityLoading ? (
+                <div className="text-center py-4">
+                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                </div>
+              ) : (
+                <div className="bg-light rounded-3 p-3" style={{ maxHeight: '300px', overflowY: 'auto', background: '#f8f9fa' }}>
+                  <ActivityTable activities={activities} />
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
-
-      {/* Recent Activity */}
-      <div className="container mt-5" data-aos="fade-up" data-aos-delay="100">
-        <h2>Recent Activity</h2>
-        {activityLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <ActivityTable activities={activities} />
-        )}
-      </div>
+      {/* Animation Styles */}
+      <style>{`
+        .dashboard-btn:hover, .dashboard-btn:focus {
+          transform: scale(1.07);
+          box-shadow: 0 4px 24px rgba(253,104,14,0.18);
+          z-index: 2;
+        }
+        .profile-upload-btn:hover, .profile-upload-btn:focus {
+          transform: scale(1.15);
+          box-shadow: 0 4px 16px rgba(253,104,14,0.25);
+          z-index: 2;
+        }
+        .message-delete-btn:hover, .message-delete-btn:focus {
+          transform: scale(1.2);
+          color: #fff !important;
+        }
+        .list-group-item:hover {
+          transform: translateX(4px);
+          box-shadow: 0 2px 8px rgba(253,104,14,0.1);
+        }
+      `}</style>
     </div>
   );
 };
