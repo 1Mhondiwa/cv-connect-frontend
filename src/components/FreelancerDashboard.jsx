@@ -459,11 +459,11 @@ const FreelancerDashboard = () => {
                         <i className="bi bi-upload me-2"></i>Upload CV
                       </Link>
                     </div>
-                    <div className="col-md-6">
+                    {/* <div className="col-md-6">
                       <Link to="/search/projects" className="btn w-100 dashboard-btn" style={{ background: 'transparent', color: '#666', border: '2px solid #ddd', borderRadius: 30, padding: '12px 24px', fontWeight: 600, transition: 'transform 0.18s, box-shadow 0.18s' }}>
                         <i className="bi bi-search me-2"></i>Find Projects
                       </Link>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Recent Activity */}
