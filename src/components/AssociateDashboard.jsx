@@ -436,42 +436,42 @@ const AssociateDashboard = () => {
                     <div className="d-flex align-items-center">
                       <i className={`bi me-2 ${toast.type === 'success' ? 'bi-check-circle' : toast.type === 'info' ? 'bi-info-circle' : 'bi-exclamation-triangle'}`}></i>
                       <div>{toast.message}</div>
-                    </div>
-                  </div>
-                </div>
-              )}
+          </div>
+        </div>
+          </div>
+        )}
               {/* Profile image and overlay buttons */}
-              <div style={{ position: 'relative', display: 'inline-block' }}>
-                <img
-                  src={getAssociateAvatarUrl()}
-                  alt="Profile"
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <img
+                src={getAssociateAvatarUrl()}
+                alt="Profile"
                   className="rounded-circle mb-3"
                   style={{ width: 90, height: 90, objectFit: 'cover', border: '3px solid #fff', boxShadow: '0 4px 16px rgba(253,104,14,0.15)' }}
-                  onError={e => {
-                    e.target.onerror = null;
+                onError={e => {
+                  e.target.onerror = null;
                     e.target.src = "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=90&bold=true";
                   }}
                 />
                 {/* Delete button overlays top-right of image */}
-                {associateProfile?.profile_picture_url && (
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      right: 0,
-                      borderRadius: "50%",
-                      padding: "6px 8px",
-                      fontSize: 18,
-                      zIndex: 2
-                    }}
-                    title="Delete Profile Picture"
-                    onClick={handleDeleteAssociateProfileImage}
-                  >
-                    <i className="bi bi-trash"></i>
-                  </button>
-                )}
+              {associateProfile?.profile_picture_url && (
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    borderRadius: "50%",
+                    padding: "6px 8px",
+                    fontSize: 18,
+                    zIndex: 2
+                  }}
+                  title="Delete Profile Picture"
+                  onClick={handleDeleteAssociateProfileImage}
+                >
+                  <i className="bi bi-trash"></i>
+                </button>
+              )}
                 {/* Upload button overlays bottom-right of image */}
                 <button
                   type="button"
@@ -483,26 +483,26 @@ const AssociateDashboard = () => {
                 >
                   <i className="bi bi-plus"></i>
                 </button>
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={assocFileInputRef}
-                  style={{ display: 'none' }}
-                  onChange={handleAssociateProfileImageChange}
-                  disabled={assocUploading}
-                />
-              </div>
+              <input
+                type="file"
+                accept="image/*"
+                ref={assocFileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleAssociateProfileImageChange}
+                disabled={assocUploading}
+              />
+            </div>
               <h5 className="mt-3 mb-1" style={{ color: '#444', fontWeight: 700 }}>{associateProfile?.contact_person || user?.email}</h5>
               <span className="badge bg-success mb-2">Associate</span>
               <div className="d-grid gap-3 w-100 mt-4">
-                <button
+                <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'search' ? '' : 'btn-outline-primary'}`}
                   style={{ background: activeTab === 'search' ? accent : 'transparent', color: activeTab === 'search' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('search')}
                 >
                   <i className="bi bi-search me-2"></i>Search Freelancers
                 </button>
-                <button
+                <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'messages' ? '' : 'btn-outline-primary'} position-relative`}
                   style={{ background: activeTab === 'messages' ? accent : 'transparent', color: activeTab === 'messages' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('messages')}
@@ -535,12 +535,12 @@ const AssociateDashboard = () => {
                 <span className="badge fs-6" style={{ background: '#df1529' }}>
                   <i className="bi bi-envelope-fill me-1"></i> {globalUnread} new message{globalUnread > 1 ? 's' : ''}
                 </span>
-              </div>
+        </div>
             )}
             {/* Tab Content */}
-            {activeTab === 'search' && (
-              <div className="tab-content">
-                {/* Skill Search */}
+        {activeTab === 'search' && (
+          <div className="tab-content">
+            {/* Skill Search */}
                 <div className="card p-4 shadow-lg mb-4 rounded-4">
                   <form className="row g-3 align-items-end" onSubmit={handleSearch}>
                     <div className="col-md-4">
@@ -598,7 +598,7 @@ const AssociateDashboard = () => {
                   </form>
                   {searchError && <div className="alert alert-danger mt-3 text-center">{searchError}</div>}
                 </div>
-                {/* Search Results */}
+            {/* Search Results */}
                 {searchLoading ? (
                   <div className="text-center py-5">
                     <div className="spinner-border" style={{ color: accent }} role="status">
@@ -650,151 +650,151 @@ const AssociateDashboard = () => {
                     <div>No results found. Try a different skill or criteria.</div>
                   </div>
                 )}
-              </div>
-            )}
-            {activeTab === 'messages' && (
+          </div>
+        )}
+        {activeTab === 'messages' && (
               <div className="container-fluid px-0">
-                <div className="row">
-                  {/* Conversations List */}
-                  <div className="col-lg-4">
+            <div className="row">
+              {/* Conversations List */}
+              <div className="col-lg-4">
                     <div className="card border-0 shadow-lg rounded-4">
                       <div className="card-header" style={{ background: '#f8f9fa', borderBottom: '1px solid #eee' }}>
                         <h5 className="mb-0" style={{ color: '#444', fontWeight: 700 }}>Conversations</h5>
-                      </div>
-                      <div className="card-body p-0">
-                        {conversations.length === 0 ? (
+                  </div>
+                  <div className="card-body p-0">
+                    {conversations.length === 0 ? (
                           <div className="p-3 text-center" style={{ color: '#888' }}>
-                            No conversations yet
-                          </div>
-                        ) : (
-                          <div className="list-group list-group-flush">
-                            {conversations.map(conversation => (
-                              <button
-                                key={conversation.conversation_id}
-                                className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${
-                                  selectedConversation === conversation.conversation_id ? 'active' : ''
-                                }`}
-                                onClick={() => loadConversation(conversation.conversation_id)}
+                        No conversations yet
+                      </div>
+                    ) : (
+                      <div className="list-group list-group-flush">
+                        {conversations.map(conversation => (
+                          <button
+                            key={conversation.conversation_id}
+                            className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${
+                              selectedConversation === conversation.conversation_id ? 'active' : ''
+                            }`}
+                            onClick={() => loadConversation(conversation.conversation_id)}
                                 style={{
                                   border: 'none',
                                   background: selectedConversation === conversation.conversation_id ? accent : 'transparent',
                                   color: selectedConversation === conversation.conversation_id ? '#fff' : '#444',
                                   transition: 'all 0.18s ease'
                                 }}
-                              >
-                                <div className="ms-2 me-auto">
-                                  <div className="fw-bold">
-                                    {conversation.freelancer_name}
-                                    {conversation.unread_count > 0 && (
+                          >
+                            <div className="ms-2 me-auto">
+                              <div className="fw-bold">
+                                {conversation.freelancer_name}
+                                {conversation.unread_count > 0 && (
                                       <span className="badge ms-2" style={{ background: '#df1529' }}>{conversation.unread_count}</span>
-                                    )}
-                                  </div>
+                                )}
+                              </div>
                                   <small style={{ color: selectedConversation === conversation.conversation_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
-                                    {conversation.last_message ? 
-                                      conversation.last_message.substring(0, 50) + '...' : 
-                                      'No messages yet'
-                                    }
-                                  </small>
-                                </div>
+                                {conversation.last_message ? 
+                                  conversation.last_message.substring(0, 50) + '...' : 
+                                  'No messages yet'
+                                }
+                              </small>
+                            </div>
                                 <small style={{ color: selectedConversation === conversation.conversation_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
-                                  {conversation.last_message_time ? 
-                                    new Date(conversation.last_message_time).toLocaleDateString() : 
-                                    ''
-                                  }
-                                </small>
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                              {conversation.last_message_time ? 
+                                new Date(conversation.last_message_time).toLocaleDateString() : 
+                                ''
+                              }
+                            </small>
+                          </button>
+                        ))}
                       </div>
-                    </div>
+                    )}
                   </div>
-                  {/* Messages */}
-                  <div className="col-lg-8">
+                </div>
+              </div>
+              {/* Messages */}
+              <div className="col-lg-8">
                     <div className="card border-0 shadow-lg rounded-4">
                       <div className="card-header" style={{ background: '#f8f9fa', borderBottom: '1px solid #eee' }}>
                         <h5 className="mb-0" style={{ color: '#444', fontWeight: 700 }}>
-                          {selectedConversation ? 
-                            conversations.find(c => c.conversation_id === selectedConversation)?.freelancer_name || 'Messages' : 
-                            'Select a conversation'
-                          }
-                        </h5>
-                      </div>
-                      <div className="card-body">
-                        {selectedConversation ? (
-                          <>
-                            {/* Messages List */}
-                            <div className="messages-container" style={{ height: '400px', overflowY: 'auto' }}>
-                              {messages.map(message => (
-                                <div key={message.message_id} className={`mb-3 ${message.sender_id === user.user_id ? 'text-end' : 'text-start'}`}>
+                      {selectedConversation ? 
+                        conversations.find(c => c.conversation_id === selectedConversation)?.freelancer_name || 'Messages' : 
+                        'Select a conversation'
+                      }
+                    </h5>
+                  </div>
+                  <div className="card-body">
+                    {selectedConversation ? (
+                      <>
+                        {/* Messages List */}
+                        <div className="messages-container" style={{ height: '400px', overflowY: 'auto' }}>
+                          {messages.map(message => (
+                            <div key={message.message_id} className={`mb-3 ${message.sender_id === user.user_id ? 'text-end' : 'text-start'}`}>
                                   <div className={`d-inline-block p-3 rounded ${message.sender_id === user.user_id ? 'text-white' : 'bg-light'}`}
                                        style={{ 
                                          background: message.sender_id === user.user_id ? accent : '#f8f9fa',
                                          maxWidth: '70%'
                                        }}>
-                                    <div className="d-flex align-items-center">
-                                      <div className="flex-grow-1">{message.content}</div>
-                                      {message.sender_id === user.user_id && (
-                                        <button
-                                          type="button"
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-grow-1">{message.content}</div>
+                                  {message.sender_id === user.user_id && (
+                                    <button
+                                      type="button"
                                           className="btn btn-sm btn-link ms-2 p-0 message-delete-btn"
-                                          title="Delete message"
-                                          onClick={() => handleDeleteMessage(message.message_id)}
+                                      title="Delete message"
+                                      onClick={() => handleDeleteMessage(message.message_id)}
                                           style={{fontSize: '1.1rem', color: 'rgba(255,255,255,0.8)', transition: 'all 0.18s ease'}}
-                                        >
-                                          <i className="bi bi-trash"></i>
-                                        </button>
-                                      )}
-                                    </div>
-                                    <small style={{ color: message.sender_id === user.user_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
-                                      {new Date(message.sent_at).toLocaleString()}
-                                    </small>
-                                  </div>
+                                    >
+                                      <i className="bi bi-trash"></i>
+                                    </button>
+                                  )}
                                 </div>
-                              ))}
-                            </div>
-                            {/* Send Message Form */}
-                            <form onSubmit={sendMessage} className="mt-3">
-                              <div className="input-group">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Type your message..."
-                                  value={newMessage}
-                                  onChange={(e) => setNewMessage(e.target.value)}
-                                  disabled={messagingLoading}
-                                  style={{ borderRadius: '20px 0 0 20px', border: '1.5px solid #eee' }}
-                                />
-                                <button type="submit" className="btn dashboard-btn" disabled={messagingLoading || !newMessage.trim()} style={{ background: accent, color: '#fff', border: 'none', borderRadius: '0 20px 20px 0', fontWeight: 600, transition: 'transform 0.18s, box-shadow 0.18s' }}>
-                                  {messagingLoading ? 'Sending...' : 'Send'}
-                                </button>
+                                    <small style={{ color: message.sender_id === user.user_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
+                                  {new Date(message.sent_at).toLocaleString()}
+                                </small>
                               </div>
-                            </form>
-                          </>
-                        ) : (
+                            </div>
+                          ))}
+                        </div>
+                        {/* Send Message Form */}
+                        <form onSubmit={sendMessage} className="mt-3">
+                          <div className="input-group">
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Type your message..."
+                              value={newMessage}
+                              onChange={(e) => setNewMessage(e.target.value)}
+                              disabled={messagingLoading}
+                                  style={{ borderRadius: '20px 0 0 20px', border: '1.5px solid #eee' }}
+                            />
+                                <button type="submit" className="btn dashboard-btn" disabled={messagingLoading || !newMessage.trim()} style={{ background: accent, color: '#fff', border: 'none', borderRadius: '0 20px 20px 0', fontWeight: 600, transition: 'transform 0.18s, box-shadow 0.18s' }}>
+                              {messagingLoading ? 'Sending...' : 'Send'}
+                            </button>
+                          </div>
+                        </form>
+                      </>
+                    ) : (
                           <div className="text-center py-5" style={{ color: '#888' }}>
                             <i className="bi bi-chat-dots fs-1" style={{ color: accent }}></i>
-                            <p>Select a conversation to start messaging</p>
-                          </div>
-                        )}
+                        <p>Select a conversation to start messaging</p>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
-            )}
-            {/* Recent Activity */}
+            </div>
+          </div>
+        )}
+      {/* Recent Activity */}
             <div className="mt-5">
               <h5 className="mb-3" style={{ color: '#444', fontWeight: 700 }}>Recent Activity</h5>
-              {activityLoading ? (
+        {activityLoading ? (
                 <div className="text-center py-4">
                   <div className="spinner-border" style={{ color: accent }} role="status"></div>
                 </div>
-              ) : (
+        ) : (
                 <div className="bg-light rounded-3 p-3" style={{ maxHeight: '300px', overflowY: 'auto', background: '#f8f9fa' }}>
-                  <ActivityTable activities={activities} />
+          <ActivityTable activities={activities} />
                 </div>
-              )}
+        )}
             </div>
           </div>
         </div>
