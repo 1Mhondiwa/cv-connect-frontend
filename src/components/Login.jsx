@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../utils/axios';
 
 const accent = '#fd680e';
 
@@ -36,10 +37,29 @@ const Login = () => {
       const result = await authLogin(form.email.trim(), form.password);
       if (result.success) {
         setSuccess('Login successful! Redirecting...');
-        setTimeout(() => {
+        setTimeout(async () => {
           // Redirect based on user type
           if (result.user.user_type === 'freelancer') {
-            navigate('/freelancer-dashboard');
+            try {
+              // Fetch freelancer profile to check for CV
+              const token = localStorage.getItem('token');
+              const profileRes = await api.get('/freelancer/profile', {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              if (profileRes.data.success) {
+                if (!profileRes.data.profile.cv) {
+                  navigate('/freelancer/welcome');
+                } else {
+                  navigate('/freelancer-dashboard');
+                }
+              } else {
+                // Fallback: if profile fetch fails, go to dashboard
+                navigate('/freelancer-dashboard');
+              }
+            } catch (profileErr) {
+              // Fallback: if profile fetch fails, go to dashboard
+              navigate('/freelancer-dashboard');
+            }
           } else if (result.user.user_type === 'associate') {
             navigate('/associate/dashboard');
           } else if (result.user.user_type === 'admin') {
