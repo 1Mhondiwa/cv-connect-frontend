@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import api from '../utils/axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const accent = '#fd680e';
 
@@ -11,6 +12,7 @@ const WelcomeFreelancer = () => {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const { logout } = useAuth();
 
   const handleButtonClick = () => {
     if (fileInputRef.current) fileInputRef.current.value = null;
@@ -50,7 +52,42 @@ const WelcomeFreelancer = () => {
   };
 
   return (
-    <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)' }}>
+    <div className="min-vh-100" style={{ background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)' }}>
+      {/* Dashboard Navbar */}
+      <nav style={{
+        width: '100%',
+        background: '#fff',
+        boxShadow: '0 2px 12px rgba(253,104,14,0.08)',
+        padding: '0.7rem 0',
+        marginBottom: 24,
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <div className="container d-flex justify-content-between align-items-center">
+          <span style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1, cursor: 'pointer' }}
+            onClick={() => navigate('/')}
+          >
+            CV<span style={{ color: '#333' }}>Connect</span>
+          </span>
+          <button
+            className="btn"
+            style={{
+              background: accent,
+              color: '#fff',
+              borderRadius: 25,
+              padding: '8px 24px',
+              fontWeight: 600,
+              border: 'none',
+              fontSize: 16
+            }}
+            onClick={() => { logout(); navigate('/'); }}
+          >
+            <i className="bi bi-box-arrow-right me-2"></i>Logout
+          </button>
+        </div>
+      </nav>
+      {/* Main Content */}
       <div className="container">
         <div className="row justify-content-center align-items-center min-vh-100">
           <div className="col-lg-8 col-xl-6">
