@@ -1,10 +1,53 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import api from '../utils/axios';
 
 const accent = '#fd680e';
 
 const WelcomeFreelancer = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef();
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const handleButtonClick = () => {
+    if (fileInputRef.current) fileInputRef.current.value = null;
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    setMessage("");
+    setError("");
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("cv", file);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await api.post(
+        "/freelancer/cv/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMessage(response.data.message || "Upload successful!");
+      setTimeout(() => navigate("/freelancer-dashboard"), 1800);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          "Upload failed. Please try again or check your file format."
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)' }}>
@@ -35,11 +78,41 @@ const WelcomeFreelancer = () => {
                     fontSize: 18,
                     transition: 'transform 0.18s, box-shadow 0.18s'
                   }}
-                  onClick={() => navigate('/freelancer/upload')}
+                  onClick={handleButtonClick}
+                  disabled={uploading}
                 >
-                  <i className="bi bi-upload me-2"></i>
-                  Upload CV & Get Started
+                  {uploading ? (
+                    <span>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Uploading...
+                    </span>
+                  ) : (
+                    <span>
+                      <i className="bi bi-upload me-2"></i>
+                      Upload CV & Get Started
+                    </span>
+                  )}
                 </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="d-none"
+                  accept=".pdf,.doc,.docx,.txt"
+                  onChange={handleFileChange}
+                  disabled={uploading}
+                />
+                {message && (
+                  <div className="alert mt-4" style={{ background: '#d4edda', color: '#155724', border: '1px solid #c3e6cb', borderRadius: 12, padding: '16px 20px', textAlign: 'center', fontWeight: 500 }}>
+                    <i className="bi bi-check-circle me-2"></i>
+                    {message}
+                  </div>
+                )}
+                {error && (
+                  <div className="alert mt-4" style={{ background: '#f8d7da', color: '#721c24', border: '1px solid #f5c6cb', borderRadius: 12, padding: '16px 20px', textAlign: 'center', fontWeight: 500 }}>
+                    <i className="bi bi-exclamation-triangle me-2"></i>
+                    {error}
+                  </div>
+                )}
               </div>
               <div className="row mt-4 g-3">
                 <div className="col-md-6">
