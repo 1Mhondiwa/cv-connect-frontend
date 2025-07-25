@@ -1,30 +1,52 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../utils/axios';
+import { useEffect, useState } from 'react';
 
-const ProtectedRoute = ({ children, requiredRole = null }) => {
+const ProtectedRoute = ({ children, requiredRole }) => {
   const { user, isAuthenticated, loading } = useAuth();
+  const navigate = useNavigate();
+  const [checking, setChecking] = useState(false);
 
-  // Show loading while checking authentication
-  if (loading) {
-    return (
-      <div className="container text-center" style={{ marginTop: '100px' }}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-        <div className="mt-3">Loading...</div>
-      </div>
-    );
+  useEffect(() => {
+    const checkFreelancerCV = async () => {
+      if (requiredRole === 'freelancer' && isAuthenticated && user?.user_type === 'freelancer') {
+        setChecking(true);
+        try {
+          const token = localStorage.getItem('token');
+          const profileRes = await api.get('/freelancer/profile', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (profileRes.data.success) {
+            if (!profileRes.data.profile.cv) {
+              navigate('/freelancer/welcome', { replace: true });
+            }
+          }
+        } catch (err) {
+          // If profile fetch fails, let the route render (could be handled elsewhere)
+        } finally {
+          setChecking(false);
+        }
+      }
+    };
+    checkFreelancerCV();
+    // Only run when user, isAuthenticated, or requiredRole changes
+  }, [user, isAuthenticated, requiredRole, navigate]);
+
+  if (loading || checking) {
+    return <div className="min-vh-100 d-flex align-items-center justify-content-center"><div className="spinner-border" style={{ color: '#fd680e' }} role="status"></div></div>;
   }
 
-  // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    navigate('/login', { replace: true });
+    return null;
   }
 
-  // Check role if required
   if (requiredRole && user?.user_type !== requiredRole) {
-    return <Navigate to="/" replace />;
+    // Optionally redirect to a not-authorized page
+    navigate('/login', { replace: true });
+    return null;
   }
 
   return children;
