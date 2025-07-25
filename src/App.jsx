@@ -23,6 +23,7 @@ import FreelancerProfile from './components/FreelancerProfile';
 import FreelancerEditProfile from './components/FreelancerEditProfile';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import WelcomeFreelancer from './components/WelcomeFreelancer';
 
 function ScrollTopButton() {
   const [show, setShow] = useState(false);
@@ -90,6 +91,7 @@ function AppRoutes() {
             <Route path="/freelancer/upload" element={<ProtectedRoute requiredRole="freelancer"><FreelancerCVUpload /></ProtectedRoute>} />
             <Route path="/freelancer/profile" element={<ProtectedRoute requiredRole="freelancer"><FreelancerProfile /></ProtectedRoute>} />
             <Route path="/freelancer/edit" element={<ProtectedRoute requiredRole="freelancer"><FreelancerEditProfile /></ProtectedRoute>} />
+            <Route path="/freelancer/welcome" element={<WelcomeFreelancer />} />
           {/* Associate Routes - Not linked in public navigation */}
             <Route path="/associate/dashboard" element={<ProtectedRoute requiredRole="associate"><AssociateDashboard /></ProtectedRoute>} />
           {/* Admin Routes - Not linked in public navigation */}
