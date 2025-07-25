@@ -70,6 +70,7 @@ function AppRoutes() {
     location.pathname.startsWith('/freelancer/upload') ||
     location.pathname.startsWith('/freelancer/profile') ||
     location.pathname.startsWith('/freelancer/edit') ||
+    location.pathname.startsWith('/freelancer/welcome') ||
     location.pathname.startsWith('/associate/dashboard') ||
     location.pathname.startsWith('/admin/dashboard');
 
