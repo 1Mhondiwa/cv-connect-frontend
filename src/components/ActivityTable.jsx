@@ -6,6 +6,21 @@ const statusColors = {
   Failed: "bg-red-600",
 };
 
+const statusStyles = {
+  Completed: {
+    backgroundColor: "#16a34a", // green-600
+    color: "#ffffff",
+  },
+  Pending: {
+    backgroundColor: "#eab308", // yellow-500
+    color: "#000000",
+  },
+  Failed: {
+    backgroundColor: "#dc2626", // red-600
+    color: "#ffffff",
+  },
+};
+
 export default function ActivityTable({ activities }) {
   return (
     <div className="activity-table">
@@ -29,9 +44,9 @@ export default function ActivityTable({ activities }) {
                 <td>{a.activity_type}</td>
                 <td>
                   <span
-                    className={`status-badge ${statusColors[a.status] || "bg-gray-400"}`}
+                    className="status-badge"
                     style={{
-                      color: "#fff",
+                      ...statusStyles[a.status] || { backgroundColor: "#9ca3af", color: "#ffffff" },
                       padding: "0.2em 0.8em",
                       borderRadius: "0.8em",
                       fontWeight: 600,

@@ -58,7 +58,7 @@ const Login = () => {
               }
             } catch (profileErr) {
               // Fallback: if profile fetch fails, go to dashboard
-              navigate('/freelancer-dashboard');
+            navigate('/freelancer-dashboard');
             }
           } else if (result.user.user_type === 'associate') {
             navigate('/associate/dashboard');
