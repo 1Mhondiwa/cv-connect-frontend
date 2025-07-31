@@ -2,19 +2,19 @@ import React from "react";
 
 const statusStyles = {
   Completed: {
-    backgroundColor: "#10b981", // emerald-500 - more modern green
+    backgroundColor: "#059652", // Success green from FreelancerDashboard
     color: "#ffffff",
-    border: "1px solid #059669",
+    border: "1px solid #047857",
   },
   Pending: {
-    backgroundColor: "#f59e0b", // amber-500 - warmer yellow
-    color: "#ffffff",
-    border: "1px solid #d97706",
+    backgroundColor: "#ffc107", // Warning yellow from FreelancerDashboard
+    color: "#000000",
+    border: "1px solid #e0a800",
   },
   Failed: {
-    backgroundColor: "#ef4444", // red-500 - brighter red
+    backgroundColor: "#df1529", // Error red from FreelancerDashboard
     color: "#ffffff",
-    border: "1px solid #dc2626",
+    border: "1px solid #b91c1c",
   },
 };
 
@@ -56,7 +56,7 @@ export default function ActivityTable({ activities }) {
         }
         
         .activity-table thead {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #fd680e 0%, #e55a00 100%);
         }
         
         .activity-table th {
@@ -84,9 +84,9 @@ export default function ActivityTable({ activities }) {
         }
         
         .activity-table tbody tr:hover {
-          background-color: #f8fafc;
+          background-color: #f8f4f2;
           transform: translateY(-1px);
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 6px -1px rgba(253, 104, 14, 0.1);
         }
         
         .activity-table tbody tr:last-child {
@@ -96,13 +96,13 @@ export default function ActivityTable({ activities }) {
         .activity-table td {
           padding: 16px 20px;
           font-size: 14px;
-          color: #374151;
+          color: #444;
           vertical-align: middle;
         }
         
         .activity-table .date-cell {
           font-weight: 500;
-          color: #6b7280;
+          color: #666;
           font-size: 13px;
         }
         
@@ -120,7 +120,7 @@ export default function ActivityTable({ activities }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #f3f4f6;
+          background: #f8f9fa;
           border-radius: 8px;
           flex-shrink: 0;
         }
@@ -135,19 +135,19 @@ export default function ActivityTable({ activities }) {
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.5px;
-          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+          box-shadow: 0 1px 2px 0 rgba(253, 104, 14, 0.1);
           transition: all 0.2s ease;
         }
         
         .activity-table .status-badge:hover {
           transform: translateY(-1px);
-          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+          box-shadow: 0 2px 4px 0 rgba(253, 104, 14, 0.2);
         }
         
         .activity-table .empty-state {
           text-align: center;
           padding: 40px 20px;
-          color: #9ca3af;
+          color: #888;
           font-style: italic;
         }
         
