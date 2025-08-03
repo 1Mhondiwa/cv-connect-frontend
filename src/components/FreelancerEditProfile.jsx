@@ -19,10 +19,20 @@ const FreelancerEditProfile = () => {
     github_url: "",
     current_status: "",
   });
+  const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [skillsError, setSkillsError] = useState("");
+  const [skillsSuccess, setSkillsSuccess] = useState("");
+  const [editingSkill, setEditingSkill] = useState(null);
+  const [newSkill, setNewSkill] = useState({
+    skill_name: "",
+    proficiency_level: "Intermediate",
+    years_experience: ""
+  });
+  const [editingSkillData, setEditingSkillData] = useState({});
   const navigate = useNavigate();
   const { logout } = useAuth();
 
@@ -41,6 +51,7 @@ const FreelancerEditProfile = () => {
             ...response.data.profile,
             email: response.data.profile.email || "",
           });
+          setSkills(response.data.profile.skills || []);
         } else {
           setError(response.data.message || "Failed to load profile.");
         }
@@ -58,6 +69,143 @@ const FreelancerEditProfile = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
     setSuccess("");
+  };
+
+  const handleNewSkillChange = (e) => {
+    setNewSkill({ ...newSkill, [e.target.name]: e.target.value });
+    setSkillsError("");
+    setSkillsSuccess("");
+  };
+
+  const handleAddSkill = async (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Prevent form submission
+    if (!newSkill.skill_name.trim()) {
+      setSkillsError("Skill name is required.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Adding skill:", newSkill); // Debug log
+      
+      const response = await axios.post(
+        "/api/freelancer/skills",
+        {
+          skill_name: newSkill.skill_name.trim(),
+          proficiency_level: newSkill.proficiency_level,
+          years_experience: parseInt(newSkill.years_experience) || 0
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Add skill response:", response.data); // Debug log
+      
+      if (response.data.success) {
+        // Refresh skills list
+        await refreshSkills();
+        setNewSkill({
+          skill_name: "",
+          proficiency_level: "Intermediate",
+          years_experience: ""
+        });
+        setSkillsSuccess("Skill added successfully!");
+        setTimeout(() => setSkillsSuccess(""), 3000);
+      } else {
+        setSkillsError(response.data.message || "Failed to add skill.");
+      }
+    } catch (err) {
+      console.error("Add skill error:", err); // Debug log
+      setSkillsError(err.response?.data?.message || "Failed to add skill.");
+    }
+  };
+
+  const refreshSkills = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("/api/freelancer/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.success) {
+        setSkills(response.data.profile.skills || []);
+      }
+    } catch (err) {
+      console.error("Error refreshing skills:", err);
+    }
+  };
+
+  const startEditingSkill = (skill) => {
+    setEditingSkill(skill.freelancer_skill_id);
+    setEditingSkillData({
+      proficiency_level: skill.proficiency_level || "Intermediate",
+      years_experience: skill.years_experience || ""
+    });
+  };
+
+  const handleUpdateSkill = async (skillId) => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Updating skill:", skillId, editingSkillData); // Debug log
+      
+      const response = await axios.put(
+        `/api/freelancer/skills/${skillId}`,
+        {
+          proficiency_level: editingSkillData.proficiency_level,
+          years_experience: parseInt(editingSkillData.years_experience) || 0
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Update skill response:", response.data); // Debug log
+      
+      if (response.data.success) {
+        await refreshSkills();
+        setEditingSkill(null);
+        setEditingSkillData({});
+        setSkillsSuccess("Skill updated successfully!");
+        setTimeout(() => setSkillsSuccess(""), 3000);
+      } else {
+        setSkillsError(response.data.message || "Failed to update skill.");
+      }
+    } catch (err) {
+      console.error("Update skill error:", err); // Debug log
+      setSkillsError(err.response?.data?.message || "Failed to update skill.");
+    }
+  };
+
+  const handleDeleteSkill = async (skillId) => {
+    if (!window.confirm("Are you sure you want to delete this skill?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Deleting skill:", skillId); // Debug log
+      
+      const response = await axios.delete(
+        `/api/freelancer/skills/${skillId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Delete skill response:", response.data); // Debug log
+      
+      if (response.data.success) {
+        await refreshSkills();
+        setSkillsSuccess("Skill deleted successfully!");
+        setTimeout(() => setSkillsSuccess(""), 3000);
+      } else {
+        setSkillsError(response.data.message || "Failed to delete skill.");
+      }
+    } catch (err) {
+      console.error("Delete skill error:", err); // Debug log
+      setSkillsError(err.response?.data?.message || "Failed to delete skill.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -220,6 +368,227 @@ const FreelancerEditProfile = () => {
               <label className="form-label">Current Status</label>
               <input type="text" className="form-control" name="current_status" value={form.current_status || ""} onChange={handleChange} />
             </div>
+
+            {/* Skills Section */}
+            <div className="mb-4">
+              <h5 className="mb-3" style={{ color: accent, fontWeight: 600 }}>
+                <i className="bi bi-tools me-2"></i>
+                Skills & Expertise
+              </h5>
+              
+              {/* Add New Skill Form */}
+              <div className="card mb-3" style={{ borderColor: accent }}>
+                <div className="card-header" style={{ background: accent, color: 'white', fontWeight: 600 }}>
+                  Add New Skill
+                </div>
+                <div className="card-body">
+                  <form onSubmit={handleAddSkill} onClick={(e) => e.stopPropagation()}>
+                    <div className="row">
+                      <div className="col-md-6 mb-2">
+                        <label className="form-label">Skill Name</label>
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          name="skill_name" 
+                          value={newSkill.skill_name} 
+                          onChange={handleNewSkillChange}
+                          placeholder="e.g., JavaScript, React, Python"
+                        />
+                      </div>
+                      <div className="col-md-3 mb-2">
+                        <label className="form-label">Proficiency Level</label>
+                        <select 
+                          className="form-control" 
+                          name="proficiency_level" 
+                          value={newSkill.proficiency_level} 
+                          onChange={handleNewSkillChange}
+                        >
+                          <option value="Beginner">Beginner</option>
+                          <option value="Intermediate">Intermediate</option>
+                          <option value="Advanced">Advanced</option>
+                          <option value="Expert">Expert</option>
+                        </select>
+                      </div>
+                      <div className="col-md-3 mb-2">
+                        <label className="form-label">Years Experience</label>
+                        <input 
+                          type="number" 
+                          min="0" 
+                          className="form-control" 
+                          name="years_experience" 
+                          value={newSkill.years_experience} 
+                          onChange={handleNewSkillChange}
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                    <button type="submit" className="btn btn-sm" style={{ background: accent, color: 'white', border: 'none' }}>
+                      <i className="bi bi-plus me-1"></i>
+                      Add Skill
+                    </button>
+                  </form>
+                </div>
+              </div>
+
+              {/* Skills List */}
+              {skills.length > 0 && (
+                <div className="card" onClick={(e) => e.stopPropagation()}>
+                  <div className="card-header" style={{ background: '#f8f9fa', fontWeight: 600 }}>
+                    Your Skills ({skills.length})
+                  </div>
+                  <div className="card-body">
+                    <div className="row g-3">
+                      {skills.map((skill) => (
+                        <div key={skill.freelancer_skill_id} className="col-md-6">
+                          <div style={{
+                            background: '#f8f9fa',
+                            borderRadius: 12,
+                            padding: '16px',
+                            border: '1px solid #e9ecef',
+                            position: 'relative'
+                          }}>
+                            {editingSkill === skill.freelancer_skill_id ? (
+                              <div>
+                                <div className="mb-2">
+                                  <label className="form-label" style={{ fontSize: 14, fontWeight: 600 }}>Skill Name</label>
+                                  <input 
+                                    type="text" 
+                                    className="form-control form-control-sm" 
+                                    value={skill.skill_name} 
+                                    readOnly
+                                  />
+                                </div>
+                                <div className="row mb-2">
+                                  <div className="col-6">
+                                    <label className="form-label" style={{ fontSize: 14, fontWeight: 600 }}>Level</label>
+                                    <select 
+                                      className="form-control form-control-sm" 
+                                      value={editingSkillData.proficiency_level || "Intermediate"}
+                                      onChange={(e) => setEditingSkillData({ ...editingSkillData, proficiency_level: e.target.value })}
+                                    >
+                                      <option value="Beginner">Beginner</option>
+                                      <option value="Intermediate">Intermediate</option>
+                                      <option value="Advanced">Advanced</option>
+                                      <option value="Expert">Expert</option>
+                                    </select>
+                                  </div>
+                                  <div className="col-6">
+                                    <label className="form-label" style={{ fontSize: 14, fontWeight: 600 }}>Years</label>
+                                    <input 
+                                      type="number" 
+                                      min="0" 
+                                      className="form-control form-control-sm" 
+                                      value={editingSkillData.years_experience || ""} 
+                                      onChange={(e) => setEditingSkillData({ ...editingSkillData, years_experience: e.target.value })}
+                                    />
+                                  </div>
+                                </div>
+                                <div className="d-flex gap-2">
+                                  <button 
+                                    type="button"
+                                    className="btn btn-sm btn-success"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      handleUpdateSkill(skill.freelancer_skill_id);
+                                    }}
+                                  >
+                                    <i className="bi bi-check me-1"></i>
+                                    Save
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    className="btn btn-sm btn-secondary"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      setEditingSkill(null);
+                                      setEditingSkillData({});
+                                    }}
+                                  >
+                                    <i className="bi bi-x me-1"></i>
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                  <h6 style={{ 
+                                    fontWeight: 600, 
+                                    color: '#333',
+                                    margin: 0
+                                  }}>
+                                    {skill.skill_name}
+                                  </h6>
+                                  <span style={{ 
+                                    background: accent, 
+                                    color: '#fff', 
+                                    padding: '4px 8px', 
+                                    borderRadius: 10,
+                                    fontSize: 12,
+                                    fontWeight: 600
+                                  }}>
+                                    {skill.proficiency_level || "Intermediate"}
+                                  </span>
+                                </div>
+                                {skill.years_experience !== undefined && skill.years_experience !== null && (
+                                  <div style={{ color: '#666', fontSize: 14, marginBottom: 12 }}>
+                                    <i className="bi bi-clock me-1"></i>
+                                    {skill.years_experience} years experience
+                                  </div>
+                                )}
+                                <div className="d-flex gap-2">
+                                  <button 
+                                    type="button"
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      startEditingSkill(skill);
+                                    }}
+                                  >
+                                    <i className="bi bi-pencil me-1"></i>
+                                    Edit
+                                  </button>
+                                  <button 
+                                    type="button"
+                                    className="btn btn-sm btn-outline-danger"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      handleDeleteSkill(skill.freelancer_skill_id);
+                                    }}
+                                  >
+                                    <i className="bi bi-trash me-1"></i>
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* No Skills Message */}
+              {skills.length === 0 && (
+                <div className="card" onClick={(e) => e.stopPropagation()}>
+                  <div className="card-body text-center" style={{ color: '#888', padding: '40px 20px' }}>
+                    <i className="bi bi-tools" style={{ fontSize: 48, color: '#ddd', marginBottom: 16 }}></i>
+                    <p>No skills listed yet. Add your first skill above!</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Skills Messages */}
+              {skillsError && <div className="alert alert-danger mt-3" onClick={(e) => e.stopPropagation()}>{skillsError}</div>}
+              {skillsSuccess && <div className="alert alert-success mt-3" onClick={(e) => e.stopPropagation()}>{skillsSuccess}</div>}
+            </div>
+
             {error && <div className="alert alert-danger text-center">{error}</div>}
             {success && <div className="alert alert-success text-center">{success}</div>}
             <div className="d-grid mt-3">
