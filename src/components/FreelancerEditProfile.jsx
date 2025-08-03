@@ -11,6 +11,7 @@ const FreelancerEditProfile = () => {
     last_name: "",
     email: "",
     phone: "",
+    address: "",
     years_experience: "",
     headline: "",
     summary: "",
@@ -76,13 +77,13 @@ const FreelancerEditProfile = () => {
         first_name: form.first_name,
         last_name: form.last_name,
         phone: form.phone,
+        address: form.address,
         years_experience: form.years_experience,
         summary: form.summary,
         headline: form.headline,
         linkedin_url: form.linkedin_url,
         github_url: form.github_url,
         current_status: form.current_status,
-        // address is optional, not shown in form
       };
       const response = await axios.put(
         "/api/freelancer/profile",
@@ -190,6 +191,10 @@ const FreelancerEditProfile = () => {
             <div className="mb-3">
               <label className="form-label">Phone Number</label>
               <input type="text" className="form-control" name="phone" value={form.phone || ""} onChange={handleChange} />
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Address</label>
+              <input type="text" className="form-control" name="address" value={form.address || ""} onChange={handleChange} />
             </div>
             <div className="mb-3">
               <label className="form-label">Job Title</label>
