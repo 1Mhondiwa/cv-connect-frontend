@@ -318,74 +318,110 @@ const FreelancerEditProfile = () => {
           </button>
         </div>
       </nav>
-      <div className="container" style={{ maxWidth: 600, margin: "40px auto" }}>
+      <div className="container" style={{ maxWidth: 800, margin: "40px auto" }}>
+        {/* Unified Profile Form */}
         <div className="card shadow p-4">
-          <h2 className="mb-4 text-center">Edit Profile</h2>
+          <h2 className="mb-4 text-center" style={{ color: accent, fontWeight: 700 }}>
+            <i className="bi bi-person-gear me-2"></i>
+            Edit Profile
+          </h2>
+          
           <form onSubmit={handleSubmit}>
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="form-label">First Name</label>
-                <input type="text" className="form-control" name="first_name" value={form.first_name} onChange={handleChange} required />
+            {/* Personal Information Section */}
+            <div className="mb-4">
+              <h5 className="mb-3" style={{ color: accent, fontWeight: 600, borderBottom: `2px solid ${accent}`, paddingBottom: '8px' }}>
+                <i className="bi bi-person me-2"></i>
+                Personal Information
+              </h5>
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label fw-semibold">First Name *</label>
+                  <input type="text" className="form-control" name="first_name" value={form.first_name} onChange={handleChange} required />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label fw-semibold">Last Name *</label>
+                  <input type="text" className="form-control" name="last_name" value={form.last_name} onChange={handleChange} required />
+                </div>
               </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Last Name</label>
-                <input type="text" className="form-control" name="last_name" value={form.last_name} onChange={handleChange} required />
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label fw-semibold">Email</label>
+                  <input type="email" className="form-control" name="email" value={form.email} readOnly disabled style={{ backgroundColor: '#f8f9fa' }} />
+                  <small className="text-muted">Email cannot be changed</small>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label fw-semibold">Phone Number</label>
+                  <input type="text" className="form-control" name="phone" value={form.phone || ""} onChange={handleChange} placeholder="+1 (555) 123-4567" />
+                </div>
+              </div>
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Address</label>
+                <input type="text" className="form-control" name="address" value={form.address || ""} onChange={handleChange} placeholder="Enter your full address" />
               </div>
             </div>
-            <div className="mb-3">
-              <label className="form-label">Email</label>
-              <input type="email" className="form-control" name="email" value={form.email} readOnly disabled />
+
+            {/* Professional Information Section */}
+            <div className="mb-4">
+              <h5 className="mb-3" style={{ color: accent, fontWeight: 600, borderBottom: `2px solid ${accent}`, paddingBottom: '8px' }}>
+                <i className="bi bi-briefcase me-2"></i>
+                Professional Information
+              </h5>
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label fw-semibold">Job Title</label>
+                  <input type="text" className="form-control" name="headline" value={form.headline || ""} onChange={handleChange} placeholder="e.g., Senior Developer" />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label fw-semibold">Years of Experience</label>
+                  <input type="number" min="0" className="form-control" name="years_experience" value={form.years_experience || ""} onChange={handleChange} placeholder="5" />
+                </div>
+              </div>
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Professional Summary</label>
+                <textarea className="form-control" name="summary" value={form.summary || ""} onChange={handleChange} rows={4} placeholder="Tell us about your professional background, expertise, and what makes you unique..." />
+              </div>
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Current Status</label>
+                <input type="text" className="form-control" name="current_status" value={form.current_status || ""} onChange={handleChange} placeholder="e.g., Available for new projects" />
+              </div>
             </div>
-            <div className="mb-3">
-              <label className="form-label">Phone Number</label>
-              <input type="text" className="form-control" name="phone" value={form.phone || ""} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Address</label>
-              <input type="text" className="form-control" name="address" value={form.address || ""} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Job Title</label>
-              <input type="text" className="form-control" name="headline" value={form.headline || ""} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Experience (years)</label>
-              <input type="number" min="0" className="form-control" name="years_experience" value={form.years_experience || ""} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Summary</label>
-              <textarea className="form-control" name="summary" value={form.summary || ""} onChange={handleChange} rows={3} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">LinkedIn URL</label>
-              <input type="url" className="form-control" name="linkedin_url" value={form.linkedin_url || ""} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">GitHub URL</label>
-              <input type="url" className="form-control" name="github_url" value={form.github_url || ""} onChange={handleChange} />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Current Status</label>
-              <input type="text" className="form-control" name="current_status" value={form.current_status || ""} onChange={handleChange} />
+
+            {/* Social Links Section */}
+            <div className="mb-4">
+              <h5 className="mb-3" style={{ color: accent, fontWeight: 600, borderBottom: `2px solid ${accent}`, paddingBottom: '8px' }}>
+                <i className="bi bi-link-45deg me-2"></i>
+                Social Links
+              </h5>
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label className="form-label fw-semibold">LinkedIn URL</label>
+                  <input type="url" className="form-control" name="linkedin_url" value={form.linkedin_url || ""} onChange={handleChange} placeholder="https://linkedin.com/in/yourprofile" />
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label className="form-label fw-semibold">GitHub URL</label>
+                  <input type="url" className="form-control" name="github_url" value={form.github_url || ""} onChange={handleChange} placeholder="https://github.com/yourusername" />
+                </div>
+              </div>
             </div>
 
             {/* Skills Section */}
             <div className="mb-4">
-              <h5 className="mb-3" style={{ color: accent, fontWeight: 600 }}>
+              <h5 className="mb-3" style={{ color: accent, fontWeight: 600, borderBottom: `2px solid ${accent}`, paddingBottom: '8px' }}>
                 <i className="bi bi-tools me-2"></i>
                 Skills & Expertise
               </h5>
               
               {/* Add New Skill Form */}
-              <div className="card mb-3" style={{ borderColor: accent }}>
+              <div className="card mb-3" style={{ borderColor: accent, borderWidth: '2px' }}>
                 <div className="card-header" style={{ background: accent, color: 'white', fontWeight: 600 }}>
+                  <i className="bi bi-plus-circle me-2"></i>
                   Add New Skill
                 </div>
                 <div className="card-body">
-                  <form onSubmit={handleAddSkill} onClick={(e) => e.stopPropagation()}>
+                  <form onSubmit={handleAddSkill}>
                     <div className="row">
                       <div className="col-md-6 mb-2">
-                        <label className="form-label">Skill Name</label>
+                        <label className="form-label fw-semibold">Skill Name *</label>
                         <input 
                           type="text" 
                           className="form-control" 
@@ -393,10 +429,11 @@ const FreelancerEditProfile = () => {
                           value={newSkill.skill_name} 
                           onChange={handleNewSkillChange}
                           placeholder="e.g., JavaScript, React, Python"
+                          required
                         />
                       </div>
                       <div className="col-md-3 mb-2">
-                        <label className="form-label">Proficiency Level</label>
+                        <label className="form-label fw-semibold">Proficiency Level</label>
                         <select 
                           className="form-control" 
                           name="proficiency_level" 
@@ -410,7 +447,7 @@ const FreelancerEditProfile = () => {
                         </select>
                       </div>
                       <div className="col-md-3 mb-2">
-                        <label className="form-label">Years Experience</label>
+                        <label className="form-label fw-semibold">Years Experience</label>
                         <input 
                           type="number" 
                           min="0" 
@@ -422,7 +459,7 @@ const FreelancerEditProfile = () => {
                         />
                       </div>
                     </div>
-                    <button type="submit" className="btn btn-sm" style={{ background: accent, color: 'white', border: 'none' }}>
+                    <button type="submit" className="btn" style={{ background: accent, color: 'white', border: 'none', borderRadius: '25px', padding: '8px 20px' }}>
                       <i className="bi bi-plus me-1"></i>
                       Add Skill
                     </button>
@@ -430,10 +467,27 @@ const FreelancerEditProfile = () => {
                 </div>
               </div>
 
+              {/* Skills Messages */}
+              {skillsError && (
+                <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                  <i className="bi bi-exclamation-triangle me-2"></i>
+                  {skillsError}
+                  <button type="button" className="btn-close" onClick={() => setSkillsError("")}></button>
+                </div>
+              )}
+              {skillsSuccess && (
+                <div className="alert alert-success alert-dismissible fade show" role="alert">
+                  <i className="bi bi-check-circle me-2"></i>
+                  {skillsSuccess}
+                  <button type="button" className="btn-close" onClick={() => setSkillsSuccess("")}></button>
+                </div>
+              )}
+
               {/* Skills List */}
               {skills.length > 0 && (
-                <div className="card" onClick={(e) => e.stopPropagation()}>
+                <div className="card">
                   <div className="card-header" style={{ background: '#f8f9fa', fontWeight: 600 }}>
+                    <i className="bi bi-list-check me-2"></i>
                     Your Skills ({skills.length})
                   </div>
                   <div className="card-body">
@@ -576,37 +630,69 @@ const FreelancerEditProfile = () => {
 
               {/* No Skills Message */}
               {skills.length === 0 && (
-                <div className="card" onClick={(e) => e.stopPropagation()}>
+                <div className="card">
                   <div className="card-body text-center" style={{ color: '#888', padding: '40px 20px' }}>
                     <i className="bi bi-tools" style={{ fontSize: 48, color: '#ddd', marginBottom: 16 }}></i>
-                    <p>No skills listed yet. Add your first skill above!</p>
+                    <p className="mb-0">No skills listed yet. Add your first skill above!</p>
                   </div>
                 </div>
               )}
-
-              {/* Skills Messages */}
-              {skillsError && <div className="alert alert-danger mt-3" onClick={(e) => e.stopPropagation()}>{skillsError}</div>}
-              {skillsSuccess && <div className="alert alert-success mt-3" onClick={(e) => e.stopPropagation()}>{skillsSuccess}</div>}
             </div>
 
-            {error && <div className="alert alert-danger text-center">{error}</div>}
-            {success && <div className="alert alert-success text-center">{success}</div>}
-            <div className="d-grid mt-3">
-              <button type="submit" className="btn btn-primary" disabled={submitting}>
+            {/* Form Messages */}
+            {error && (
+              <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                {error}
+                <button type="button" className="btn-close" onClick={() => setError("")}></button>
+              </div>
+            )}
+            {success && (
+              <div className="alert alert-success alert-dismissible fade show" role="alert">
+                <i className="bi bi-check-circle me-2"></i>
+                {success}
+                <button type="button" className="btn-close" onClick={() => setSuccess("")}></button>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="d-flex justify-content-between align-items-center mt-4 pt-3" style={{ borderTop: '1px solid #dee2e6' }}>
+              <button 
+                type="button" 
+                className="btn btn-outline-secondary" 
+                onClick={() => navigate("/freelancer/profile")}
+                style={{ borderRadius: '25px', padding: '10px 20px' }}
+              >
+                <i className="bi bi-arrow-left me-2"></i>
+                Back to Profile
+              </button>
+              <button 
+                type="submit" 
+                className="btn" 
+                disabled={submitting}
+                style={{ 
+                  background: accent, 
+                  color: 'white', 
+                  border: 'none', 
+                  borderRadius: '25px', 
+                  padding: '12px 30px',
+                  fontWeight: 600
+                }}
+              >
                 {submitting ? (
                   <span>
                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Saving...
+                    Saving Changes...
                   </span>
                 ) : (
-                  "Save Changes"
+                  <>
+                    <i className="bi bi-check-circle me-2"></i>
+                    Save All Changes
+                  </>
                 )}
               </button>
             </div>
           </form>
-          <div className="text-center mt-3">
-            <button className="btn btn-link" onClick={() => navigate("/freelancer/profile")}>Cancel</button>
-          </div>
         </div>
       </div>
     </section>
