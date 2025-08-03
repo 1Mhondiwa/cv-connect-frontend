@@ -472,6 +472,12 @@ const FreelancerProfile = () => {
                           <span style={{ color: '#666' }}>{profile.phone}</span>
                         </div>
                       )}
+                      {profile.address && (
+                        <div className="d-flex align-items-center mb-2">
+                          <i className="bi bi-geo-alt me-2" style={{ color: accent, fontSize: 16 }}></i>
+                          <span style={{ color: '#666' }}>{profile.address}</span>
+                        </div>
+                      )}
           </div>
           <div className="col-md-6">
                       <div className="d-flex align-items-center mb-2">
