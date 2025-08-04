@@ -85,9 +85,18 @@ const FreelancerEditProfile = () => {
           // Load CV parsed data
           if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
             const parsedData = response.data.profile.cv.parsed_data;
+            // Add unique IDs to existing data for editing
+            const workExperienceWithIds = (parsedData.work_experience || []).map((work, index) => ({
+              ...work,
+              id: work.id || `work_${index}_${Date.now()}`
+            }));
+            const educationWithIds = (parsedData.education || []).map((edu, index) => ({
+              ...edu,
+              id: edu.id || `edu_${index}_${Date.now()}`
+            }));
             setCvData({
-              work_experience: parsedData.work_experience || [],
-              education: parsedData.education || []
+              work_experience: workExperienceWithIds,
+              education: educationWithIds
             });
           }
         } else {
@@ -450,15 +459,20 @@ const FreelancerEditProfile = () => {
               }
             );
             
-            if (!cvResponse.data.success) {
+            if (cvResponse.data.success) {
+              setSuccess("Profile and CV data updated successfully!");
+            } else {
               console.warn("Failed to update CV parsed data:", cvResponse.data.message);
+              setSuccess("Profile updated successfully! CV data update failed.");
             }
           } catch (cvErr) {
             console.warn("Failed to update CV parsed data:", cvErr);
+            setSuccess("Profile updated successfully! CV data update failed.");
           }
+        } else {
+          setSuccess("Profile updated successfully!");
         }
         
-        setSuccess("Profile updated successfully!");
         setTimeout(() => navigate("/freelancer/profile"), 1500);
       } else {
         setError(response.data.message || "Update failed.");
@@ -817,44 +831,30 @@ const FreelancerEditProfile = () => {
                                     style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
                                   />
                                 </div>
-                               <div className="col-md-6">
-                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Start Date</label>
-                                 <input 
-                                   type="date" 
-                                   className="form-control form-control-sm" 
-                                   name="start_date" 
-                                   value={newWork.start_date} 
-                                   onChange={handleNewWorkChange}
-                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                 />
-                               </div>
-                               <div className="col-md-6">
-                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>End Date</label>
-                                 <input 
-                                   type="date" 
-                                   className="form-control form-control-sm" 
-                                   name="end_date" 
-                                   value={newWork.end_date} 
-                                   onChange={handleNewWorkChange}
-                                   disabled={newWork.current}
-                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                 />
-                               </div>
-                               <div className="col-12">
-                                 <div className="form-check">
-                                   <input 
-                                     className="form-check-input" 
-                                     type="checkbox" 
-                                     name="current" 
-                                     checked={newWork.current} 
-                                     onChange={handleNewWorkChange}
-                                     id="currentWork"
-                                   />
-                                   <label className="form-check-label" htmlFor="currentWork" style={{ fontSize: '14px' }}>
-                                     I currently work here
-                                   </label>
-                                 </div>
-                               </div>
+                                                               <div className="col-md-6">
+                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Start Date</label>
+                                  <input 
+                                    type="text" 
+                                    className="form-control form-control-sm" 
+                                    name="start_date" 
+                                    value={newWork.start_date} 
+                                    onChange={handleNewWorkChange}
+                                    placeholder="e.g., January 2020"
+                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                                  />
+                                </div>
+                                <div className="col-md-6">
+                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>End Date</label>
+                                  <input 
+                                    type="text" 
+                                    className="form-control form-control-sm" 
+                                    name="end_date" 
+                                    value={newWork.end_date} 
+                                    onChange={handleNewWorkChange}
+                                    placeholder="e.g., December 2023 or Present"
+                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                                  />
+                                </div>
                                <div className="col-12">
                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Description</label>
                                  <textarea 
@@ -946,38 +946,27 @@ const FreelancerEditProfile = () => {
                                          <div className="col-md-6">
                                            <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Start Date</label>
                                            <input 
-                                             type="date" 
+                                             type="text" 
                                              className="form-control form-control-sm" 
                                              value={editingWorkData.start_date} 
                                              onChange={(e) => setEditingWorkData({ ...editingWorkData, start_date: e.target.value })}
+                                             placeholder="e.g., January 2020"
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
                                            />
                                          </div>
                                          <div className="col-md-6">
                                            <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>End Date</label>
                                            <input 
-                                             type="date" 
+                                             type="text" 
                                              className="form-control form-control-sm" 
                                              value={editingWorkData.end_date} 
                                              onChange={(e) => setEditingWorkData({ ...editingWorkData, end_date: e.target.value })}
-                                             disabled={editingWorkData.current}
+                                             placeholder="e.g., December 2023 or Present"
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
                                            />
                                          </div>
                                        </div>
-                                       <div className="mb-2">
-                                         <div className="form-check">
-                                           <input 
-                                             className="form-check-input" 
-                                             type="checkbox" 
-                                             checked={editingWorkData.current} 
-                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, current: e.target.checked })}
-                                           />
-                                           <label className="form-check-label" style={{ fontSize: '12px' }}>
-                                             Currently working here
-                                           </label>
-                                         </div>
-                                       </div>
+
                                        <div className="mb-2">
                                          <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Description</label>
                                          <textarea 
@@ -1271,50 +1260,19 @@ const FreelancerEditProfile = () => {
                                            />
                                          </div>
                                          <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Start Date</label>
+                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Year</label>
                                            <input 
-                                             type="date" 
+                                             type="text" 
                                              className="form-control form-control-sm" 
-                                             value={editingEducationData.start_date} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, start_date: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>End Date</label>
-                                           <input 
-                                             type="date" 
-                                             className="form-control form-control-sm" 
-                                             value={editingEducationData.end_date} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, end_date: e.target.value })}
-                                             disabled={editingEducationData.current}
+                                             value={editingEducationData.year} 
+                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, year: e.target.value })}
+                                             placeholder="e.g., 2020"
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
                                            />
                                          </div>
                                        </div>
-                                       <div className="mb-2">
-                                         <div className="form-check">
-                                           <input 
-                                             className="form-check-input" 
-                                             type="checkbox" 
-                                             checked={editingEducationData.current} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, current: e.target.checked })}
-                                           />
-                                           <label className="form-check-label" style={{ fontSize: '12px' }}>
-                                             Currently studying here
-                                           </label>
-                                         </div>
-                                       </div>
-                                       <div className="mb-2">
-                                         <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Description</label>
-                                         <textarea 
-                                           className="form-control form-control-sm" 
-                                           value={editingEducationData.description} 
-                                           onChange={(e) => setEditingEducationData({ ...editingEducationData, description: e.target.value })}
-                                           rows={2}
-                                           style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                         />
-                                       </div>
+
+
                                        <div className="d-flex gap-2">
                                          <button 
                                            type="button"
@@ -1375,11 +1333,7 @@ const FreelancerEditProfile = () => {
                                           <i className="bi bi-calendar me-1"></i>
                                           {edu.year || 'Year not specified'}
                                         </div>
-                                       {edu.description && (
-                                         <div style={{ color: '#666', fontSize: '12px', marginBottom: '12px' }}>
-                                           {edu.description}
-                                         </div>
-                                       )}
+                                       
                                        <div className="d-flex gap-2">
                                          <button 
                                            type="button"
