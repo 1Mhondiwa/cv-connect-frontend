@@ -265,14 +265,14 @@ const FreelancerEditProfile = () => {
     setWorkSuccess("");
   };
 
-  const handleAddWork = (e) => {
-    e.preventDefault();
+  const handleAddWork = () => {
     if (!newWork.title.trim() || !newWork.company.trim()) {
       setWorkError("Job title and company are required.");
       return;
     }
 
     const updatedWorkExperience = [...cvData.work_experience, { ...newWork, id: Date.now() }];
+    
     setCvData(prev => ({
       ...prev,
       work_experience: updatedWorkExperience
@@ -300,7 +300,11 @@ const FreelancerEditProfile = () => {
     });
   };
 
-  const handleUpdateWork = () => {
+  const handleUpdateWork = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation(); // Prevent event bubbling to parent form
+    }
     const updatedWorkExperience = cvData.work_experience.map(work => 
       work.id === editingWork ? { ...editingWorkData, id: work.id } : work
     );
@@ -316,7 +320,11 @@ const FreelancerEditProfile = () => {
     setTimeout(() => setWorkSuccess(""), 3000);
   };
 
-  const handleDeleteWork = (workId) => {
+  const handleDeleteWork = (workId, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation(); // Prevent event bubbling to parent form
+    }
     if (!window.confirm("Are you sure you want to delete this work experience?")) {
       return;
     }
@@ -470,7 +478,7 @@ const FreelancerEditProfile = () => {
             setSuccess("Profile updated successfully! CV data update failed.");
           }
         } else {
-          setSuccess("Profile updated successfully!");
+        setSuccess("Profile updated successfully!");
         }
         
         setTimeout(() => navigate("/freelancer/profile"), 1500);
@@ -570,7 +578,7 @@ const FreelancerEditProfile = () => {
             <div className="col-lg-8">
               <div className="card shadow-sm" style={{ borderRadius: '16px', border: 'none' }}>
                 <div className="card-body p-4">
-                  <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
                     {/* Personal Information */}
                     <div className="mb-5">
                       <div className="d-flex align-items-center mb-4">
@@ -581,12 +589,12 @@ const FreelancerEditProfile = () => {
                           marginRight: '16px'
                         }}>
                           <i className="bi bi-person" style={{ color: '#fff', fontSize: '20px' }}></i>
-                        </div>
+              </div>
                         <div>
                           <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Personal Information</h4>
                           <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Basic details about yourself</p>
-                        </div>
-                      </div>
+              </div>
+            </div>
                       
                       <div className="row g-3">
                         <div className="col-md-6">
@@ -600,7 +608,7 @@ const FreelancerEditProfile = () => {
                             required 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
-                        </div>
+            </div>
                         <div className="col-md-6">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Last Name *</label>
                           <input 
@@ -612,7 +620,7 @@ const FreelancerEditProfile = () => {
                             required 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
-                        </div>
+            </div>
                         <div className="col-md-6">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Email Address</label>
                           <input 
@@ -630,7 +638,7 @@ const FreelancerEditProfile = () => {
                             }} 
                           />
                           <small className="text-muted">Email cannot be changed</small>
-                        </div>
+            </div>
                         <div className="col-md-6">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Phone Number</label>
                           <input 
@@ -642,7 +650,7 @@ const FreelancerEditProfile = () => {
                             placeholder="+1 (555) 123-4567" 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
-                        </div>
+            </div>
                         <div className="col-12">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Address</label>
                           <input 
@@ -654,9 +662,9 @@ const FreelancerEditProfile = () => {
                             placeholder="Enter your full address" 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
-                        </div>
-                      </div>
-                    </div>
+            </div>
+            </div>
+            </div>
 
                     {/* Professional Information */}
                     <div className="mb-5">
@@ -668,11 +676,11 @@ const FreelancerEditProfile = () => {
                           marginRight: '16px'
                         }}>
                           <i className="bi bi-briefcase" style={{ color: '#fff', fontSize: '20px' }}></i>
-                        </div>
+            </div>
                         <div>
                           <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Professional Information</h4>
                           <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Your work experience and expertise</p>
-                        </div>
+            </div>
                       </div>
                       
                       <div className="row g-3">
@@ -803,7 +811,7 @@ const FreelancerEditProfile = () => {
                            Add Work Experience
                          </div>
                          <div className="card-body p-3">
-                           <form onSubmit={handleAddWork}>
+                           <div>
                              <div className="row g-3">
                                                                <div className="col-md-6">
                                   <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Job Title *</label>
@@ -869,8 +877,9 @@ const FreelancerEditProfile = () => {
                                </div>
                              </div>
                              <button 
-                               type="submit" 
+                               type="button" 
                                className="btn btn-sm mt-3" 
+                               onClick={handleAddWork}
                                style={{ 
                                  background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
                                  color: 'white', 
@@ -883,7 +892,7 @@ const FreelancerEditProfile = () => {
                                <i className="bi bi-plus me-1"></i>
                                Add Work Experience
                              </button>
-                           </form>
+                           </div>
                          </div>
                        </div>
 
@@ -981,7 +990,7 @@ const FreelancerEditProfile = () => {
                                          <button 
                                            type="button"
                                            className="btn btn-sm btn-success flex-fill"
-                                           onClick={() => handleUpdateWork(work.id)}
+                                           onClick={(e) => handleUpdateWork(e)}
                                            style={{ borderRadius: '8px', fontSize: '12px' }}
                                          >
                                            <i className="bi bi-check me-1"></i>
@@ -1055,7 +1064,7 @@ const FreelancerEditProfile = () => {
                                          <button 
                                            type="button"
                                            className="btn btn-sm btn-outline-danger flex-fill"
-                                           onClick={() => handleDeleteWork(work.id)}
+                                           onClick={(e) => handleDeleteWork(work.id, e)}
                                            style={{ borderRadius: '8px', fontSize: '12px' }}
                                          >
                                            <i className="bi bi-trash me-1"></i>
@@ -1413,20 +1422,20 @@ const FreelancerEditProfile = () => {
                           fontSize: '16px'
                         }}
                       >
-                        {submitting ? (
-                          <span>
-                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {submitting ? (
+                  <span>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                             Saving Changes...
-                          </span>
-                        ) : (
+                  </span>
+                ) : (
                           <>
                             <i className="bi bi-check-circle me-2"></i>
                             Save Profile Changes
                           </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
+                )}
+              </button>
+            </div>
+          </form>
                 </div>
               </div>
             </div>
@@ -1710,4 +1719,4 @@ const FreelancerEditProfile = () => {
   );
 };
 
-export default FreelancerEditProfile;
+export default FreelancerEditProfile; 
