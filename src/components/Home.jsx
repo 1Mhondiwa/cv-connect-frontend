@@ -37,14 +37,15 @@ const Home = () => {
   }, []);
 
   return (
-    <section
-      className="hero d-flex align-items-center justify-content-center"
-      style={{
-        minHeight: '100vh',
-        background: 'url(/assets/img/hero-bg.jpg) center center/cover no-repeat',
-        position: 'relative'
-      }}
-    >
+    <>
+      <section
+        className="hero d-flex align-items-center justify-content-center"
+        style={{
+          minHeight: '100vh',
+          background: 'url(/assets/img/hero-bg.jpg) center center/cover no-repeat',
+          position: 'relative'
+        }}
+      >
       {/* Overlay for better contrast */}
       <div
         style={{
@@ -228,6 +229,7 @@ const Home = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 
