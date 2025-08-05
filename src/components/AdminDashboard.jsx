@@ -5,12 +5,26 @@ import { useAuth } from '../contexts/AuthContext';
 
 const accent = '#fd680e';
 
-const AdminDashboard = () => {
+const ESCAdminDashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Associate request management states
+  const [associateRequests, setAssociateRequests] = useState([]);
+  const [associateRequestsLoading, setAssociateRequestsLoading] = useState(false);
+  const [associateRequestsError, setAssociateRequestsError] = useState('');
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewFormData, setReviewFormData] = useState({
+    status: 'approved',
+    review_notes: '',
+    password: ''
+  });
+  
+  // Legacy associate management (keeping for backward compatibility)
   const [associateFormData, setAssociateFormData] = useState({
     email: '',
     password: '',
@@ -29,13 +43,25 @@ const AdminDashboard = () => {
   const [associatesLoading, setAssociatesLoading] = useState(false);
   const [associatesError, setAssociatesError] = useState('');
   const [toggleLoading, setToggleLoading] = useState({});
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associates', or 'freelancers'
+  
+  // Enhanced freelancer management
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associate-requests', 'associates', 'freelancers'
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
+  const [freelancerFilters, setFreelancerFilters] = useState({
+    availability_status: 'all',
+    page: 1,
+    limit: 10
+  });
+  const [availabilityUpdateLoading, setAvailabilityUpdateLoading] = useState({});
+  
+  // Enhanced statistics
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState('');
+  
+  // Admin profile management
   const [adminImage, setAdminImage] = useState(null);
   const [adminImageUploading, setAdminImageUploading] = useState(false);
   const [adminImageError, setAdminImageError] = useState('');
@@ -57,7 +83,15 @@ const AdminDashboard = () => {
   // Fetch freelancers when freelancers tab is activated
   useEffect(() => {
     if (activeTab === 'freelancers') {
-      fetchFreelancers();
+      fetchFreelancersWithFilters();
+    }
+    // eslint-disable-next-line
+  }, [activeTab]);
+
+  // Fetch associate requests when associate-requests tab is activated
+  useEffect(() => {
+    if (activeTab === 'associate-requests') {
+      fetchAssociateRequests();
     }
     // eslint-disable-next-line
   }, [activeTab]);
@@ -363,6 +397,100 @@ const AdminDashboard = () => {
     }
   };
 
+  // Associate Request Management Functions
+  const fetchAssociateRequests = async () => {
+    setAssociateRequestsLoading(true);
+    setAssociateRequestsError('');
+    try {
+      const res = await api.get('/associate-request/requests');
+      if (res.data.success) {
+        setAssociateRequests(res.data.data.requests);
+      } else {
+        setAssociateRequestsError(res.data.message || 'Failed to fetch associate requests');
+      }
+    } catch (err) {
+      setAssociateRequestsError(err.response?.data?.message || 'Failed to fetch associate requests');
+    } finally {
+      setAssociateRequestsLoading(false);
+    }
+  };
+
+  const handleReviewRequest = async (requestId) => {
+    setReviewLoading(true);
+    try {
+      const res = await api.put(`/associate-request/requests/${requestId}/review`, reviewFormData);
+      if (res.data.success) {
+        // Refresh the requests list
+        fetchAssociateRequests();
+        setSelectedRequest(null);
+        setReviewFormData({ status: 'approved', review_notes: '', password: '' });
+        alert(`Request ${reviewFormData.status} successfully`);
+      } else {
+        alert(res.data.message || 'Failed to review request');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to review request');
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  const handleReviewFormChange = (e) => {
+    setReviewFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  // Enhanced Freelancer Management Functions
+  const fetchFreelancersWithFilters = async () => {
+    setFreelancersLoading(true);
+    setFreelancersError('');
+    try {
+      const params = new URLSearchParams();
+      if (freelancerFilters.availability_status !== 'all') {
+        params.append('availability_status', freelancerFilters.availability_status);
+      }
+      params.append('page', freelancerFilters.page);
+      params.append('limit', freelancerFilters.limit);
+
+      const res = await api.get(`/admin/freelancers?${params.toString()}`);
+      if (res.data.success) {
+        setFreelancers(res.data.freelancers);
+      } else {
+        setFreelancersError(res.data.message || 'Failed to fetch freelancers');
+      }
+    } catch (err) {
+      setFreelancersError(err.response?.data?.message || 'Failed to fetch freelancers');
+    } finally {
+      setFreelancersLoading(false);
+    }
+  };
+
+  const updateFreelancerAvailability = async (freelancerId, availabilityStatus) => {
+    setAvailabilityUpdateLoading(prev => ({ ...prev, [freelancerId]: true }));
+    try {
+      const res = await api.put(`/admin/freelancers/${freelancerId}/availability`, {
+        availability_status: availabilityStatus
+      });
+      if (res.data.success) {
+        // Update freelancer in state
+        setFreelancers(prev => prev.map(f => 
+          f.freelancer_id === freelancerId 
+            ? { ...f, availability_status: availabilityStatus }
+            : f
+        ));
+        alert(`Freelancer availability updated to ${availabilityStatus}`);
+      } else {
+        alert(res.data.message || 'Failed to update availability');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update availability');
+    } finally {
+      setAvailabilityUpdateLoading(prev => ({ ...prev, [freelancerId]: false }));
+    }
+  };
+
   if (loading) {
     return (
       <section className="contact section">
@@ -391,7 +519,7 @@ const AdminDashboard = () => {
         <div>
           <div style={{ padding: '32px 0 24px 0', textAlign: 'center', borderBottom: '1px solid #23284a' }}>
             <h2 style={{ color: accent, fontWeight: 800, fontSize: 28, letterSpacing: 1, margin: 0 }}>CV‑Connect</h2>
-            <div style={{ fontSize: 13, color: '#bdbdbd', marginTop: 4 }}>Admin Panel</div>
+            <div style={{ fontSize: 13, color: '#bdbdbd', marginTop: 4 }}>ESC Admin Panel</div>
           </div>
           <nav style={{ marginTop: 32 }}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -401,15 +529,15 @@ const AdminDashboard = () => {
                 </button>
               </li>
               <li>
+                <button onClick={() => setActiveTab('associate-requests')} className="admin-sidebar-btn">
+                  <i className="bi bi-envelope me-2"></i> Associate Requests
+                </button>
+              </li>
+              <li>
                 <button onClick={() => setActiveTab('associates')} className="admin-sidebar-btn">
                   <i className="bi bi-building me-2"></i> Associates
                 </button>
               </li>
-             { /*<li>
-                <Link to="/admin/users" className="admin-sidebar-btn" style={{ textDecoration: 'none' }}>
-                  <i className="bi bi-people me-2"></i> Manage Users
-                </Link>
-              </li>*/}
               <li>
                 <button onClick={() => setActiveTab('freelancers')} className="admin-sidebar-btn">
                   <i className="bi bi-person-workspace me-2"></i> Freelancers
@@ -502,7 +630,7 @@ const AdminDashboard = () => {
             <>
               {/* System Stats Row */}
               <div className="row gy-4 mb-4">
-                <div className="col-lg-4 col-md-6">
+                <div className="col-lg-3 col-md-6">
                   <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
                     <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-people"></i></div>
                     <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Users</div>
@@ -511,7 +639,7 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-4 col-md-6">
+                <div className="col-lg-3 col-md-6">
                   <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
                     <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-file-earmark-text"></i></div>
                     <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>CVs</div>
@@ -520,12 +648,52 @@ const AdminDashboard = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-4 col-md-6">
+                <div className="col-lg-3 col-md-6">
                   <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
                     <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-chat-dots"></i></div>
                     <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Messages</div>
                     <div style={{ color: '#888', fontSize: 15 }}>
                       {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.total_messages ?? '--'}
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-3 col-md-6">
+                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
+                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-envelope"></i></div>
+                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Pending Requests</div>
+                    <div style={{ color: '#888', fontSize: 15 }}>
+                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.associate_requests?.pending ?? '--'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Additional Stats Row */}
+              <div className="row gy-4 mb-4">
+                <div className="col-lg-4 col-md-6">
+                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
+                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-person-check"></i></div>
+                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Available Freelancers</div>
+                    <div style={{ color: '#888', fontSize: 15 }}>
+                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.freelancer_availability?.available ?? '--'}
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-4 col-md-6">
+                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
+                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-person-x"></i></div>
+                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Unavailable Freelancers</div>
+                    <div style={{ color: '#888', fontSize: 15 }}>
+                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.freelancer_availability?.unavailable ?? '--'}
+                    </div>
+                  </div>
+                </div>
+                <div className="col-lg-4 col-md-6">
+                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
+                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-person-busy"></i></div>
+                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Busy Freelancers</div>
+                    <div style={{ color: '#888', fontSize: 15 }}>
+                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.freelancer_availability?.busy ?? '--'}
                     </div>
                   </div>
                 </div>
@@ -640,6 +808,167 @@ const AdminDashboard = () => {
               </div>
             </>
           )}
+          {/* Associate Requests Table (Associate Requests Tab) */}
+          {activeTab === 'associate-requests' && (
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Associate Requests</h5>
+              {associateRequestsLoading ? (
+                <div>Loading associate requests...</div>
+              ) : associateRequestsError ? (
+                <div style={{ color: '#df1529', fontWeight: 500 }}>{associateRequestsError}</div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="table table-bordered" style={{ minWidth: 700 }}>
+                    <thead style={{ background: '#f8f9fa' }}>
+                      <tr>
+                        <th>Email</th>
+                        <th>Company Name</th>
+                        <th>Contact Person</th>
+                        <th>Industry</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {associateRequests.map(request => (
+                        <tr key={request.request_id}>
+                          <td>{request.email}</td>
+                          <td>{request.company_name || 'N/A'}</td>
+                          <td>{request.contact_person}</td>
+                          <td>{request.industry}</td>
+                          <td>{request.phone}</td>
+                          <td>
+                            <span className={`badge ${request.status === 'pending' ? 'bg-warning' : request.status === 'approved' ? 'bg-success' : 'bg-danger'}`}>
+                              {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                            </span>
+                          </td>
+                          <td>{request.created_at ? new Date(request.created_at).toLocaleDateString() : ''}</td>
+                          <td>
+                            {request.status === 'pending' && (
+                              <button
+                                className="btn btn-sm btn-primary me-2"
+                                onClick={() => setSelectedRequest(request)}
+                                style={{ borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px' }}
+                              >
+                                Review
+                              </button>
+                            )}
+                            {request.status !== 'pending' && (
+                              <div>
+                                <small className="text-muted">
+                                  {request.reviewed_at ? `Reviewed: ${new Date(request.reviewed_at).toLocaleDateString()}` : ''}
+                                </small>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Review Modal */}
+              {selectedRequest && (
+                <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                  <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">Review Associate Request</h5>
+                        <button type="button" className="btn-close" onClick={() => setSelectedRequest(null)}></button>
+                      </div>
+                      <div className="modal-body">
+                        <div className="row mb-3">
+                          <div className="col-md-6">
+                            <strong>Email:</strong> {selectedRequest.email}
+                          </div>
+                          <div className="col-md-6">
+                            <strong>Company:</strong> {selectedRequest.company_name || 'N/A'}
+                          </div>
+                        </div>
+                        <div className="row mb-3">
+                          <div className="col-md-6">
+                            <strong>Contact Person:</strong> {selectedRequest.contact_person}
+                          </div>
+                          <div className="col-md-6">
+                            <strong>Industry:</strong> {selectedRequest.industry}
+                          </div>
+                        </div>
+                        <div className="row mb-3">
+                          <div className="col-md-6">
+                            <strong>Phone:</strong> {selectedRequest.phone}
+                          </div>
+                          <div className="col-md-6">
+                            <strong>Website:</strong> {selectedRequest.website || 'N/A'}
+                          </div>
+                        </div>
+                        {selectedRequest.request_reason && (
+                          <div className="mb-3">
+                            <strong>Reason:</strong> {selectedRequest.request_reason}
+                          </div>
+                        )}
+                        <hr />
+                        <form>
+                          <div className="mb-3">
+                            <label className="form-label">Decision:</label>
+                            <select 
+                              name="status" 
+                              className="form-select" 
+                              value={reviewFormData.status}
+                              onChange={handleReviewFormChange}
+                            >
+                              <option value="approved">Approve</option>
+                              <option value="rejected">Reject</option>
+                            </select>
+                          </div>
+                          {reviewFormData.status === 'approved' && (
+                            <div className="mb-3">
+                              <label className="form-label">Set Password:</label>
+                              <input 
+                                type="password" 
+                                name="password" 
+                                className="form-control" 
+                                placeholder="Enter password for the new account"
+                                value={reviewFormData.password}
+                                onChange={handleReviewFormChange}
+                                required
+                              />
+                            </div>
+                          )}
+                          <div className="mb-3">
+                            <label className="form-label">Review Notes (Optional):</label>
+                            <textarea 
+                              name="review_notes" 
+                              className="form-control" 
+                              rows="3"
+                              placeholder="Add any notes about this decision"
+                              value={reviewFormData.review_notes}
+                              onChange={handleReviewFormChange}
+                            ></textarea>
+                          </div>
+                        </form>
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={() => setSelectedRequest(null)}>
+                          Cancel
+                        </button>
+                        <button 
+                          type="button" 
+                          className="btn btn-primary" 
+                          onClick={() => handleReviewRequest(selectedRequest.request_id)}
+                          disabled={reviewLoading || (reviewFormData.status === 'approved' && !reviewFormData.password)}
+                        >
+                          {reviewLoading ? 'Processing...' : `Submit ${reviewFormData.status}`}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           {/* Associates Table (Associates Tab) */}
           {activeTab === 'associates' && (
             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
@@ -695,6 +1024,27 @@ const AdminDashboard = () => {
           {activeTab === 'freelancers' && (
             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
               <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>All Freelancers</h5>
+              
+              {/* Filters */}
+              <div className="row mb-4">
+                <div className="col-md-4">
+                  <label className="form-label">Availability Status:</label>
+                  <select 
+                    className="form-select" 
+                    value={freelancerFilters.availability_status}
+                    onChange={(e) => {
+                      setFreelancerFilters(prev => ({ ...prev, availability_status: e.target.value, page: 1 }));
+                      setTimeout(() => fetchFreelancersWithFilters(), 100);
+                    }}
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="available">Available</option>
+                    <option value="unavailable">Unavailable</option>
+                    <option value="busy">Busy</option>
+                  </select>
+                </div>
+              </div>
+              
               {freelancersLoading ? (
                 <div>Loading freelancers...</div>
               ) : freelancersError ? (
@@ -708,10 +1058,12 @@ const AdminDashboard = () => {
                         <th>First Name</th>
                         <th>Last Name</th>
                         <th>Phone</th>
+                        <th>Availability</th>
                         <th>Status</th>
                         <th>Created</th>
                         <th>Last Login</th>
                         <th>Active</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -721,6 +1073,19 @@ const AdminDashboard = () => {
                           <td>{f.first_name}</td>
                           <td>{f.last_name}</td>
                           <td>{f.phone}</td>
+                          <td>
+                            <select 
+                              className="form-select form-select-sm" 
+                              value={f.availability_status || 'available'}
+                              onChange={(e) => updateFreelancerAvailability(f.freelancer_id, e.target.value)}
+                              disabled={availabilityUpdateLoading[f.freelancer_id]}
+                              style={{ minWidth: 100 }}
+                            >
+                              <option value="available">Available</option>
+                              <option value="unavailable">Unavailable</option>
+                              <option value="busy">Busy</option>
+                            </select>
+                          </td>
                           <td>{f.is_verified ? 'Verified' : 'Unverified'}</td>
                           <td>{f.created_at ? new Date(f.created_at).toLocaleDateString() : ''}</td>
                           <td>{f.last_login ? new Date(f.last_login).toLocaleDateString() : ''}</td>
@@ -728,6 +1093,11 @@ const AdminDashboard = () => {
                             <span className="badge" style={{ background: f.is_active ? '#059652' : '#df1529', color: '#fff', borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px', minWidth: 90 }}>
                               {f.is_active ? 'Active' : 'Inactive'}
                             </span>
+                          </td>
+                          <td>
+                            {availabilityUpdateLoading[f.freelancer_id] && (
+                              <small className="text-muted">Updating...</small>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -812,4 +1182,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard; 
+export default ESCAdminDashboard; 

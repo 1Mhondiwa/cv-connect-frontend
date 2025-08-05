@@ -13,7 +13,7 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import FreelancerDashboard from './components/FreelancerDashboard';
 import AdminCreate from './components/AdminCreate';
-import AdminDashboard from './components/AdminDashboard';
+import ESCAdminDashboard from './components/AdminDashboard';
 import AssociateDashboard from './components/AssociateDashboard';
 import NotFound from './components/NotFound';
 import Footer from './components/Footer';
@@ -97,7 +97,7 @@ function AppRoutes() {
             <Route path="/associate/dashboard" element={<ProtectedRoute requiredRole="associate"><AssociateDashboard /></ProtectedRoute>} />
           {/* Admin Routes - Not linked in public navigation */}
           <Route path="/admin/create" element={<AdminCreate />} />
-            <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><ESCAdminDashboard /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
