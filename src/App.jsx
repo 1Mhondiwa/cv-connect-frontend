@@ -24,6 +24,7 @@ import FreelancerEditProfile from './components/FreelancerEditProfile';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import WelcomeFreelancer from './components/WelcomeFreelancer';
+import AssociateRequestForm from './components/AssociateRequestForm';
 
 function ScrollTopButton() {
   const [show, setShow] = useState(false);
@@ -96,9 +97,10 @@ function AppRoutes() {
           {/* Associate Routes - Not linked in public navigation */}
             <Route path="/associate/dashboard" element={<ProtectedRoute requiredRole="associate"><AssociateDashboard /></ProtectedRoute>} />
           {/* Admin Routes - Not linked in public navigation */}
-          <Route path="/admin/create" element={<AdminCreate />} />
+                      <Route path="/admin/create" element={<AdminCreate />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><ESCAdminDashboard /></ProtectedRoute>} />
-          <Route path="*" element={<NotFound />} />
+            <Route path="/associate-request" element={<AssociateRequestForm />} />
+            <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
         

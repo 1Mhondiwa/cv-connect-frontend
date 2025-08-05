@@ -171,6 +171,63 @@ const Home = () => {
         }
       `}</style>
     </section>
+
+    {/* Associate Call-to-Action Section */}
+    <section className="py-5" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)' }}>
+      <div className="container">
+        <div className="row align-items-center">
+          <div className="col-lg-8 mx-auto text-center">
+            <div className="bg-white rounded-4 shadow-sm p-5" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+              <div style={{ fontSize: 48, color: '#fd680e', marginBottom: 24 }}>
+                <i className="bi bi-building"></i>
+              </div>
+              <h2 style={{ color: '#333', fontWeight: 700, marginBottom: 16 }}>
+                Are You a Company Looking for Talent?
+              </h2>
+              <p style={{ fontSize: 18, color: '#666', marginBottom: 32, lineHeight: 1.6 }}>
+                Join CV-Connect as an associate company and gain access to our curated pool of skilled freelancers. 
+                ESC reviews all applications to ensure quality partnerships.
+              </p>
+              <div className="d-flex justify-content-center gap-3 flex-wrap">
+                <Link
+                  to="/associate-request"
+                  className="btn dashboard-btn"
+                  style={{ 
+                    background: '#fd680e', 
+                    color: '#fff', 
+                    border: 'none', 
+                    borderRadius: 30, 
+                    fontWeight: 600, 
+                    fontSize: 16, 
+                    padding: '12px 32px',
+                    transition: 'transform 0.18s, box-shadow 0.18s'
+                  }}
+                >
+                  <i className="bi bi-arrow-right me-2"></i>
+                  Apply to Become Associate
+                </Link>
+                <Link
+                  to="/services"
+                  className="btn dashboard-btn"
+                  style={{ 
+                    background: 'transparent', 
+                    color: '#fd680e', 
+                    border: '2px solid #fd680e', 
+                    borderRadius: 30, 
+                    fontWeight: 600, 
+                    fontSize: 16, 
+                    padding: '12px 32px',
+                    transition: 'transform 0.18s, box-shadow 0.18s'
+                  }}
+                >
+                  Learn More
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 

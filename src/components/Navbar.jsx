@@ -6,7 +6,8 @@ const navLinks = [
   { to: '/about', label: 'About' },
   { to: '/whyus', label: 'Why Us' },
   { to: '/services', label: 'Services' },
-  { to: '/contact', label: 'Contact' }
+  { to: '/contact', label: 'Contact' },
+  { to: '/associate-request', label: 'Become Associate' }
 ];
 const authLinks = [
   { to: '/register', label: 'Register' },
