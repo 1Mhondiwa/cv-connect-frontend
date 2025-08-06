@@ -387,9 +387,10 @@ const AssociateDashboard = () => {
     }
     setChangePwLoading(true);
     try {
-      const res = await api.post('/associate/change-password', {
+      const res = await api.put('/auth/change-password', {
         oldPassword: changePwForm.oldPassword,
-        newPassword: changePwForm.newPassword
+        newPassword: changePwForm.newPassword,
+        confirmPassword: changePwForm.confirmPassword
       });
       if (res.data.success) {
         setChangePwSuccess('Password changed successfully!');
