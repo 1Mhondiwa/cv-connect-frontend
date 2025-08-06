@@ -34,7 +34,7 @@ const AssociateDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [messagingLoading, setMessagingLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('search'); // 'search' or 'messages'
+  const [activeTab, setActiveTab] = useState('search'); // 'search', 'messages', 'change-password'
   
   // Skills for dropdown
   const [availableSkills, setAvailableSkills] = useState([]);
@@ -51,6 +51,11 @@ const AssociateDashboard = () => {
   const [activities, setActivities] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
   const [toast, setToast] = useState({ message: '', type: '' });
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [changePwForm, setChangePwForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
+  const [changePwLoading, setChangePwLoading] = useState(false);
+  const [changePwError, setChangePwError] = useState('');
+  const [changePwSuccess, setChangePwSuccess] = useState('');
 
   // REMOVE: const socket = io('http://localhost:5000'); // Adjust if backend URL is different
 
@@ -361,6 +366,44 @@ const AssociateDashboard = () => {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=eee&color=555&size=120&bold=true`;
   };
 
+  // Handler for change password form
+  const handleChangePwInput = (e) => {
+    setChangePwForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setChangePwError('');
+    setChangePwSuccess('');
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setChangePwError('');
+    setChangePwSuccess('');
+    if (!changePwForm.oldPassword || !changePwForm.newPassword || !changePwForm.confirmPassword) {
+      setChangePwError('All fields are required.');
+      return;
+    }
+    if (changePwForm.newPassword !== changePwForm.confirmPassword) {
+      setChangePwError('New passwords do not match.');
+      return;
+    }
+    setChangePwLoading(true);
+    try {
+      const res = await api.post('/associate/change-password', {
+        oldPassword: changePwForm.oldPassword,
+        newPassword: changePwForm.newPassword
+      });
+      if (res.data.success) {
+        setChangePwSuccess('Password changed successfully!');
+        setChangePwForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        setChangePwError(res.data.message || 'Failed to change password.');
+      }
+    } catch (err) {
+      setChangePwError(err.response?.data?.message || 'Failed to change password.');
+    } finally {
+      setChangePwLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <section className="contact section">
@@ -513,6 +556,13 @@ const AssociateDashboard = () => {
                       {globalUnread}
                     </span>
                   )}
+                </button>
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'change-password' ? '' : 'btn-outline-primary'}`}
+                  style={{ background: activeTab === 'change-password' ? accent : 'transparent', color: activeTab === 'change-password' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => setActiveTab('change-password')}
+                >
+                  <i className="bi bi-key me-2"></i>Change Password
                 </button>
               </div>
               {assocUploading && (
@@ -781,6 +831,32 @@ const AssociateDashboard = () => {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+        {activeTab === 'change-password' && (
+          <div className="bg-white rounded-4 shadow-sm p-4 mt-3" style={{ maxWidth: 500, margin: '0 auto' }}>
+            <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Change Password</h5>
+            <form onSubmit={handleChangePassword}>
+              <div className="mb-3">
+                <label className="form-label">Old Password</label>
+                <input type="password" name="oldPassword" className="form-control" value={changePwForm.oldPassword} onChange={handleChangePwInput} required />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">New Password</label>
+                <input type="password" name="newPassword" className="form-control" value={changePwForm.newPassword} onChange={handleChangePwInput} required />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">Confirm New Password</label>
+                <input type="password" name="confirmPassword" className="form-control" value={changePwForm.confirmPassword} onChange={handleChangePwInput} required />
+              </div>
+              {changePwError && <div className="alert alert-danger">{changePwError}</div>}
+              {changePwSuccess && <div className="alert alert-success">{changePwSuccess}</div>}
+              <div className="d-flex gap-2">
+                <button type="submit" className="btn dashboard-btn" style={{ background: accent, color: '#fff', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '10px 28px' }} disabled={changePwLoading}>
+                  {changePwLoading ? 'Changing...' : 'Submit'}
+                </button>
+              </div>
+            </form>
           </div>
         )}
       {/* Recent Activity */}
