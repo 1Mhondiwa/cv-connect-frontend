@@ -387,11 +387,20 @@ const AssociateDashboard = () => {
     }
     setChangePwLoading(true);
     try {
+      console.log('Sending change password request...', {
+        oldPassword: changePwForm.oldPassword ? '***' : 'empty',
+        newPassword: changePwForm.newPassword ? '***' : 'empty',
+        confirmPassword: changePwForm.confirmPassword ? '***' : 'empty'
+      });
+      
       const res = await api.put('/auth/change-password', {
         oldPassword: changePwForm.oldPassword,
         newPassword: changePwForm.newPassword,
         confirmPassword: changePwForm.confirmPassword
       });
+      
+      console.log('Change password response:', res.data);
+      
       if (res.data.success) {
         setChangePwSuccess('Password changed successfully!');
         setChangePwForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
@@ -399,6 +408,8 @@ const AssociateDashboard = () => {
         setChangePwError(res.data.message || 'Failed to change password.');
       }
     } catch (err) {
+      console.error('Change password error:', err);
+      console.error('Error response:', err.response?.data);
       setChangePwError(err.response?.data?.message || 'Failed to change password.');
     } finally {
       setChangePwLoading(false);
