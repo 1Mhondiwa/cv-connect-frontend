@@ -78,7 +78,9 @@ const AssociateRequestForm = () => {
     setSuccess(false);
 
     try {
+      console.log('Submitting associate request:', formData);
       const response = await api.post('/associate-request/submit', formData);
+      console.log('Response received:', response.data);
       
       if (response.data.success) {
         setSuccess(true);
@@ -96,6 +98,9 @@ const AssociateRequestForm = () => {
         setError(response.data.message || 'Failed to submit request');
       }
     } catch (err) {
+      console.error('Error submitting request:', err);
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
       setError(err.response?.data?.message || 'Failed to submit request. Please try again.');
     } finally {
       setLoading(false);
