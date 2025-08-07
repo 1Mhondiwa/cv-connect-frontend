@@ -41,11 +41,66 @@ const Register = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, strength: 'weak', color: '#dc3545' });
 
   const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
     setError('');
     setSuccess('');
+    
+    // Update password strength for password field
+    if (name === 'password') {
+      const strength = validatePasswordStrength(value);
+      setPasswordStrength(strength);
+    }
+  };
+
+  // Password strength validation
+  const validatePasswordStrength = (password) => {
+    let score = 0;
+
+    // Length check
+    if (password.length >= 8) score += 1;
+
+    // Uppercase check
+    if (/[A-Z]/.test(password)) score += 1;
+
+    // Lowercase check
+    if (/[a-z]/.test(password)) score += 1;
+
+    // Number check
+    if (/\d/.test(password)) score += 1;
+
+    // Special character check
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+
+    // Common password check
+    const commonPasswords = ['password', '123456', 'qwerty', 'abc123'];
+    if (!commonPasswords.includes(password.toLowerCase())) score += 1;
+
+    // Sequential check
+    const sequentialPatterns = ['123', 'abc', 'qwe'];
+    const hasSequential = sequentialPatterns.some(pattern => 
+      password.toLowerCase().includes(pattern)
+    );
+    if (!hasSequential) score += 1;
+
+    // Repeated characters check
+    if (!/(.)\1{2,}/.test(password)) score += 1;
+
+    let strength = 'weak';
+    let color = '#dc3545';
+    
+    if (score >= 7) {
+      strength = 'strong';
+      color = '#28a745';
+    } else if (score >= 5) {
+      strength = 'medium';
+      color = '#ffc107';
+    }
+
+    return { score, strength, color };
   };
 
   const handleSubmit = async e => {
@@ -208,6 +263,30 @@ const Register = () => {
                     placeholder="Create a password"
                     style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '10px 14px' }}
                   />
+                  {/* Password strength indicator */}
+                  {form.password && (
+                    <div className="mt-2">
+                      <div className="d-flex align-items-center mb-1">
+                        <div className="me-2" style={{ fontSize: 12, fontWeight: 600, color: passwordStrength.color }}>
+                          {passwordStrength.strength.toUpperCase()}
+                        </div>
+                        <div className="flex-grow-1">
+                          <div className="progress" style={{ height: 4 }}>
+                            <div 
+                              className="progress-bar" 
+                              style={{ 
+                                width: `${(passwordStrength.score / 8) * 100}%`, 
+                                backgroundColor: passwordStrength.color 
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                      <small className="text-muted" style={{ fontSize: 11 }}>
+                        Requirements: 8+ chars, uppercase, lowercase, number, special char
+                      </small>
+                    </div>
+                  )}
                 </div>
                 <div className="mb-3">
                   <label htmlFor="confirmPassword" style={{ fontWeight: 500, color: '#444', marginBottom: 4 }}>Confirm Password</label>
