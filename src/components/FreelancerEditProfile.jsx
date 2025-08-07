@@ -265,17 +265,21 @@ const FreelancerEditProfile = () => {
     setWorkSuccess("");
   };
 
+  // Modify handleAddWork to only update local state
   const handleAddWork = () => {
     if (!newWork.title.trim() || !newWork.company.trim()) {
       setWorkError("Job title and company are required.");
       return;
     }
-
-    const updatedWorkExperience = [...cvData.work_experience, { ...newWork, id: Date.now() }];
+    
+    const workToAdd = {
+      ...newWork,
+      id: `work_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    };
     
     setCvData(prev => ({
       ...prev,
-      work_experience: updatedWorkExperience
+      work_experience: [...prev.work_experience, workToAdd]
     }));
     
     setNewWork({
@@ -285,7 +289,9 @@ const FreelancerEditProfile = () => {
       end_date: "",
       description: ""
     });
-    setWorkSuccess("Work experience added successfully!");
+    
+    setWorkError("");
+    setWorkSuccess("Work experience added to form. Click 'Save Profile Changes' to save.");
     setTimeout(() => setWorkSuccess(""), 3000);
   };
 
@@ -300,42 +306,42 @@ const FreelancerEditProfile = () => {
     });
   };
 
+  // Modify handleUpdateWork to only update local state
   const handleUpdateWork = (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation(); // Prevent event bubbling to parent form
+    e.preventDefault();
+    if (!editingWorkData.company.trim() || !editingWorkData.position.trim()) {
+      setWorkError("Company and position are required.");
+      return;
     }
-    const updatedWorkExperience = cvData.work_experience.map(work => 
-      work.id === editingWork ? { ...editingWorkData, id: work.id } : work
-    );
     
     setCvData(prev => ({
       ...prev,
-      work_experience: updatedWorkExperience
+      work_experience: prev.work_experience.map(work => 
+        work.id === editingWork 
+          ? { ...work, ...editingWorkData }
+          : work
+      )
     }));
     
     setEditingWork(null);
     setEditingWorkData({});
-    setWorkSuccess("Work experience updated successfully!");
+    setWorkError("");
+    setWorkSuccess("Work experience updated in form. Click 'Save Profile Changes' to save.");
     setTimeout(() => setWorkSuccess(""), 3000);
   };
 
+  // Modify handleDeleteWork to only update local state
   const handleDeleteWork = (workId, e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation(); // Prevent event bubbling to parent form
-    }
-    if (!window.confirm("Are you sure you want to delete this work experience?")) {
-      return;
-    }
-
-    const updatedWorkExperience = cvData.work_experience.filter(work => work.id !== workId);
+    e.preventDefault();
+    e.stopPropagation();
+    
     setCvData(prev => ({
       ...prev,
-      work_experience: updatedWorkExperience
+      work_experience: prev.work_experience.filter(work => work.id !== workId)
     }));
     
-    setWorkSuccess("Work experience deleted successfully!");
+    setWorkError("");
+    setWorkSuccess("Work experience removed from form. Click 'Save Profile Changes' to save.");
     setTimeout(() => setWorkSuccess(""), 3000);
   };
 
@@ -350,17 +356,21 @@ const FreelancerEditProfile = () => {
     setEducationSuccess("");
   };
 
-  const handleAddEducation = (e) => {
-    e.preventDefault();
+  // Modify handleAddEducation to only update local state
+  const handleAddEducation = () => {
     if (!newEducation.degree.trim() || !newEducation.institution.trim()) {
       setEducationError("Degree and institution are required.");
       return;
     }
-
-    const updatedEducation = [...cvData.education, { ...newEducation, id: Date.now() }];
+    
+    const educationToAdd = {
+      ...newEducation,
+      id: `edu_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    };
+    
     setCvData(prev => ({
       ...prev,
-      education: updatedEducation
+      education: [...prev.education, educationToAdd]
     }));
     
     setNewEducation({
@@ -369,7 +379,9 @@ const FreelancerEditProfile = () => {
       institution: "",
       year: ""
     });
-    setEducationSuccess("Education added successfully!");
+    
+    setEducationError("");
+    setEducationSuccess("Education added to form. Click 'Save Profile Changes' to save.");
     setTimeout(() => setEducationSuccess(""), 3000);
   };
 
@@ -383,34 +395,38 @@ const FreelancerEditProfile = () => {
     });
   };
 
+  // Modify handleUpdateEducation to only update local state
   const handleUpdateEducation = () => {
-    const updatedEducation = cvData.education.map(edu => 
-      edu.id === editingEducation ? { ...editingEducationData, id: edu.id } : edu
-    );
+    if (!editingEducationData.degree.trim() || !editingEducationData.institution.trim()) {
+      setEducationError("Degree and institution are required.");
+      return;
+    }
     
     setCvData(prev => ({
       ...prev,
-      education: updatedEducation
+      education: prev.education.map(edu => 
+        edu.id === editingEducation 
+          ? { ...edu, ...editingEducationData }
+          : edu
+      )
     }));
     
     setEditingEducation(null);
     setEditingEducationData({});
-    setEducationSuccess("Education updated successfully!");
+    setEducationError("");
+    setEducationSuccess("Education updated in form. Click 'Save Profile Changes' to save.");
     setTimeout(() => setEducationSuccess(""), 3000);
   };
 
+  // Modify handleDeleteEducation to only update local state
   const handleDeleteEducation = (educationId) => {
-    if (!window.confirm("Are you sure you want to delete this education?")) {
-      return;
-    }
-
-    const updatedEducation = cvData.education.filter(edu => edu.id !== educationId);
     setCvData(prev => ({
       ...prev,
-      education: updatedEducation
+      education: prev.education.filter(edu => edu.id !== educationId)
     }));
     
-    setEducationSuccess("Education deleted successfully!");
+    setEducationError("");
+    setEducationSuccess("Education removed from form. Click 'Save Profile Changes' to save.");
     setTimeout(() => setEducationSuccess(""), 3000);
   };
 
@@ -876,22 +892,30 @@ const FreelancerEditProfile = () => {
                                  />
                                </div>
                              </div>
-                             <button 
-                               type="button" 
-                               className="btn btn-sm mt-3" 
-                               onClick={handleAddWork}
-                               style={{ 
-                                 background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
-                                 color: 'white', 
-                                 border: 'none', 
-                                 borderRadius: '20px', 
-                                 padding: '8px 16px',
-                                 fontWeight: 600
-                               }}
-                             >
-                               <i className="bi bi-plus me-1"></i>
-                               Add Work Experience
-                             </button>
+                             <div className="mt-3 text-center">
+                               <button 
+                                 type="button" 
+                                 className="btn btn-sm me-2" 
+                                 onClick={handleAddWork}
+                                 style={{ 
+                                   background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
+                                   color: 'white', 
+                                   border: 'none', 
+                                   borderRadius: '20px', 
+                                   padding: '8px 16px',
+                                   fontWeight: 600
+                                 }}
+                               >
+                                 <i className="bi bi-plus me-1"></i>
+                                 Add to Form
+                               </button>
+                               <div className="mt-2">
+                                 <small className="text-muted">
+                                   <i className="bi bi-info-circle me-1"></i>
+                                   Work experience will be saved when you click "Save Profile Changes"
+                                 </small>
+                               </div>
+                             </div>
                            </div>
                          </div>
                        </div>
@@ -1119,7 +1143,7 @@ const FreelancerEditProfile = () => {
                            Add Education
                          </div>
                          <div className="card-body p-3">
-                           <form onSubmit={handleAddEducation}>
+                           <div>
                              <div className="row g-3">
                                                                <div className="col-md-6">
                                   <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Degree *</label>
@@ -1173,22 +1197,31 @@ const FreelancerEditProfile = () => {
                                 </div>
                                
                              </div>
-                             <button 
-                               type="submit" 
-                               className="btn btn-sm mt-3" 
-                               style={{ 
-                                 background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
-                                 color: 'white', 
-                                 border: 'none', 
-                                 borderRadius: '20px', 
-                                 padding: '8px 16px',
-                                 fontWeight: 600
-                               }}
-                             >
-                               <i className="bi bi-plus me-1"></i>
-                               Add Education
-                             </button>
-                           </form>
+                             <div className="mt-3 text-center">
+                               <button 
+                                 type="button" 
+                                 className="btn btn-sm me-2" 
+                                 onClick={handleAddEducation}
+                                 style={{ 
+                                   background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
+                                   color: 'white', 
+                                   border: 'none', 
+                                   borderRadius: '20px', 
+                                   padding: '8px 16px',
+                                   fontWeight: 600
+                                 }}
+                               >
+                                 <i className="bi bi-plus me-1"></i>
+                                 Add to Form
+                               </button>
+                               <div className="mt-2">
+                                 <small className="text-muted">
+                                   <i className="bi bi-info-circle me-1"></i>
+                                   Education will be saved when you click "Save Profile Changes"
+                                 </small>
+                               </div>
+                             </div>
+                           </div>
                          </div>
                        </div>
 
