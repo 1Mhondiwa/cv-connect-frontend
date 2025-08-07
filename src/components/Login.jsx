@@ -16,6 +16,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = e => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -119,16 +120,35 @@ const Login = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="password" style={{ fontWeight: 500, color: '#444', marginBottom: 4 }}>Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="password"
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Enter your password"
-                    style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '10px 14px' }}
-                  />
+                  <div className="position-relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      className="form-control"
+                      id="password"
+                      name="password"
+                      value={form.password}
+                      onChange={handleChange}
+                      placeholder="Enter your password"
+                      style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '10px 14px', paddingRight: '40px' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn position-absolute"
+                      style={{
+                        right: '5px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#666',
+                        fontSize: '16px',
+                        padding: '5px'
+                      }}
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
+                  </div>
                 </div>
                 <button
                   type="submit"

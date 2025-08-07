@@ -14,6 +14,9 @@ const AdminCreate = () => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSecretKey, setShowSecretKey] = useState(false);
 
   // SECURITY NOTE: This route should not be exposed publicly in production
   // Consider adding additional security measures like IP whitelisting or a hardcoded token
@@ -171,38 +174,98 @@ const AdminCreate = () => {
                 </div>
 
                 <div className="col-md-6">
-                  <input 
-                    type="password" 
-                    name="password" 
-                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                    placeholder="Password" 
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
+                  <div className="position-relative">
+                    <input 
+                      type={showPassword ? "text" : "password"}
+                      name="password" 
+                      className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                      placeholder="Password" 
+                      value={formData.password}
+                      onChange={handleChange}
+                      style={{ paddingRight: '40px' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn position-absolute"
+                      style={{
+                        right: '5px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#666',
+                        fontSize: '16px',
+                        padding: '5px'
+                      }}
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
+                  </div>
                   {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                 </div>
 
                 <div className="col-md-6">
-                  <input 
-                    type="password" 
-                    name="confirm_password" 
-                    className={`form-control ${errors.confirm_password ? 'is-invalid' : ''}`}
-                    placeholder="Confirm Password" 
-                    value={formData.confirm_password}
-                    onChange={handleChange}
-                  />
+                  <div className="position-relative">
+                    <input 
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirm_password" 
+                      className={`form-control ${errors.confirm_password ? 'is-invalid' : ''}`}
+                      placeholder="Confirm Password" 
+                      value={formData.confirm_password}
+                      onChange={handleChange}
+                      style={{ paddingRight: '40px' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn position-absolute"
+                      style={{
+                        right: '5px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#666',
+                        fontSize: '16px',
+                        padding: '5px'
+                      }}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
+                  </div>
                   {errors.confirm_password && <div className="invalid-feedback">{errors.confirm_password}</div>}
                 </div>
 
                 <div className="col-md-12">
-                  <input 
-                    type="password" 
-                    name="secretKey" 
-                    className={`form-control ${errors.secretKey ? 'is-invalid' : ''}`}
-                    placeholder="Secret Key (from .env file)" 
-                    value={formData.secretKey}
-                    onChange={handleChange}
-                  />
+                  <div className="position-relative">
+                    <input 
+                      type={showSecretKey ? "text" : "password"}
+                      name="secretKey" 
+                      className={`form-control ${errors.secretKey ? 'is-invalid' : ''}`}
+                      placeholder="Secret Key (from .env file)" 
+                      value={formData.secretKey}
+                      onChange={handleChange}
+                      style={{ paddingRight: '40px' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn position-absolute"
+                      style={{
+                        right: '5px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#666',
+                        fontSize: '16px',
+                        padding: '5px'
+                      }}
+                      onClick={() => setShowSecretKey(!showSecretKey)}
+                    >
+                      <i className={`bi ${showSecretKey ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
+                  </div>
                   {errors.secretKey && <div className="invalid-feedback">{errors.secretKey}</div>}
                   <small className="form-text text-muted">
                     Enter the ADMIN_SECRET_KEY value from your backend .env file

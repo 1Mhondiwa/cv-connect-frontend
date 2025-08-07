@@ -18,6 +18,8 @@ const ResetPassword = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, strength: 'weak', color: '#dc3545' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Password strength validation
   const validatePasswordStrength = (password) => {
@@ -155,17 +157,37 @@ const ResetPassword = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="password" style={{ fontWeight: 500, color: '#444', marginBottom: 4 }}>New Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="password"
-                    name="password"
-                    value={password}
-                    onChange={handlePasswordChange}
-                    placeholder="Enter new password"
-                    style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '10px 14px' }}
-                    disabled={loading}
-                  />
+                  <div className="position-relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      className="form-control"
+                      id="password"
+                      name="password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                      placeholder="Enter new password"
+                      style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '10px 14px', paddingRight: '40px' }}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="btn position-absolute"
+                      style={{
+                        right: '5px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#666',
+                        fontSize: '16px',
+                        padding: '5px'
+                      }}
+                      onClick={() => setShowPassword(!showPassword)}
+                      disabled={loading}
+                    >
+                      <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
+                  </div>
                   {/* Password strength indicator */}
                   {password && (
                     <div className="mt-2">
@@ -193,17 +215,37 @@ const ResetPassword = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="confirmPassword" style={{ fontWeight: 500, color: '#444', marginBottom: 4 }}>Confirm New Password</label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
-                    style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '10px 14px' }}
-                    disabled={loading}
-                  />
+                  <div className="position-relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      className="form-control"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
+                      style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '10px 14px', paddingRight: '40px' }}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="btn position-absolute"
+                      style={{
+                        right: '5px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: '#666',
+                        fontSize: '16px',
+                        padding: '5px'
+                      }}
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={loading}
+                    >
+                      <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                    </button>
+                  </div>
                 </div>
                 <button
                   type="submit"

@@ -57,6 +57,9 @@ const AssociateDashboard = () => {
   const [changePwSuccess, setChangePwSuccess] = useState('');
   const [changePwLoading, setChangePwLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, strength: 'weak', color: '#dc3545' });
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // REMOVE: const socket = io('http://localhost:5000'); // Adjust if backend URL is different
 
@@ -903,31 +906,71 @@ const AssociateDashboard = () => {
             <form onSubmit={handleChangePassword} autoComplete="off" data-form-type="other">
               <div className="mb-3">
                 <label className="form-label">Old Password</label>
-                <input 
-                  type="password" 
-                  name="oldPassword" 
-                  className="form-control" 
-                  value={changePwForm.oldPassword} 
-                  onChange={handleChangePwInput} 
-                  required 
-                  autoComplete="off"
-                  data-lpignore="true"
-                  data-form-type="other"
-                />
+                <div className="position-relative">
+                  <input 
+                    type={showOldPassword ? "text" : "password"}
+                    name="oldPassword" 
+                    className="form-control" 
+                    value={changePwForm.oldPassword} 
+                    onChange={handleChangePwInput} 
+                    required 
+                    autoComplete="off"
+                    data-lpignore="true"
+                    data-form-type="other"
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn position-absolute"
+                    style={{
+                      right: '5px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      fontSize: '16px',
+                      padding: '5px'
+                    }}
+                    onClick={() => setShowOldPassword(!showOldPassword)}
+                  >
+                    <i className={`bi ${showOldPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                  </button>
+                </div>
               </div>
               <div className="mb-3">
                 <label className="form-label">New Password</label>
-                <input 
-                  type="password" 
-                  name="newPassword" 
-                  className="form-control" 
-                  value={changePwForm.newPassword} 
-                  onChange={handleChangePwInput} 
-                  required 
-                  autoComplete="new-password"
-                  data-lpignore="true"
-                  data-form-type="other"
-                />
+                <div className="position-relative">
+                  <input 
+                    type={showNewPassword ? "text" : "password"}
+                    name="newPassword" 
+                    className="form-control" 
+                    value={changePwForm.newPassword} 
+                    onChange={handleChangePwInput} 
+                    required 
+                    autoComplete="new-password"
+                    data-lpignore="true"
+                    data-form-type="other"
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn position-absolute"
+                    style={{
+                      right: '5px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      fontSize: '16px',
+                      padding: '5px'
+                    }}
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    <i className={`bi ${showNewPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                  </button>
+                </div>
                 {/* Password strength indicator */}
                 {changePwForm.newPassword && (
                   <div className="mt-2">
@@ -955,17 +998,37 @@ const AssociateDashboard = () => {
               </div>
               <div className="mb-3">
                 <label className="form-label">Confirm New Password</label>
-                <input 
-                  type="password" 
-                  name="confirmPassword" 
-                  className="form-control" 
-                  value={changePwForm.confirmPassword} 
-                  onChange={handleChangePwInput} 
-                  required 
-                  autoComplete="new-password"
-                  data-lpignore="true"
-                  data-form-type="other"
-                />
+                <div className="position-relative">
+                  <input 
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword" 
+                    className="form-control" 
+                    value={changePwForm.confirmPassword} 
+                    onChange={handleChangePwInput} 
+                    required 
+                    autoComplete="new-password"
+                    data-lpignore="true"
+                    data-form-type="other"
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn position-absolute"
+                    style={{
+                      right: '5px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      fontSize: '16px',
+                      padding: '5px'
+                    }}
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                  </button>
+                </div>
               </div>
               {changePwError && <div className="alert alert-danger">{changePwError}</div>}
               {changePwSuccess && <div className="alert alert-success">{changePwSuccess}</div>}
