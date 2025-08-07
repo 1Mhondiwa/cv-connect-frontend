@@ -93,6 +93,9 @@ const Navbar = () => {
                     : '2px solid transparent',
                   marginRight: 2,
                   marginLeft: 2,
+                  whiteSpace: 'nowrap',
+                  fontSize: 16,
+                  lineHeight: 1.2,
                   transition: 'transform 0.18s, box-shadow 0.18s, color 0.18s, background 0.18s, border 0.18s'
                 })}
               >
@@ -125,6 +128,9 @@ const Navbar = () => {
                   border: '2px solid #fd680e',
                   marginRight: 2,
                   marginLeft: 2,
+                  whiteSpace: 'nowrap',
+                  fontSize: 16,
+                  lineHeight: 1.2,
                   transition: 'transform 0.18s, box-shadow 0.18s, color 0.18s, background 0.18s, border 0.18s'
                 })}
               >
