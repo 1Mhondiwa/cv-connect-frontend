@@ -836,18 +836,48 @@ const AssociateDashboard = () => {
         {activeTab === 'change-password' && (
           <div className="bg-white rounded-4 shadow-sm p-4 mt-3" style={{ maxWidth: 500, margin: '0 auto' }}>
             <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Change Password</h5>
-            <form onSubmit={handleChangePassword}>
+            <form onSubmit={handleChangePassword} autoComplete="off" data-form-type="other">
               <div className="mb-3">
                 <label className="form-label">Old Password</label>
-                <input type="password" name="oldPassword" className="form-control" value={changePwForm.oldPassword} onChange={handleChangePwInput} required />
+                <input 
+                  type="password" 
+                  name="oldPassword" 
+                  className="form-control" 
+                  value={changePwForm.oldPassword} 
+                  onChange={handleChangePwInput} 
+                  required 
+                  autoComplete="off"
+                  data-lpignore="true"
+                  data-form-type="other"
+                />
               </div>
               <div className="mb-3">
                 <label className="form-label">New Password</label>
-                <input type="password" name="newPassword" className="form-control" value={changePwForm.newPassword} onChange={handleChangePwInput} required />
+                <input 
+                  type="password" 
+                  name="newPassword" 
+                  className="form-control" 
+                  value={changePwForm.newPassword} 
+                  onChange={handleChangePwInput} 
+                  required 
+                  autoComplete="new-password"
+                  data-lpignore="true"
+                  data-form-type="other"
+                />
               </div>
               <div className="mb-3">
                 <label className="form-label">Confirm New Password</label>
-                <input type="password" name="confirmPassword" className="form-control" value={changePwForm.confirmPassword} onChange={handleChangePwInput} required />
+                <input 
+                  type="password" 
+                  name="confirmPassword" 
+                  className="form-control" 
+                  value={changePwForm.confirmPassword} 
+                  onChange={handleChangePwInput} 
+                  required 
+                  autoComplete="new-password"
+                  data-lpignore="true"
+                  data-form-type="other"
+                />
               </div>
               {changePwError && <div className="alert alert-danger">{changePwError}</div>}
               {changePwSuccess && <div className="alert alert-success">{changePwSuccess}</div>}
