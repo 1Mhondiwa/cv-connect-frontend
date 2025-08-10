@@ -137,6 +137,42 @@ const FreelancerEditProfile = () => {
     setSuccess("");
   };
 
+  // Save specific profile fields (per-section saver)
+  const saveProfileFields = async (fieldKeys = []) => {
+    try {
+      const token = localStorage.getItem("token");
+      const payload = {};
+      if (initialForm) {
+        for (const key of fieldKeys) {
+          const value = form[key];
+          const initialVal = initialForm[key];
+          if (typeof value !== 'undefined' && value !== initialVal) {
+            payload[key] = value;
+          }
+        }
+      }
+      if (Object.keys(payload).length === 0) {
+        setSuccess("No changes detected in this section.");
+        setTimeout(() => setSuccess(""), 2500);
+        return;
+      }
+      const response = await axios.put(
+        "/api/freelancer/profile",
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data?.success) {
+        setInitialForm({ ...initialForm, ...payload });
+        setSuccess("Section saved successfully!");
+        setTimeout(() => setSuccess(""), 2500);
+      } else {
+        setError(response.data?.message || "Failed to save section.");
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save section.");
+    }
+  };
+
   const handleNewSkillChange = (e) => {
     setNewSkill({ ...newSkill, [e.target.name]: e.target.value });
     setSkillsError("");
@@ -285,7 +321,7 @@ const FreelancerEditProfile = () => {
   };
 
   // Modify handleAddWork to only update local state
-  const handleAddWork = () => {
+  const handleAddWork = async () => {
     if (!newWork.title.trim() || !newWork.company.trim()) {
       setWorkError("Job title and company are required.");
       return;
@@ -296,10 +332,11 @@ const FreelancerEditProfile = () => {
       id: `work_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
     
-    setCvData(prev => ({
-      ...prev,
-      work_experience: [...prev.work_experience, workToAdd]
-    }));
+    const nextCv = {
+      ...cvData,
+      work_experience: [...cvData.work_experience, workToAdd]
+    };
+    setCvData(nextCv);
     
     setNewWork({
       title: "",
@@ -310,8 +347,7 @@ const FreelancerEditProfile = () => {
     });
     
     setWorkError("");
-    setWorkSuccess("Work experience added to form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setWorkSuccess(""), 3000);
+    await persistCvData(nextCv, 'work');
   };
 
   const startEditingWork = (work) => {
@@ -325,43 +361,82 @@ const FreelancerEditProfile = () => {
     });
   };
 
-  // Modify handleUpdateWork to only update local state
-  const handleUpdateWork = (e) => {
+  // Persist CV parsed data helper
+  const persistCvData = async (nextCvData, section) => {
+    try {
+      const token = localStorage.getItem("token");
+      const cvResponse = await axios.put(
+        "/api/freelancer/cv/parsed-data",
+        {
+          parsed_data: {
+            work_experience: nextCvData.work_experience,
+            education: nextCvData.education
+          }
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (cvResponse.data.success) {
+        setInitialCvData({
+          work_experience: [...nextCvData.work_experience],
+          education: [...nextCvData.education]
+        });
+        if (section === 'work') {
+          setWorkSuccess("Work experience saved successfully!");
+          setTimeout(() => setWorkSuccess(""), 3000);
+        } else if (section === 'education') {
+          setEducationSuccess("Education saved successfully!");
+          setTimeout(() => setEducationSuccess(""), 3000);
+        } else {
+          setSuccess("CV data updated successfully!");
+          setTimeout(() => setSuccess(""), 3000);
+        }
+      } else {
+        if (section === 'work') setWorkError(cvResponse.data.message || "Failed to save work experience.");
+        else if (section === 'education') setEducationError(cvResponse.data.message || "Failed to save education.");
+        else setError(cvResponse.data.message || "Failed to update CV data.");
+      }
+    } catch (cvErr) {
+      if (section === 'work') setWorkError(cvErr.response?.data?.message || "Failed to save work experience.");
+      else if (section === 'education') setEducationError(cvErr.response?.data?.message || "Failed to save education.");
+      else setError(cvErr.response?.data?.message || "Failed to update CV data.");
+    }
+  };
+
+  // Update work and persist immediately
+  const handleUpdateWork = async (e) => {
     e.preventDefault();
-    if (!editingWorkData.company.trim() || !editingWorkData.position.trim()) {
-      setWorkError("Company and position are required.");
+    if (!editingWorkData.company?.trim() || !editingWorkData.title?.trim()) {
+      setWorkError("Company and job title are required.");
       return;
     }
-    
-    setCvData(prev => ({
-      ...prev,
-      work_experience: prev.work_experience.map(work => 
+    const nextCv = {
+      ...cvData,
+      work_experience: cvData.work_experience.map(work => 
         work.id === editingWork 
           ? { ...work, ...editingWorkData }
           : work
       )
-    }));
-    
+    };
+    setCvData(nextCv);
     setEditingWork(null);
     setEditingWorkData({});
     setWorkError("");
-    setWorkSuccess("Work experience updated in form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setWorkSuccess(""), 3000);
+    await persistCvData(nextCv, 'work');
   };
 
   // Modify handleDeleteWork to only update local state
-  const handleDeleteWork = (workId, e) => {
+  const handleDeleteWork = async (workId, e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    setCvData(prev => ({
-      ...prev,
-      work_experience: prev.work_experience.filter(work => work.id !== workId)
-    }));
-    
+    const nextCv = {
+      ...cvData,
+      work_experience: cvData.work_experience.filter(work => work.id !== workId)
+    };
+    setCvData(nextCv);
     setWorkError("");
-    setWorkSuccess("Work experience removed from form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setWorkSuccess(""), 3000);
+    await persistCvData(nextCv, 'work');
   };
 
   // Education Functions
@@ -376,7 +451,7 @@ const FreelancerEditProfile = () => {
   };
 
   // Modify handleAddEducation to only update local state
-  const handleAddEducation = () => {
+  const handleAddEducation = async () => {
     if (!newEducation.degree.trim() || !newEducation.institution.trim()) {
       setEducationError("Degree and institution are required.");
       return;
@@ -387,10 +462,11 @@ const FreelancerEditProfile = () => {
       id: `edu_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
     
-    setCvData(prev => ({
-      ...prev,
-      education: [...prev.education, educationToAdd]
-    }));
+    const nextCv = {
+      ...cvData,
+      education: [...cvData.education, educationToAdd]
+    };
+    setCvData(nextCv);
     
     setNewEducation({
       degree: "",
@@ -400,8 +476,7 @@ const FreelancerEditProfile = () => {
     });
     
     setEducationError("");
-    setEducationSuccess("Education added to form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setEducationSuccess(""), 3000);
+    await persistCvData(nextCv, 'education');
   };
 
   const startEditingEducation = (edu) => {
@@ -415,38 +490,36 @@ const FreelancerEditProfile = () => {
   };
 
   // Modify handleUpdateEducation to only update local state
-  const handleUpdateEducation = () => {
-    if (!editingEducationData.degree.trim() || !editingEducationData.institution.trim()) {
+  const handleUpdateEducation = async () => {
+    if (!editingEducationData.degree?.trim() || !editingEducationData.institution?.trim()) {
       setEducationError("Degree and institution are required.");
       return;
     }
-    
-    setCvData(prev => ({
-      ...prev,
-      education: prev.education.map(edu => 
+    const nextCv = {
+      ...cvData,
+      education: cvData.education.map(edu => 
         edu.id === editingEducation 
           ? { ...edu, ...editingEducationData }
           : edu
       )
-    }));
+    };
+    setCvData(nextCv);
     
     setEditingEducation(null);
     setEditingEducationData({});
     setEducationError("");
-    setEducationSuccess("Education updated in form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setEducationSuccess(""), 3000);
+    await persistCvData(nextCv, 'education');
   };
 
   // Modify handleDeleteEducation to only update local state
-  const handleDeleteEducation = (educationId) => {
-    setCvData(prev => ({
-      ...prev,
-      education: prev.education.filter(edu => edu.id !== educationId)
-    }));
-    
+  const handleDeleteEducation = async (educationId) => {
+    const nextCv = {
+      ...cvData,
+      education: cvData.education.filter(edu => edu.id !== educationId)
+    };
+    setCvData(nextCv);
     setEducationError("");
-    setEducationSuccess("Education removed from form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setEducationSuccess(""), 3000);
+    await persistCvData(nextCv, 'education');
   };
 
   const handleSubmit = async (e) => {
@@ -649,7 +722,6 @@ const FreelancerEditProfile = () => {
                             name="first_name" 
                             value={form.first_name} 
                             onChange={handleChange} 
-                            required 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
             </div>
@@ -661,7 +733,6 @@ const FreelancerEditProfile = () => {
                             name="last_name" 
                             value={form.last_name} 
                             onChange={handleChange} 
-                            required 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
             </div>
@@ -707,6 +778,24 @@ const FreelancerEditProfile = () => {
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
             </div>
+                        <div className="col-12 d-flex justify-content-end">
+                          <button
+                            type="button"
+                            className="btn btn-sm"
+                            onClick={() => saveProfileFields(['first_name','last_name','phone','address'])}
+                            style={{ 
+                              background: `linear-gradient(135deg, ${accent}, #ff8533)`,
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '20px',
+                              padding: '8px 16px',
+                              fontWeight: 600
+                            }}
+                          >
+                            <i className="bi bi-check2 me-1"></i>
+                            Save Personal Info
+                          </button>
+                        </div>
             </div>
             </div>
 
@@ -777,6 +866,24 @@ const FreelancerEditProfile = () => {
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
                         </div>
+                        <div className="col-12 d-flex justify-content-end">
+                          <button
+                            type="button"
+                            className="btn btn-sm"
+                            onClick={() => saveProfileFields(['headline','years_experience','summary','current_status'])}
+                            style={{ 
+                              background: `linear-gradient(135deg, ${accent}, #ff8533)`,
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '20px',
+                              padding: '8px 16px',
+                              fontWeight: 600
+                            }}
+                          >
+                            <i className="bi bi-check2 me-1"></i>
+                            Save Professional Info
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -797,7 +904,7 @@ const FreelancerEditProfile = () => {
                          </div>
                        </div>
                        
-                       <div className="row g-3">
+                      <div className="row g-3">
                          <div className="col-md-6">
                            <label className="form-label fw-semibold" style={{ color: '#333' }}>LinkedIn URL</label>
                            <input 
@@ -822,6 +929,24 @@ const FreelancerEditProfile = () => {
                              style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                            />
                          </div>
+                        <div className="col-12 d-flex justify-content-end">
+                          <button
+                            type="button"
+                            className="btn btn-sm"
+                            onClick={() => saveProfileFields(['linkedin_url','github_url'])}
+                            style={{ 
+                              background: `linear-gradient(135deg, ${accent}, #ff8533)`,
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '20px',
+                              padding: '8px 16px',
+                              fontWeight: 600
+                            }}
+                          >
+                            <i className="bi bi-check2 me-1"></i>
+                            Save Social Links
+                          </button>
+                        </div>
                        </div>
                      </div>
 
@@ -859,27 +984,25 @@ const FreelancerEditProfile = () => {
                              <div className="row g-3">
                                                                <div className="col-md-6">
                                   <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Job Title *</label>
-                                  <input 
+                                   <input 
                                     type="text" 
                                     className="form-control form-control-sm" 
                                     name="title" 
                                     value={newWork.title} 
                                     onChange={handleNewWorkChange}
                                     placeholder="e.g., Senior Developer"
-                                    required
                                     style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
                                   />
                                 </div>
                                 <div className="col-md-6">
                                   <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Company *</label>
-                                  <input 
+                                   <input 
                                     type="text" 
                                     className="form-control form-control-sm" 
                                     name="company" 
                                     value={newWork.company} 
                                     onChange={handleNewWorkChange}
                                     placeholder="Company name"
-                                    required
                                     style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
                                   />
                                 </div>
@@ -938,10 +1061,10 @@ const FreelancerEditProfile = () => {
                                  Add to Form
                                </button>
                                <div className="mt-2">
-                                 <small className="text-muted">
-                                   <i className="bi bi-info-circle me-1"></i>
-                                   Work experience will be saved when you click "Save Profile Changes"
-                                 </small>
+                                  <small className="text-muted">
+                                    <i className="bi bi-info-circle me-1"></i>
+                                    Work experience is saved immediately when added.
+                                  </small>
                                </div>
                              </div>
                            </div>
@@ -994,16 +1117,16 @@ const FreelancerEditProfile = () => {
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
                                            />
                                          </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Position</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingWorkData.position} 
-                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, position: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
+                                          <div className="col-md-6">
+                                            <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Job Title</label>
+                                            <input 
+                                              type="text" 
+                                              className="form-control form-control-sm" 
+                                              value={editingWorkData.title} 
+                                              onChange={(e) => setEditingWorkData({ ...editingWorkData, title: e.target.value })}
+                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                            />
+                                          </div>
                                          <div className="col-md-6">
                                            <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Start Date</label>
                                            <input 
@@ -1182,7 +1305,6 @@ const FreelancerEditProfile = () => {
                                     value={newEducation.degree} 
                                     onChange={handleNewEducationChange}
                                     placeholder="e.g., Bachelor's, Master's"
-                                    required
                                     style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
                                   />
                                 </div>
@@ -1195,7 +1317,6 @@ const FreelancerEditProfile = () => {
                                     value={newEducation.institution} 
                                     onChange={handleNewEducationChange}
                                     placeholder="University/College name"
-                                    required
                                     style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
                                   />
                                 </div>
@@ -1243,10 +1364,10 @@ const FreelancerEditProfile = () => {
                                  Add to Form
                                </button>
                                <div className="mt-2">
-                                 <small className="text-muted">
-                                   <i className="bi bi-info-circle me-1"></i>
-                                   Education will be saved when you click "Save Profile Changes"
-                                 </small>
+                                  <small className="text-muted">
+                                    <i className="bi bi-info-circle me-1"></i>
+                                    Education is saved immediately when added.
+                                  </small>
                                </div>
                              </div>
                            </div>
@@ -1309,26 +1430,16 @@ const FreelancerEditProfile = () => {
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
                                            />
                                          </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Field of Study</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingEducationData.field_of_study} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, field_of_study: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>GPA</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingEducationData.gpa} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, gpa: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
+                                          <div className="col-md-6">
+                                            <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Field of Study</label>
+                                            <input 
+                                              type="text" 
+                                              className="form-control form-control-sm" 
+                                              value={editingEducationData.field} 
+                                              onChange={(e) => setEditingEducationData({ ...editingEducationData, field: e.target.value })}
+                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                            />
+                                          </div>
                                          <div className="col-md-6">
                                            <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Year</label>
                                            <input 
