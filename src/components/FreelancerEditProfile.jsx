@@ -20,6 +20,7 @@ const FreelancerEditProfile = () => {
     current_status: "",
   });
   const [skills, setSkills] = useState([]);
+  const [initialForm, setInitialForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -39,6 +40,7 @@ const FreelancerEditProfile = () => {
     work_experience: [],
     education: []
   });
+  const [initialCvData, setInitialCvData] = useState({ work_experience: [], education: [] });
   const [editingWork, setEditingWork] = useState(null);
   const [newWork, setNewWork] = useState({
     title: "",
@@ -80,6 +82,19 @@ const FreelancerEditProfile = () => {
             ...response.data.profile,
             email: response.data.profile.email || "",
           });
+          // Save initial snapshot for change detection
+          setInitialForm({
+            first_name: response.data.profile.first_name || "",
+            last_name: response.data.profile.last_name || "",
+            phone: response.data.profile.phone || "",
+            address: response.data.profile.address || "",
+            years_experience: response.data.profile.years_experience || "",
+            summary: response.data.profile.summary || "",
+            headline: response.data.profile.headline || "",
+            linkedin_url: response.data.profile.linkedin_url || "",
+            github_url: response.data.profile.github_url || "",
+            current_status: response.data.profile.current_status || ""
+          });
           setSkills(response.data.profile.skills || []);
           
           // Load CV parsed data
@@ -95,6 +110,10 @@ const FreelancerEditProfile = () => {
               id: edu.id || `edu_${index}_${Date.now()}`
             }));
             setCvData({
+              work_experience: workExperienceWithIds,
+              education: educationWithIds
+            });
+            setInitialCvData({
               work_experience: workExperienceWithIds,
               education: educationWithIds
             });
@@ -436,39 +455,39 @@ const FreelancerEditProfile = () => {
     setError("");
     setSuccess("");
     
-    if (!form.first_name.trim() || !form.last_name.trim()) {
-      setError("First and last name are required.");
-      setSubmitting(false);
-      return;
-    }
-    
     try {
       const token = localStorage.getItem("token");
-      const payload = {
-        first_name: form.first_name,
-        last_name: form.last_name,
-        phone: form.phone,
-        address: form.address,
-        years_experience: form.years_experience,
-        summary: form.summary,
-        headline: form.headline,
-        linkedin_url: form.linkedin_url,
-        github_url: form.github_url,
-        current_status: form.current_status,
-      };
+      // Build partial payload only for changed fields
+      const payload = {};
+      if (initialForm) {
+        Object.entries(form).forEach(([key, value]) => {
+          if (key === 'email') return; // not updated here
+          const initialVal = initialForm[key];
+          if (typeof value !== 'undefined' && value !== initialVal) {
+            payload[key] = value;
+          }
+        });
+      }
       
-      // Update profile data
-      const response = await axios.put(
-        "/api/freelancer/profile",
-        payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+      let profileOk = true;
+      if (Object.keys(payload).length > 0) {
+        const response = await axios.put(
+          "/api/freelancer/profile",
+          payload,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        profileOk = response.data?.success;
+        if (!profileOk) {
+          throw new Error(response.data?.message || 'Profile update failed');
         }
-      );
+      }
       
-      if (response.data.success) {
-        // Update CV parsed data if there are changes
-        if (cvData.work_experience.length > 0 || cvData.education.length > 0) {
+      // Detect CV parsed data changes
+      const cvChanged = JSON.stringify(cvData) !== JSON.stringify(initialCvData);
+      if (profileOk) {
+        if (cvChanged) {
           try {
             const cvResponse = await axios.put(
               "/api/freelancer/cv/parsed-data",
@@ -484,7 +503,13 @@ const FreelancerEditProfile = () => {
             );
             
             if (cvResponse.data.success) {
-              setSuccess("Profile and CV data updated successfully!");
+              setSuccess(Object.keys(payload).length > 0 ? "Profile and CV data updated successfully!" : "CV data updated successfully!");
+              // Refresh initial snapshots
+              setInitialForm({ ...form });
+              setInitialCvData({
+                work_experience: [...cvData.work_experience],
+                education: [...cvData.education]
+              });
             } else {
               console.warn("Failed to update CV parsed data:", cvResponse.data.message);
               setSuccess("Profile updated successfully! CV data update failed.");
@@ -494,12 +519,15 @@ const FreelancerEditProfile = () => {
             setSuccess("Profile updated successfully! CV data update failed.");
           }
         } else {
-        setSuccess("Profile updated successfully!");
+          if (Object.keys(payload).length > 0) {
+            setSuccess("Profile updated successfully!");
+            setInitialForm({ ...form });
+          } else {
+            setSuccess("No changes detected.");
+          }
         }
         
         setTimeout(() => navigate("/freelancer/profile"), 1500);
-      } else {
-        setError(response.data.message || "Update failed.");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Update failed.");
