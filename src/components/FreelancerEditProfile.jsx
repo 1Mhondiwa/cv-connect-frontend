@@ -332,10 +332,14 @@ const FreelancerEditProfile = () => {
       id: `work_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
     
+    console.log('Adding work experience:', workToAdd);
+    
     const nextCv = {
       ...cvData,
       work_experience: [...cvData.work_experience, workToAdd]
     };
+    
+    console.log('Updated CV data:', nextCv);
     setCvData(nextCv);
     
     setNewWork({
@@ -365,6 +369,13 @@ const FreelancerEditProfile = () => {
   const persistCvData = async (nextCvData, section) => {
     try {
       const token = localStorage.getItem("token");
+      console.log('Saving CV data:', {
+        parsed_data: {
+          work_experience: nextCvData.work_experience,
+          education: nextCvData.education
+        }
+      });
+      
       const cvResponse = await axios.put(
         "/api/freelancer/cv/parsed-data",
         {
@@ -377,6 +388,9 @@ const FreelancerEditProfile = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      
+      console.log('CV save response:', cvResponse.data);
+      
       if (cvResponse.data.success) {
         setInitialCvData({
           work_experience: [...nextCvData.work_experience],
@@ -398,6 +412,7 @@ const FreelancerEditProfile = () => {
         else setError(cvResponse.data.message || "Failed to update CV data.");
       }
     } catch (cvErr) {
+      console.error('Error saving CV data:', cvErr);
       if (section === 'work') setWorkError(cvErr.response?.data?.message || "Failed to save work experience.");
       else if (section === 'education') setEducationError(cvErr.response?.data?.message || "Failed to save education.");
       else setError(cvErr.response?.data?.message || "Failed to update CV data.");
@@ -462,10 +477,14 @@ const FreelancerEditProfile = () => {
       id: `edu_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     };
     
+    console.log('Adding education:', educationToAdd);
+    
     const nextCv = {
       ...cvData,
       education: [...cvData.education, educationToAdd]
     };
+    
+    console.log('Updated CV data:', nextCv);
     setCvData(nextCv);
     
     setNewEducation({
