@@ -62,7 +62,12 @@ const Login = () => {
             navigate('/freelancer-dashboard');
             }
           } else if (result.user.user_type === 'associate') {
-            navigate('/associate/dashboard');
+            // Check if associate needs to change temporary password
+            if (!result.user.has_changed_temp_password) {
+              navigate('/associate/temp-password-change');
+            } else {
+              navigate('/associate/dashboard');
+            }
           } else if (result.user.user_type === 'admin') {
             navigate('/admin/dashboard');
           } else {

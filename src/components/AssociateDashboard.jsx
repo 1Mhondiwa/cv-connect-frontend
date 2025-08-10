@@ -135,6 +135,13 @@ const AssociateDashboard = () => {
         setLoading(false);
         return;
       }
+      
+      // Check if associate needs to change temporary password
+      if (!parsedUser.has_changed_temp_password) {
+        navigate('/associate/temp-password-change');
+        return;
+      }
+      
       setUser(parsedUser);
       setLoading(false);
     } catch (error) {
