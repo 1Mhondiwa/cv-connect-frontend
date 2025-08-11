@@ -30,17 +30,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
         }
       }
     };
-
-    const checkAssociateTempPassword = () => {
-      if (requiredRole === 'associate' && isAuthenticated && user?.user_type === 'associate') {
-        if (!user.has_changed_temp_password) {
-          navigate('/associate/temp-password-change', { replace: true });
-        }
-      }
-    };
-
     checkFreelancerCV();
-    checkAssociateTempPassword();
     // Only run when user, isAuthenticated, or requiredRole changes
   }, [user, isAuthenticated, requiredRole, navigate]);
 
