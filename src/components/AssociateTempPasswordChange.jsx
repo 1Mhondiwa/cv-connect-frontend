@@ -9,6 +9,7 @@ const AssociateTempPasswordChange = () => {
   const navigate = useNavigate();
   const { user, logout, updateUser } = useAuth();
   const [form, setForm] = useState({
+    oldPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
@@ -72,7 +73,7 @@ const AssociateTempPasswordChange = () => {
     setError('');
     setSuccess('');
 
-    if (!form.newPassword || !form.confirmPassword) {
+    if (!form.oldPassword || !form.newPassword || !form.confirmPassword) {
       setError('Please fill in all fields.');
       return;
     }
@@ -91,10 +92,14 @@ const AssociateTempPasswordChange = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await api.post('/associate/change-password', {
-        newPassword: form.newPassword,
-        isTemporaryPasswordChange: true
-      }, {
+      const requestData = {
+        oldPassword: form.oldPassword,
+        newPassword: form.newPassword
+      };
+      
+      console.log('🔍 Sending password change request:', requestData);
+      
+      const response = await api.post('/associate/change-password', requestData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -153,12 +158,12 @@ const AssociateTempPasswordChange = () => {
                  <p style={{ color: '#888', fontSize: 14, marginBottom: 24 }}>
                    For security reasons, please change your temporary password to a new password of your choice.
                  </p>
-                 <div style={{ background: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: 8, padding: '12px 16px', marginTop: 16 }}>
-                   <p style={{ color: '#856404', fontSize: 14, margin: 0 }}>
-                     <i className="bi bi-info-circle me-2"></i>
-                     <strong>Note:</strong> This is your first login. You only need to enter a new password.
-                   </p>
-                 </div>
+                                   <div style={{ background: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: 8, padding: '12px 16px', marginTop: 16 }}>
+                    <p style={{ color: '#856404', fontSize: 14, margin: 0 }}>
+                      <i className="bi bi-info-circle me-2"></i>
+                      <strong>Note:</strong> This is your first login. Enter your temporary password as the current password, then choose a new password.
+                    </p>
+                  </div>
                </div>
 
               {error && (
@@ -173,11 +178,30 @@ const AssociateTempPasswordChange = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} autoComplete="off">
-                <div className="mb-3">
-                  <label htmlFor="newPassword" style={{ fontWeight: 500, color: '#444', marginBottom: 8 }}>
-                    New Password <span style={{ color: '#df1529' }}>*</span>
-                  </label>
+                             <form onSubmit={handleSubmit} autoComplete="off">
+                 <div className="mb-3">
+                   <label htmlFor="oldPassword" style={{ fontWeight: 500, color: '#444', marginBottom: 8 }}>
+                     Current Password <span style={{ color: '#df1529' }}>*</span>
+                   </label>
+                   <div className="position-relative">
+                     <input
+                       type="password"
+                       className="form-control"
+                       id="oldPassword"
+                       name="oldPassword"
+                       value={form.oldPassword}
+                       onChange={handleChange}
+                       placeholder="Enter your current password"
+                       style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '12px 16px' }}
+                       required
+                     />
+                   </div>
+                 </div>
+
+                 <div className="mb-3">
+                   <label htmlFor="newPassword" style={{ fontWeight: 500, color: '#444', marginBottom: 8 }}>
+                     New Password <span style={{ color: '#df1529' }}>*</span>
+                   </label>
                   <div className="position-relative">
                     <input
                       type={showNewPassword ? "text" : "password"}
