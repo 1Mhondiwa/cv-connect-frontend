@@ -418,7 +418,15 @@ const ESCAdminDashboard = () => {
   const handleReviewRequest = async (requestId) => {
     setReviewLoading(true);
     try {
+      console.log('🔍 Sending review request:', {
+        url: `/associate-request/requests/${requestId}/review`,
+        data: reviewFormData,
+        requestId
+      });
+      
       const res = await api.put(`/associate-request/requests/${requestId}/review`, reviewFormData);
+      console.log('✅ Review response:', res.data);
+      
       if (res.data.success) {
         // Refresh the requests list
         fetchAssociateRequests();
@@ -429,6 +437,8 @@ const ESCAdminDashboard = () => {
         alert(res.data.message || 'Failed to review request');
       }
     } catch (err) {
+      console.error('❌ Review request error:', err);
+      console.error('Error response:', err.response?.data);
       alert(err.response?.data?.message || 'Failed to review request');
     } finally {
       setReviewLoading(false);

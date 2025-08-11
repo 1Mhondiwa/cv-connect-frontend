@@ -111,7 +111,7 @@ const Contact = () => {
                       <i className="bi bi-geo-alt me-3" style={{ color: accent, fontSize: 18 }}></i>
                       <div>
                         <strong style={{ color: '#333' }}>Headquarters</strong><br />
-                        <span style={{ color: '#666', fontSize: 14 }}>123 Innovation Drive, Tech City, TC 12345</span>
+                        <span style={{ color: '#666', fontSize: 14 }}>Johannesburg, South Africa</span>
                       </div>
                     </div>
                     <div className="d-flex align-items-center mb-3">
