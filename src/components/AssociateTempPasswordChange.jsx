@@ -184,17 +184,18 @@ const AssociateTempPasswordChange = () => {
                      Current Password <span style={{ color: '#df1529' }}>*</span>
                    </label>
                    <div className="position-relative">
-                     <input
-                       type="password"
-                       className="form-control"
-                       id="oldPassword"
-                       name="oldPassword"
-                       value={form.oldPassword}
-                       onChange={handleChange}
-                       placeholder="Enter your current password"
-                       style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '12px 16px' }}
-                       required
-                     />
+                                           <input
+                        type="password"
+                        className="form-control"
+                        id="oldPassword"
+                        name="oldPassword"
+                        value={form.oldPassword}
+                        onChange={handleChange}
+                        placeholder="Enter your current password"
+                        style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '12px 16px' }}
+                        autoComplete="current-password"
+                        required
+                      />
                    </div>
                  </div>
 
@@ -203,17 +204,18 @@ const AssociateTempPasswordChange = () => {
                      New Password <span style={{ color: '#df1529' }}>*</span>
                    </label>
                   <div className="position-relative">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      className="form-control"
-                      id="newPassword"
-                      name="newPassword"
-                      value={form.newPassword}
-                      onChange={handleChange}
-                      placeholder="Enter your new password"
-                      style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '12px 16px', paddingRight: '50px' }}
-                      required
-                    />
+                                         <input
+                       type={showNewPassword ? "text" : "password"}
+                       className="form-control"
+                       id="newPassword"
+                       name="newPassword"
+                       value={form.newPassword}
+                       onChange={handleChange}
+                       placeholder="Enter your new password"
+                       style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '12px 16px', paddingRight: '50px' }}
+                       autoComplete="new-password"
+                       required
+                     />
                     <button
                       type="button"
                       className="btn position-absolute"
@@ -261,17 +263,18 @@ const AssociateTempPasswordChange = () => {
                     Confirm New Password <span style={{ color: '#df1529' }}>*</span>
                   </label>
                   <div className="position-relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      className="form-control"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      value={form.confirmPassword}
-                      onChange={handleChange}
-                      placeholder="Confirm your new password"
-                      style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '12px 16px', paddingRight: '50px' }}
-                      required
-                    />
+                                         <input
+                       type={showConfirmPassword ? "text" : "password"}
+                       className="form-control"
+                       id="confirmPassword"
+                       name="confirmPassword"
+                       value={form.confirmPassword}
+                       onChange={handleChange}
+                       placeholder="Confirm your new password"
+                       style={{ borderRadius: 12, border: '1.5px solid #eee', fontSize: 16, padding: '12px 16px', paddingRight: '50px' }}
+                       autoComplete="new-password"
+                       required
+                     />
                     <button
                       type="button"
                       className="btn position-absolute"
