@@ -51,10 +51,16 @@ const ESCAdminDashboard = () => {
   const [freelancersError, setFreelancersError] = useState('');
   const [freelancerFilters, setFreelancerFilters] = useState({
     availability_status: 'all',
+    approval_status: 'all',
     page: 1,
     limit: 10
   });
   const [availabilityUpdateLoading, setAvailabilityUpdateLoading] = useState({});
+  const [approvalLoading, setApprovalLoading] = useState({});
+  const [selectedFreelancerForNotes, setSelectedFreelancerForNotes] = useState(null);
+  const [freelancerNotesModal, setFreelancerNotesModal] = useState(false);
+  const [freelancerNotes, setFreelancerNotes] = useState('');
+  const [notesLoading, setNotesLoading] = useState(false);
   
   // Enhanced statistics
   const [stats, setStats] = useState(null);
@@ -461,6 +467,9 @@ const ESCAdminDashboard = () => {
       if (freelancerFilters.availability_status !== 'all') {
         params.append('availability_status', freelancerFilters.availability_status);
       }
+      if (freelancerFilters.approval_status !== 'all') {
+        params.append('approval_status', freelancerFilters.approval_status);
+      }
       params.append('page', freelancerFilters.page);
       params.append('limit', freelancerFilters.limit);
 
@@ -481,13 +490,13 @@ const ESCAdminDashboard = () => {
     setAvailabilityUpdateLoading(prev => ({ ...prev, [freelancerId]: true }));
     try {
       const res = await api.put(`/admin/freelancers/${freelancerId}/availability`, {
-        availability_status: availabilityStatus
+        is_available: availabilityStatus === 'available'
       });
       if (res.data.success) {
         // Update freelancer in state
         setFreelancers(prev => prev.map(f => 
           f.freelancer_id === freelancerId 
-            ? { ...f, availability_status: availabilityStatus }
+            ? { ...f, is_available: availabilityStatus === 'available' }
             : f
         ));
         alert(`Freelancer availability updated to ${availabilityStatus}`);
@@ -498,6 +507,118 @@ const ESCAdminDashboard = () => {
       alert(err.response?.data?.message || 'Failed to update availability');
     } finally {
       setAvailabilityUpdateLoading(prev => ({ ...prev, [freelancerId]: false }));
+    }
+  };
+
+  const approveFreelancer = async (freelancerId) => {
+    setApprovalLoading(prev => ({ ...prev, [freelancerId]: true }));
+    try {
+      const res = await api.put(`/admin/freelancers/${freelancerId}/approve`);
+      if (res.data.success) {
+        // Update freelancer in state
+        setFreelancers(prev => prev.map(f => 
+          f.freelancer_id === freelancerId 
+            ? { 
+                ...f, 
+                is_approved: true, 
+                approval_date: new Date().toISOString(),
+                approved_by: user.user_id,
+                last_admin_review: new Date().toISOString()
+              }
+            : f
+        ));
+        alert('Freelancer approved successfully!');
+      } else {
+        alert(res.data.message || 'Failed to approve freelancer');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to approve freelancer');
+    } finally {
+      setApprovalLoading(prev => ({ ...prev, [freelancerId]: false }));
+    }
+  };
+
+  const rejectFreelancer = async (freelancerId) => {
+    setApprovalLoading(prev => ({ ...prev, [freelancerId]: true }));
+    try {
+      const res = await api.put(`/admin/freelancers/${freelancerId}/reject`);
+      if (res.data.success) {
+        // Update freelancer in state
+        setFreelancers(prev => prev.map(f => 
+          f.freelancer_id === freelancerId 
+            ? { 
+                ...f, 
+                is_approved: false, 
+                approval_date: null,
+                approved_by: null,
+                last_admin_review: new Date().toISOString()
+              }
+            : f
+        ));
+        alert('Freelancer rejected successfully!');
+      } else {
+        alert(res.data.message || 'Failed to reject freelancer');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to reject freelancer');
+    } finally {
+      setApprovalLoading(prev => ({ ...prev, [freelancerId]: false }));
+    }
+  };
+
+  const updateFreelancerRating = async (freelancerId, rating) => {
+    try {
+      const res = await api.put(`/admin/freelancers/${freelancerId}/rating`, { rating });
+      if (res.data.success) {
+        // Update freelancer in state
+        setFreelancers(prev => prev.map(f => 
+          f.freelancer_id === freelancerId 
+            ? { ...f, admin_rating: rating, last_admin_review: new Date().toISOString() }
+            : f
+        ));
+      } else {
+        alert(res.data.message || 'Failed to update rating');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update rating');
+    }
+  };
+
+  const openFreelancerNotes = (freelancerId) => {
+    const freelancer = freelancers.find(f => f.freelancer_id === freelancerId);
+    setSelectedFreelancerForNotes(freelancer);
+    setFreelancerNotes(freelancer?.admin_notes || '');
+    setFreelancerNotesModal(true);
+  };
+
+  const saveFreelancerNotes = async () => {
+    if (!selectedFreelancerForNotes) return;
+    
+    setNotesLoading(true);
+    try {
+      const res = await api.put(`/admin/freelancers/${selectedFreelancerForNotes.freelancer_id}/notes`, {
+        notes: freelancerNotes
+      });
+      if (res.data.success) {
+        // Update freelancer in state
+        setFreelancers(prev => prev.map(f => 
+          f.freelancer_id === selectedFreelancerForNotes.freelancer_id
+            ? { 
+                ...f, 
+                admin_notes: freelancerNotes,
+                last_admin_review: new Date().toISOString()
+              }
+            : f
+        ));
+        setFreelancerNotesModal(false);
+        alert('Notes saved successfully!');
+      } else {
+        alert(res.data.message || 'Failed to save notes');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to save notes');
+    } finally {
+      setNotesLoading(false);
     }
   };
 
@@ -1033,7 +1154,43 @@ const ESCAdminDashboard = () => {
           {/* Freelancers Table (Freelancers Tab) */}
           {activeTab === 'freelancers' && (
             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>All Freelancers</h5>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>ECS Admin Freelancer Management</h5>
+              
+              {/* Summary Statistics */}
+              <div className="row mb-4">
+                <div className="col-md-3">
+                  <div className="card border-0 shadow-sm text-center p-3">
+                    <div className="text-primary fs-4 fw-bold">
+                      {freelancers.filter(f => f.is_approved).length}
+                    </div>
+                    <div className="text-muted small">Approved</div>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="card border-0 shadow-sm text-center p-3">
+                    <div className="text-warning fs-4 fw-bold">
+                      {freelancers.filter(f => !f.is_approved).length}
+                    </div>
+                    <div className="text-muted small">Pending Approval</div>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="card border-0 shadow-sm text-center p-3">
+                    <div className="text-success fs-4 fw-bold">
+                      {freelancers.filter(f => f.is_available).length}
+                    </div>
+                    <div className="text-muted small">Available</div>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="card border-0 shadow-sm text-center p-3">
+                    <div className="text-info fs-4 fw-bold">
+                      {freelancers.length}
+                    </div>
+                    <div className="text-muted small">Total</div>
+                  </div>
+                </div>
+              </div>
               
               {/* Filters */}
               <div className="row mb-4">
@@ -1050,7 +1207,21 @@ const ESCAdminDashboard = () => {
                     <option value="all">All Statuses</option>
                     <option value="available">Available</option>
                     <option value="unavailable">Unavailable</option>
-                    <option value="busy">Busy</option>
+                  </select>
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label">Approval Status:</label>
+                  <select 
+                    className="form-select" 
+                    value={freelancerFilters.approval_status}
+                    onChange={(e) => {
+                      setFreelancerFilters(prev => ({ ...prev, approval_status: e.target.value, page: 1 }));
+                      setTimeout(() => fetchFreelancersWithFilters(), 100);
+                    }}
+                  >
+                    <option value="all">All Approval Statuses</option>
+                    <option value="approved">Approved</option>
+                    <option value="pending">Pending Approval</option>
                   </select>
                 </div>
               </div>
@@ -1061,18 +1232,18 @@ const ESCAdminDashboard = () => {
                 <div style={{ color: '#df1529', fontWeight: 500 }}>{freelancersError}</div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
-                  <table className="table table-bordered" style={{ minWidth: 700 }}>
+                  <table className="table table-bordered" style={{ minWidth: 900 }}>
                     <thead style={{ background: '#f8f9fa' }}>
                       <tr>
                         <th>Email</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
+                        <th>Name</th>
                         <th>Phone</th>
+                        <th>Approval Status</th>
+                        <th>Admin Rating</th>
                         <th>Availability</th>
                         <th>Status</th>
                         <th>Created</th>
-                        <th>Last Login</th>
-                        <th>Active</th>
+                        <th>Last Review</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -1080,34 +1251,85 @@ const ESCAdminDashboard = () => {
                       {freelancers.map(f => (
                         <tr key={f.freelancer_id}>
                           <td>{f.email}</td>
-                          <td>{f.first_name}</td>
-                          <td>{f.last_name}</td>
-                          <td>{f.phone}</td>
+                          <td>
+                            <div>
+                              <strong>{f.first_name} {f.last_name}</strong>
+                              {f.headline && <div className="text-muted small">{f.headline}</div>}
+                            </div>
+                          </td>
+                          <td>{f.phone || 'N/A'}</td>
+                          <td>
+                            <span className={`badge ${f.is_approved ? 'bg-success' : 'bg-warning'}`} style={{ borderRadius: 20, fontWeight: 600, fontSize: 12, padding: '6px 12px' }}>
+                              {f.is_approved ? 'Approved' : 'Pending'}
+                            </span>
+                            {f.approval_date && (
+                              <div className="text-muted small mt-1">
+                                {new Date(f.approval_date).toLocaleDateString()}
+                              </div>
+                            )}
+                          </td>
+                          <td>
+                            <div className="d-flex align-items-center">
+                              <div className="me-2">
+                                {[1, 2, 3, 4, 5].map(star => (
+                                  <i 
+                                    key={star} 
+                                    className={`bi ${star <= (f.admin_rating || 0) ? 'bi-star-fill text-warning' : 'bi-star text-muted'}`}
+                                    style={{ cursor: 'pointer', fontSize: '14px' }}
+                                    onClick={() => updateFreelancerRating(f.freelancer_id, star)}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-muted small">({f.admin_rating || 0}/5)</span>
+                            </div>
+                          </td>
                           <td>
                             <select 
                               className="form-select form-select-sm" 
-                              value={f.availability_status || 'available'}
+                              value={f.is_available ? 'available' : 'unavailable'}
                               onChange={(e) => updateFreelancerAvailability(f.freelancer_id, e.target.value)}
                               disabled={availabilityUpdateLoading[f.freelancer_id]}
-                              style={{ minWidth: 100 }}
+                              style={{ minWidth: 120 }}
                             >
                               <option value="available">Available</option>
                               <option value="unavailable">Unavailable</option>
-                              <option value="busy">Busy</option>
                             </select>
                           </td>
-                          <td>{f.is_verified ? 'Verified' : 'Unverified'}</td>
-                          <td>{f.created_at ? new Date(f.created_at).toLocaleDateString() : ''}</td>
-                          <td>{f.last_login ? new Date(f.last_login).toLocaleDateString() : ''}</td>
                           <td>
-                            <span className="badge" style={{ background: f.is_active ? '#059652' : '#df1529', color: '#fff', borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px', minWidth: 90 }}>
-                              {f.is_active ? 'Active' : 'Inactive'}
+                            <span className={`badge ${f.is_verified ? 'bg-info' : 'bg-secondary'}`} style={{ borderRadius: 20, fontWeight: 600, fontSize: 12, padding: '6px 12px' }}>
+                              {f.is_verified ? 'Verified' : 'Unverified'}
                             </span>
                           </td>
+                          <td>{f.created_at ? new Date(f.created_at).toLocaleDateString() : 'N/A'}</td>
                           <td>
-                            {availabilityUpdateLoading[f.freelancer_id] && (
-                              <small className="text-muted">Updating...</small>
-                            )}
+                            {f.last_admin_review ? new Date(f.last_admin_review).toLocaleDateString() : 'Never'}
+                          </td>
+                          <td>
+                            <div className="d-flex flex-column gap-1">
+                              {!f.is_approved ? (
+                                <button 
+                                  className="btn btn-success btn-sm"
+                                  onClick={() => approveFreelancer(f.freelancer_id)}
+                                  disabled={approvalLoading[f.freelancer_id]}
+                                >
+                                  {approvalLoading[f.freelancer_id] ? 'Approving...' : 'Approve'}
+                                </button>
+                              ) : (
+                                <button 
+                                  className="btn btn-warning btn-sm"
+                                  onClick={() => rejectFreelancer(f.freelancer_id)}
+                                  disabled={approvalLoading[f.freelancer_id]}
+                                >
+                                  {approvalLoading[f.freelancer_id] ? 'Rejecting...' : 'Reject'}
+                                </button>
+                              )}
+                              <button 
+                                className="btn btn-outline-primary btn-sm"
+                                onClick={() => openFreelancerNotes(f.freelancer_id)}
+                              >
+                                Notes
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
@@ -1120,6 +1342,56 @@ const ESCAdminDashboard = () => {
           {/* Optionally, add more admin widgets or info here */}
         </div>
       </div>
+
+      {/* Freelancer Notes Modal */}
+      {freelancerNotesModal && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  Admin Notes - {selectedFreelancerForNotes?.first_name} {selectedFreelancerForNotes?.last_name}
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setFreelancerNotesModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label className="form-label">Internal Notes (ECS Admin Only):</label>
+                  <textarea
+                    className="form-control"
+                    rows="4"
+                    value={freelancerNotes}
+                    onChange={(e) => setFreelancerNotes(e.target.value)}
+                    placeholder="Add internal notes about this freelancer..."
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setFreelancerNotesModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-primary" 
+                  onClick={saveFreelancerNotes}
+                  disabled={notesLoading}
+                >
+                  {notesLoading ? 'Saving...' : 'Save Notes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Animation Styles */}
       <style>{`
         .dashboard-btn:hover, .dashboard-btn:focus {
