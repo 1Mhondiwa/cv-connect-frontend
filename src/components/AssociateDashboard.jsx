@@ -26,6 +26,7 @@ const AssociateDashboard = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState('');
+  const [searchSuccess, setSearchSuccess] = useState('');
   const [pagination, setPagination] = useState({});
   
   // Messaging state
@@ -34,7 +35,7 @@ const AssociateDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [messagingLoading, setMessagingLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('search'); // 'search', 'messages', 'change-password'
+  const [activeTab, setActiveTab] = useState('request'); // 'request', 'messages', 'change-password'
   
   // Skills for dropdown
   const [availableSkills, setAvailableSkills] = useState([]);
@@ -195,6 +196,8 @@ const AssociateDashboard = () => {
       ...prev,
       [name]: value
     }));
+    setSearchError(''); // Clear error when form changes
+    setSearchSuccess(''); // Clear success message when form changes
   };
 
   const handleSearch = async (e) => {
@@ -204,29 +207,23 @@ const AssociateDashboard = () => {
     setSearchResults([]);
 
     try {
-      const params = new URLSearchParams();
-      
-      // Add search parameters
-      Object.keys(searchForm).forEach(key => {
-        if (searchForm[key]) {
-          params.append(key, searchForm[key]);
-        }
-      });
-
-      const response = await api.get(`/search/freelancers?${params}`);
+      // Submit freelancer request to ECS Admin
+      const response = await api.post('/associate/freelancer-request', searchForm);
 
       if (response.data.success) {
-        setSearchResults(response.data.freelancers);
-        setPagination(response.data.pagination);
+        setSearchError(''); // Clear any previous errors
+        setSearchSuccess('Your freelancer request has been submitted successfully! ECS Admin will review your requirements and contact you within 24-48 hours.');
+        // Show success message - results will come from ECS Admin later
+        setSearchResults([]); // Clear any previous results
       } else {
-        setSearchError(response.data.message || 'Search failed');
+        setSearchError(response.data.message || 'Request submission failed');
       }
     } catch (error) {
-      console.error('Search error:', error);
+      console.error('Request submission error:', error);
       if (error.response?.data?.message) {
         setSearchError(error.response.data.message);
       } else {
-        setSearchError('Search failed. Please try again.');
+        setSearchError('Request submission failed. Please try again.');
       }
     } finally {
       setSearchLoading(false);
@@ -606,11 +603,11 @@ const AssociateDashboard = () => {
               <span className="badge bg-success mb-2">Associate</span>
               <div className="d-grid gap-3 w-100 mt-4">
                 <button 
-                  className={`btn dashboard-btn w-100 ${activeTab === 'search' ? '' : 'btn-outline-primary'}`}
-                  style={{ background: activeTab === 'search' ? accent : 'transparent', color: activeTab === 'search' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => setActiveTab('search')}
+                  className={`btn dashboard-btn w-100 ${activeTab === 'request' ? '' : 'btn-outline-primary'}`}
+                  style={{ background: activeTab === 'request' ? accent : 'transparent', color: activeTab === 'request' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => setActiveTab('request')}
                 >
-                  <i className="bi bi-search me-2"></i>Search Freelancers
+                  <i className="bi bi-person-plus me-2"></i>Request Freelancer
                 </button>
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'messages' ? '' : 'btn-outline-primary'} position-relative`}
@@ -644,7 +641,7 @@ const AssociateDashboard = () => {
           <div className="col-lg-9">
             <div className="section-title mb-4">
               <h2 style={{ color: accent, fontWeight: 700 }}>Associate Dashboard</h2>
-              <p style={{ color: '#888' }}>Search for top freelancers, review profiles, and connect with talent that matches your needs.</p>
+              <p style={{ color: '#888' }}>Request freelancers through ECS Admin, review curated profiles, and connect with pre-approved talent that matches your needs.</p>
             </div>
             {/* Global Unread Badge */}
             {globalUnread > 0 && (
@@ -655,20 +652,24 @@ const AssociateDashboard = () => {
         </div>
             )}
             {/* Tab Content */}
-        {activeTab === 'search' && (
+        {activeTab === 'request' && (
           <div className="tab-content">
             {/* Skill Search */}
                 <div className="card p-4 shadow-lg mb-4 rounded-4">
+                  <div className="text-center mb-4">
+                    <h4 style={{ color: accent, fontWeight: 600 }}>Request Freelancer Services</h4>
+                    <p style={{ color: '#666', fontSize: 14 }}>Submit your requirements and ECS Admin will provide you with curated freelancer options</p>
+                  </div>
                   <form className="row g-3 align-items-end" onSubmit={handleSearch}>
                     <div className="col-md-4">
-                      <label className="form-label">Skill</label>
+                      <label className="form-label">Required Skills</label>
                       <input
                         list="skills-list"
                         className="form-control"
                         name="skills"
                         value={searchForm.skills}
                         onChange={handleSearchChange}
-                        placeholder="Type or select a skill"
+                        placeholder="Type or select required skills"
                         autoComplete="off"
                       />
                       <datalist id="skills-list">
@@ -705,68 +706,67 @@ const AssociateDashboard = () => {
                         {searchLoading ? (
                           <span>
                             <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            Searching...
+                            Submitting...
                           </span>
                         ) : (
-                          "Search"
+                          "Submit Request"
                         )}
                       </button>
                     </div>
                   </form>
                   {searchError && <div className="alert alert-danger mt-3 text-center">{searchError}</div>}
-                </div>
-            {/* Search Results */}
-                {searchLoading ? (
-                  <div className="text-center py-5">
-                    <div className="spinner-border" style={{ color: accent }} role="status">
-                      <span className="visually-hidden">Loading...</span>
+                  {searchSuccess && <div className="alert alert-success mt-3 text-center">{searchSuccess}</div>}
+                  {!searchError && !searchSuccess && (
+                    <div className="alert alert-info mt-3 text-center">
+                      <i className="bi bi-info-circle me-2"></i>
+                      Your request will be reviewed by ECS Admin. We'll contact you with curated freelancer options within 24-48 hours.
                     </div>
-                    <div className="mt-3">Searching freelancers...</div>
-                  </div>
-                ) : searchResults.length > 0 ? (
-                  <div className="row gy-4">
-                    {searchResults.map((freelancer, idx) => (
-                      <div className="col-lg-4 col-md-6" key={freelancer.freelancer_id || idx}>
-                        <div className="card h-100 shadow-lg rounded-4">
-                          <div className="card-body">
-                            <h5 className="card-title mb-2" style={{ color: accent, fontWeight: 700 }}>
-                              {freelancer.first_name} {freelancer.last_name}
-                            </h5>
-                            <p className="mb-1"><strong>Job Title:</strong> {freelancer.headline || <span className="text-muted">N/A</span>}</p>
-                            <p className="mb-1"><strong>Experience:</strong> {freelancer.years_experience || 0} years</p>
-                            <p className="mb-1"><strong>Email:</strong> {freelancer.email}</p>
-                            <div className="mb-2">
-                              <strong>Skills:</strong>
-                              {freelancer.skills && freelancer.skills.length > 0 ? (
-                                <ul className="list-inline mb-0">
-                                  {freelancer.skills.map(skill => (
-                                    <li key={skill.skill_id} className="list-inline-item badge bg-primary me-1">
-                                      {skill.skill_name}
-                                    </li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <span className="text-muted ms-1">None</span>
-                              )}
-                            </div>
-                            <button 
-                              onClick={() => handleSendMessage(freelancer.freelancer_id)}
-                              className="btn dashboard-btn mt-2"
-                              style={{ background: accent, color: '#fff', border: 'none', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '10px 24px', transition: 'transform 0.18s, box-shadow 0.18s' }}
-                            >
-                              <i className="bi bi-chat me-2"></i>Message
-                            </button>
-                          </div>
-                        </div>
+                  )}
+                </div>
+            {/* Request Status */}
+            <div className="card p-4 shadow-lg rounded-4">
+              <div className="text-center">
+                <i className="bi bi-clock-history fs-1 mb-3" style={{ color: accent }}></i>
+                <h5 style={{ color: '#444', fontWeight: 600 }}>Request Status</h5>
+                <p style={{ color: '#666', fontSize: 14 }}>
+                  Once you submit your request, ECS Admin will review your requirements and provide you with curated freelancer options.
+                </p>
+                <div className="row mt-4">
+                  <div className="col-md-3">
+                    <div className="text-center">
+                      <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
+                        <i className="bi bi-1-circle-fill fs-4" style={{ color: accent }}></i>
                       </div>
-                    ))}
+                      <small style={{ color: '#666' }}>Submit Request</small>
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-center text-muted py-5">
-                    <i className="bi bi-search fs-1 mb-3"></i>
-                    <div>No results found. Try a different skill or criteria.</div>
+                  <div className="col-md-3">
+                    <div className="text-center">
+                      <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
+                        <i className="bi bi-2-circle-fill fs-4" style={{ color: accent }}></i>
+                      </div>
+                      <small style={{ color: '#666' }}>ECS Admin Review</small>
+                    </div>
                   </div>
-                )}
+                  <div className="col-md-3">
+                    <div className="text-center">
+                      <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
+                        <i className="bi bi-3-circle-fill fs-4" style={{ color: accent }}></i>
+                      </div>
+                      <small style={{ color: '#666' }}>Get Curated List</small>
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="text-center">
+                      <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
+                        <i className="bi bi-4-circle-fill fs-4" style={{ color: accent }}></i>
+                      </div>
+                      <small style={{ color: '#666' }}>Connect & Hire</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
         {activeTab === 'messages' && (
