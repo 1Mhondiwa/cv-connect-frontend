@@ -92,7 +92,8 @@ const AssociateTempPasswordChange = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await api.post('/associate/change-password', {
-        newPassword: form.newPassword
+        newPassword: form.newPassword,
+        isTemporaryPasswordChange: true
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -144,15 +145,21 @@ const AssociateTempPasswordChange = () => {
         <div className="row g-0 align-items-stretch" style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.07)', borderRadius: 32, overflow: 'hidden', background: '#fff' }}>
           <div className="col-12 d-flex align-items-center" style={{ padding: '40px 32px', minHeight: 500 }}>
             <div style={{ width: '100%' }}>
-              <div className="text-center mb-4">
-                <h2 style={{ fontWeight: 700, color: accent, marginBottom: 16 }}>Welcome to CV-Connect!</h2>
-                <p style={{ color: '#666', fontSize: 16, marginBottom: 8 }}>
-                  Your associate account has been approved by ESC.
-                </p>
-                <p style={{ color: '#888', fontSize: 14, marginBottom: 24 }}>
-                  For security reasons, please change your temporary password to a new password of your choice.
-                </p>
-              </div>
+                             <div className="text-center mb-4">
+                 <h2 style={{ fontWeight: 700, color: accent, marginBottom: 16 }}>Welcome to CV-Connect!</h2>
+                 <p style={{ color: '#666', fontSize: 16, marginBottom: 8 }}>
+                   Your associate account has been approved by ESC.
+                 </p>
+                 <p style={{ color: '#888', fontSize: 14, marginBottom: 24 }}>
+                   For security reasons, please change your temporary password to a new password of your choice.
+                 </p>
+                 <div style={{ background: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: 8, padding: '12px 16px', marginTop: 16 }}>
+                   <p style={{ color: '#856404', fontSize: 14, margin: 0 }}>
+                     <i className="bi bi-info-circle me-2"></i>
+                     <strong>Note:</strong> This is your first login. You only need to enter a new password.
+                   </p>
+                 </div>
+               </div>
 
               {error && (
                 <div style={{ color: '#fff', background: '#df1529', borderRadius: 8, padding: '12px 16px', marginBottom: 20, textAlign: 'center', fontWeight: 500 }}>
