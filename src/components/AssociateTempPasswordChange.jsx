@@ -92,7 +92,6 @@ const AssociateTempPasswordChange = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await api.post('/associate/change-password', {
-        oldPassword: '', // Empty for temporary password change
         newPassword: form.newPassword
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -104,6 +103,7 @@ const AssociateTempPasswordChange = () => {
         // Update user data in AuthContext and localStorage
         const updatedUser = { ...user, has_changed_temp_password: true };
         updateUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
         
         setTimeout(() => {
           navigate('/associate/dashboard');

@@ -25,6 +25,7 @@ import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
 import WelcomeFreelancer from './components/WelcomeFreelancer';
 import AssociateRequestForm from './components/AssociateRequestForm';
+import AssociateTempPasswordChange from './components/AssociateTempPasswordChange';
 
 function ScrollTopButton() {
   const [show, setShow] = useState(false);
@@ -73,6 +74,7 @@ function AppRoutes() {
     location.pathname.startsWith('/freelancer/edit') ||
     location.pathname.startsWith('/freelancer/welcome') ||
     location.pathname.startsWith('/associate/dashboard') ||
+    location.pathname.startsWith('/associate/temp-password-change') ||
     location.pathname.startsWith('/admin/dashboard');
 
   return (
@@ -96,6 +98,7 @@ function AppRoutes() {
             <Route path="/freelancer/welcome" element={<WelcomeFreelancer />} />
           {/* Associate Routes - Not linked in public navigation */}
             <Route path="/associate/dashboard" element={<ProtectedRoute requiredRole="associate"><AssociateDashboard /></ProtectedRoute>} />
+            <Route path="/associate/temp-password-change" element={<ProtectedRoute requiredRole="associate"><AssociateTempPasswordChange /></ProtectedRoute>} />
           {/* Admin Routes - Not linked in public navigation */}
                       <Route path="/admin/create" element={<AdminCreate />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><ESCAdminDashboard /></ProtectedRoute>} />
