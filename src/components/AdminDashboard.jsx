@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const accent = '#fd680e';
 
@@ -97,6 +97,20 @@ const ESCAdminDashboard = () => {
   // Analytics tab state
   const [timeRange, setTimeRange] = useState('90d');
   const [filteredChartData, setFilteredChartData] = useState([]);
+  
+  // Analytics data states
+  const [analyticsData, setAnalyticsData] = useState({
+    registrationTrends: [],
+    userTypeDistribution: [],
+    userActivityStatus: [],
+    cvUploadTrends: [],
+    topSkills: [],
+    cvFileTypes: [],
+    messageTrends: [],
+    userCommunicationActivity: []
+  });
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState('');
 
   // Chart data (static for now, will be real-time later)
   const chartData = [
@@ -359,6 +373,14 @@ const ESCAdminDashboard = () => {
   useEffect(() => {
     if (activeTab === 'freelancer-requests') {
       fetchFreelancerRequests();
+    }
+    // eslint-disable-next-line
+  }, [activeTab]);
+
+  // Fetch analytics data when analytics tab is activated
+  useEffect(() => {
+    if (activeTab === 'analytics') {
+      fetchAnalyticsData();
     }
     // eslint-disable-next-line
   }, [activeTab]);
@@ -717,6 +739,100 @@ const ESCAdminDashboard = () => {
       ...prev,
       [e.target.name]: e.target.value
     }));
+  };
+
+  // Analytics Functions
+  const fetchAnalyticsData = async () => {
+    setAnalyticsLoading(true);
+    setAnalyticsError('');
+    
+    try {
+      // Fetch registration trends (last 6 months)
+      const registrationResponse = await api.get('/admin/analytics/registration-trends');
+      const userTypeResponse = await api.get('/admin/analytics/user-type-distribution');
+      const userActivityResponse = await api.get('/admin/analytics/user-activity-status');
+      const cvUploadResponse = await api.get('/admin/analytics/cv-upload-trends');
+      const topSkillsResponse = await api.get('/admin/analytics/top-skills');
+      const cvFileTypesResponse = await api.get('/admin/analytics/cv-file-types');
+      const messageTrendsResponse = await api.get('/admin/analytics/message-trends');
+      const communicationActivityResponse = await api.get('/admin/analytics/user-communication-activity');
+      
+      setAnalyticsData({
+        registrationTrends: registrationResponse.data.data || [],
+        userTypeDistribution: userTypeResponse.data.data || [],
+        userActivityStatus: userActivityResponse.data.data || [],
+        cvUploadTrends: cvUploadResponse.data.data || [],
+        topSkills: topSkillsResponse.data.data || [],
+        cvFileTypes: cvFileTypesResponse.data.data || [],
+        messageTrends: messageTrendsResponse.data.data || [],
+        userCommunicationActivity: communicationActivityResponse.data.data || []
+      });
+      
+    } catch (error) {
+      console.error('Analytics fetch error:', error);
+      setAnalyticsError('Failed to fetch analytics data. Using sample data.');
+      
+      // Fallback to sample data if API fails
+      setAnalyticsData({
+        registrationTrends: [
+          { month: 'Jan', users: 45, associates: 12, freelancers: 33 },
+          { month: 'Feb', users: 52, associates: 15, freelancers: 37 },
+          { month: 'Mar', users: 48, associates: 18, freelancers: 30 },
+          { month: 'Apr', users: 61, associates: 22, freelancers: 39 },
+          { month: 'May', users: 67, associates: 25, freelancers: 42 },
+          { month: 'Jun', users: 73, associates: 28, freelancers: 45 }
+        ],
+        userTypeDistribution: [
+          { type: 'Freelancers', count: 226, fill: '#fd680e' },
+          { type: 'Associates', count: 120, fill: '#10b981' },
+          { type: 'Admins', count: 5, fill: '#3b82f6' }
+        ],
+        userActivityStatus: [
+          { status: 'Active', count: 298, fill: '#10b981' },
+          { status: 'Inactive', count: 45, fill: '#6b7280' },
+          { status: 'Pending', count: 8, fill: '#f59e0b' }
+        ],
+        cvUploadTrends: [
+          { month: 'Jan', uploads: 28, approved: 25, rejected: 3 },
+          { month: 'Feb', uploads: 35, approved: 32, rejected: 3 },
+          { month: 'Mar', uploads: 31, approved: 28, rejected: 3 },
+          { month: 'Apr', uploads: 42, approved: 38, rejected: 4 },
+          { month: 'May', uploads: 48, approved: 44, rejected: 4 },
+          { month: 'Jun', uploads: 55, approved: 50, rejected: 5 }
+        ],
+        topSkills: [
+          { skill: 'JavaScript', count: 89, fill: '#fd680e' },
+          { skill: 'React', count: 76, fill: '#10b981' },
+          { skill: 'Python', count: 65, fill: '#3b82f6' },
+          { skill: 'Node.js', count: 58, fill: '#8b5cf6' },
+          { skill: 'SQL', count: 52, fill: '#f59e0b' },
+          { skill: 'AWS', count: 45, fill: '#ef4444' }
+        ],
+        cvFileTypes: [
+          { type: 'PDF', count: 156, fill: '#ef4444' },
+          { type: 'DOCX', count: 89, fill: '#3b82f6' },
+          { type: 'DOC', count: 34, fill: '#10b981' },
+          { type: 'TXT', count: 12, fill: '#f59e0b' }
+        ],
+        messageTrends: [
+          { month: 'Jan', messages: 156, conversations: 23 },
+          { month: 'Feb', messages: 189, conversations: 28 },
+          { month: 'Mar', messages: 167, conversations: 25 },
+          { month: 'Apr', messages: 234, conversations: 34 },
+          { month: 'May', messages: 278, conversations: 41 },
+          { month: 'Jun', messages: 312, conversations: 47 }
+        ],
+        userCommunicationActivity: [
+          { user: 'John Doe', messages: 45, conversations: 8, fill: '#fd680e' },
+          { user: 'Jane Smith', messages: 38, conversations: 6, fill: '#10b981' },
+          { user: 'Bob Johnson', messages: 32, conversations: 5, fill: '#3b82f6' },
+          { user: 'Alice Brown', messages: 28, conversations: 4, fill: '#8b5cf6' },
+          { user: 'Mike Wilson', messages: 25, conversations: 3, fill: '#f59e0b' }
+        ]
+      });
+    } finally {
+      setAnalyticsLoading(false);
+    }
   };
 
   // Freelancer Request Management Functions
@@ -1322,7 +1438,7 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-folder me-3"></i>
                 Documents
-              </button>
+                </button>
         </div>
           </div>
 
@@ -2021,7 +2137,7 @@ const ESCAdminDashboard = () => {
                           </div>
                           
                           <div className="row g-2 mb-3">
-                            <div className="col-md-4">
+                <div className="col-md-4">
                               <small className="text-muted">
                                 <i className="bi bi-building me-1"></i>
                                 <strong>Company:</strong> {request.associate_email}
@@ -2093,16 +2209,360 @@ const ESCAdminDashboard = () => {
           )}
           {/* Analytics Tab */}
           {activeTab === 'analytics' && (
-            <div className="analytics-tab">
-              <div className="card">
-                <div className="card-header">
-                  <h5 className="mb-0">Analytics Overview</h5>
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1400, margin: '0 auto' }}>
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h5 style={{ color: accent, fontWeight: 700, marginBottom: 8 }}>Analytics Dashboard</h5>
+                  <p style={{ color: '#666', fontSize: 14, margin: 0 }}>Real-time performance insights and trends</p>
                 </div>
-                <div className="card-body">
-                  <div className="text-center py-5">
-                    <i className="bi bi-graph-up" style={{ fontSize: '3rem', color: accent }}></i>
-                    <h5 className="mt-3">Analytics Dashboard</h5>
-                    <p className="text-muted">Performance metrics and insights will be displayed here</p>
+                <div className="d-flex gap-2">
+                  <select 
+                    className="form-select form-select-sm" 
+                    style={{ width: '120px' }}
+                    value={timeRange}
+                    onChange={(e) => setTimeRange(e.target.value)}
+                  >
+                    <option value="30d">Last 30 Days</option>
+                    <option value="90d">Last 90 Days</option>
+                    <option value="6m">Last 6 Months</option>
+                    <option value="1y">Last Year</option>
+                  </select>
+                  <button 
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={fetchAnalyticsData}
+                    disabled={analyticsLoading}
+                  >
+                    {analyticsLoading ? 'Loading...' : 'Refresh'}
+                  </button>
+                </div>
+              </div>
+
+              {analyticsError && (
+                <div className="alert alert-warning mb-4">
+                  <i className="bi bi-exclamation-triangle me-2"></i>
+                  {analyticsError}
+                </div>
+              )}
+
+              {/* Registration Trends - Line Chart */}
+              <div className="row g-4 mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-graph-up me-2"></i>User Registration Trends
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={analyticsData.registrationTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="month" stroke="#666" />
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="users" 
+                            stackId="1" 
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="associates" 
+                            stackId="1" 
+                            stroke="#10b981" 
+                            fill="#10b981" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="freelancers" 
+                            stackId="1" 
+                            stroke="#3b82f6" 
+                            fill="#3b82f6" 
+                            fillOpacity={0.6}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* User Distribution and Activity - Pie Charts */}
+              <div className="row g-4 mb-4">
+                <div className="col-md-6">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-pie-chart me-2"></i>User Type Distribution
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                          <Pie
+                            data={analyticsData.userTypeDistribution}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="count"
+                            label={({ type, count }) => `${type}: ${count}`}
+                          >
+                            {analyticsData.userTypeDistribution.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.fill} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-activity me-2"></i>User Activity Status
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                          <Pie
+                            data={analyticsData.userActivityStatus}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="count"
+                            label={({ status, count }) => `${status}: ${count}`}
+                          >
+                            {analyticsData.userActivityStatus.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.fill} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CV Upload Trends - Line Chart */}
+              <div className="row g-4 mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-file-earmark-arrow-up me-2"></i>CV Upload Trends
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={analyticsData.cvUploadTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="month" stroke="#666" />
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="uploads" 
+                            stackId="1" 
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="approved" 
+                            stackId="1" 
+                            stroke="#10b981" 
+                            fill="#10b981" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="rejected" 
+                            stackId="1" 
+                            stroke="#ef4444" 
+                            fill="#ef4444" 
+                            fillOpacity={0.6}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Top Skills and CV File Types - Bar and Pie Charts */}
+              <div className="row g-4 mb-4">
+                <div className="col-md-8">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-bar-chart me-2"></i>Top Skills Distribution
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={analyticsData.topSkills}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="skill" stroke="#666" />
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="count" 
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-file-earmark me-2"></i>CV File Types
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={analyticsData.cvFileTypes}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="count"
+                            label={({ type, count }) => `${type}: ${count}`}
+                          >
+                            {analyticsData.cvFileTypes.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.fill} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Communication Trends - Line Chart */}
+              <div className="row g-4 mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-chat-dots me-2"></i>Communication Trends
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={analyticsData.messageTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="month" stroke="#666" />
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="messages" 
+                            stackId="1" 
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="conversations" 
+                            stackId="1" 
+                            stroke="#10b981" 
+                            fill="#10b981" 
+                            fillOpacity={0.6}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* User Communication Activity - Bar Chart */}
+              <div className="row g-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-people me-2"></i>User Communication Activity
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={analyticsData.userCommunicationActivity}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="user" stroke="#666" />
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="messages" 
+                            stackId="1" 
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="conversations" 
+                            stackId="1" 
+                            stroke="#10b981" 
+                            fill="#10b981" 
+                            fillOpacity={0.6}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2274,8 +2734,8 @@ const ESCAdminDashboard = () => {
                     <i className="bi bi-star me-1"></i>Provide Recommendations
                   </button>
                 )}
+                </div>
               </div>
-            </div>
           </div>
         </div>
       )}
@@ -2379,15 +2839,15 @@ const ESCAdminDashboard = () => {
                         </div>
                         <div className="col-md-3">
                           <label className="form-label small">Status:</label>
-                          <select 
-                            className="form-select form-select-sm"
+                            <select 
+                              className="form-select form-select-sm" 
                             value={searchStatus}
                             onChange={(e) => setSearchStatus(e.target.value)}
                           >
                             <option value="">All Statuses</option>
                             <option value="available">Available Only</option>
                             <option value="approved">Approved Only</option>
-                          </select>
+                            </select>
                         </div>
                         <div className="col-md-3 d-flex align-items-end">
                           <div className="d-flex gap-2 w-100">
@@ -2514,7 +2974,7 @@ const ESCAdminDashboard = () => {
                                 <div className="d-flex gap-1 mb-2">
                                   <span className={`badge ${freelancer.is_available ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
                                     {freelancer.is_available ? 'Available' : 'Unavailable'}
-                                  </span>
+                            </span>
                                   <span className={`badge ${freelancer.is_approved ? 'bg-primary' : 'bg-warning'}`} style={{ fontSize: '10px' }}>
                                     {freelancer.is_approved ? 'Approved' : 'Pending'}
                                   </span>
@@ -2541,9 +3001,9 @@ const ESCAdminDashboard = () => {
                           </div>
                         </div>
                       ))}
-                    </div>
-                  )}
                 </div>
+              )}
+            </div>
               </div>
               <div className="modal-footer">
                 <button 
@@ -2572,8 +3032,8 @@ const ESCAdminDashboard = () => {
                     </>
                   )}
                 </button>
-              </div>
-            </div>
+        </div>
+      </div>
           </div>
         </div>
       )}
