@@ -500,14 +500,34 @@ const ESCAdminDashboard = () => {
 
   const fetchAvailableFreelancers = async () => {
     try {
+      console.log('🔍 Starting to fetch freelancers...');
+      console.log('🔍 API URL: /admin/freelancers?availability_status=all&approval_status=all');
+      
       // Get ALL freelancers for comprehensive recommendations
       const res = await api.get('/admin/freelancers?availability_status=all&approval_status=all');
+      console.log('🔍 API Response:', res);
+      console.log('🔍 Response Status:', res.status);
+      console.log('🔍 Response Data:', res.data);
+      
       if (res.data.success) {
+        console.log('🔍 Fetched Freelancers:', res.data.freelancers.length);
+        if (res.data.freelancers.length > 0) {
+          console.log('🔍 Sample Freelancer:', res.data.freelancers[0]);
+        } else {
+          console.log('🔍 No freelancers returned from API');
+        }
         setAllFreelancers(res.data.freelancers);
         setAvailableFreelancers(res.data.freelancers);
+        console.log('🔍 State updated - allFreelancers:', res.data.freelancers.length);
+        console.log('🔍 State updated - availableFreelancers:', res.data.freelancers.length);
+      } else {
+        console.error('🔍 API returned success: false:', res.data);
       }
     } catch (err) {
       console.error('Error fetching available freelancers:', err);
+      console.error('Error details:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      console.error('Error message:', err.message);
     }
   };
 
@@ -517,12 +537,18 @@ const ESCAdminDashboard = () => {
     await fetchAvailableFreelancers();
   };
 
-  const openRecommendationsModal = (request) => {
+  const openRecommendationsModal = async (request) => {
+    console.log('🔍 Opening recommendations modal for request:', request);
     setSelectedFreelancerRequest(request);
     setShowRecommendationsModal(true);
     setSelectedFreelancers([]);
     setHighlightedFreelancers([]);
     setAdminNotes('');
+    
+    // Fetch all freelancers when opening recommendations modal
+    console.log('🔍 Fetching freelancers...');
+    await fetchAvailableFreelancers();
+    console.log('🔍 Freelancers fetched, modal should show data now');
   };
 
   const handleFreelancerSelection = (freelancerId, isSelected) => {
@@ -600,7 +626,23 @@ const ESCAdminDashboard = () => {
 
     const { required_skills, min_experience, preferred_location, budget_range, urgency_level } = selectedFreelancerRequest;
     
-    let filtered = allFreelancers.filter(freelancer => {
+    console.log('🔍 Smart Filtering - Request Requirements:', {
+      required_skills,
+      min_experience,
+      preferred_location,
+      budget_range,
+      urgency_level
+    });
+    
+    console.log('🔍 Smart Filtering - Available Freelancers:', availableFreelancers.length);
+    console.log('🔍 Smart Filtering - All Freelancers:', allFreelancers.length);
+    
+    // Start with the current filtered list (if any filters are applied) or all freelancers
+    let baseList = availableFreelancers.length < allFreelancers.length ? availableFreelancers : allFreelancers;
+    
+    console.log('🔍 Smart Filtering - Base List:', baseList.length);
+    
+    let filtered = baseList.filter(freelancer => {
       // Skills match (check if freelancer has any of the required skills)
       const hasRequiredSkills = required_skills.some(requiredSkill => 
         freelancer.skills?.some(skill => 
@@ -617,8 +659,22 @@ const ESCAdminDashboard = () => {
         freelancer.location?.toLowerCase().includes(preferred_location.toLowerCase()) ||
         preferred_location === 'Any';
 
-      return hasRequiredSkills && hasRequiredExperience && locationMatch;
+      const matches = hasRequiredSkills && hasRequiredExperience && locationMatch;
+      
+      if (matches) {
+        console.log('✅ Freelancer matches:', freelancer.first_name, freelancer.last_name, {
+          hasRequiredSkills,
+          hasRequiredExperience,
+          locationMatch,
+          skills: freelancer.skills,
+          experience: freelancer.experience_years
+        });
+      }
+
+      return matches;
     });
+
+    console.log('🔍 Smart Filtering - Filtered Results:', filtered.length);
 
     // Sort by relevance (skills match, then admin rating, then experience)
     filtered.sort((a, b) => {
@@ -644,6 +700,7 @@ const ESCAdminDashboard = () => {
       return (b.experience_years || 0) - (a.experience_years || 0); // More experience first
     });
 
+    console.log('🔍 Smart Filtering - Final Results:', filtered.length);
     setAvailableFreelancers(filtered);
   };
 
@@ -1892,6 +1949,28 @@ const ESCAdminDashboard = () => {
                 <div className="mb-4">
                   <h6 style={{ color: accent, fontWeight: 600 }}>All Registered Freelancers</h6>
                   
+                  {/* Debug Info */}
+                  <div className="alert alert-info mb-3">
+                    <strong>Debug Info:</strong> allFreelancers: {allFreelancers.length}, availableFreelancers: {availableFreelancers.length}
+                    <br />
+                    <button 
+                      className="btn btn-sm btn-warning mt-2 me-2"
+                      onClick={() => {
+                        console.log('🔍 Manual Test - allFreelancers:', allFreelancers);
+                        console.log('🔍 Manual Test - availableFreelancers:', availableFreelancers);
+                        console.log('🔍 Manual Test - selectedFreelancerRequest:', selectedFreelancerRequest);
+                      }}
+                    >
+                      Debug: Log State to Console
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-success mt-2"
+                      onClick={fetchAvailableFreelancers}
+                    >
+                      Debug: Re-fetch Freelancers
+                    </button>
+                  </div>
+                  
                   {/* Smart Filtering Interface */}
                   <div className="card border-0 shadow-sm mb-3">
                     <div className="card-body">
@@ -1923,34 +2002,33 @@ const ESCAdminDashboard = () => {
                             placeholder="e.g., React, Node.js"
                             onChange={(e) => {
                               const skillFilter = e.target.value.toLowerCase();
-                              setAvailableFreelancers(prev => 
-                                availableFreelancers.filter(f => 
-                                  !skillFilter || 
+                              if (!skillFilter) {
+                                setAvailableFreelancers(allFreelancers);
+                              } else {
+                                setAvailableFreelancers(allFreelancers.filter(f => 
                                   f.skills?.some(skill => skill.toLowerCase().includes(skillFilter)) ||
                                   f.headline?.toLowerCase().includes(skillFilter)
-                                )
-                              );
+                                ));
+                              }
                             }}
                           />
                         </div>
-                        <div className="col-md-3">
+                        <div className="col-md-2">
                           <label className="form-label small">Filter by Experience:</label>
                           <select 
                             className="form-select form-select-sm"
                             onChange={(e) => {
                               const expFilter = e.target.value;
                               if (expFilter === 'all') {
-                                setAvailableFreelancers(prev => availableFreelancers);
+                                setAvailableFreelancers(allFreelancers);
                               } else {
-                                setAvailableFreelancers(prev => 
-                                  availableFreelancers.filter(f => 
-                                    f.experience_years >= parseInt(expFilter)
-                                  )
-                                );
+                                setAvailableFreelancers(allFreelancers.filter(f => 
+                                  (f.experience_years || 0) >= parseInt(expFilter)
+                                ));
                               }
                             }}
                           >
-                            <option value="all">All Experience Levels</option>
+                            <option value="all">All Experience</option>
                             <option value="0">0+ years</option>
                             <option value="1">1+ years</option>
                             <option value="3">3+ years</option>
@@ -1958,18 +2036,18 @@ const ESCAdminDashboard = () => {
                             <option value="10">10+ years</option>
                           </select>
                         </div>
-                        <div className="col-md-3">
+                        <div className="col-md-2">
                           <label className="form-label small">Filter by Status:</label>
                           <select 
                             className="form-select form-select-sm"
                             onChange={(e) => {
                               const statusFilter = e.target.value;
                               if (statusFilter === 'all') {
-                                setAvailableFreelancers(prev => availableFreelancers);
+                                setAvailableFreelancers(allFreelancers);
                               } else if (statusFilter === 'available') {
-                                setAvailableFreelancers(prev => availableFreelancers.filter(f => f.is_available));
+                                setAvailableFreelancers(allFreelancers.filter(f => f.is_available));
                               } else if (statusFilter === 'approved') {
-                                setAvailableFreelancers(prev => availableFreelancers.filter(f => f.is_approved));
+                                setAvailableFreelancers(allFreelancers.filter(f => f.is_approved));
                               }
                             }}
                           >
@@ -1978,7 +2056,7 @@ const ESCAdminDashboard = () => {
                             <option value="approved">Approved Only</option>
                           </select>
                         </div>
-                        <div className="col-md-3">
+                        <div className="col-md-2">
                           <label className="form-label small">Sort by:</label>
                           <select 
                             className="form-select form-select-sm"
