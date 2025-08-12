@@ -193,6 +193,58 @@ const ESCAdminDashboard = () => {
     { date: "2024-06-30", desktop: 446, mobile: 400 },
   ];
 
+  const [recommendationNotes, setRecommendationNotes] = useState('');
+  const [submittingRecommendations, setSubmittingRecommendations] = useState(false);
+  const [dataTableData, setDataTableData] = useState([
+    {
+      id: 1,
+      header: "Executive Summary",
+      type: "Executive Summary",
+      status: "Done",
+      target: "2-3",
+      limit: "3",
+      reviewer: "Eddie Lake"
+    },
+    {
+      id: 2,
+      header: "Technical Approach",
+      type: "Technical Approach",
+      status: "In Progress",
+      target: "5-8",
+      limit: "8",
+      reviewer: "Jamik Tashpulatov"
+    },
+    {
+      id: 3,
+      header: "Project Management",
+      type: "Management",
+      status: "Not Started",
+      target: "3-5",
+      limit: "5",
+      reviewer: "Assign reviewer"
+    },
+    {
+      id: 4,
+      header: "Quality Assurance",
+      type: "Quality",
+      status: "Done",
+      target: "2-4",
+      limit: "4",
+      reviewer: "Emily Whalen"
+    },
+    {
+      id: 5,
+      header: "Risk Management",
+      type: "Risk",
+      status: "In Progress",
+      target: "3-6",
+      limit: "6",
+      reviewer: "Eddie Lake"
+    }
+  ]);
+  const [showDataModal, setShowDataModal] = useState(false);
+  const [selectedDataItem, setSelectedDataItem] = useState(null);
+
   useEffect(() => {
     checkAuth();
   }, []);
@@ -1019,6 +1071,23 @@ const ESCAdminDashboard = () => {
     }
   };
 
+  const openDataModal = (item) => {
+    setSelectedDataItem(item);
+    setShowDataModal(true);
+  };
+
+  const closeDataModal = () => {
+    setShowDataModal(false);
+    setSelectedDataItem(null);
+  };
+
+  const handleDataUpdate = (updatedItem) => {
+    setDataTableData(prev => prev.map(item => 
+      item.id === updatedItem.id ? updatedItem : item
+    ));
+    closeDataModal();
+  };
+
   if (loading) {
     return (
       <section className="contact section">
@@ -1172,6 +1241,25 @@ const ESCAdminDashboard = () => {
                 <i className="bi bi-handshake me-3"></i>
                 Freelancer Requests
                 </button>
+
+              <button
+                className={`nav-item w-100 text-start ${activeTab === 'data-management' ? 'active' : ''}`}
+                onClick={() => setActiveTab('data-management')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: activeTab === 'data-management' ? accent : 'transparent',
+                  color: activeTab === 'data-management' ? '#fff' : '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-table me-3"></i>
+                Data Management
+              </button>
         </div>
           </div>
 
@@ -1301,6 +1389,7 @@ const ESCAdminDashboard = () => {
               {activeTab === 'analytics' && 'Analytics'}
               {activeTab === 'reports' && 'Reports'}
               {activeTab === 'settings' && 'Settings'}
+              {activeTab === 'data-management' && 'Data Management'}
             </h1>
             <p className="text-muted mb-0">
               {activeTab === 'dashboard' && 'System overview and key metrics'}
@@ -1310,6 +1399,7 @@ const ESCAdminDashboard = () => {
               {activeTab === 'analytics' && 'Performance insights and trends'}
               {activeTab === 'reports' && 'Generate and view system reports'}
               {activeTab === 'settings' && 'System configuration and preferences'}
+              {activeTab === 'data-management' && 'Data management and analysis'}
             </p>
           </div>
         </div>
@@ -2143,6 +2233,251 @@ const ESCAdminDashboard = () => {
               </div>
             </div>
           )}
+
+          {/* Data Management Tab */}
+          {activeTab === 'data-management' && (
+            <div className="data-management-tab">
+              {/* Tab Navigation */}
+              <div className="mb-4">
+                <ul className="nav nav-tabs" id="dataTabs" role="tablist">
+                  <li className="nav-item" role="presentation">
+                    <button 
+                      className="nav-link active" 
+                      id="outline-tab" 
+                      data-bs-toggle="tab" 
+                      data-bs-target="#outline" 
+                      type="button" 
+                      role="tab"
+                      style={{ color: accent, borderColor: accent }}
+                    >
+                      Outline
+                    </button>
+                  </li>
+                  <li className="nav-item" role="presentation">
+                    <button 
+                      className="nav-link" 
+                      id="performance-tab" 
+                      data-bs-toggle="tab" 
+                      data-bs-target="#performance" 
+                      type="button" 
+                      role="tab"
+                    >
+                      Past Performance <span className="badge bg-secondary ms-1">3</span>
+                    </button>
+                  </li>
+                  <li className="nav-item" role="presentation">
+                    <button 
+                      className="nav-link" 
+                      id="personnel-tab" 
+                      data-bs-toggle="tab" 
+                      data-bs-target="#personnel" 
+                      type="button" 
+                      role="tab"
+                    >
+                      Key Personnel <span className="badge bg-secondary ms-1">2</span>
+                    </button>
+                  </li>
+                  <li className="nav-item" role="presentation">
+                    <button 
+                      className="nav-link" 
+                      id="documents-tab" 
+                      data-bs-toggle="tab" 
+                      data-bs-target="#documents" 
+                      type="button" 
+                      role="tab"
+                    >
+                      Focus Documents
+                    </button>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Tab Content */}
+              <div className="tab-content" id="dataTabsContent">
+                {/* Outline Tab */}
+                <div className="tab-pane fade show active" id="outline" role="tabpanel">
+                  <div className="card">
+                    <div className="card-header d-flex justify-content-between align-items-center">
+                      <h5 className="mb-0">Data Management</h5>
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-outline-secondary btn-sm">
+                          <i className="bi bi-gear me-1"></i>Customize
+                        </button>
+                        <button className="btn btn-primary btn-sm">
+                          <i className="bi bi-plus me-1"></i>Add Section
+                        </button>
+                      </div>
+                    </div>
+                    <div className="card-body p-0">
+                      <div className="table-responsive">
+                        <table className="table table-hover mb-0">
+                          <thead className="table-light">
+                            <tr>
+                              <th style={{ width: '50px' }}>
+                                <div className="form-check d-flex justify-content-center">
+                                  <input className="form-check-input" type="checkbox" id="selectAll" />
+                                </div>
+                              </th>
+                              <th>Header</th>
+                              <th>Section Type</th>
+                              <th>Status</th>
+                              <th style={{ textAlign: 'right' }}>Target</th>
+                              <th style={{ textAlign: 'right' }}>Limit</th>
+                              <th>Reviewer</th>
+                              <th style={{ width: '80px' }}>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {dataTableData.map((item, index) => (
+                              <tr key={item.id} className="align-middle">
+                                <td>
+                                  <div className="form-check d-flex justify-content-center">
+                                    <input className="form-check-input" type="checkbox" />
+                                  </div>
+                                </td>
+                                <td>
+                                  <button 
+                                    className="btn btn-link p-0 text-start text-decoration-none"
+                                    onClick={() => openDataModal(item)}
+                                    style={{ color: accent }}
+                                  >
+                                    {item.header}
+                                  </button>
+                                </td>
+                                <td>
+                                  <span className="badge bg-light text-dark border px-2 py-1">
+                                    {item.type}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className={`badge px-2 py-1 ${
+                                    item.status === 'Done' ? 'bg-success' : 
+                                    item.status === 'In Progress' ? 'bg-warning' : 'bg-secondary'
+                                  }`}>
+                                    {item.status === 'Done' ? (
+                                      <i className="bi bi-check-circle-fill me-1"></i>
+                                    ) : (
+                                      <i className="bi bi-arrow-clockwise me-1"></i>
+                                    )}
+                                    {item.status}
+                                  </span>
+                                </td>
+                                <td style={{ textAlign: 'right' }}>
+                                  <input 
+                                    type="text" 
+                                    className="form-control form-control-sm text-end border-0 bg-transparent"
+                                    defaultValue={item.target}
+                                    style={{ width: '60px' }}
+                                  />
+                                </td>
+                                <td style={{ textAlign: 'right' }}>
+                                  <input 
+                                    type="text" 
+                                    className="form-control form-control-sm text-end border-0 bg-transparent"
+                                    defaultValue={item.limit}
+                                    style={{ width: '60px' }}
+                                  />
+                                </td>
+                                <td>
+                                  {item.reviewer === 'Assign reviewer' ? (
+                                    <select className="form-select form-select-sm" style={{ width: '140px' }}>
+                                      <option>Assign reviewer</option>
+                                      <option>Eddie Lake</option>
+                                      <option>Jamik Tashpulatov</option>
+                                      <option>Emily Whalen</option>
+                                    </select>
+                                  ) : (
+                                    item.reviewer
+                                  )}
+                                </td>
+                                <td>
+                                  <div className="dropdown">
+                                    <button className="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                      <i className="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul className="dropdown-menu">
+                                      <li><a className="dropdown-item" href="#"><i className="bi bi-pencil me-2"></i>Edit</a></li>
+                                      <li><a className="dropdown-item" href="#"><i className="bi bi-files me-2"></i>Make a copy</a></li>
+                                      <li><a className="dropdown-item" href="#"><i className="bi bi-heart me-2"></i>Favorite</a></li>
+                                      <li><hr className="dropdown-divider" /></li>
+                                      <li><a className="dropdown-item text-danger" href="#"><i className="bi bi-trash me-2"></i>Delete</a></li>
+                                    </ul>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div className="card-footer">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div className="text-muted small">
+                          Showing 1 to 10 of {dataTableData.length} entries
+                        </div>
+                        <div className="d-flex gap-2 align-items-center">
+                          <span className="small text-muted">Rows per page:</span>
+                          <select className="form-select form-select-sm" style={{ width: '70px' }}>
+                            <option>10</option>
+                            <option>20</option>
+                            <option>30</option>
+                            <option>50</option>
+                          </select>
+                          <div className="btn-group btn-group-sm">
+                            <button className="btn btn-outline-secondary" disabled>
+                              <i className="bi bi-chevron-double-left"></i>
+                            </button>
+                            <button className="btn btn-outline-secondary" disabled>
+                              <i className="bi bi-chevron-left"></i>
+                            </button>
+                            <button className="btn btn-outline-secondary" disabled>
+                              <i className="bi bi-chevron-right"></i>
+                            </button>
+                            <button className="btn btn-outline-secondary" disabled>
+                              <i className="bi bi-chevron-double-right"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Past Performance Tab */}
+                <div className="tab-pane fade" id="performance" role="tabpanel">
+                  <div className="card">
+                    <div className="card-body text-center py-5">
+                      <i className="bi bi-graph-up" style={{ fontSize: '3rem', color: accent }}></i>
+                      <h5 className="mt-3">Past Performance Analytics</h5>
+                      <p className="text-muted">Performance data and metrics will be displayed here</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Personnel Tab */}
+                <div className="tab-pane fade" id="personnel" role="tabpanel">
+                  <div className="card">
+                    <div className="card-body text-center py-5">
+                      <i className="bi bi-people" style={{ fontSize: '3rem', color: accent }}></i>
+                      <h5 className="mt-3">Key Personnel Management</h5>
+                      <p className="text-muted">Personnel information and management tools will be displayed here</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Focus Documents Tab */}
+                <div className="tab-pane fade" id="documents" role="tabpanel">
+                  <div className="card">
+                    <div className="card-body text-center py-5">
+                      <i className="bi bi-file-earmark-text" style={{ fontSize: '3rem', color: accent }}></i>
+                      <h5 className="mt-3">Focus Documents</h5>
+                      <p className="text-muted">Document management and organization tools will be displayed here</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2624,6 +2959,103 @@ const ESCAdminDashboard = () => {
           transition: all 0.2s ease;
         }
       `}</style>
+
+      {/* Data Modal */}
+      {showDataModal && selectedDataItem && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{selectedDataItem.header}</h5>
+                <button type="button" className="btn-close" onClick={closeDataModal}></button>
+              </div>
+              <div className="modal-body">
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <label className="form-label">Header</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      defaultValue={selectedDataItem.header}
+                      id="modal-header"
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Type</label>
+                    <select className="form-select" id="modal-type">
+                      <option value="Executive Summary">Executive Summary</option>
+                      <option value="Technical Approach">Technical Approach</option>
+                      <option value="Management">Management</option>
+                      <option value="Quality">Quality</option>
+                      <option value="Risk">Risk</option>
+                      <option value="Design">Design</option>
+                      <option value="Capabilities">Capabilities</option>
+                      <option value="Focus Documents">Focus Documents</option>
+                      <option value="Narrative">Narrative</option>
+                      <option value="Cover Page">Cover Page</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Status</label>
+                    <select className="form-select" id="modal-status">
+                      <option value="Done">Done</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Not Started">Not Started</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Reviewer</label>
+                    <select className="form-select" id="modal-reviewer">
+                      <option value="Eddie Lake">Eddie Lake</option>
+                      <option value="Jamik Tashpulatov">Jamik Tashpulatov</option>
+                      <option value="Emily Whalen">Emily Whalen</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Target</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      defaultValue={selectedDataItem.target}
+                      id="modal-target"
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">Limit</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      defaultValue={selectedDataItem.limit}
+                      id="modal-limit"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={closeDataModal}>Cancel</button>
+                <button 
+                  type="button" 
+                  className="btn btn-primary"
+                  onClick={() => {
+                    const updatedItem = {
+                      ...selectedDataItem,
+                      header: document.getElementById('modal-header').value,
+                      type: document.getElementById('modal-type').value,
+                      status: document.getElementById('modal-status').value,
+                      reviewer: document.getElementById('modal-reviewer').value,
+                      target: document.getElementById('modal-target').value,
+                      limit: document.getElementById('modal-limit').value
+                    };
+                    handleDataUpdate(updatedItem);
+                  }}
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
