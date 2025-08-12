@@ -82,6 +82,7 @@ const ESCAdminDashboard = () => {
   const [showFreelancerRequestDetailsModal, setShowFreelancerRequestDetailsModal] = useState(false);
   const [showRecommendationsModal, setShowRecommendationsModal] = useState(false);
   const [availableFreelancers, setAvailableFreelancers] = useState([]);
+  const [allFreelancers, setAllFreelancers] = useState([]); // Store original list for filtering
   const [selectedFreelancers, setSelectedFreelancers] = useState([]);
   const [highlightedFreelancers, setHighlightedFreelancers] = useState([]);
   const [adminNotes, setAdminNotes] = useState('');
@@ -499,8 +500,10 @@ const ESCAdminDashboard = () => {
 
   const fetchAvailableFreelancers = async () => {
     try {
-      const res = await api.get('/admin/freelancers?availability_status=available&approval_status=approved');
+      // Get ALL freelancers for comprehensive recommendations
+      const res = await api.get('/admin/freelancers?availability_status=all&approval_status=all');
       if (res.data.success) {
+        setAllFreelancers(res.data.freelancers);
         setAvailableFreelancers(res.data.freelancers);
       }
     } catch (err) {
@@ -584,6 +587,64 @@ const ESCAdminDashboard = () => {
       console.error('Error updating request status:', err);
       alert(err.response?.data?.message || 'Failed to update request status');
     }
+  };
+
+  // Reset filters to show all freelancers
+  const resetFilters = () => {
+    setAvailableFreelancers(allFreelancers);
+  };
+
+  // Smart filtering based on request requirements
+  const applySmartFiltering = () => {
+    if (!selectedFreelancerRequest) return;
+
+    const { required_skills, min_experience, preferred_location, budget_range, urgency_level } = selectedFreelancerRequest;
+    
+    let filtered = allFreelancers.filter(freelancer => {
+      // Skills match (check if freelancer has any of the required skills)
+      const hasRequiredSkills = required_skills.some(requiredSkill => 
+        freelancer.skills?.some(skill => 
+          skill.toLowerCase().includes(requiredSkill.toLowerCase())
+        ) || 
+        freelancer.headline?.toLowerCase().includes(requiredSkill.toLowerCase())
+      );
+
+      // Experience match
+      const hasRequiredExperience = (freelancer.experience_years || 0) >= min_experience;
+
+      // Location match (if specified)
+      const locationMatch = !preferred_location || 
+        freelancer.location?.toLowerCase().includes(preferred_location.toLowerCase()) ||
+        preferred_location === 'Any';
+
+      return hasRequiredSkills && hasRequiredExperience && locationMatch;
+    });
+
+    // Sort by relevance (skills match, then admin rating, then experience)
+    filtered.sort((a, b) => {
+      // Count matching skills
+      const aSkillMatches = required_skills.filter(requiredSkill => 
+        a.skills?.some(skill => skill.toLowerCase().includes(requiredSkill.toLowerCase())) ||
+        a.headline?.toLowerCase().includes(requiredSkill.toLowerCase())
+      ).length;
+      
+      const bSkillMatches = required_skills.filter(requiredSkill => 
+        b.skills?.some(skill => skill.toLowerCase().includes(requiredSkill.toLowerCase())) ||
+        b.headline?.toLowerCase().includes(requiredSkill.toLowerCase()))
+      .length;
+
+      if (aSkillMatches !== bSkillMatches) {
+        return bSkillMatches - aSkillMatches; // More skill matches first
+      }
+      
+      if ((a.admin_rating || 0) !== (b.admin_rating || 0)) {
+        return (b.admin_rating || 0) - (a.admin_rating || 0); // Higher rating first
+      }
+      
+      return (b.experience_years || 0) - (a.experience_years || 0); // More experience first
+    });
+
+    setAvailableFreelancers(filtered);
   };
 
   // Enhanced Freelancer Management Functions
@@ -1779,6 +1840,42 @@ const ESCAdminDashboard = () => {
                 <div className="mb-4">
                   <h6 style={{ color: accent, fontWeight: 600 }}>Request: {selectedFreelancerRequest.title}</h6>
                   <p className="text-muted">Select freelancers that match the requirements and provide admin notes</p>
+                  
+                  {/* Request Requirements Summary */}
+                  <div className="card border-0 bg-light mb-3">
+                    <div className="card-body p-3">
+                      <div className="row g-2">
+                        <div className="col-md-3">
+                          <small className="text-muted">
+                            <i className="bi bi-gear me-1"></i>
+                            <strong>Required Skills:</strong><br/>
+                            {selectedFreelancerRequest.required_skills.join(', ')}
+                          </small>
+                        </div>
+                        <div className="col-md-3">
+                          <small className="text-muted">
+                            <i className="bi bi-clock me-1"></i>
+                            <strong>Min Experience:</strong><br/>
+                            {selectedFreelancerRequest.min_experience}+ years
+                          </small>
+                        </div>
+                        <div className="col-md-3">
+                          <small className="text-muted">
+                            <i className="bi bi-geo-alt me-1"></i>
+                            <strong>Location:</strong><br/>
+                            {selectedFreelancerRequest.preferred_location || 'Any'}
+                          </small>
+                        </div>
+                        <div className="col-md-3">
+                          <small className="text-muted">
+                            <i className="bi bi-currency-dollar me-1"></i>
+                            <strong>Budget:</strong><br/>
+                            {selectedFreelancerRequest.budget_range || 'Not specified'}
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mb-3">
@@ -1793,11 +1890,139 @@ const ESCAdminDashboard = () => {
                 </div>
 
                 <div className="mb-4">
-                  <h6 style={{ color: accent, fontWeight: 600 }}>Available Freelancers</h6>
+                  <h6 style={{ color: accent, fontWeight: 600 }}>All Registered Freelancers</h6>
+                  
+                  {/* Smart Filtering Interface */}
+                  <div className="card border-0 shadow-sm mb-3">
+                    <div className="card-body">
+                      <div className="row g-3">
+                        <div className="col-md-2">
+                          <button 
+                            className="btn btn-sm w-100"
+                            style={{ background: accent, color: '#fff' }}
+                            onClick={applySmartFiltering}
+                            title="Automatically filter freelancers based on request requirements"
+                          >
+                            <i className="bi bi-magic me-1"></i>Smart Filter
+                          </button>
+                        </div>
+                        <div className="col-md-2">
+                          <button 
+                            className="btn btn-sm btn-outline-secondary w-100"
+                            onClick={resetFilters}
+                            title="Show all freelancers"
+                          >
+                            <i className="bi bi-arrow-clockwise me-1"></i>Reset
+                          </button>
+                        </div>
+                        <div className="col-md-2">
+                          <label className="form-label small">Filter by Skills:</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            placeholder="e.g., React, Node.js"
+                            onChange={(e) => {
+                              const skillFilter = e.target.value.toLowerCase();
+                              setAvailableFreelancers(prev => 
+                                availableFreelancers.filter(f => 
+                                  !skillFilter || 
+                                  f.skills?.some(skill => skill.toLowerCase().includes(skillFilter)) ||
+                                  f.headline?.toLowerCase().includes(skillFilter)
+                                )
+                              );
+                            }}
+                          />
+                        </div>
+                        <div className="col-md-3">
+                          <label className="form-label small">Filter by Experience:</label>
+                          <select 
+                            className="form-select form-select-sm"
+                            onChange={(e) => {
+                              const expFilter = e.target.value;
+                              if (expFilter === 'all') {
+                                setAvailableFreelancers(prev => availableFreelancers);
+                              } else {
+                                setAvailableFreelancers(prev => 
+                                  availableFreelancers.filter(f => 
+                                    f.experience_years >= parseInt(expFilter)
+                                  )
+                                );
+                              }
+                            }}
+                          >
+                            <option value="all">All Experience Levels</option>
+                            <option value="0">0+ years</option>
+                            <option value="1">1+ years</option>
+                            <option value="3">3+ years</option>
+                            <option value="5">5+ years</option>
+                            <option value="10">10+ years</option>
+                          </select>
+                        </div>
+                        <div className="col-md-3">
+                          <label className="form-label small">Filter by Status:</label>
+                          <select 
+                            className="form-select form-select-sm"
+                            onChange={(e) => {
+                              const statusFilter = e.target.value;
+                              if (statusFilter === 'all') {
+                                setAvailableFreelancers(prev => availableFreelancers);
+                              } else if (statusFilter === 'available') {
+                                setAvailableFreelancers(prev => availableFreelancers.filter(f => f.is_available));
+                              } else if (statusFilter === 'approved') {
+                                setAvailableFreelancers(prev => availableFreelancers.filter(f => f.is_approved));
+                              }
+                            }}
+                          >
+                            <option value="all">All Statuses</option>
+                            <option value="available">Available Only</option>
+                            <option value="approved">Approved Only</option>
+                          </select>
+                        </div>
+                        <div className="col-md-3">
+                          <label className="form-label small">Sort by:</label>
+                          <select 
+                            className="form-select form-select-sm"
+                            onChange={(e) => {
+                              const sortBy = e.target.value;
+                              const sorted = [...availableFreelancers];
+                              if (sortBy === 'rating') {
+                                sorted.sort((a, b) => (b.admin_rating || 0) - (a.admin_rating || 0));
+                              } else if (sortBy === 'experience') {
+                                sorted.sort((a, b) => (b.experience_years || 0) - (a.experience_years || 0));
+                              } else if (sortBy === 'name') {
+                                sorted.sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`));
+                              }
+                              setAvailableFreelancers(sorted);
+                            }}
+                          >
+                            <option value="rating">Admin Rating (High to Low)</option>
+                            <option value="experience">Experience (High to Low)</option>
+                            <option value="name">Name (A-Z)</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="row mt-2">
+                        <div className="col-12">
+                          <small className="text-muted">
+                            <i className="bi bi-info-circle me-1"></i>
+                            Showing {availableFreelancers.length} of {allFreelancers.length} freelancers. 
+                            Use Smart Filter to automatically find the best matches for this request.
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {availableFreelancers.length === 0 ? (
                     <div className="text-center py-4">
                       <i className="bi bi-exclamation-triangle display-4 text-warning"></i>
-                      <p className="mt-3 text-muted">No available freelancers found</p>
+                      <p className="mt-3 text-muted">No freelancers match the current filters</p>
+                      <button 
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={resetFilters}
+                      >
+                        Reset Filters
+                      </button>
                     </div>
                   ) : (
                     <div className="row g-3">
@@ -1824,22 +2049,57 @@ const ESCAdminDashboard = () => {
                               
                               <div className="mt-2">
                                 <p className="text-muted small mb-2">{freelancer.headline}</p>
-                                <div className="d-flex align-items-center mb-2">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <i
-                                      key={star}
-                                      className={`bi ${star <= (freelancer.admin_rating || 0) ? 'bi-star-fill' : 'bi-star'}`}
-                                      style={{ color: star <= (freelancer.admin_rating || 0) ? '#ffc107' : '#dee2e6', fontSize: '12px' }}
-                                    ></i>
-                                  ))}
-                                  <small className="ms-1 text-muted">({freelancer.admin_rating || 0}/5)</small>
+                                
+                                {/* Skills Display */}
+                                {freelancer.skills && freelancer.skills.length > 0 && (
+                                  <div className="mb-2">
+                                    <small className="text-muted">
+                                      <i className="bi bi-gear me-1"></i>
+                                      <strong>Skills:</strong> {freelancer.skills.slice(0, 3).join(', ')}
+                                      {freelancer.skills.length > 3 && <span className="text-muted">...</span>}
+                                    </small>
+                                  </div>
+                                )}
+                                
+                                {/* Experience and Rating */}
+                                <div className="row g-2 mb-2">
+                                  <div className="col-6">
+                                    <small className="text-muted">
+                                      <i className="bi bi-clock me-1"></i>
+                                      <strong>Exp:</strong> {freelancer.experience_years || 0} years
+                                    </small>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="d-flex align-items-center">
+                                      {[1, 2, 3, 4, 5].map((star) => (
+                                        <i
+                                          key={star}
+                                          className={`bi ${star <= (freelancer.admin_rating || 0) ? 'bi-star-fill' : 'bi-star'}`}
+                                          style={{ color: star <= (freelancer.admin_rating || 0) ? '#ffc107' : '#dee2e6', fontSize: '10px' }}
+                                        ></i>
+                                      ))}
+                                      <small className="ms-1 text-muted">({freelancer.admin_rating || 0}/5)</small>
+                                    </div>
+                                  </div>
                                 </div>
+                                
+                                {/* Contact Information */}
                                 <p className="text-muted small mb-1">
                                   <i className="bi bi-envelope me-1"></i>{freelancer.email}
                                 </p>
-                                <p className="text-muted small">
+                                <p className="text-muted small mb-2">
                                   <i className="bi bi-telephone me-1"></i>{freelancer.phone || 'No phone'}
                                 </p>
+                                
+                                {/* Status Badges */}
+                                <div className="d-flex gap-1 mb-2">
+                                  <span className={`badge ${freelancer.is_available ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
+                                    {freelancer.is_available ? 'Available' : 'Unavailable'}
+                                  </span>
+                                  <span className={`badge ${freelancer.is_approved ? 'bg-primary' : 'bg-warning'}`} style={{ fontSize: '10px' }}>
+                                    {freelancer.is_approved ? 'Approved' : 'Pending'}
+                                  </span>
+                                </div>
                               </div>
 
                               {selectedFreelancers.includes(freelancer.freelancer_id) && (
