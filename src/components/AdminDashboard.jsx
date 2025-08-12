@@ -1287,7 +1287,7 @@ const ESCAdminDashboard = () => {
                   transition: 'all 0.2s ease'
                 }}
               >
-                <i className="bi bi-handshake me-3"></i>
+                <i className="bi bi-people-fill me-3"></i>
                 Associate Freelancer Requests
                 </button>
 
