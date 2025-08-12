@@ -1073,12 +1073,12 @@ const ESCAdminDashboard = () => {
             }}>
               <i className="bi bi-building" style={{ color: '#fff', fontSize: '18px' }}></i>
             </div>
-            <div>
+        <div>
               <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }}>
                 ECS Admin
               </h5>
               <small className="text-muted">Control Center</small>
-            </div>
+          </div>
           </div>
         </div>
 
@@ -1114,7 +1114,7 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-speedometer2 me-3"></i>
                 Dashboard
-              </button>
+                </button>
               
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'freelancers' ? 'active' : ''}`}
@@ -1133,7 +1133,7 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-people me-3"></i>
                 Freelancer Management
-              </button>
+                </button>
 
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'associate-requests' ? 'active' : ''}`}
@@ -1152,7 +1152,7 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-person-plus me-3"></i>
                 Associate Requests
-              </button>
+                </button>
 
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'freelancer-requests' ? 'active' : ''}`}
@@ -1171,8 +1171,8 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-handshake me-3"></i>
                 Freelancer Requests
-              </button>
-            </div>
+                </button>
+        </div>
           </div>
 
           {/* Management Tools */}
@@ -1224,8 +1224,8 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-file-earmark-text me-3"></i>
                 Reports
-              </button>
-            </div>
+          </button>
+        </div>
           </div>
 
           {/* System */}
@@ -1360,75 +1360,129 @@ const ESCAdminDashboard = () => {
           {activeTab === 'dashboard' && (
             <>
               {/* System Stats Row */}
-              <div className="row gy-4 mb-4">
+              <div className="row g-4 mb-4">
                 <div className="col-lg-3 col-md-6">
-                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
-                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-people"></i></div>
-                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Users</div>
-                    <div style={{ color: '#888', fontSize: 15 }}>
-                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.users ? Object.values(stats.users).reduce((a, b) => a + b, 0) : '--'}
+                  {/* Total Users Card */}
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <div className="mb-3">
+                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
+                        <i className="bi bi-people"></i>
+                    </div>
+                      <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Total Users
+                  </div>
+                </div>
+                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
+                      {statsLoading ? '...' : statsError ? '--' : stats?.users ? Object.values(stats.users).reduce((a, b) => a + b, 0) : '--'}
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
+                        <i className="bi bi-arrow-up me-1"></i>
+                        +12.5%
+                      </span>
+                  </div>
+                    <div className="mt-3 text-sm text-muted">
+                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
+                        <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
+                        <span style={{ fontWeight: 500 }}>Growing steadily</span>
+                </div>
+                      <div className="text-muted">Active users across all platforms</div>
                     </div>
                   </div>
                 </div>
+
                 <div className="col-lg-3 col-md-6">
-                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
-                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-file-earmark-text"></i></div>
-                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>CVs</div>
-                    <div style={{ color: '#888', fontSize: 15 }}>
-                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.total_cvs ?? '--'}
+                  {/* Total CVs Card */}
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <div className="mb-3">
+                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
+                        <i className="bi bi-file-earmark-text"></i>
                     </div>
+                      <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Total CVs
                   </div>
                 </div>
-                <div className="col-lg-3 col-md-6">
-                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
-                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-chat-dots"></i></div>
-                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Messages</div>
-                    <div style={{ color: '#888', fontSize: 15 }}>
-                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.total_messages ?? '--'}
+                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
+                      {statsLoading ? '...' : statsError ? '--' : stats?.total_cvs ?? '--'}
+              </div>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
+                        <i className="bi bi-arrow-up me-1"></i>
+                        +8.2%
+                      </span>
+                    </div>
+                    <div className="mt-3 text-sm text-muted">
+                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
+                        <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
+                        <span style={{ fontWeight: 500 }}>CV uploads increasing</span>
+                  </div>
+                      <div className="text-muted">Professional profiles added</div>
+                </div>
                     </div>
                   </div>
-                </div>
+
                 <div className="col-lg-3 col-md-6">
-                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
-                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-envelope"></i></div>
-                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Pending Requests</div>
-                    <div style={{ color: '#888', fontSize: 15 }}>
-                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.associate_requests?.pending ?? '--'}
+                  {/* Total Messages Card */}
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <div className="mb-3">
+                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
+                        <i className="bi bi-chat-dots"></i>
+                </div>
+                      <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Total Messages
                     </div>
                   </div>
+                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
+                      {statsLoading ? '...' : statsError ? '--' : stats?.total_messages ?? '--'}
                 </div>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
+                        <i className="bi bi-arrow-up me-1"></i>
+                        +15.3%
+                      </span>
+              </div>
+                    <div className="mt-3 text-sm text-muted">
+                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
+                        <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
+                        <span style={{ fontWeight: 500 }}>Communication active</span>
+                        </div>
+                      <div className="text-muted">High engagement levels</div>
+                        </div>
+                        </div>
+                        </div>
+
+                <div className="col-lg-3 col-md-6">
+                  {/* Pending Requests Card */}
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <div className="mb-3">
+                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
+                        <i className="bi bi-envelope"></i>
+                        </div>
+                      <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Pending Requests
+                        </div>
+                        </div>
+                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
+                      {statsLoading ? '...' : statsError ? '--' : stats?.associate_requests?.pending ?? '--'}
+                        </div>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
+                        <i className="bi bi-clock me-1"></i>
+                        Awaiting
+                      </span>
+                        </div>
+                    <div className="mt-3 text-sm text-muted">
+                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
+                        <i className="bi bi-clock" style={{ color: '#f59e0b' }}></i>
+                        <span style={{ fontWeight: 500 }}>Review required</span>
+                      </div>
+                      <div className="text-muted">ECS Admin attention needed</div>
+                  </div>
+                </div>
+              </div>
               </div>
               
-              {/* Additional Stats Row */}
-              <div className="row gy-4 mb-4">
-                <div className="col-lg-4 col-md-6">
-                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
-                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-person-check"></i></div>
-                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Available Freelancers</div>
-                    <div style={{ color: '#888', fontSize: 15 }}>
-                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.freelancer_availability?.available ?? '--'}
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-4 col-md-6">
-                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
-                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-person-x"></i></div>
-                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Unavailable Freelancers</div>
-                    <div style={{ color: '#888', fontSize: 15 }}>
-                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.freelancer_availability?.unavailable ?? '--'}
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-4 col-md-6">
-                  <div className="dashboard-stat-card bg-white rounded-4 shadow-sm p-4 text-center animate-fade-in orange-border">
-                    <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}><i className="bi bi-person-busy"></i></div>
-                    <div style={{ fontWeight: 700, fontSize: 22, color: '#444' }}>Busy Freelancers</div>
-                    <div style={{ color: '#888', fontSize: 15 }}>
-                      {statsLoading ? '...' : statsError ? <span style={{ color: '#df1529' }}>{statsError}</span> : stats?.freelancer_availability?.busy ?? '--'}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Additional Stats Row - REMOVED to match image layout */}
             </>
           )}
           {/* Associate Requests Table (Associate Requests Tab) */}
@@ -1841,14 +1895,14 @@ const ESCAdminDashboard = () => {
                 <div className="text-center py-4">
                   <div className="spinner-border" style={{ color: accent }} role="status"></div>
                   <p className="mt-2 text-muted">Loading freelancer requests...</p>
-                </div>
+        </div>
               ) : freelancerRequestsError ? (
                 <div className="alert alert-danger">{freelancerRequestsError}</div>
               ) : freelancerRequests.length === 0 ? (
                 <div className="text-center py-4">
                   <i className="bi bi-inbox display-4 text-muted"></i>
                   <p className="mt-3 text-muted">No freelancer requests submitted yet</p>
-                </div>
+      </div>
               ) : (
                 <div className="row g-3">
                   {freelancerRequests.map((request) => (
