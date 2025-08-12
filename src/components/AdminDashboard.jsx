@@ -552,10 +552,19 @@ const ESCAdminDashboard = () => {
   };
 
   const handleFreelancerSelection = (freelancerId, isSelected) => {
+    console.log('🔍 handleFreelancerSelection called:', { freelancerId, isSelected });
     if (isSelected) {
-      setSelectedFreelancers(prev => [...prev, freelancerId]);
+      setSelectedFreelancers(prev => {
+        const newSelection = [...prev, freelancerId];
+        console.log('🔍 Added freelancer to selection:', newSelection);
+        return newSelection;
+      });
     } else {
-      setSelectedFreelancers(prev => prev.filter(id => id !== freelancerId));
+      setSelectedFreelancers(prev => {
+        const newSelection = prev.filter(id => id !== freelancerId);
+        console.log('🔍 Removed freelancer from selection:', newSelection);
+        return newSelection;
+      });
     }
   };
 
@@ -1969,6 +1978,24 @@ const ESCAdminDashboard = () => {
                     >
                       Debug: Re-fetch Freelancers
                     </button>
+                    <button 
+                      className="btn btn-sm btn-info mt-2 ms-2"
+                      onClick={() => {
+                        console.log('🔍 Manual Test - selectedFreelancers:', selectedFreelancers);
+                        console.log('🔍 Manual Test - highlightedFreelancers:', highlightedFreelancers);
+                      }}
+                    >
+                      Debug: Selection State
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-primary mt-2 ms-2"
+                      onClick={() => {
+                        setSelectedFreelancers([1, 2]);
+                        console.log('🔍 Manual Test - Set selectedFreelancers to [1, 2]');
+                      }}
+                    >
+                      Test: Select First 2
+                    </button>
                   </div>
                   
                   {/* Smart Filtering Interface */}
@@ -2112,17 +2139,30 @@ const ESCAdminDashboard = () => {
                               : 'border-light'
                           }`}>
                             <div className="card-body">
-                              <div className="form-check">
+                              <div className="form-check" style={{ border: '1px solid #ddd', padding: '10px', marginBottom: '10px' }}>
                                 <input
                                   className="form-check-input"
                                   type="checkbox"
                                   id={`freelancer-${freelancer.freelancer_id}`}
                                   checked={selectedFreelancers.includes(freelancer.freelancer_id)}
                                   onChange={(e) => handleFreelancerSelection(freelancer.freelancer_id, e.target.checked)}
+                                  style={{ 
+                                    width: '20px', 
+                                    height: '20px', 
+                                    marginRight: '10px',
+                                    cursor: 'pointer',
+                                    display: 'inline-block'
+                                  }}
                                 />
-                                <label className="form-check-label" htmlFor={`freelancer-${freelancer.freelancer_id}`}>
+                                <label className="form-check-label" htmlFor={`freelancer-${freelancer.freelancer_id}`} style={{ cursor: 'pointer' }}>
                                   <strong>{freelancer.first_name} {freelancer.last_name}</strong>
                                 </label>
+                                {/* Debug info */}
+                                <small className="text-muted d-block">
+                                  ID: {freelancer.freelancer_id} | 
+                                  Selected: {selectedFreelancers.includes(freelancer.freelancer_id) ? 'Yes' : 'No'} |
+                                  Checkbox visible: Yes
+                                </small>
                               </div>
                               
                               <div className="mt-2">
