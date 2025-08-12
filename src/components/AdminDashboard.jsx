@@ -1620,9 +1620,6 @@ const ESCAdminDashboard = () => {
 
               {/* Total Visitors Graph */}
               <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-                <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Analytics Dashboard</h5>
-                <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Comprehensive insights and performance metrics</p>
-                
                 {/* Interactive Chart Component */}
                 <div className="chart-container">
                   <div className="card border-0 shadow-sm">
