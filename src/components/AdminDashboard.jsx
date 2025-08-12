@@ -1290,69 +1290,28 @@ const ESCAdminDashboard = () => {
         minHeight: '100vh',
         background: '#f9fafb'
       }}>
-        {/* Top Bar */}
-        <div style={{ width: '100%', background: '#fff', boxShadow: '0 2px 12px rgba(253,104,14,0.08)', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 70, position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontWeight: 700, color: '#444', fontSize: 17 }}>{user?.first_name || 'Admin'} {user?.last_name || ''}</div>
-              <div style={{ color: '#888', fontSize: 13 }}>Administrator</div>
-            </div>
-            <div style={{ position: 'relative', width: 44, height: 44 }}>
-              {getAdminImageUrl() ? (
-                <img
-                  src={getAdminImageUrl()}
-                  alt="Profile"
-                  className="rounded-circle"
-                  style={{ width: 44, height: 44, objectFit: 'cover', border: '2.5px solid #fd680e', background: '#eee' }}
-                />
-              ) : (
-                <i className="bi bi-person-circle" style={{ fontSize: 32, color: accent, background: '#eee', borderRadius: '50%', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}></i>
-              )}
-              {/* Upload button */}
-              <button
-                type="button"
-                className="btn btn-sm btn-light"
-                style={{ position: 'absolute', bottom: -6, right: -6, borderRadius: '50%', border: '2px solid #fff', background: accent, color: '#fff', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, boxShadow: '0 2px 8px rgba(253,104,14,0.12)', zIndex: 2, padding: 0 }}
-                onClick={() => adminImageInputRef.current && adminImageInputRef.current.click()}
-                title="Upload/Change Profile Picture"
-                disabled={adminImageUploading}
-              >
-                <i className="bi bi-plus"></i>
-              </button>
-              <input
-                type="file"
-                accept="image/*"
-                ref={adminImageInputRef}
-                style={{ display: 'none' }}
-                onChange={handleAdminImageChange}
-                disabled={adminImageUploading}
-              />
-              {/* Delete button */}
-              {getAdminImageUrl() && (
-                <button
-                  type="button"
-                  className="btn btn-sm btn-danger"
-                  style={{ position: 'absolute', top: -6, right: -6, borderRadius: '50%', border: '2px solid #fff', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, zIndex: 2, padding: 0 }}
-                  onClick={handleDeleteAdminImage}
-                  title="Delete Profile Picture"
-                  disabled={adminImageUploading}
-                >
-                  <i className="bi bi-trash"></i>
-                </button>
-              )}
-            </div>
+        {/* Page Header */}
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h1 className="h3 mb-0" style={{ color: '#111827', fontWeight: 600 }}>
+              {activeTab === 'dashboard' && 'Dashboard'}
+              {activeTab === 'freelancers' && 'Freelancer Management'}
+              {activeTab === 'associate-requests' && 'Associate Requests'}
+              {activeTab === 'freelancer-requests' && 'Freelancer Requests'}
+              {activeTab === 'analytics' && 'Analytics'}
+              {activeTab === 'reports' && 'Reports'}
+              {activeTab === 'settings' && 'Settings'}
+            </h1>
+            <p className="text-muted mb-0">
+              {activeTab === 'dashboard' && 'System overview and key metrics'}
+              {activeTab === 'freelancers' && 'Manage and review freelancer profiles'}
+              {activeTab === 'associate-requests' && 'Review associate join requests'}
+              {activeTab === 'freelancer-requests' && 'Handle associate freelancer requests'}
+              {activeTab === 'analytics' && 'Performance insights and trends'}
+              {activeTab === 'reports' && 'Generate and view system reports'}
+              {activeTab === 'settings' && 'System configuration and preferences'}
+            </p>
           </div>
-          {/* Feedback messages */}
-          {(adminImageSuccess || adminImageError || adminImageUploading) && (
-            <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, minWidth: 180 }}>
-              <div className={`toast show align-items-center text-white bg-${adminImageSuccess ? 'success' : adminImageError ? 'danger' : 'primary'} border-0`} role="alert" aria-live="assertive" aria-atomic="true" style={{ borderRadius: 16, boxShadow: '0 2px 16px rgba(253,104,14,0.18)', fontWeight: 600, fontSize: 15, padding: '12px 24px' }}>
-                <div className="d-flex align-items-center">
-                  <i className={`bi me-2 ${adminImageSuccess ? 'bi-check-circle' : adminImageError ? 'bi-exclamation-triangle' : 'bi-info-circle'}`}></i>
-                  <div>{adminImageUploading ? 'Uploading...' : adminImageSuccess || adminImageError}</div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
         {/* Main Dashboard Content */}
         <div style={{ flex: 1, padding: '40px 32px', background: 'transparent', minHeight: 0, overflowY: 'auto' }}>
