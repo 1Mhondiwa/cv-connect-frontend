@@ -74,6 +74,19 @@ const ESCAdminDashboard = () => {
   const [adminImageSuccess, setAdminImageSuccess] = useState('');
   const adminImageInputRef = useRef(null);
 
+  // Freelancer request management
+  const [freelancerRequests, setFreelancerRequests] = useState([]);
+  const [freelancerRequestsLoading, setFreelancerRequestsLoading] = useState(false);
+  const [freelancerRequestsError, setFreelancerRequestsError] = useState('');
+  const [selectedFreelancerRequest, setSelectedFreelancerRequest] = useState(null);
+  const [showFreelancerRequestDetailsModal, setShowFreelancerRequestDetailsModal] = useState(false);
+  const [showRecommendationsModal, setShowRecommendationsModal] = useState(false);
+  const [availableFreelancers, setAvailableFreelancers] = useState([]);
+  const [selectedFreelancers, setSelectedFreelancers] = useState([]);
+  const [highlightedFreelancers, setHighlightedFreelancers] = useState([]);
+  const [adminNotes, setAdminNotes] = useState('');
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+
   useEffect(() => {
     checkAuth();
   }, []);
@@ -98,6 +111,14 @@ const ESCAdminDashboard = () => {
   useEffect(() => {
     if (activeTab === 'associate-requests') {
       fetchAssociateRequests();
+    }
+    // eslint-disable-next-line
+  }, [activeTab]);
+
+  // Fetch freelancer requests when freelancer-requests tab is activated
+  useEffect(() => {
+    if (activeTab === 'freelancer-requests') {
+      fetchFreelancerRequests();
     }
     // eslint-disable-next-line
   }, [activeTab]);
@@ -458,6 +479,113 @@ const ESCAdminDashboard = () => {
     }));
   };
 
+  // Freelancer Request Management Functions
+  const fetchFreelancerRequests = async () => {
+    setFreelancerRequestsLoading(true);
+    setFreelancerRequestsError('');
+    try {
+      const res = await api.get('/admin/associate-requests');
+      if (res.data.success) {
+        setFreelancerRequests(res.data.requests);
+      } else {
+        setFreelancerRequestsError(res.data.message || 'Failed to fetch freelancer requests');
+      }
+    } catch (err) {
+      setFreelancerRequestsError(err.response?.data?.message || 'Failed to fetch freelancer requests');
+    } finally {
+      setFreelancerRequestsLoading(false);
+    }
+  };
+
+  const fetchAvailableFreelancers = async () => {
+    try {
+      const res = await api.get('/admin/freelancers?availability_status=available&approval_status=approved');
+      if (res.data.success) {
+        setAvailableFreelancers(res.data.freelancers);
+      }
+    } catch (err) {
+      console.error('Error fetching available freelancers:', err);
+    }
+  };
+
+  const openFreelancerRequestDetails = async (request) => {
+    setSelectedFreelancerRequest(request);
+    setShowFreelancerRequestDetailsModal(true);
+    await fetchAvailableFreelancers();
+  };
+
+  const openRecommendationsModal = (request) => {
+    setSelectedFreelancerRequest(request);
+    setShowRecommendationsModal(true);
+    setSelectedFreelancers([]);
+    setHighlightedFreelancers([]);
+    setAdminNotes('');
+  };
+
+  const handleFreelancerSelection = (freelancerId, isSelected) => {
+    if (isSelected) {
+      setSelectedFreelancers(prev => [...prev, freelancerId]);
+    } else {
+      setSelectedFreelancers(prev => prev.filter(id => id !== freelancerId));
+    }
+  };
+
+  const handleHighlightFreelancer = (freelancerId, isHighlighted) => {
+    if (isHighlighted) {
+      setHighlightedFreelancers(prev => [...prev, freelancerId]);
+    } else {
+      setHighlightedFreelancers(prev => prev.filter(id => id !== freelancerId));
+    }
+  };
+
+  const submitRecommendations = async () => {
+    if (selectedFreelancers.length === 0) {
+      alert('Please select at least one freelancer');
+      return;
+    }
+
+    setRecommendationsLoading(true);
+    try {
+      const res = await api.post(`/admin/associate-requests/${selectedFreelancerRequest.request_id}/recommendations`, {
+        freelancer_ids: selectedFreelancers,
+        admin_notes: adminNotes,
+        highlighted_freelancers: highlightedFreelancers
+      });
+
+      if (res.data.success) {
+        alert('Recommendations submitted successfully!');
+        setShowRecommendationsModal(false);
+        fetchFreelancerRequests();
+      } else {
+        alert(res.data.message || 'Failed to submit recommendations');
+      }
+    } catch (err) {
+      console.error('Error submitting recommendations:', err);
+      alert(err.response?.data?.message || 'Failed to submit recommendations');
+    } finally {
+      setRecommendationsLoading(false);
+    }
+  };
+
+  const updateRequestStatus = async (requestId, status, notes = '') => {
+    try {
+      const res = await api.put(`/admin/associate-requests/${requestId}/status`, {
+        status,
+        admin_notes: notes
+      });
+
+      if (res.data.success) {
+        alert('Request status updated successfully!');
+        fetchFreelancerRequests();
+      } else {
+        alert(res.data.message || 'Failed to update request status');
+      }
+    } catch (err) {
+      console.error('Error updating request status:', err);
+      alert(err.response?.data?.message || 'Failed to update request status');
+    }
+  };
+
   // Enhanced Freelancer Management Functions
   const fetchFreelancersWithFilters = async () => {
     setFreelancersLoading(true);
@@ -672,6 +800,11 @@ const ESCAdminDashboard = () => {
               <li>
                 <button onClick={() => setActiveTab('freelancers')} className="admin-sidebar-btn">
                   <i className="bi bi-person-workspace me-2"></i> Freelancers
+                </button>
+              </li>
+              <li>
+                <button onClick={() => setActiveTab('freelancer-requests')} className="admin-sidebar-btn">
+                  <i className="bi bi-list-check me-2"></i> Freelancer Requests
                 </button>
               </li>
              {/* <li>
@@ -1339,6 +1472,151 @@ const ESCAdminDashboard = () => {
               )}
             </div>
           )}
+          {/* Freelancer Requests Tab */}
+          {activeTab === 'freelancer-requests' && (
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>ECS Admin Freelancer Request Management</h5>
+              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Review associate requests for freelancer services and provide curated recommendations</p>
+              
+              {freelancerRequestsLoading ? (
+                <div className="text-center py-4">
+                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                  <p className="mt-2 text-muted">Loading freelancer requests...</p>
+                </div>
+              ) : freelancerRequestsError ? (
+                <div className="alert alert-danger">{freelancerRequestsError}</div>
+              ) : freelancerRequests.length === 0 ? (
+                <div className="text-center py-4">
+                  <i className="bi bi-inbox display-4 text-muted"></i>
+                  <p className="mt-3 text-muted">No freelancer requests submitted yet</p>
+                </div>
+              ) : (
+                <div className="row g-3">
+                  {freelancerRequests.map((request) => (
+                    <div key={request.request_id} className="col-12">
+                      <div className="card border-0 shadow-sm h-100">
+                        <div className="card-body">
+                          <div className="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                              <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600 }}>
+                                {request.title}
+                              </h6>
+                              <p className="card-text text-muted small mb-2">
+                                {request.description.length > 150 
+                                  ? `${request.description.substring(0, 150)}...` 
+                                  : request.description}
+                              </p>
+                            </div>
+                            <div className="text-end">
+                              <span className={`badge ${
+                                request.status === 'pending' ? 'bg-warning' :
+                                request.status === 'reviewed' ? 'bg-info' :
+                                request.status === 'provided' ? 'bg-success' :
+                                request.status === 'completed' ? 'bg-primary' :
+                                'bg-secondary'
+                              }`}>
+                                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="row g-2 mb-3">
+                            <div className="col-md-4">
+                              <small className="text-muted">
+                                <i className="bi bi-building me-1"></i>
+                                <strong>Company:</strong> {request.associate_email}
+                              </small>
+                            </div>
+                            <div className="col-md-4">
+                              <small className="text-muted">
+                                <i className="bi bi-gear me-1"></i>
+                                <strong>Skills:</strong> {request.required_skills.join(', ')}
+                              </small>
+                            </div>
+                            <div className="col-md-4">
+                              <small className="text-muted">
+                                <i className="bi bi-calendar me-1"></i>
+                                <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
+                              </small>
+                            </div>
+                          </div>
+
+                          <div className="row g-2 mb-3">
+                            <div className="col-md-3">
+                              <small className="text-muted">
+                                <i className="bi bi-clock me-1"></i>
+                                <strong>Urgency:</strong> {request.urgency_level}
+                              </small>
+                            </div>
+                            <div className="col-md-3">
+                              <small className="text-muted">
+                                <i className="bi bi-currency-dollar me-1"></i>
+                                <strong>Budget:</strong> {request.budget_range || 'Not specified'}
+                              </small>
+                            </div>
+                            <div className="col-md-3">
+                              <small className="text-muted">
+                                <i className="bi bi-geo-alt me-1"></i>
+                                <strong>Location:</strong> {request.preferred_location || 'Any'}
+                              </small>
+                            </div>
+                            <div className="col-md-3">
+                              <small className="text-muted">
+                                <i className="bi bi-star me-1"></i>
+                                <strong>Experience:</strong> {request.min_experience}+ years
+                              </small>
+                            </div>
+                          </div>
+
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                              {request.status === 'provided' && (
+                                <small className="text-success">
+                                  <i className="bi bi-check-circle me-1"></i>
+                                  {request.recommendation_count} freelancer(s) recommended
+                                </small>
+                              )}
+                              {request.status === 'pending' && (
+                                <small className="text-warning">
+                                  <i className="bi bi-clock me-1"></i>
+                                  Awaiting ECS Admin review
+                                </small>
+                              )}
+                            </div>
+                            <div className="d-flex gap-2">
+                              <button
+                                className="btn btn-sm btn-outline-primary"
+                                onClick={() => openFreelancerRequestDetails(request)}
+                              >
+                                <i className="bi bi-eye me-1"></i>View Details
+                              </button>
+                              {request.status === 'pending' && (
+                                <button
+                                  className="btn btn-sm"
+                                  style={{ background: accent, color: '#fff' }}
+                                  onClick={() => openRecommendationsModal(request)}
+                                >
+                                  <i className="bi bi-star me-1"></i>Provide Recommendations
+                                </button>
+                              )}
+                              {request.status === 'provided' && (
+                                <button
+                                  className="btn btn-sm btn-outline-success"
+                                  onClick={() => openRecommendationsModal(request)}
+                                >
+                                  <i className="bi bi-pencil me-1"></i>Update Recommendations
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           {/* Optionally, add more admin widgets or info here */}
         </div>
       </div>
@@ -1385,6 +1663,235 @@ const ESCAdminDashboard = () => {
                   disabled={notesLoading}
                 >
                   {notesLoading ? 'Saving...' : 'Save Notes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Freelancer Request Details Modal */}
+      {showFreelancerRequestDetailsModal && selectedFreelancerRequest && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" style={{ color: accent, fontWeight: 600 }}>
+                  <i className="bi bi-file-text me-2"></i>Request Details
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowFreelancerRequestDetailsModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="row">
+                  <div className="col-md-6">
+                    <h6 style={{ color: accent, fontWeight: 600 }}>Project Information</h6>
+                    <p><strong>Title:</strong> {selectedFreelancerRequest.title}</p>
+                    <p><strong>Description:</strong> {selectedFreelancerRequest.description}</p>
+                    <p><strong>Required Skills:</strong> {selectedFreelancerRequest.required_skills.join(', ')}</p>
+                    <p><strong>Minimum Experience:</strong> {selectedFreelancerRequest.min_experience} years</p>
+                  </div>
+                  <div className="col-md-6">
+                    <h6 style={{ color: accent, fontWeight: 600 }}>Additional Details</h6>
+                    <p><strong>Budget Range:</strong> {selectedFreelancerRequest.budget_range || 'Not specified'}</p>
+                    <p><strong>Urgency Level:</strong> {selectedFreelancerRequest.urgency_level}</p>
+                    <p><strong>Preferred Location:</strong> {selectedFreelancerRequest.preferred_location || 'Any'}</p>
+                    <p><strong>Status:</strong> 
+                      <span className={`badge ms-2 ${
+                        selectedFreelancerRequest.status === 'pending' ? 'bg-warning' :
+                        selectedFreelancerRequest.status === 'reviewed' ? 'bg-info' :
+                        selectedFreelancerRequest.status === 'provided' ? 'bg-success' :
+                        selectedFreelancerRequest.status === 'completed' ? 'bg-primary' :
+                        'bg-secondary'
+                      }`}>
+                        {selectedFreelancerRequest.status.charAt(0).toUpperCase() + selectedFreelancerRequest.status.slice(1)}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                
+                <hr />
+                
+                <div className="row">
+                  <div className="col-md-6">
+                    <h6 style={{ color: accent, fontWeight: 600 }}>Associate Information</h6>
+                    <p><strong>Email:</strong> {selectedFreelancerRequest.associate_email}</p>
+                    <p><strong>Contact Person:</strong> {selectedFreelancerRequest.contact_person}</p>
+                    <p><strong>Industry:</strong> {selectedFreelancerRequest.industry}</p>
+                    <p><strong>Submitted:</strong> {new Date(selectedFreelancerRequest.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <div className="col-md-6">
+                    <h6 style={{ color: accent, fontWeight: 600 }}>Request Statistics</h6>
+                    <p><strong>Recommendations:</strong> {selectedFreelancerRequest.recommendation_count || 0}</p>
+                    <p><strong>Responses:</strong> {selectedFreelancerRequest.response_count || 0}</p>
+                    {selectedFreelancerRequest.reviewed_at && (
+                      <p><strong>Reviewed:</strong> {new Date(selectedFreelancerRequest.reviewed_at).toLocaleDateString()}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setShowFreelancerRequestDetailsModal(false)}
+                >
+                  Close
+                </button>
+                {selectedFreelancerRequest.status === 'pending' && (
+                  <button 
+                    type="button" 
+                    className="btn"
+                    style={{ background: accent, color: '#fff' }}
+                    onClick={() => {
+                      setShowFreelancerRequestDetailsModal(false);
+                      openRecommendationsModal(selectedFreelancerRequest);
+                    }}
+                  >
+                    <i className="bi bi-star me-1"></i>Provide Recommendations
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recommendations Modal */}
+      {showRecommendationsModal && selectedFreelancerRequest && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-xl">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" style={{ color: accent, fontWeight: 600 }}>
+                  <i className="bi bi-star me-2"></i>Provide Freelancer Recommendations
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setShowRecommendationsModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-4">
+                  <h6 style={{ color: accent, fontWeight: 600 }}>Request: {selectedFreelancerRequest.title}</h6>
+                  <p className="text-muted">Select freelancers that match the requirements and provide admin notes</p>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Admin Notes (Optional):</label>
+                  <textarea
+                    className="form-control"
+                    rows="3"
+                    value={adminNotes}
+                    onChange={(e) => setAdminNotes(e.target.value)}
+                    placeholder="Add notes about your recommendations or the request..."
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <h6 style={{ color: accent, fontWeight: 600 }}>Available Freelancers</h6>
+                  {availableFreelancers.length === 0 ? (
+                    <div className="text-center py-4">
+                      <i className="bi bi-exclamation-triangle display-4 text-warning"></i>
+                      <p className="mt-3 text-muted">No available freelancers found</p>
+                    </div>
+                  ) : (
+                    <div className="row g-3">
+                      {availableFreelancers.map((freelancer) => (
+                        <div key={freelancer.freelancer_id} className="col-md-6">
+                          <div className={`card border-2 h-100 ${
+                            selectedFreelancers.includes(freelancer.freelancer_id) 
+                              ? 'border-primary' 
+                              : 'border-light'
+                          }`}>
+                            <div className="card-body">
+                              <div className="form-check">
+                                <input
+                                  className="form-check-input"
+                                  type="checkbox"
+                                  id={`freelancer-${freelancer.freelancer_id}`}
+                                  checked={selectedFreelancers.includes(freelancer.freelancer_id)}
+                                  onChange={(e) => handleFreelancerSelection(freelancer.freelancer_id, e.target.checked)}
+                                />
+                                <label className="form-check-label" htmlFor={`freelancer-${freelancer.freelancer_id}`}>
+                                  <strong>{freelancer.first_name} {freelancer.last_name}</strong>
+                                </label>
+                              </div>
+                              
+                              <div className="mt-2">
+                                <p className="text-muted small mb-2">{freelancer.headline}</p>
+                                <div className="d-flex align-items-center mb-2">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <i
+                                      key={star}
+                                      className={`bi ${star <= (freelancer.admin_rating || 0) ? 'bi-star-fill' : 'bi-star'}`}
+                                      style={{ color: star <= (freelancer.admin_rating || 0) ? '#ffc107' : '#dee2e6', fontSize: '12px' }}
+                                    ></i>
+                                  ))}
+                                  <small className="ms-1 text-muted">({freelancer.admin_rating || 0}/5)</small>
+                                </div>
+                                <p className="text-muted small mb-1">
+                                  <i className="bi bi-envelope me-1"></i>{freelancer.email}
+                                </p>
+                                <p className="text-muted small">
+                                  <i className="bi bi-telephone me-1"></i>{freelancer.phone || 'No phone'}
+                                </p>
+                              </div>
+
+                              {selectedFreelancers.includes(freelancer.freelancer_id) && (
+                                <div className="mt-3">
+                                  <div className="form-check">
+                                    <input
+                                      className="form-check-input"
+                                      type="checkbox"
+                                      id={`highlight-${freelancer.freelancer_id}`}
+                                      checked={highlightedFreelancers.includes(freelancer.freelancer_id)}
+                                      onChange={(e) => handleHighlightFreelancer(freelancer.freelancer_id, e.target.checked)}
+                                    />
+                                    <label className="form-check-label text-warning" htmlFor={`highlight-${freelancer.freelancer_id}`}>
+                                      <i className="bi bi-star-fill me-1"></i>Top Recommendation
+                                    </label>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setShowRecommendationsModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  className="btn"
+                  style={{ background: accent, color: '#fff' }}
+                  onClick={submitRecommendations}
+                  disabled={recommendationsLoading || selectedFreelancers.length === 0}
+                >
+                  {recommendationsLoading ? (
+                    <span>
+                      <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                      Submitting...
+                    </span>
+                  ) : (
+                    <>
+                      <i className="bi bi-check-circle me-1"></i>
+                      Submit Recommendations ({selectedFreelancers.length})
+                    </>
+                  )}
                 </button>
               </div>
             </div>
