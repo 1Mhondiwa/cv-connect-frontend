@@ -1265,7 +1265,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-person-plus me-3"></i>
@@ -1284,7 +1288,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-people-fill me-3"></i>
@@ -1303,7 +1311,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-table me-3"></i>
@@ -1322,7 +1334,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-folder me-3"></i>
@@ -1356,7 +1372,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-graph-up me-3"></i>
@@ -1375,7 +1395,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-file-earmark-text me-3"></i>
@@ -1409,7 +1433,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-gear me-3"></i>
@@ -1428,7 +1456,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-box-arrow-right me-3"></i>
