@@ -1533,14 +1533,14 @@ const ESCAdminDashboard = () => {
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-file-earmark-text"></i>
-                    </div>
+                      </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Total CVs
-                  </div>
-                </div>
+                      </div>
+                    </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {statsLoading ? '...' : statsError ? '--' : stats?.total_cvs ?? '--'}
-              </div>
+                    </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
                         <i className="bi bi-arrow-up me-1"></i>
@@ -1551,11 +1551,11 @@ const ESCAdminDashboard = () => {
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
                         <span style={{ fontWeight: 500 }}>CV uploads increasing</span>
-                  </div>
+                      </div>
                       <div className="text-muted">Professional profiles added</div>
-                </div>
                     </div>
                   </div>
+                </div>
 
                 <div className="col-lg-3 col-md-6">
                   {/* Total Messages Card */}
@@ -1563,29 +1563,29 @@ const ESCAdminDashboard = () => {
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-chat-dots"></i>
-                </div>
+                      </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Total Messages
+                      </div>
                     </div>
-                  </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {statsLoading ? '...' : statsError ? '--' : stats?.total_messages ?? '--'}
-                </div>
+                    </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
                         <i className="bi bi-arrow-up me-1"></i>
                         +15.3%
                       </span>
-              </div>
+                    </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
                         <span style={{ fontWeight: 500 }}>Communication active</span>
-                        </div>
+                      </div>
                       <div className="text-muted">High engagement levels</div>
-                        </div>
-                        </div>
-                        </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="col-lg-3 col-md-6">
                   {/* Pending Requests Card */}
@@ -1593,32 +1593,181 @@ const ESCAdminDashboard = () => {
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-envelope"></i>
-                        </div>
+                      </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Pending Requests
-                        </div>
-                        </div>
+                      </div>
+                    </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {statsLoading ? '...' : statsError ? '--' : stats?.associate_requests?.pending ?? '--'}
-                        </div>
+                    </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
                         <i className="bi bi-clock me-1"></i>
                         Awaiting
                       </span>
-                        </div>
+                    </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-clock" style={{ color: '#f59e0b' }}></i>
                         <span style={{ fontWeight: 500 }}>Review required</span>
                       </div>
                       <div className="text-muted">ECS Admin attention needed</div>
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* Total Visitors Graph */}
+              <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+                <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Analytics Dashboard</h5>
+                <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Comprehensive insights and performance metrics</p>
+                
+                {/* Interactive Chart Component */}
+                <div className="chart-container">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0 pb-0">
+                      <div className="d-flex justify-content-between align-items-start flex-wrap">
+                        <div>
+                          <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600, fontSize: '18px' }}>
+                            Total Visitors
+                          </h6>
+                          <p className="card-text text-muted small mb-0">
+                            Total for the last 3 months
+                          </p>
+                        </div>
+                        <div className="d-flex gap-2 mt-2">
+                          {/* Time Range Toggle Group */}
+                          <div className="btn-group" role="group">
+                            <button
+                              type="button"
+                              className={`btn btn-sm ${timeRange === '90d' ? '' : 'btn-outline-primary'}`}
+                              onClick={() => setTimeRange('90d')}
+                              style={{ 
+                                fontSize: '12px', 
+                                padding: '6px 12px',
+                                background: timeRange === '90d' ? accent : 'transparent',
+                                color: timeRange === '90d' ? '#fff' : accent,
+                                border: `1px solid ${accent}`,
+                                borderRadius: timeRange === '90d' ? '6px 0 0 6px' : '6px 0 0 6px'
+                              }}
+                            >
+                              Last 3 months
+                            </button>
+                            <button
+                              type="button"
+                              className={`btn btn-sm ${timeRange === '30d' ? '' : 'btn-outline-primary'}`}
+                              onClick={() => setTimeRange('30d')}
+                              style={{ 
+                                fontSize: '12px', 
+                                padding: '6px 12px',
+                                background: timeRange === '30d' ? accent : 'transparent',
+                                color: timeRange === '30d' ? '#fff' : accent,
+                                border: `1px solid ${accent}`,
+                                borderRadius: '0'
+                              }}
+                            >
+                              Last 30 days
+                            </button>
+                            <button
+                              type="button"
+                              className={`btn btn-sm ${timeRange === '7d' ? '' : 'btn-outline-primary'}`}
+                              onClick={() => setTimeRange('7d')}
+                              style={{ 
+                                fontSize: '12px', 
+                                padding: '6px 12px',
+                                background: timeRange === '7d' ? accent : 'transparent',
+                                color: timeRange === '7d' ? '#fff' : accent,
+                                border: `1px solid ${accent}`,
+                                borderRadius: timeRange === '7d' ? '0 6px 6px 0' : '0 6px 6px 0'
+                              }}
+                            >
+                              Last 7 days
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="card-body pt-0">
+                      <div className="chart-wrapper" style={{ height: '300px', width: '100%' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={filteredChartData}>
+                            <defs>
+                              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor={accent} stopOpacity={1.0} />
+                                <stop offset="95%" stopColor={accent} stopOpacity={0.1} />
+                              </linearGradient>
+                              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#6c757d" stopOpacity={0.8} />
+                                <stop offset="95%" stopColor="#6c757d" stopOpacity={0.1} />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                            <XAxis
+                              dataKey="date"
+                              tickLine={false}
+                              axisLine={false}
+                              tickMargin={8}
+                              minTickGap={32}
+                              tick={{ fontSize: 12, fill: '#666' }}
+                              tickFormatter={(value) => {
+                                const date = new Date(value)
+                                return date.toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                })
+                              }}
+                            />
+                            <YAxis
+                              tickLine={false}
+                              axisLine={false}
+                              tickMargin={8}
+                              tick={{ fontSize: 12, fill: '#666' }}
+                            />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: '#fff',
+                                border: '1px solid #e5e7eb',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
+                              }}
+                              labelFormatter={(value) => {
+                                return new Date(value).toLocaleDateString("en-US", {
+                                  month: "long",
+                                  day: "numeric",
+                                  year: "numeric"
+                                })
+                              }}
+                              formatter={(value, name) => [
+                                value,
+                                name === 'Desktop' ? 'Desktop' : 'Mobile'
+                              ]}
+                            />
+                            <Area
+                              dataKey="mobile"
+                              type="monotone"
+                              fill="url(#fillMobile)"
+                              stroke="#6c757d"
+                              strokeWidth={2}
+                              stackId="a"
+                              name="Mobile"
+                            />
+                            <Area
+                              dataKey="desktop"
+                              type="monotone"
+                              fill="url(#fillDesktop)"
+                              stroke={accent}
+                              strokeWidth={2}
+                              stackId="a"
+                              name="Desktop"
+                            />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              
-              {/* Additional Stats Row - REMOVED to match image layout */}
             </>
           )}
           {/* Associate Requests Table (Associate Requests Tab) */}
@@ -2142,151 +2291,16 @@ const ESCAdminDashboard = () => {
           )}
           {/* Analytics Tab */}
           {activeTab === 'analytics' && (
-            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Analytics Dashboard</h5>
-              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Comprehensive insights and performance metrics</p>
-              
-              {/* Interactive Chart Component */}
-              <div className="chart-container">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-transparent border-0 pb-0">
-                    <div className="d-flex justify-content-between align-items-start flex-wrap">
-                      <div>
-                        <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600, fontSize: '18px' }}>
-                          Total Visitors
-                        </h6>
-                        <p className="card-text text-muted small mb-0">
-                          Total for the last 3 months
-                        </p>
-                      </div>
-                      <div className="d-flex gap-2 mt-2">
-                        {/* Time Range Toggle Group */}
-                        <div className="btn-group" role="group">
-                          <button
-                            type="button"
-                            className={`btn btn-sm ${timeRange === '90d' ? '' : 'btn-outline-primary'}`}
-                            onClick={() => setTimeRange('90d')}
-                            style={{ 
-                              fontSize: '12px', 
-                              padding: '6px 12px',
-                              background: timeRange === '90d' ? accent : 'transparent',
-                              color: timeRange === '90d' ? '#fff' : accent,
-                              border: `1px solid ${accent}`,
-                              borderRadius: timeRange === '90d' ? '6px 0 0 6px' : '6px 0 0 6px'
-                            }}
-                          >
-                            Last 3 months
-                          </button>
-                          <button
-                            type="button"
-                            className={`btn btn-sm ${timeRange === '30d' ? '' : 'btn-outline-primary'}`}
-                            onClick={() => setTimeRange('30d')}
-                            style={{ 
-                              fontSize: '12px', 
-                              padding: '6px 12px',
-                              background: timeRange === '30d' ? accent : 'transparent',
-                              color: timeRange === '30d' ? '#fff' : accent,
-                              border: `1px solid ${accent}`,
-                              borderRadius: '0'
-                            }}
-                          >
-                            Last 30 days
-                          </button>
-                          <button
-                            type="button"
-                            className={`btn btn-sm ${timeRange === '7d' ? '' : 'btn-outline-primary'}`}
-                            onClick={() => setTimeRange('7d')}
-                            style={{ 
-                              fontSize: '12px', 
-                              padding: '6px 12px',
-                              background: timeRange === '7d' ? accent : 'transparent',
-                              color: timeRange === '7d' ? '#fff' : accent,
-                              border: `1px solid ${accent}`,
-                              borderRadius: timeRange === '7d' ? '0 6px 6px 0' : '0 6px 6px 0'
-                            }}
-                          >
-                            Last 7 days
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card-body pt-0">
-                    <div className="chart-wrapper" style={{ height: '300px', width: '100%' }}>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={filteredChartData}>
-                          <defs>
-                            <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor={accent} stopOpacity={1.0} />
-                              <stop offset="95%" stopColor={accent} stopOpacity={0.1} />
-                            </linearGradient>
-                            <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#6c757d" stopOpacity={0.8} />
-                              <stop offset="95%" stopColor="#6c757d" stopOpacity={0.1} />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                          <XAxis
-                            dataKey="date"
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            minTickGap={32}
-                            tick={{ fontSize: 12, fill: '#666' }}
-                            tickFormatter={(value) => {
-                              const date = new Date(value)
-                              return date.toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })
-                            }}
-                          />
-                          <YAxis
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            tick={{ fontSize: 12, fill: '#666' }}
-                          />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: '#fff',
-                              border: '1px solid #e5e7eb',
-                              borderRadius: '8px',
-                              boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
-                            }}
-                            labelFormatter={(value) => {
-                              return new Date(value).toLocaleDateString("en-US", {
-                                month: "long",
-                                day: "numeric",
-                                year: "numeric"
-                              })
-                            }}
-                            formatter={(value, name) => [
-                              value,
-                              name === 'Desktop' ? 'Desktop' : 'Mobile'
-                            ]}
-                          />
-                          <Area
-                            dataKey="mobile"
-                            type="monotone"
-                            fill="url(#fillMobile)"
-                            stroke="#6c757d"
-                            strokeWidth={2}
-                            stackId="a"
-                            name="Mobile"
-                          />
-                          <Area
-                            dataKey="desktop"
-                            type="monotone"
-                            fill="url(#fillDesktop)"
-                            stroke={accent}
-                            strokeWidth={2}
-                            stackId="a"
-                            name="Desktop"
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
+            <div className="analytics-tab">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="mb-0">Analytics Overview</h5>
+                </div>
+                <div className="card-body">
+                  <div className="text-center py-5">
+                    <i className="bi bi-graph-up" style={{ fontSize: '3rem', color: accent }}></i>
+                    <h5 className="mt-3">Analytics Dashboard</h5>
+                    <p className="text-muted">Performance metrics and insights will be displayed here</p>
                   </div>
                 </div>
               </div>
