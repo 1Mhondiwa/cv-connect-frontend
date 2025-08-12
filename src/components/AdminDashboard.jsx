@@ -1367,11 +1367,11 @@ const ESCAdminDashboard = () => {
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-people"></i>
-                    </div>
+                      </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Total Users
-                  </div>
-                </div>
+                      </div>
+                    </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {statsLoading ? '...' : statsError ? '--' : stats?.users ? Object.values(stats.users).reduce((a, b) => a + b, 0) : '--'}
                     </div>
@@ -1380,13 +1380,13 @@ const ESCAdminDashboard = () => {
                         <i className="bi bi-arrow-up me-1"></i>
                         +12.5%
                       </span>
-                  </div>
+                    </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
                         <span style={{ fontWeight: 500 }}>Growing steadily</span>
-                </div>
-                      <div className="text-muted">Active users across all platforms</div>
+                      </div>
+                      <div className="text-muted">Active users</div>
                     </div>
                   </div>
                 </div>
