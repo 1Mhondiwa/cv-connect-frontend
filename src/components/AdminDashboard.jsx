@@ -1251,24 +1251,7 @@ const ESCAdminDashboard = () => {
                 Dashboard
                 </button>
               
-              <button
-                className={`nav-item w-100 text-start ${activeTab === 'freelancers' ? 'active' : ''}`}
-                onClick={() => setActiveTab('freelancers')}
-                style={{
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: activeTab === 'freelancers' ? accent : 'transparent',
-                  color: activeTab === 'freelancers' ? '#fff' : '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <i className="bi bi-people me-3"></i>
-                Freelancer Management
-                </button>
+
 
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'associate-requests' ? 'active' : ''}`}
@@ -1305,7 +1288,7 @@ const ESCAdminDashboard = () => {
                 }}
               >
                 <i className="bi bi-handshake me-3"></i>
-                Freelancer Requests
+                Associate Freelancer Requests
                 </button>
 
               <button
@@ -1399,7 +1382,7 @@ const ESCAdminDashboard = () => {
                 Reports
           </button>
         </div>
-          </div>
+            </div>
 
           {/* System */}
           <div className="nav-section">
@@ -1433,7 +1416,7 @@ const ESCAdminDashboard = () => {
                 Settings
               </button>
               
-              <button
+                <button
                 className="nav-item w-100 text-start"
                 onClick={logout}
                 style={{
@@ -1450,11 +1433,11 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-box-arrow-right me-3"></i>
                 Logout
-              </button>
+                </button>
             </div>
           </div>
-        </div>
-      </div>
+                </div>
+              </div>
 
       {/* Main Content Area */}
       <div className="main-content" style={{ 
@@ -1468,9 +1451,8 @@ const ESCAdminDashboard = () => {
           <div>
             <h1 className="h3 mb-0" style={{ color: '#111827', fontWeight: 600 }}>
               {activeTab === 'dashboard' && 'Dashboard'}
-              {activeTab === 'freelancers' && 'Freelancer Management'}
               {activeTab === 'associate-requests' && 'Associate Requests'}
-              {activeTab === 'freelancer-requests' && 'Freelancer Requests'}
+              {activeTab === 'freelancer-requests' && 'Associate Freelancer Requests'}
               {activeTab === 'analytics' && 'Analytics'}
               {activeTab === 'reports' && 'Reports'}
               {activeTab === 'settings' && 'Settings'}
@@ -1479,7 +1461,6 @@ const ESCAdminDashboard = () => {
             </h1>
             <p className="text-muted mb-0">
               {activeTab === 'dashboard' && 'System overview and key metrics'}
-              {activeTab === 'freelancers' && 'Manage and review freelancer profiles'}
               {activeTab === 'associate-requests' && 'Review associate join requests'}
               {activeTab === 'freelancer-requests' && 'Handle associate freelancer requests'}
               {activeTab === 'analytics' && 'Performance insights and trends'}
@@ -1488,7 +1469,7 @@ const ESCAdminDashboard = () => {
               {activeTab === 'data-management' && 'Data management and analysis'}
               {activeTab === 'documents' && 'Document management and organization'}
             </p>
-          </div>
+            </div>
         </div>
         {/* Main Dashboard Content */}
         <div style={{ flex: 1, padding: '40px 32px', background: 'transparent', minHeight: 0, overflowY: 'auto' }}>
@@ -1503,11 +1484,11 @@ const ESCAdminDashboard = () => {
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-people"></i>
-                      </div>
+                    </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Total Users
-                      </div>
-                    </div>
+                  </div>
+                </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {statsLoading ? '...' : statsError ? '--' : stats?.users ? Object.values(stats.users).reduce((a, b) => a + b, 0) : '--'}
                     </div>
@@ -1516,12 +1497,12 @@ const ESCAdminDashboard = () => {
                         <i className="bi bi-arrow-up me-1"></i>
                         +12.5%
                       </span>
-                    </div>
+                  </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
                         <span style={{ fontWeight: 500 }}>Growing steadily</span>
-                      </div>
+                </div>
                       <div className="text-muted">Active users</div>
                     </div>
                   </div>
@@ -1533,7 +1514,7 @@ const ESCAdminDashboard = () => {
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-file-earmark-text"></i>
-                      </div>
+                    </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Total CVs
                       </div>
@@ -1553,21 +1534,21 @@ const ESCAdminDashboard = () => {
                         <span style={{ fontWeight: 500 }}>CV uploads increasing</span>
                       </div>
                       <div className="text-muted">Professional profiles added</div>
-                    </div>
                   </div>
                 </div>
-
+              </div>
+              
                 <div className="col-lg-3 col-md-6">
                   {/* Total Messages Card */}
                   <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-chat-dots"></i>
-                      </div>
+                    </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Total Messages
-                      </div>
-                    </div>
+                  </div>
+                </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {statsLoading ? '...' : statsError ? '--' : stats?.total_messages ?? '--'}
                     </div>
@@ -1576,12 +1557,12 @@ const ESCAdminDashboard = () => {
                         <i className="bi bi-arrow-up me-1"></i>
                         +15.3%
                       </span>
-                    </div>
+                  </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
                         <span style={{ fontWeight: 500 }}>Communication active</span>
-                      </div>
+                </div>
                       <div className="text-muted">High engagement levels</div>
                     </div>
                   </div>
@@ -1593,29 +1574,29 @@ const ESCAdminDashboard = () => {
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-envelope"></i>
-                      </div>
+              </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Pending Requests
-                      </div>
-                    </div>
+                        </div>
+                        </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {statsLoading ? '...' : statsError ? '--' : stats?.associate_requests?.pending ?? '--'}
-                    </div>
+                        </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
                         <i className="bi bi-clock me-1"></i>
                         Awaiting
                       </span>
-                    </div>
+                        </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-clock" style={{ color: '#f59e0b' }}></i>
                         <span style={{ fontWeight: 500 }}>Review required</span>
-                      </div>
+                        </div>
                       <div className="text-muted">ECS Admin attention needed</div>
-                    </div>
-                  </div>
-                </div>
+                        </div>
+                        </div>
+                        </div>
               </div>
 
               {/* Total Visitors Graph */}
@@ -1680,9 +1661,9 @@ const ESCAdminDashboard = () => {
                               }}
                             >
                               Last 7 days
-                            </button>
-                          </div>
+                          </button>
                         </div>
+                      </div>
                       </div>
                     </div>
                     <div className="card-body pt-0">
@@ -1979,194 +1960,7 @@ const ESCAdminDashboard = () => {
               )}
             </div>
           )}
-          {/* Freelancers Table (Freelancers Tab) */}
-          {activeTab === 'freelancers' && (
-            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>ECS Admin Freelancer Management</h5>
-              
-              {/* Summary Statistics */}
-              <div className="row mb-4">
-                <div className="col-md-3">
-                  <div className="card border-0 shadow-sm text-center p-3">
-                    <div className="text-primary fs-4 fw-bold">
-                      {freelancers.filter(f => f.is_approved).length}
-                    </div>
-                    <div className="text-muted small">Approved</div>
-                  </div>
-                </div>
-                <div className="col-md-3">
-                  <div className="card border-0 shadow-sm text-center p-3">
-                    <div className="text-warning fs-4 fw-bold">
-                      {freelancers.filter(f => !f.is_approved).length}
-                    </div>
-                    <div className="text-muted small">Pending Approval</div>
-                  </div>
-                </div>
-                <div className="col-md-3">
-                  <div className="card border-0 shadow-sm text-center p-3">
-                    <div className="text-success fs-4 fw-bold">
-                      {freelancers.filter(f => f.is_available).length}
-                    </div>
-                    <div className="text-muted small">Available</div>
-                  </div>
-                </div>
-                <div className="col-md-3">
-                  <div className="card border-0 shadow-sm text-center p-3">
-                    <div className="text-info fs-4 fw-bold">
-                      {freelancers.length}
-                    </div>
-                    <div className="text-muted small">Total</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Filters */}
-              <div className="row mb-4">
-                <div className="col-md-4">
-                  <label className="form-label">Availability Status:</label>
-                  <select 
-                    className="form-select" 
-                    value={freelancerFilters.availability_status}
-                    onChange={(e) => {
-                      setFreelancerFilters(prev => ({ ...prev, availability_status: e.target.value, page: 1 }));
-                      setTimeout(() => fetchFreelancersWithFilters(), 100);
-                    }}
-                  >
-                    <option value="all">All Statuses</option>
-                    <option value="available">Available</option>
-                    <option value="unavailable">Unavailable</option>
-                  </select>
-                </div>
-                <div className="col-md-4">
-                  <label className="form-label">Approval Status:</label>
-                  <select 
-                    className="form-select" 
-                    value={freelancerFilters.approval_status}
-                    onChange={(e) => {
-                      setFreelancerFilters(prev => ({ ...prev, approval_status: e.target.value, page: 1 }));
-                      setTimeout(() => fetchFreelancersWithFilters(), 100);
-                    }}
-                  >
-                    <option value="all">All Approval Statuses</option>
-                    <option value="approved">Approved</option>
-                    <option value="pending">Pending Approval</option>
-                  </select>
-                </div>
-              </div>
-              
-              {freelancersLoading ? (
-                <div>Loading freelancers...</div>
-              ) : freelancersError ? (
-                <div style={{ color: '#df1529', fontWeight: 500 }}>{freelancersError}</div>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table className="table table-bordered" style={{ minWidth: 900 }}>
-                    <thead style={{ background: '#f8f9fa' }}>
-                      <tr>
-                        <th>Email</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Approval Status</th>
-                        <th>Admin Rating</th>
-                        <th>Availability</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                        <th>Last Review</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {freelancers.map(f => (
-                        <tr key={f.freelancer_id}>
-                          <td>{f.email}</td>
-                          <td>
-                            <div>
-                              <strong>{f.first_name} {f.last_name}</strong>
-                              {f.headline && <div className="text-muted small">{f.headline}</div>}
-                            </div>
-                          </td>
-                          <td>{f.phone || 'N/A'}</td>
-                          <td>
-                            <span className={`badge ${f.is_approved ? 'bg-success' : 'bg-warning'}`} style={{ borderRadius: 20, fontWeight: 600, fontSize: 12, padding: '6px 12px' }}>
-                              {f.is_approved ? 'Approved' : 'Pending'}
-                            </span>
-                            {f.approval_date && (
-                              <div className="text-muted small mt-1">
-                                {new Date(f.approval_date).toLocaleDateString()}
-                              </div>
-                            )}
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <div className="me-2">
-                                {[1, 2, 3, 4, 5].map(star => (
-                                  <i 
-                                    key={star} 
-                                    className={`bi ${star <= (f.admin_rating || 0) ? 'bi-star-fill text-warning' : 'bi-star text-muted'}`}
-                                    style={{ cursor: 'pointer', fontSize: '14px' }}
-                                    onClick={() => updateFreelancerRating(f.freelancer_id, star)}
-                                  />
-                                ))}
-                              </div>
-                              <span className="text-muted small">({f.admin_rating || 0}/5)</span>
-                            </div>
-                          </td>
-                          <td>
-                            <select 
-                              className="form-select form-select-sm" 
-                              value={f.is_available ? 'available' : 'unavailable'}
-                              onChange={(e) => updateFreelancerAvailability(f.freelancer_id, e.target.value)}
-                              disabled={availabilityUpdateLoading[f.freelancer_id]}
-                              style={{ minWidth: 120 }}
-                            >
-                              <option value="available">Available</option>
-                              <option value="unavailable">Unavailable</option>
-                            </select>
-                          </td>
-                          <td>
-                            <span className={`badge ${f.is_verified ? 'bg-info' : 'bg-secondary'}`} style={{ borderRadius: 20, fontWeight: 600, fontSize: 12, padding: '6px 12px' }}>
-                              {f.is_verified ? 'Verified' : 'Unverified'}
-                            </span>
-                          </td>
-                          <td>{f.created_at ? new Date(f.created_at).toLocaleDateString() : 'N/A'}</td>
-                          <td>
-                            {f.last_admin_review ? new Date(f.last_admin_review).toLocaleDateString() : 'Never'}
-                          </td>
-                          <td>
-                            <div className="d-flex flex-column gap-1">
-                              {!f.is_approved ? (
-                                <button 
-                                  className="btn btn-success btn-sm"
-                                  onClick={() => approveFreelancer(f.freelancer_id)}
-                                  disabled={approvalLoading[f.freelancer_id]}
-                                >
-                                  {approvalLoading[f.freelancer_id] ? 'Approving...' : 'Approve'}
-                                </button>
-                              ) : (
-                                <button 
-                                  className="btn btn-warning btn-sm"
-                                  onClick={() => rejectFreelancer(f.freelancer_id)}
-                                  disabled={approvalLoading[f.freelancer_id]}
-                                >
-                                  {approvalLoading[f.freelancer_id] ? 'Rejecting...' : 'Reject'}
-                                </button>
-                              )}
-                              <button 
-                                className="btn btn-outline-primary btn-sm"
-                                onClick={() => openFreelancerNotes(f.freelancer_id)}
-                              >
-                                Notes
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          )}
+
           {/* Freelancer Requests Tab */}
           {activeTab === 'freelancer-requests' && (
             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
