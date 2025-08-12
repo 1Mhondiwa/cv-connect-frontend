@@ -865,9 +865,9 @@ const AssociateDashboard = () => {
                     <div className="alert alert-info mt-3 text-center">
                       <i className="bi bi-info-circle me-2"></i>
                       Your request will be reviewed by ECS Admin. We'll contact you with curated freelancer options within 24-48 hours.
-                    </div>
-                  )}
                 </div>
+                  )}
+                    </div>
             {/* Request Status */}
             <div className="card p-4 shadow-lg rounded-4">
               <div className="text-center">
@@ -881,23 +881,23 @@ const AssociateDashboard = () => {
                     <div className="text-center">
                       <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
                         <i className="bi bi-1-circle-fill fs-4" style={{ color: accent }}></i>
-                      </div>
-                      <small style={{ color: '#666' }}>Submit Request</small>
-                    </div>
                   </div>
+                      <small style={{ color: '#666' }}>Submit Request</small>
+                            </div>
+                          </div>
                   <div className="col-md-3">
                     <div className="text-center">
                       <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
                         <i className="bi bi-2-circle-fill fs-4" style={{ color: accent }}></i>
-                      </div>
+                        </div>
                       <small style={{ color: '#666' }}>ECS Admin Review</small>
-                    </div>
+                      </div>
                   </div>
                   <div className="col-md-3">
                     <div className="text-center">
                       <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
                         <i className="bi bi-3-circle-fill fs-4" style={{ color: accent }}></i>
-                      </div>
+                  </div>
                       <small style={{ color: '#666' }}>Get Curated List</small>
                     </div>
                   </div>

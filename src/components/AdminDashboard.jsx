@@ -87,6 +87,11 @@ const ESCAdminDashboard = () => {
   const [highlightedFreelancers, setHighlightedFreelancers] = useState([]);
   const [adminNotes, setAdminNotes] = useState('');
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  
+  // Simple search state
+  const [searchSkills, setSearchSkills] = useState('');
+  const [searchExperience, setSearchExperience] = useState('');
+  const [searchStatus, setSearchStatus] = useState('');
 
   useEffect(() => {
     checkAuth();
@@ -624,94 +629,105 @@ const ESCAdminDashboard = () => {
     }
   };
 
-  // Reset filters to show all freelancers
-  const resetFilters = () => {
-    setAvailableFreelancers(allFreelancers);
-  };
-
-  // Smart filtering based on request requirements
-  const applySmartFiltering = () => {
-    if (!selectedFreelancerRequest) return;
-
-    const { required_skills, min_experience, preferred_location, budget_range, urgency_level } = selectedFreelancerRequest;
+  // Simple search function
+  const handleSearch = () => {
+    console.log('🔍 Search function called with:', { searchSkills, searchExperience, searchStatus });
+    console.log('🔍 allFreelancers count:', allFreelancers.length);
+    console.log('🔍 Sample freelancer data:', allFreelancers[0]);
     
-    console.log('🔍 Smart Filtering - Request Requirements:', {
-      required_skills,
-      min_experience,
-      preferred_location,
-      budget_range,
-      urgency_level
-    });
+    let filtered = [...allFreelancers];
+    console.log('🔍 Starting with all freelancers:', filtered.length);
     
-    console.log('🔍 Smart Filtering - Available Freelancers:', availableFreelancers.length);
-    console.log('🔍 Smart Filtering - All Freelancers:', allFreelancers.length);
-    
-    // Start with the current filtered list (if any filters are applied) or all freelancers
-    let baseList = availableFreelancers.length < allFreelancers.length ? availableFreelancers : allFreelancers;
-    
-    console.log('🔍 Smart Filtering - Base List:', baseList.length);
-    
-    let filtered = baseList.filter(freelancer => {
-      // Skills match (check if freelancer has any of the required skills)
-      const hasRequiredSkills = required_skills.some(requiredSkill => 
-        freelancer.skills?.some(skill => 
-          skill.toLowerCase().includes(requiredSkill.toLowerCase())
-        ) || 
-        freelancer.headline?.toLowerCase().includes(requiredSkill.toLowerCase())
-      );
-
-      // Experience match
-      const hasRequiredExperience = (freelancer.experience_years || 0) >= min_experience;
-
-      // Location match (if specified)
-      const locationMatch = !preferred_location || 
-        freelancer.location?.toLowerCase().includes(preferred_location.toLowerCase()) ||
-        preferred_location === 'Any';
-
-      const matches = hasRequiredSkills && hasRequiredExperience && locationMatch;
-      
-      if (matches) {
-        console.log('✅ Freelancer matches:', freelancer.first_name, freelancer.last_name, {
-          hasRequiredSkills,
-          hasRequiredExperience,
-          locationMatch,
-          skills: freelancer.skills,
-          experience: freelancer.experience_years
+    // Filter by skills
+    if (searchSkills.trim()) {
+      console.log('🔍 Filtering by skills:', searchSkills);
+      filtered = filtered.filter(f => {
+        const hasSkills = f.skills?.some(skill => skill.toLowerCase().includes(searchSkills.toLowerCase()));
+        const hasHeadline = f.headline?.toLowerCase().includes(searchSkills.toLowerCase());
+        const matches = hasSkills || hasHeadline;
+        
+        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
+          skills: f.skills,
+          headline: f.headline,
+          searchTerm: searchSkills,
+          hasSkills,
+          hasHeadline,
+          matches
         });
+        
+        return matches;
+      });
+      console.log('🔍 After skills filter:', filtered.length);
+    }
+    
+    // Filter by experience
+    if (searchExperience.trim()) {
+      console.log('🔍 Filtering by experience:', searchExperience);
+      const minExp = parseInt(searchExperience);
+      if (!isNaN(minExp)) {
+        filtered = filtered.filter(f => {
+          const experience = f.experience_years || 0;
+          const matches = experience >= minExp;
+          
+          console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
+            experience,
+            minRequired: minExp,
+            matches
+          });
+          
+          return matches;
+        });
+        console.log('🔍 After experience filter:', filtered.length);
       }
-
-      return matches;
-    });
-
-    console.log('🔍 Smart Filtering - Filtered Results:', filtered.length);
-
-    // Sort by relevance (skills match, then admin rating, then experience)
-    filtered.sort((a, b) => {
-      // Count matching skills
-      const aSkillMatches = required_skills.filter(requiredSkill => 
-        a.skills?.some(skill => skill.toLowerCase().includes(requiredSkill.toLowerCase())) ||
-        a.headline?.toLowerCase().includes(requiredSkill.toLowerCase())
-      ).length;
-      
-      const bSkillMatches = required_skills.filter(requiredSkill => 
-        b.skills?.some(skill => skill.toLowerCase().includes(requiredSkill.toLowerCase())) ||
-        b.headline?.toLowerCase().includes(requiredSkill.toLowerCase()))
-      .length;
-
-      if (aSkillMatches !== bSkillMatches) {
-        return bSkillMatches - aSkillMatches; // More skill matches first
-      }
-      
-      if ((a.admin_rating || 0) !== (b.admin_rating || 0)) {
-        return (b.admin_rating || 0) - (a.admin_rating || 0); // Higher rating first
-      }
-      
-      return (b.experience_years || 0) - (a.experience_years || 0); // More experience first
-    });
-
-    console.log('🔍 Smart Filtering - Final Results:', filtered.length);
+    }
+    
+    // Filter by status
+    if (searchStatus === 'available') {
+      console.log('🔍 Filtering by status: available');
+      filtered = filtered.filter(f => {
+        const matches = f.is_available;
+        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
+          is_available: f.is_available,
+          matches
+        });
+        return matches;
+      });
+      console.log('🔍 After status filter (available):', filtered.length);
+    } else if (searchStatus === 'approved') {
+      console.log('🔍 Filtering by status: approved');
+      filtered = filtered.filter(f => {
+        const matches = f.is_approved;
+        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
+          is_approved: f.is_approved,
+          matches
+        });
+        return matches;
+      });
+      console.log('🔍 After status filter (approved):', filtered.length);
+    }
+    
+    console.log('🔍 Final filtered results:', filtered.length);
+    console.log('🔍 Sample filtered results:', filtered.slice(0, 3));
+    
     setAvailableFreelancers(filtered);
+    console.log('🔍 Search completed:', { 
+      skills: searchSkills, 
+      experience: searchExperience, 
+      status: searchStatus, 
+      results: filtered.length 
+    });
   };
+
+  // Reset search to show all freelancers
+  const resetSearch = () => {
+    setSearchSkills('');
+    setSearchExperience('');
+    setSearchStatus('');
+    setAvailableFreelancers(allFreelancers);
+    console.log('🔍 Search reset - showing all freelancers');
+  };
+
+
 
   // Enhanced Freelancer Management Functions
   const fetchFreelancersWithFilters = async () => {
@@ -1962,6 +1978,8 @@ const ESCAdminDashboard = () => {
                   <div className="alert alert-info mb-3">
                     <strong>Debug Info:</strong> allFreelancers: {allFreelancers.length}, availableFreelancers: {availableFreelancers.length}
                     <br />
+                                         <strong>Current Search:</strong> Skills: "{searchSkills}", Experience: {searchExperience}, Status: {searchStatus}
+                    <br />
                     <button 
                       className="btn btn-sm btn-warning mt-2 me-2"
                       onClick={() => {
@@ -1981,6 +1999,21 @@ const ESCAdminDashboard = () => {
                     <button 
                       className="btn btn-sm btn-info mt-2 ms-2"
                       onClick={() => {
+                        console.log('🔍 Test Search Data - allFreelancers:', allFreelancers.length);
+                        if (allFreelancers.length > 0) {
+                          console.log('🔍 First freelancer:', allFreelancers[0]);
+                          console.log('🔍 Skills field:', allFreelancers[0].skills);
+                          console.log('🔍 Experience field:', allFreelancers[0].experience_years);
+                          console.log('🔍 Available field:', allFreelancers[0].is_available);
+                          console.log('🔍 Approved field:', allFreelancers[0].is_approved);
+                        }
+                      }}
+                    >
+                      Test: Check Data Structure
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-info mt-2 ms-2"
+                      onClick={() => {
                         console.log('🔍 Manual Test - selectedFreelancers:', selectedFreelancers);
                         console.log('🔍 Manual Test - highlightedFreelancers:', highlightedFreelancers);
                       }}
@@ -1996,114 +2029,99 @@ const ESCAdminDashboard = () => {
                     >
                       Test: Select First 2
                     </button>
+                    <button 
+                      className="btn btn-sm btn-danger mt-2 ms-2"
+                      onClick={() => {
+                                                 console.log('🔍 Test Search - Current state:', { searchSkills, searchExperience, searchStatus });
+                        console.log('🔍 Test Filters - allFreelancers sample:', allFreelancers.slice(0, 3));
+                      }}
+                    >
+                      Test: Filter State
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-warning mt-2 ms-2"
+                      onClick={() => {
+                        console.log('🔍 Test Simple Filter - Before:', availableFreelancers.length);
+                        const filtered = allFreelancers.filter(f => f.is_available);
+                        console.log('🔍 Test Simple Filter - After (available only):', filtered.length);
+                        setAvailableFreelancers(filtered);
+                      }}
+                    >
+                      Test: Available Only
+                    </button>
+                    <button 
+                      className="btn btn-sm btn-success mt-2 ms-2"
+                      onClick={() => {
+                        console.log('🔍 Test Direct Filter - allFreelancers:', allFreelancers.length);
+                        if (allFreelancers.length > 0) {
+                          const sample = allFreelancers[0];
+                          console.log('🔍 Sample freelancer:', {
+                            id: sample.freelancer_id,
+                            name: `${sample.first_name} ${sample.last_name}`,
+                            skills: sample.skills,
+                            experience: sample.experience_years,
+                            available: sample.is_available,
+                            approved: sample.is_approved
+                          });
+                        }
+                      }}
+                    >
+                      Test: Sample Data
+                    </button>
                   </div>
                   
-                  {/* Smart Filtering Interface */}
+                  {/* Simple Search Interface */}
                   <div className="card border-0 shadow-sm mb-3">
                     <div className="card-body">
                       <div className="row g-3">
-                        <div className="col-md-2">
-                          <button 
-                            className="btn btn-sm w-100"
-                            style={{ background: accent, color: '#fff' }}
-                            onClick={applySmartFiltering}
-                            title="Automatically filter freelancers based on request requirements"
-                          >
-                            <i className="bi bi-magic me-1"></i>Smart Filter
-                          </button>
-                        </div>
-                        <div className="col-md-2">
-                          <button 
-                            className="btn btn-sm btn-outline-secondary w-100"
-                            onClick={resetFilters}
-                            title="Show all freelancers"
-                          >
-                            <i className="bi bi-arrow-clockwise me-1"></i>Reset
-                          </button>
-                        </div>
-                        <div className="col-md-2">
-                          <label className="form-label small">Filter by Skills:</label>
+                        <div className="col-md-3">
+                          <label className="form-label small">Search by Skills:</label>
                           <input
                             type="text"
                             className="form-control form-control-sm"
                             placeholder="e.g., React, Node.js"
-                            onChange={(e) => {
-                              const skillFilter = e.target.value.toLowerCase();
-                              if (!skillFilter) {
-                                setAvailableFreelancers(allFreelancers);
-                              } else {
-                                setAvailableFreelancers(allFreelancers.filter(f => 
-                                  f.skills?.some(skill => skill.toLowerCase().includes(skillFilter)) ||
-                                  f.headline?.toLowerCase().includes(skillFilter)
-                                ));
-                              }
-                            }}
+                            value={searchSkills}
+                            onChange={(e) => setSearchSkills(e.target.value)}
                           />
                         </div>
-                        <div className="col-md-2">
-                          <label className="form-label small">Filter by Experience:</label>
-                          <select 
-                            className="form-select form-select-sm"
-                            onChange={(e) => {
-                              const expFilter = e.target.value;
-                              if (expFilter === 'all') {
-                                setAvailableFreelancers(allFreelancers);
-                              } else {
-                                setAvailableFreelancers(allFreelancers.filter(f => 
-                                  (f.experience_years || 0) >= parseInt(expFilter)
-                                ));
-                              }
-                            }}
-                          >
-                            <option value="all">All Experience</option>
-                            <option value="0">0+ years</option>
-                            <option value="1">1+ years</option>
-                            <option value="3">3+ years</option>
-                            <option value="5">5+ years</option>
-                            <option value="10">10+ years</option>
-                          </select>
+                        <div className="col-md-3">
+                          <label className="form-label small">Minimum Experience (years):</label>
+                          <input
+                            type="number"
+                            className="form-control form-control-sm"
+                            placeholder="e.g., 3"
+                            value={searchExperience}
+                            onChange={(e) => setSearchExperience(e.target.value)}
+                          />
                         </div>
-                        <div className="col-md-2">
-                          <label className="form-label small">Filter by Status:</label>
+                        <div className="col-md-3">
+                          <label className="form-label small">Status:</label>
                           <select 
                             className="form-select form-select-sm"
-                            onChange={(e) => {
-                              const statusFilter = e.target.value;
-                              if (statusFilter === 'all') {
-                                setAvailableFreelancers(allFreelancers);
-                              } else if (statusFilter === 'available') {
-                                setAvailableFreelancers(allFreelancers.filter(f => f.is_available));
-                              } else if (statusFilter === 'approved') {
-                                setAvailableFreelancers(allFreelancers.filter(f => f.is_approved));
-                              }
-                            }}
+                            value={searchStatus}
+                            onChange={(e) => setSearchStatus(e.target.value)}
                           >
-                            <option value="all">All Statuses</option>
+                            <option value="">All Statuses</option>
                             <option value="available">Available Only</option>
                             <option value="approved">Approved Only</option>
                           </select>
                         </div>
-                        <div className="col-md-2">
-                          <label className="form-label small">Sort by:</label>
-                          <select 
-                            className="form-select form-select-sm"
-                            onChange={(e) => {
-                              const sortBy = e.target.value;
-                              const sorted = [...availableFreelancers];
-                              if (sortBy === 'rating') {
-                                sorted.sort((a, b) => (b.admin_rating || 0) - (a.admin_rating || 0));
-                              } else if (sortBy === 'experience') {
-                                sorted.sort((a, b) => (b.experience_years || 0) - (a.experience_years || 0));
-                              } else if (sortBy === 'name') {
-                                sorted.sort((a, b) => `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`));
-                              }
-                              setAvailableFreelancers(sorted);
-                            }}
-                          >
-                            <option value="rating">Admin Rating (High to Low)</option>
-                            <option value="experience">Experience (High to Low)</option>
-                            <option value="name">Name (A-Z)</option>
-                          </select>
+                        <div className="col-md-3 d-flex align-items-end">
+                          <div className="d-flex gap-2 w-100">
+                            <button 
+                              className="btn btn-sm w-100"
+                              style={{ background: accent, color: '#fff' }}
+                              onClick={handleSearch}
+                            >
+                              <i className="bi bi-search me-1"></i>Search
+                            </button>
+                            <button 
+                              className="btn btn-sm btn-outline-secondary w-100"
+                              onClick={resetSearch}
+                            >
+                              <i className="bi bi-arrow-clockwise me-1"></i>Reset
+                            </button>
+                          </div>
                         </div>
                       </div>
                       <div className="row mt-2">
@@ -2111,7 +2129,7 @@ const ESCAdminDashboard = () => {
                           <small className="text-muted">
                             <i className="bi bi-info-circle me-1"></i>
                             Showing {availableFreelancers.length} of {allFreelancers.length} freelancers. 
-                            Use Smart Filter to automatically find the best matches for this request.
+                            Use the search above to find specific freelancers.
                           </small>
                         </div>
                       </div>
@@ -2124,9 +2142,9 @@ const ESCAdminDashboard = () => {
                       <p className="mt-3 text-muted">No freelancers match the current filters</p>
                       <button 
                         className="btn btn-sm btn-outline-primary"
-                        onClick={resetFilters}
+                        onClick={resetSearch}
                       >
-                        Reset Filters
+                        Reset Search
                       </button>
                     </div>
                   ) : (
