@@ -915,57 +915,255 @@ const ESCAdminDashboard = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)', display: 'flex' }}>
-      {/* Sidebar */}
-      <aside style={{ width: 250, background: '#181c2f', color: '#fff', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: '2px 0 12px rgba(0,0,0,0.07)' }}>
-        <div>
-          <div style={{ padding: '32px 0 24px 0', textAlign: 'center', borderBottom: '1px solid #23284a' }}>
-            <h2 style={{ color: accent, fontWeight: 800, fontSize: 28, letterSpacing: 1, margin: 0 }}>CV‑Connect</h2>
-            <div style={{ fontSize: 13, color: '#bdbdbd', marginTop: 4 }}>ESC Admin Panel</div>
+    <div className="admin-dashboard">
+      {/* Professional Sidebar */}
+      <div className="sidebar" style={{ 
+        width: '280px', 
+        height: '100vh', 
+        position: 'fixed', 
+        left: 0, 
+        top: 0, 
+        background: '#fff', 
+        borderRight: '1px solid #e5e7eb',
+        overflowY: 'auto',
+        zIndex: 1000
+      }}>
+        {/* Sidebar Header */}
+        <div className="sidebar-header" style={{ 
+          padding: '24px', 
+          borderBottom: '1px solid #e5e7eb',
+          background: '#fafafa'
+        }}>
+          <div className="d-flex align-items-center">
+            <div style={{ 
+              width: '32px', 
+              height: '32px', 
+              background: accent, 
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: '12px'
+            }}>
+              <i className="bi bi-building" style={{ color: '#fff', fontSize: '18px' }}></i>
+            </div>
+            <div>
+              <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }}>
+                ECS Admin
+              </h5>
+              <small className="text-muted">Control Center</small>
+            </div>
           </div>
-          <nav style={{ marginTop: 32 }}>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              <li>
-                <button onClick={() => setActiveTab('dashboard')} className="admin-sidebar-btn">
-                  <i className="bi bi-house-door me-2"></i> Dashboard
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('associate-requests')} className="admin-sidebar-btn">
-                  <i className="bi bi-envelope me-2"></i> Associate Requests
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('associates')} className="admin-sidebar-btn">
-                  <i className="bi bi-building me-2"></i> Associates
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('freelancers')} className="admin-sidebar-btn">
-                  <i className="bi bi-person-workspace me-2"></i> Freelancers
-                </button>
-              </li>
-              <li>
-                <button onClick={() => setActiveTab('freelancer-requests')} className="admin-sidebar-btn">
-                  <i className="bi bi-list-check me-2"></i> Freelancer Requests
-                </button>
-              </li>
-             {/* <li>
-                <Link to="/admin/analytics" className="admin-sidebar-btn" style={{ textDecoration: 'none' }}>
-                  <i className="bi bi-graph-up me-2"></i> Analytics
-                </Link>
-              </li>*/}
-            </ul>
-          </nav>
         </div>
-        <div style={{ padding: '24px 0', textAlign: 'center', borderTop: '1px solid #23284a' }}>
-          <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#fff', fontWeight: 600, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', margin: '0 auto' }}>
-            <i className="bi bi-box-arrow-right me-2"></i> Logout
-          </button>
+
+        {/* Sidebar Content */}
+        <div className="sidebar-content" style={{ padding: '16px' }}>
+          {/* Main Navigation */}
+          <div className="nav-section mb-4">
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              Main Navigation
+            </h6>
+            <div className="nav-items">
+              <button
+                className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
+                onClick={() => setActiveTab('dashboard')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: activeTab === 'dashboard' ? accent : 'transparent',
+                  color: activeTab === 'dashboard' ? '#fff' : '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-speedometer2 me-3"></i>
+                Dashboard
+              </button>
+              
+              <button
+                className={`nav-item w-100 text-start ${activeTab === 'freelancers' ? 'active' : ''}`}
+                onClick={() => setActiveTab('freelancers')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: activeTab === 'freelancers' ? accent : 'transparent',
+                  color: activeTab === 'freelancers' ? '#fff' : '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-people me-3"></i>
+                Freelancer Management
+              </button>
+
+              <button
+                className={`nav-item w-100 text-start ${activeTab === 'associate-requests' ? 'active' : ''}`}
+                onClick={() => setActiveTab('associate-requests')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: activeTab === 'associate-requests' ? accent : 'transparent',
+                  color: activeTab === 'associate-requests' ? '#fff' : '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-person-plus me-3"></i>
+                Associate Requests
+              </button>
+
+              <button
+                className={`nav-item w-100 text-start ${activeTab === 'freelancer-requests' ? 'active' : ''}`}
+                onClick={() => setActiveTab('freelancer-requests')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: activeTab === 'freelancer-requests' ? accent : 'transparent',
+                  color: activeTab === 'freelancer-requests' ? '#fff' : '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-handshake me-3"></i>
+                Freelancer Requests
+              </button>
+            </div>
+          </div>
+
+          {/* Management Tools */}
+          <div className="nav-section mb-4">
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              Management Tools
+            </h6>
+            <div className="nav-items">
+              <button
+                className="nav-item w-100 text-start"
+                onClick={() => setActiveTab('analytics')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-graph-up me-3"></i>
+                Analytics
+              </button>
+              
+              <button
+                className="nav-item w-100 text-start"
+                onClick={() => setActiveTab('reports')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-file-earmark-text me-3"></i>
+                Reports
+              </button>
+            </div>
+          </div>
+
+          {/* System */}
+          <div className="nav-section">
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              System
+            </h6>
+            <div className="nav-items">
+              <button
+                className="nav-item w-100 text-start"
+                onClick={() => setActiveTab('settings')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-gear me-3"></i>
+                Settings
+              </button>
+              
+              <button
+                className="nav-item w-100 text-start"
+                onClick={logout}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: 'transparent',
+                  color: '#dc3545',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-box-arrow-right me-3"></i>
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
-      </aside>
-      {/* Main Content */}
-      <div style={{ flex: 1, minHeight: '100vh', background: 'transparent', display: 'flex', flexDirection: 'column' }}>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="main-content" style={{ 
+        marginLeft: '280px', 
+        padding: '24px',
+        minHeight: '100vh',
+        background: '#f9fafb'
+      }}>
         {/* Top Bar */}
         <div style={{ width: '100%', background: '#fff', boxShadow: '0 2px 12px rgba(253,104,14,0.08)', padding: '18px 40px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', minHeight: 70, position: 'relative' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -1713,44 +1911,18 @@ const ESCAdminDashboard = () => {
 
                           <div className="d-flex justify-content-between align-items-center">
                             <div>
-                              {request.status === 'provided' && (
-                                <small className="text-success">
-                                  <i className="bi bi-check-circle me-1"></i>
-                                  {request.recommendation_count} freelancer(s) recommended
-                                </small>
-                              )}
-                              {request.status === 'pending' && (
-                                <small className="text-warning">
-                                  <i className="bi bi-clock me-1"></i>
-                                  Awaiting ECS Admin review
-                                </small>
-                              )}
+                              <small className="text-muted">
+                                <i className="bi bi-calendar me-1"></i>
+                                <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
+                              </small>
                             </div>
-                            <div className="d-flex gap-2">
-                              <button
-                                className="btn btn-sm btn-outline-primary"
-                                onClick={() => openFreelancerRequestDetails(request)}
-                              >
-                                <i className="bi bi-eye me-1"></i>View Details
-                              </button>
-                              {request.status === 'pending' && (
-                                <button
-                                  className="btn btn-sm"
-                                  style={{ background: accent, color: '#fff' }}
-                                  onClick={() => openRecommendationsModal(request)}
-                                >
-                                  <i className="bi bi-star me-1"></i>Provide Recommendations
-                                </button>
-                              )}
-                              {request.status === 'provided' && (
-                                <button
-                                  className="btn btn-sm btn-outline-success"
-                                  onClick={() => openRecommendationsModal(request)}
-                                >
-                                  <i className="bi bi-pencil me-1"></i>Update Recommendations
-                                </button>
-                              )}
-                            </div>
+                            <button
+                              className="btn btn-sm"
+                              style={{ background: accent, color: '#fff', borderRadius: 20 }}
+                              onClick={() => openRecommendationsModal(request)}
+                            >
+                              <i className="bi bi-star me-1"></i>Provide Recommendations
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1760,7 +1932,47 @@ const ESCAdminDashboard = () => {
               )}
             </div>
           )}
-          {/* Optionally, add more admin widgets or info here */}
+          {/* Analytics Tab */}
+          {activeTab === 'analytics' && (
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Analytics Dashboard</h5>
+              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Comprehensive insights and performance metrics</p>
+              
+              <div className="text-center py-5">
+                <i className="bi bi-graph-up display-1 text-muted"></i>
+                <h6 className="text-muted mt-3">Analytics Coming Soon</h6>
+                <p className="text-muted">Advanced analytics and reporting features will be available here</p>
+              </div>
+            </div>
+          )}
+
+          {/* Reports Tab */}
+          {activeTab === 'reports' && (
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Reports & Documentation</h5>
+              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Generate and view system reports</p>
+              
+              <div className="text-center py-5">
+                <i className="bi bi-file-earmark-text display-1 text-muted"></i>
+                <h6 className="text-muted mt-3">Reports Coming Soon</h6>
+                <p className="text-muted">Comprehensive reporting and documentation features will be available here</p>
+              </div>
+            </div>
+          )}
+
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>System Settings</h5>
+              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Configure system preferences and settings</p>
+              
+              <div className="text-center py-5">
+                <i className="bi bi-gear display-1 text-muted"></i>
+                <h6 className="text-muted mt-3">Settings Coming Soon</h6>
+                <p className="text-muted">System configuration and preferences will be available here</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2208,65 +2420,38 @@ const ESCAdminDashboard = () => {
           box-shadow: 0 4px 24px rgba(253,104,14,0.18);
           z-index: 2;
         }
-        .is-invalid {
-          border-color: #df1529 !important;
-        }
-        .invalid-feedback {
-          color: #df1529;
-        }
-        .dashboard-stat-card {
-          transition: transform 0.22s cubic-bezier(.4,2,.6,1), box-shadow 0.22s cubic-bezier(.4,2,.6,1);
-          will-change: transform, box-shadow;
-        }
-        .dashboard-stat-card:hover, .dashboard-stat-card:focus {
-          transform: translateY(-8px) scale(1.045);
-          box-shadow: 0 8px 32px rgba(253,104,14,0.18);
+        .profile-upload-btn:hover, .profile-upload-btn:focus {
+          transform: scale(1.15);
+          box-shadow: 0 4px 16px rgba(253,104,14,0.25);
           z-index: 2;
         }
-        .animate-fade-in {
-          animation: fadeInUp 0.7s cubic-bezier(.4,2,.6,1);
+        .message-delete-btn:hover, .message-delete-btn:focus {
+          transform: scale(1.2);
+          color: #fff !important;
         }
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(32px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .list-group-item:hover {
+          transform: translateX(4px);
+          box-shadow: 0 2px 8px rgba(253,104,14,0.1);
         }
-        .admin-sidebar-btn {
-          background: none;
-          border: none;
-          color: #fff;
-          text-align: left;
-          width: 100%;
-          display: flex;
-          align-items: center;
-          padding: 14px 32px;
-          font-weight: 600;
-          font-size: 16px;
-          cursor: pointer;
-          position: relative;
-          transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s;
-          outline: none;
+        
+        /* Sidebar Navigation Hover Effects */
+        .nav-item:hover {
+          background: #f3f4f6 !important;
+          color: #111827 !important;
+          transform: translateX(4px);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .admin-sidebar-btn:hover, .admin-sidebar-btn:focus {
-          background: rgba(253,104,14,0.12);
-          color: #fd680e;
-          box-shadow: 0 2px 16px rgba(253,104,14,0.18);
-          transform: translateX(6px) scale(1.04);
-          z-index: 2;
+        
+        .nav-item.active:hover {
+          background: ${accent} !important;
+          color: #fff !important;
+          transform: translateX(4px);
+          box-shadow: 0 4px 16px rgba(253,104,14,0.3);
         }
-        .orange-border {
-          border: 2.5px solid rgba(253,104,14,0.18);
-          box-shadow: 0 2px 16px rgba(253,104,14,0.08);
-          transition: border-color 0.22s cubic-bezier(.4,2,.6,1), box-shadow 0.22s cubic-bezier(.4,2,.6,1);
-        }
-        .dashboard-stat-card.orange-border:hover, .dashboard-stat-card.orange-border:focus {
-          border-color: #fd680e;
-          box-shadow: 0 8px 32px rgba(253,104,14,0.18), 0 0 0 4px rgba(253,104,14,0.10);
+        
+        /* Smooth transitions for all sidebar elements */
+        .sidebar * {
+          transition: all 0.2s ease;
         }
       `}</style>
     </div>
