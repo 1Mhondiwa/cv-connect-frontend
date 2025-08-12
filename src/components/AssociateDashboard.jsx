@@ -312,7 +312,7 @@ const AssociateDashboard = () => {
     }
   };
 
-  const handleSendMessage = async (freelancerId) => {
+  const handleStartConversation = async (freelancerId, firstName, lastName) => {
     try {
       // Create or get conversation
       const conversationResponse = await api.post('/message/conversations', {
@@ -322,13 +322,25 @@ const AssociateDashboard = () => {
       if (conversationResponse.data.success) {
         const conversationId = conversationResponse.data.conversation_id;
         
+        // Close recommendations modal
+        setShowRecommendationsModal(false);
+        
         // Open messaging tab and load conversation
         setActiveTab('messages');
         await loadConversation(conversationId);
+        
+        // Show success message
+        setToast({ 
+          message: `Conversation started with ${firstName} ${lastName}!`, 
+          type: 'success' 
+        });
       }
     } catch (error) {
-      console.error('Error creating conversation:', error);
-      alert('Failed to start conversation. Please try again.');
+      console.error('Error starting conversation:', error);
+      setToast({ 
+        message: 'Failed to start conversation. Please try again.', 
+        type: 'error' 
+      });
     }
   };
 
@@ -1413,6 +1425,14 @@ const AssociateDashboard = () => {
                                 onClick={() => handleRecommendationResponse(rec.freelancer_id, 'hired')}
                               >
                                 <i className="bi bi-check-circle me-1"></i>Hire
+                              </button>
+                              <button
+                                className="btn btn-sm"
+                                style={{ background: accent, color: '#fff' }}
+                                onClick={() => handleStartConversation(rec.freelancer_id, rec.first_name, rec.last_name)}
+                                title="Start a conversation with this freelancer"
+                              >
+                                <i className="bi bi-chat-dots me-1"></i>Start Conversation
                               </button>
                             </div>
                           </div>
