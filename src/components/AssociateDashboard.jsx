@@ -1,96 +1,288 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../utils/axios';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../utils/axios';
+import { useRef } from 'react';
+import ActivityTable from "./ActivityTable";
+import { useAuth } from '../contexts/AuthContext';
+// REMOVE: import io from 'socket.io-client';
+
+const accent = '#fd680e';
 
 const AssociateDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const { logout } = useAuth();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [requests, setRequests] = useState([]);
-  const [requestLoading, setRequestLoading] = useState(false);
-  const [showRequestForm, setShowRequestForm] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [showRecommendations, setShowRecommendations] = useState(false);
-  const [recommendations, setRecommendations] = useState([]);
-  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
-
-  // Request form state
-  const [requestForm, setRequestForm] = useState({
+  const [error, setError] = useState(null);
+  
+  // Search state
+  const [searchForm, setSearchForm] = useState({
     title: '',
     description: '',
-    required_skills: '',
+    skills: '',
     min_experience: '',
-    preferred_location: '',
+    location: '',
     budget_range: '',
     urgency_level: 'normal'
   });
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchError, setSearchError] = useState('');
+  const [searchSuccess, setSearchSuccess] = useState('');
+  const [pagination, setPagination] = useState({});
+  
+  // Messaging state
+  const [conversations, setConversations] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [messagingLoading, setMessagingLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('request'); // 'request', 'messages', 'change-password', 'my-requests'
+  
+  // Skills for dropdown
+  const [availableSkills, setAvailableSkills] = useState([]);
+  const [globalUnread, setGlobalUnread] = useState(0);
+  const messagesEndRef = useRef(null);
 
-  // Response form state
-  const [responseForm, setResponseForm] = useState({
-    response: 'interested',
-    notes: ''
-  });
+  const [associateProfile, setAssociateProfile] = useState(null);
+  const [assocUploading, setAssocUploading] = useState(false);
+  const [assocUploadError, setAssocUploadError] = useState('');
+  const [assocUploadSuccess, setAssocUploadSuccess] = useState('');
+  const [assocDeleteMsg, setAssocDeleteMsg] = useState('');
+  const assocFileInputRef = useRef(null);
+
+  const [activities, setActivities] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(true);
+  const [toast, setToast] = useState({ message: '', type: '' });
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [changePwForm, setChangePwForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
+  const [changePwError, setChangePwError] = useState('');
+  const [changePwSuccess, setChangePwSuccess] = useState('');
+  const [changePwLoading, setChangePwLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, strength: 'weak', color: '#dc3545' });
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Request management state
+  const [requests, setRequests] = useState([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  const [showRecommendationsModal, setShowRecommendationsModal] = useState(false);
+
+  // REMOVE: const socket = io('http://localhost:5000'); // Adjust if backend URL is different
 
   useEffect(() => {
-    fetchUserData();
-    if (activeTab === 'requests') {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchSkills();
+      fetchConversations();
+      fetchGlobalUnread();
       fetchRequests();
     }
-  }, [activeTab]);
+  }, [user]);
 
-  const fetchUserData = async () => {
+  useEffect(() => {
+    // Fetch associate profile on mount
+    const fetchAssociateProfile = async () => {
+      try {
+        const response = await api.get('/associate/profile');
+        if (response.data.success) {
+          setAssociateProfile(response.data.profile);
+        }
+      } catch (err) {
+        // Optionally handle error
+      }
+    };
+    fetchAssociateProfile();
+  }, []);
+
+  useEffect(() => {
+    fetchActivity();
+  }, []);
+
+  // REMOVE: useEffect for socket.io real-time status updates
+
+  useEffect(() => {
+    // Show toast for upload success
+    if (assocUploadSuccess) {
+      setToast({ message: assocUploadSuccess, type: 'success' });
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
+    }
+  }, [assocUploadSuccess]);
+  // Show toast for delete
+  useEffect(() => {
+    if (assocDeleteMsg) {
+      setToast({ message: assocDeleteMsg, type: 'info' });
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
+    }
+  }, [assocDeleteMsg]);
+  // Show toast for upload error
+  useEffect(() => {
+    if (assocUploadError) {
+      setToast({ message: assocUploadError, type: 'danger' });
+      setTimeout(() => setToast({ message: '', type: '' }), 3000);
+    }
+  }, [assocUploadError]);
+
+  const checkAuth = () => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+      setError('No authentication token found');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
+      const parsedUser = JSON.parse(userData);
+      if (parsedUser.user_type !== 'associate') {
+        setError('Access denied. Associate privileges required.');
+        setLoading(false);
         return;
       }
-
-      const response = await axios.get('/auth/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (response.data.success) {
-        setUser(response.data.user);
-      }
+      setUser(parsedUser);
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching user data:', error);
-      navigate('/login');
-    } finally {
+      setError('Invalid user data');
       setLoading(false);
     }
   };
 
-  const fetchRequests = async () => {
+  const fetchSkills = async () => {
     try {
-      setRequestLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/associate/freelancer-requests', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/search/skills');
+      
+      if (response.data.success) {
+        setAvailableSkills(response.data.skills);
+      }
+    } catch (error) {
+      console.error('Error fetching skills:', error);
+    }
+  };
 
+  const fetchConversations = async () => {
+    try {
+      const response = await api.get('/message/conversations');
+      
+      if (response.data.success) {
+        setConversations(response.data.conversations);
+      }
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    }
+  };
+
+  const fetchGlobalUnread = async () => {
+    try {
+      const response = await api.get('/message/unread-count');
+      if (response.data.success) {
+        setGlobalUnread(response.data.total_unread);
+      }
+    } catch (error) {
+      setGlobalUnread(0);
+    }
+  };
+
+  const fetchActivity = async () => {
+    try {
+      const res = await api.get("/associate/activity");
+      setActivities(res.data.activities || []);
+    } catch (err) {
+      setActivities([]);
+    } finally {
+      setActivityLoading(false);
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    const { name, value } = e.target;
+    setSearchForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setSearchError(''); // Clear error when form changes
+    setSearchSuccess(''); // Clear success message when form changes
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setSearchLoading(true);
+    setSearchError('');
+    setSearchResults([]);
+
+    try {
+      // Process skills field - convert comma-separated string to array
+      const requestData = {
+        ...searchForm,
+        required_skills: searchForm.skills.split(',').map(skill => skill.trim()).filter(skill => skill)
+      };
+
+      // Submit freelancer request to ECS Admin
+      const response = await api.post('/associate/freelancer-request', requestData);
+
+      if (response.data.success) {
+        setSearchError(''); // Clear any previous errors
+        setSearchSuccess('Your freelancer request has been submitted successfully! ECS Admin will review your requirements and contact you within 24-48 hours.');
+        // Show success message - results will come from ECS Admin later
+        setSearchResults([]); // Clear any previous results
+        // Refresh requests list
+        fetchRequests();
+        // Clear form
+        setSearchForm({
+          title: '',
+          description: '',
+          skills: '',
+          min_experience: '',
+          location: '',
+          budget_range: '',
+          urgency_level: 'normal'
+        });
+      } else {
+        setSearchError(response.data.message || 'Request submission failed');
+      }
+    } catch (error) {
+      console.error('Request submission error:', error);
+      if (error.response?.data?.message) {
+        setSearchError(error.response.data.message);
+      } else {
+        setSearchError('Request submission failed. Please try again.');
+      }
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  // Fetch all requests for this associate
+  const fetchRequests = async () => {
+    setRequestsLoading(true);
+    try {
+      const response = await api.get('/associate/freelancer-requests');
       if (response.data.success) {
         setRequests(response.data.requests);
       }
     } catch (error) {
       console.error('Error fetching requests:', error);
     } finally {
-      setRequestLoading(false);
+      setRequestsLoading(false);
     }
   };
 
+  // Fetch recommendations for a specific request
   const fetchRecommendations = async (requestId) => {
+    setRecommendationsLoading(true);
     try {
-      setRecommendationsLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`/associate/freelancer-requests/${requestId}/recommendations`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
+      const response = await api.get(`/associate/freelancer-requests/${requestId}/recommendations`);
       if (response.data.success) {
         setRecommendations(response.data.recommendations);
-        setShowRecommendations(true);
+        setSelectedRequest(requestId);
+        setShowRecommendationsModal(true);
       }
     } catch (error) {
       console.error('Error fetching recommendations:', error);
@@ -99,669 +291,1129 @@ const AssociateDashboard = () => {
     }
   };
 
-  const handleRequestSubmit = async (e) => {
-    e.preventDefault();
+  // Submit response to a recommendation
+  const handleRecommendationResponse = async (freelancerId, response, notes = '') => {
     try {
-      setRequestLoading(true);
-      const token = localStorage.getItem('token');
-      
-      // Convert skills string to array
-      const skillsArray = requestForm.required_skills.split(',').map(skill => skill.trim()).filter(skill => skill);
-      
-      const response = await axios.post('/associate/freelancer-request', {
-        ...requestForm,
-        required_skills: skillsArray
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (response.data.success) {
-        alert('Request submitted successfully!');
-        setShowRequestForm(false);
-        setRequestForm({
-          title: '',
-          description: '',
-          required_skills: '',
-          min_experience: '',
-          preferred_location: '',
-          budget_range: '',
-          urgency_level: 'normal'
-        });
-        fetchRequests();
-      }
-    } catch (error) {
-      console.error('Error submitting request:', error);
-      alert('Failed to submit request. Please try again.');
-    } finally {
-      setRequestLoading(false);
-    }
-  };
-
-  const handleResponseSubmit = async (freelancerId) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(`/associate/freelancer-requests/${selectedRequest.request_id}/respond`, {
+      const responseData = await api.post(`/associate/freelancer-requests/${selectedRequest}/respond`, {
         freelancer_id: freelancerId,
-        response: responseForm.response,
-        notes: responseForm.notes
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+        response,
+        notes
       });
 
-      if (response.data.success) {
-        alert('Response submitted successfully!');
-        setResponseForm({ response: 'interested', notes: '' });
-        fetchRequests(); // Refresh to show updated response count
+      if (responseData.data.success) {
+        // Refresh recommendations
+        await fetchRecommendations(selectedRequest);
+        // Show success message
+        setToast({ message: 'Response submitted successfully!', type: 'success' });
       }
     } catch (error) {
       console.error('Error submitting response:', error);
-      alert('Failed to submit response. Please try again.');
+      setToast({ message: 'Failed to submit response. Please try again.', type: 'error' });
+    }
+  };
+
+  const handleSendMessage = async (freelancerId) => {
+    try {
+      // Create or get conversation
+      const conversationResponse = await api.post('/message/conversations', {
+        recipient_id: freelancerId
+      });
+
+      if (conversationResponse.data.success) {
+        const conversationId = conversationResponse.data.conversation_id;
+        
+        // Open messaging tab and load conversation
+        setActiveTab('messages');
+        await loadConversation(conversationId);
+      }
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      alert('Failed to start conversation. Please try again.');
+    }
+  };
+
+  const loadConversation = async (conversationId) => {
+    try {
+      const response = await api.get(`/message/conversations/${conversationId}/messages`);
+      if (response.data.success) {
+        setMessages(response.data.messages);
+        setSelectedConversation(conversationId);
+        // Mark as read
+        await api.put(`/message/conversations/${conversationId}/read`, {});
+        // Refresh conversations to update unread counts
+        await fetchConversations();
+        await fetchGlobalUnread();
+      }
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+    }
+  };
+
+  const handleDeleteMessage = async (messageId) => {
+    if (!window.confirm('Delete this message?')) return;
+    try {
+      await api.delete(`/message/messages/${messageId}`);
+      if (selectedConversation) await loadConversation(selectedConversation);
+    } catch (error) {
+      alert('Failed to delete message.');
+    }
+  };
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedConversation) return;
+
+    setMessagingLoading(true);
+    try {
+      const response = await api.post(`/message/conversations/${selectedConversation}/messages`, {
+        content: newMessage.trim()
+      });
+
+      if (response.data.success) {
+        setNewMessage('');
+        // Reload messages
+        await loadConversation(selectedConversation);
+        // Refresh conversations list
+        await fetchConversations();
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setMessagingLoading(false);
+    }
+  };
+
+  const handleAssociateProfileImageChange = async (e) => {
+    setAssocUploadError('');
+    setAssocUploadSuccess('');
+    setAssocDeleteMsg('');
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setAssocUploadError('Please select a valid image file.');
+      return;
+    }
+    setAssocUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await api.post('/associate/profile-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
+      });
+      if (response.data.success) {
+        setAssocUploadSuccess('Profile picture updated!');
+        setAssociateProfile((prev) => ({
+          ...prev,
+          profile_picture_url: response.data.image_url
+        }));
+      } else {
+        setAssocUploadError(response.data.message || 'Failed to upload image.');
+      }
+    } catch (err) {
+      setAssocUploadError('Failed to upload image. Please try again.');
+    } finally {
+      setAssocUploading(false);
+      if (assocFileInputRef.current) assocFileInputRef.current.value = '';
+    }
   };
 
-  const handleInputChange = (e) => {
+  const handleDeleteAssociateProfileImage = async () => {
+    if (!window.confirm("Delete your profile picture?")) return;
+    try {
+      await api.delete("/associate/profile-image");
+      setAssocDeleteMsg("Profile picture deleted.");
+      setAssociateProfile(prev => ({
+        ...prev,
+        profile_picture_url: null
+      }));
+    } catch (err) {
+      setAssocDeleteMsg(
+        err.response?.data?.message ||
+        "Failed to delete profile picture."
+      );
+    }
+  };
+
+  const getAssociateAvatarUrl = () => {
+    const BACKEND_URL = "http://localhost:5000";
+    if (associateProfile?.profile_picture_url) {
+      if (associateProfile.profile_picture_url.startsWith('http')) {
+        return associateProfile.profile_picture_url;
+      }
+      return `${BACKEND_URL}${associateProfile.profile_picture_url}?t=${Date.now()}`;
+    }
+    const name = `${associateProfile?.contact_person || associateProfile?.email || "User"}`;
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=eee&color=555&size=120&bold=true`;
+  };
+
+  // Password strength validation
+  const validatePasswordStrength = (password) => {
+    let score = 0;
+    const errors = [];
+
+    // Length check
+    if (password.length >= 8) score += 1;
+    else errors.push('At least 8 characters');
+
+    // Uppercase check
+    if (/[A-Z]/.test(password)) score += 1;
+    else errors.push('One uppercase letter');
+
+    // Lowercase check
+    if (/[a-z]/.test(password)) score += 1;
+    else errors.push('One lowercase letter');
+
+    // Number check
+    if (/\d/.test(password)) score += 1;
+    else errors.push('One number');
+
+    // Special character check
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+    else errors.push('One special character');
+
+    // Common password check
+    const commonPasswords = ['password', '123456', 'qwerty', 'abc123'];
+    if (!commonPasswords.includes(password.toLowerCase())) score += 1;
+    else errors.push('Not a common password');
+
+    // Sequential check
+    const sequentialPatterns = ['123', 'abc', 'qwe'];
+    const hasSequential = sequentialPatterns.some(pattern => 
+      password.toLowerCase().includes(pattern)
+    );
+    if (!hasSequential) score += 1;
+    else errors.push('No sequential characters');
+
+    // Repeated characters check
+    if (!/(.)\1{2,}/.test(password)) score += 1;
+    else errors.push('No repeated characters');
+
+    let strength = 'weak';
+    let color = '#dc3545';
+    
+    if (score >= 7) {
+      strength = 'strong';
+      color = '#28a745';
+    } else if (score >= 5) {
+      strength = 'medium';
+      color = '#ffc107';
+    }
+
+    return { score, strength, color, errors };
+  };
+
+  // Handler for change password form
+  const handleChangePwInput = (e) => {
     const { name, value } = e.target;
-    setRequestForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setChangePwForm(prev => ({ ...prev, [name]: value }));
+    setChangePwError('');
+    setChangePwSuccess('');
+    
+    // Update password strength for new password field
+    if (name === 'newPassword') {
+      const strength = validatePasswordStrength(value);
+      setPasswordStrength(strength);
+    }
   };
 
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: { class: 'bg-warning', text: 'Pending Review' },
-      reviewed: { class: 'bg-info', text: 'Reviewed' },
-      provided: { class: 'bg-primary', text: 'Recommendations Provided' },
-      completed: { class: 'bg-success', text: 'Completed' },
-      cancelled: { class: 'bg-danger', text: 'Cancelled' }
-    };
-
-    const config = statusConfig[status] || { class: 'bg-secondary', text: status };
-    
-    return (
-      <span className={`badge ${config.class} text-white px-2 py-1 rounded-pill`}>
-        {config.text}
-      </span>
-    );
-  };
-
-  const getUrgencyBadge = (urgency) => {
-    const urgencyConfig = {
-      low: { class: 'bg-success', text: 'Low' },
-      normal: { class: 'bg-warning', text: 'Normal' },
-      high: { class: 'bg-danger', text: 'High' },
-      urgent: { class: 'bg-danger', text: 'Urgent' }
-    };
-
-    const config = urgencyConfig[urgency] || { class: 'bg-secondary', text: urgency };
-    
-    return (
-      <span className={`badge ${config.class} text-white px-2 py-1 rounded-pill`}>
-        {config.text}
-      </span>
-    );
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setChangePwError('');
+    setChangePwSuccess('');
+    if (!changePwForm.oldPassword || !changePwForm.newPassword || !changePwForm.confirmPassword) {
+      setChangePwError('All fields are required.');
+      return;
+    }
+    if (changePwForm.newPassword !== changePwForm.confirmPassword) {
+      setChangePwError('New passwords do not match.');
+      return;
+    }
+    setChangePwLoading(true);
+    try {
+      const res = await api.post('/associate/change-password', {
+        oldPassword: changePwForm.oldPassword,
+        newPassword: changePwForm.newPassword
+      });
+      if (res.data.success) {
+        setChangePwSuccess('Password changed successfully!');
+        setChangePwForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        setChangePwError(res.data.message || 'Failed to change password.');
+      }
+    } catch (err) {
+      setChangePwError(err.response?.data?.message || 'Failed to change password.');
+    } finally {
+      setChangePwLoading(false);
+    }
   };
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <section className="contact section">
+        <div className="container text-center" data-aos="fade-up">
+          <div className="loading">Loading...</div>
         </div>
-      </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="contact section">
+        <div className="container text-center" data-aos="fade-up">
+          <div className="error-message">
+            <h4>Authentication Error</h4>
+            <p>{error}</p>
+            <p className="text-muted">This might be due to an expired session. Please try logging in again.</p>
+          </div>
+          <button onClick={() => navigate('/login')} className="btn-get-started">Back to Login</button>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="container-fluid py-4">
-      <div className="row">
-        <div className="col-12">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="mb-0">Welcome back, {user?.first_name}!</h2>
-            <div className="d-flex gap-2">
-              <button 
-                className="btn btn-outline-secondary"
-                onClick={() => navigate('/associate/profile')}
-              >
-                <i className="bi bi-person-circle me-2"></i>
-                Profile
-              </button>
-              <button 
-                className="btn btn-outline-secondary"
-                onClick={() => navigate('/associate/change-password')}
-              >
-                <i className="bi bi-key me-2"></i>
-                Change Password
-              </button>
+    <div className="min-vh-100" style={{ background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)' }}>
+      {/* Navbar */}
+      <nav style={{
+        width: '100%',
+        background: '#fff',
+        boxShadow: '0 2px 12px rgba(253,104,14,0.08)',
+        padding: '0.7rem 0',
+        marginBottom: 24,
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <div className="container d-flex justify-content-between align-items-center">
+          <Link to="/associate/dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }}>
+            CV<span style={{ color: '#333' }}>‑Connect</span>
+          </Link>
+          <button
+            className="btn"
+            style={{
+              background: accent,
+              color: '#fff',
+              borderRadius: 25,
+              padding: '8px 24px',
+              fontWeight: 600,
+              border: 'none',
+              fontSize: 16
+            }}
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
+          >
+            <i className="bi bi-box-arrow-right me-2"></i>Logout
+          </button>
+        </div>
+      </nav>
+      {/* Main Layout */}
+      <div className="container-fluid py-4">
+        <div className="row">
+          {/* Left Panel */}
+          <div className="col-lg-3 mb-4 mb-lg-0">
+            <div className="bg-white rounded-4 shadow-lg p-4 h-100 d-flex flex-column align-items-center" style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.07)', position: 'relative' }}>
+              {/* Toast popup notification */}
+              {toast.message && (
+                <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, minWidth: 180 }}>
+                  <div className={`toast show align-items-center text-white bg-${toast.type === 'success' ? 'success' : toast.type === 'info' ? 'primary' : 'danger'} border-0`} role="alert" aria-live="assertive" aria-atomic="true" style={{ borderRadius: 16, boxShadow: '0 2px 16px rgba(253,104,14,0.18)', fontWeight: 600, fontSize: 15, padding: '12px 24px' }}>
+                    <div className="d-flex align-items-center">
+                      <i className={`bi me-2 ${toast.type === 'success' ? 'bi-check-circle' : toast.type === 'info' ? 'bi-info-circle' : 'bi-exclamation-triangle'}`}></i>
+                      <div>{toast.message}</div>
+          </div>
+        </div>
+          </div>
+        )}
+              {/* Profile image and overlay buttons */}
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <img
+                src={getAssociateAvatarUrl()}
+                alt="Profile"
+                  className="rounded-circle mb-3"
+                  style={{ width: 90, height: 90, objectFit: 'cover', border: '3px solid #fff', boxShadow: '0 4px 16px rgba(253,104,14,0.15)' }}
+                onError={e => {
+                  e.target.onerror = null;
+                    e.target.src = "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=90&bold=true";
+                  }}
+                />
+                {/* Delete button overlays top-right of image */}
+              {associateProfile?.profile_picture_url && (
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    right: 0,
+                    borderRadius: "50%",
+                    padding: "6px 8px",
+                    fontSize: 18,
+                    zIndex: 2
+                  }}
+                  title="Delete Profile Picture"
+                  onClick={handleDeleteAssociateProfileImage}
+                >
+                  <i className="bi bi-trash"></i>
+                </button>
+              )}
+                {/* Upload button overlays bottom-right of image */}
+                <button
+                  type="button"
+                  className="btn rounded-circle profile-upload-btn position-absolute"
+                  style={{ bottom: 0, right: 0, width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', padding: 0, background: accent, color: '#fff', transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => assocFileInputRef.current && assocFileInputRef.current.click()}
+                  title="Upload/Change Profile Picture"
+                  disabled={assocUploading}
+                >
+                  <i className="bi bi-plus"></i>
+                </button>
+              <input
+                type="file"
+                accept="image/*"
+                ref={assocFileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleAssociateProfileImageChange}
+                disabled={assocUploading}
+              />
+            </div>
+              <h5 className="mt-3 mb-1" style={{ color: '#444', fontWeight: 700 }}>{associateProfile?.contact_person || user?.email}</h5>
+              <span className="badge bg-success mb-2">Associate</span>
+              <div className="d-grid gap-3 w-100 mt-4">
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'request' ? '' : 'btn-outline-primary'}`}
+                  style={{ background: activeTab === 'request' ? accent : 'transparent', color: activeTab === 'request' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => setActiveTab('request')}
+                >
+                  <i className="bi bi-person-plus me-2"></i>Request Freelancer
+                </button>
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'messages' ? '' : 'btn-outline-primary'} position-relative`}
+                  style={{ background: activeTab === 'messages' ? accent : 'transparent', color: activeTab === 'messages' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => setActiveTab('messages')}
+                >
+                  <i className="bi bi-chat-dots me-2"></i>Messages
+                  {globalUnread > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill" style={{ background: '#df1529' }}>
+                      {globalUnread}
+                    </span>
+                  )}
+                </button>
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'change-password' ? '' : 'btn-outline-primary'}`}
+                  style={{ background: activeTab === 'change-password' ? accent : 'transparent', color: activeTab === 'change-password' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => setActiveTab('change-password')}
+                >
+                  <i className="bi bi-key me-2"></i>Change Password
+                </button>
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'my-requests' ? '' : 'btn-outline-primary'}`}
+                  style={{ background: activeTab === 'my-requests' ? accent : 'transparent', color: activeTab === 'my-requests' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => setActiveTab('my-requests')}
+                >
+                  <i className="bi bi-list-check me-2"></i>My Requests
+                </button>
+              </div>
+              {assocUploading && (
+                <div className="mt-2">
+                  <span className="spinner-border spinner-border-sm text-primary" role="status" />
+                  <span className="ms-2">Uploading...</span>
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Navigation Tabs */}
-          <ul className="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
-            <li className="nav-item" role="presentation">
-              <button
-                className={`nav-link ${activeTab === 'overview' ? 'active' : ''}`}
-                onClick={() => setActiveTab('overview')}
-                type="button"
-              >
-                <i className="bi bi-house me-2"></i>
-                Overview
-              </button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button
-                className={`nav-link ${activeTab === 'requests' ? 'active' : ''}`}
-                onClick={() => setActiveTab('requests')}
-                type="button"
-              >
-                <i className="bi bi-file-earmark-text me-2"></i>
-                Freelancer Requests
-                {requests.filter(r => r.status === 'pending').length > 0 && (
-                  <span className="badge bg-warning text-dark ms-2">
-                    {requests.filter(r => r.status === 'pending').length}
-                  </span>
-                )}
-              </button>
-            </li>
-          </ul>
-
-          {/* Tab Content */}
-          <div className="tab-content" id="dashboardTabContent">
-            {/* Overview Tab */}
-            {activeTab === 'overview' && (
-              <div className="tab-pane fade show active">
-                <div className="row">
-                  <div className="col-md-4 mb-4">
-                    <div className="card border-0 shadow-sm h-100">
-                      <div className="card-body text-center">
-                        <div className="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px' }}>
-                          <i className="bi bi-file-earmark-text text-primary" style={{ fontSize: '24px' }}></i>
-                        </div>
-                        <h5 className="card-title">Total Requests</h5>
-                        <h3 className="text-primary mb-0">{requests.length}</h3>
-                        <p className="text-muted small mb-0">Freelancer service requests</p>
+          {/* Main Content Area */}
+          <div className="col-lg-9">
+            <div className="section-title mb-4">
+              <h2 style={{ color: accent, fontWeight: 700 }}>Associate Dashboard</h2>
+              <p style={{ color: '#888' }}>Request freelancers through ECS Admin, review curated profiles, and connect with pre-approved talent that matches your needs.</p>
+            </div>
+            {/* Global Unread Badge */}
+            {globalUnread > 0 && (
+              <div className="text-end mb-3">
+                <span className="badge fs-6" style={{ background: '#df1529' }}>
+                  <i className="bi bi-envelope-fill me-1"></i> {globalUnread} new message{globalUnread > 1 ? 's' : ''}
+                </span>
+        </div>
+            )}
+            {/* Tab Content */}
+        {activeTab === 'request' && (
+          <div className="tab-content">
+            {/* Skill Search */}
+                <div className="card p-4 shadow-lg mb-4 rounded-4">
+                  <div className="text-center mb-4">
+                    <h4 style={{ color: accent, fontWeight: 600 }}>Request Freelancer Services</h4>
+                    <p style={{ color: '#666', fontSize: 14 }}>Submit your requirements and ECS Admin will provide you with curated freelancer options</p>
+                  </div>
+                  <form className="row g-3" onSubmit={handleSearch}>
+                    <div className="col-12">
+                      <label className="form-label">Request Title *</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="title"
+                        value={searchForm.title || ''}
+                        onChange={handleSearchChange}
+                        placeholder="Brief title for your request"
+                        required
+                      />
+                    </div>
+                    <div className="col-12">
+                      <label className="form-label">Detailed Description *</label>
+                      <textarea
+                        className="form-control"
+                        name="description"
+                        value={searchForm.description || ''}
+                        onChange={handleSearchChange}
+                        placeholder="Describe your project requirements, timeline, and expectations"
+                        rows="3"
+                        required
+                      ></textarea>
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label">Required Skills *</label>
+                      <input
+                        list="skills-list"
+                        className="form-control"
+                        name="skills"
+                        value={searchForm.skills}
+                        onChange={handleSearchChange}
+                        placeholder="e.g., React, Node.js, PostgreSQL"
+                        autoComplete="off"
+                        required
+                      />
+                      <datalist id="skills-list">
+                        {availableSkills.map(skill => (
+                          <option key={skill.skill_id} value={skill.skill_name} />
+                        ))}
+                      </datalist>
+                      <small className="text-muted">Separate multiple skills with commas</small>
+                    </div>
+                    <div className="col-md-3">
+                      <label className="form-label">Min Experience</label>
+                      <input
+                        type="number"
+                        className="form-control"
+                        name="min_experience"
+                        value={searchForm.min_experience}
+                        onChange={handleSearchChange}
+                        min="0"
+                        placeholder="Years"
+                      />
+                    </div>
+                    <div className="col-md-3">
+                      <label className="form-label">Location</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="location"
+                        value={searchForm.location}
+                        onChange={handleSearchChange}
+                        placeholder="Location"
+                      />
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label">Budget Range</label>
+                      <select
+                        className="form-control"
+                        name="budget_range"
+                        value={searchForm.budget_range || ''}
+                        onChange={handleSearchChange}
+                      >
+                        <option value="">Select budget range</option>
+                        <option value="Under $1,000">Under $1,000</option>
+                        <option value="$1,000 - $5,000">$1,000 - $5,000</option>
+                        <option value="$5,000 - $10,000">$5,000 - $10,000</option>
+                        <option value="$10,000 - $25,000">$10,000 - $25,000</option>
+                        <option value="$25,000+">$25,000+</option>
+                      </select>
+                    </div>
+                    <div className="col-md-4">
+                      <label className="form-label">Urgency Level</label>
+                      <select
+                        className="form-control"
+                        name="urgency_level"
+                        value={searchForm.urgency_level || 'normal'}
+                        onChange={handleSearchChange}
+                      >
+                        <option value="low">Low - Flexible timeline</option>
+                        <option value="normal">Normal - Standard timeline</option>
+                        <option value="high">High - Urgent</option>
+                        <option value="urgent">Urgent - ASAP</option>
+                      </select>
+                    </div>
+                    <div className="col-md-4 d-grid">
+                      <button type="submit" className="btn dashboard-btn" style={{ background: accent, color: '#fff', border: 'none', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '12px 24px', transition: 'transform 0.18s, box-shadow 0.18s' }} disabled={searchLoading}>
+                        {searchLoading ? (
+                          <span>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Submitting...
+                          </span>
+                        ) : (
+                          "Submit Request"
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                  {searchError && <div className="alert alert-danger mt-3 text-center">{searchError}</div>}
+                  {searchSuccess && <div className="alert alert-success mt-3 text-center">{searchSuccess}</div>}
+                  {!searchError && !searchSuccess && (
+                    <div className="alert alert-info mt-3 text-center">
+                      <i className="bi bi-info-circle me-2"></i>
+                      Your request will be reviewed by ECS Admin. We'll contact you with curated freelancer options within 24-48 hours.
+                    </div>
+                  )}
+                </div>
+            {/* Request Status */}
+            <div className="card p-4 shadow-lg rounded-4">
+              <div className="text-center">
+                <i className="bi bi-clock-history fs-1 mb-3" style={{ color: accent }}></i>
+                <h5 style={{ color: '#444', fontWeight: 600 }}>Request Status</h5>
+                <p style={{ color: '#666', fontSize: 14 }}>
+                  Once you submit your request, ECS Admin will review your requirements and provide you with curated freelancer options.
+                </p>
+                <div className="row mt-4">
+                  <div className="col-md-3">
+                    <div className="text-center">
+                      <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
+                        <i className="bi bi-1-circle-fill fs-4" style={{ color: accent }}></i>
                       </div>
+                      <small style={{ color: '#666' }}>Submit Request</small>
                     </div>
                   </div>
-
-                  <div className="col-md-4 mb-4">
-                    <div className="card border-0 shadow-sm h-100">
-                      <div className="card-body text-center">
-                        <div className="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px' }}>
-                          <i className="bi bi-clock text-warning" style={{ fontSize: '24px' }}></i>
-                        </div>
-                        <h5 className="card-title">Pending Review</h5>
-                        <h3 className="text-warning mb-0">{requests.filter(r => r.status === 'pending').length}</h3>
-                        <p className="text-muted small mb-0">Awaiting ECS Admin review</p>
+                  <div className="col-md-3">
+                    <div className="text-center">
+                      <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
+                        <i className="bi bi-2-circle-fill fs-4" style={{ color: accent }}></i>
                       </div>
+                      <small style={{ color: '#666' }}>ECS Admin Review</small>
                     </div>
                   </div>
-
-                  <div className="col-md-4 mb-4">
-                    <div className="card border-0 shadow-sm h-100">
-                      <div className="card-body text-center">
-                        <div className="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: '60px', height: '60px' }}>
-                          <i className="bi bi-check-circle text-success" style={{ fontSize: '24px' }}></i>
-                        </div>
-                        <h5 className="card-title">Completed</h5>
-                        <h3 className="text-success mb-0">{requests.filter(r => r.status === 'completed').length}</h3>
-                        <p className="text-muted small mb-0">Successfully completed</p>
+                  <div className="col-md-3">
+                    <div className="text-center">
+                      <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
+                        <i className="bi bi-3-circle-fill fs-4" style={{ color: accent }}></i>
                       </div>
+                      <small style={{ color: '#666' }}>Get Curated List</small>
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <div className="text-center">
+                      <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style={{ width: '50px', height: '50px' }}>
+                        <i className="bi bi-4-circle-fill fs-4" style={{ color: accent }}></i>
+                      </div>
+                      <small style={{ color: '#666' }}>Connect & Hire</small>
                     </div>
                   </div>
                 </div>
-
-                <div className="row">
-                  <div className="col-12">
-                    <div className="card border-0 shadow-sm">
-                      <div className="card-header bg-transparent border-0">
-                        <h5 className="mb-0">Recent Activity</h5>
+              </div>
+            </div>
+          </div>
+        )}
+        {activeTab === 'messages' && (
+              <div className="container-fluid px-0">
+            <div className="row">
+              {/* Conversations List */}
+              <div className="col-lg-4">
+                    <div className="card border-0 shadow-lg rounded-4">
+                      <div className="card-header" style={{ background: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                        <h5 className="mb-0" style={{ color: '#444', fontWeight: 700 }}>Conversations</h5>
+                  </div>
+                  <div className="card-body p-0">
+                    {conversations.length === 0 ? (
+                          <div className="p-3 text-center" style={{ color: '#888' }}>
+                        No conversations yet
                       </div>
-                      <div className="card-body">
-                        {requests.length === 0 ? (
-                          <div className="text-center py-4">
-                            <i className="bi bi-inbox text-muted" style={{ fontSize: '48px' }}></i>
-                            <p className="text-muted mt-3">No requests yet. Submit your first freelancer request to get started!</p>
-                            <button 
-                              className="btn btn-primary"
-                              onClick={() => setActiveTab('requests')}
-                            >
-                              Submit Request
+                    ) : (
+                      <div className="list-group list-group-flush">
+                        {conversations.map(conversation => (
+                          <button
+                            key={conversation.conversation_id}
+                            className={`list-group-item list-group-item-action d-flex justify-content-between align-items-start ${
+                              selectedConversation === conversation.conversation_id ? 'active' : ''
+                            }`}
+                            onClick={() => loadConversation(conversation.conversation_id)}
+                                style={{
+                                  border: 'none',
+                                  background: selectedConversation === conversation.conversation_id ? accent : 'transparent',
+                                  color: selectedConversation === conversation.conversation_id ? '#fff' : '#444',
+                                  transition: 'all 0.18s ease'
+                                }}
+                          >
+                            <div className="ms-2 me-auto">
+                              <div className="fw-bold">
+                                {conversation.freelancer_name}
+                                {conversation.unread_count > 0 && (
+                                      <span className="badge ms-2" style={{ background: '#df1529' }}>{conversation.unread_count}</span>
+                                )}
+                              </div>
+                                  <small style={{ color: selectedConversation === conversation.conversation_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
+                                {conversation.last_message ? 
+                                  conversation.last_message.substring(0, 50) + '...' : 
+                                  'No messages yet'
+                                }
+                              </small>
+                            </div>
+                                <small style={{ color: selectedConversation === conversation.conversation_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
+                              {conversation.last_message_time ? 
+                                new Date(conversation.last_message_time).toLocaleDateString() : 
+                                ''
+                              }
+                            </small>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {/* Messages */}
+              <div className="col-lg-8">
+                    <div className="card border-0 shadow-lg rounded-4">
+                      <div className="card-header" style={{ background: '#f8f9fa', borderBottom: '1px solid #eee' }}>
+                        <h5 className="mb-0" style={{ color: '#444', fontWeight: 700 }}>
+                      {selectedConversation ? 
+                        conversations.find(c => c.conversation_id === selectedConversation)?.freelancer_name || 'Messages' : 
+                        'Select a conversation'
+                      }
+                    </h5>
+                  </div>
+                  <div className="card-body">
+                    {selectedConversation ? (
+                      <>
+                        {/* Messages List */}
+                        <div className="messages-container" style={{ height: '400px', overflowY: 'auto' }}>
+                          {messages.map(message => (
+                            <div key={message.message_id} className={`mb-3 ${message.sender_id === user.user_id ? 'text-end' : 'text-start'}`}>
+                                  <div className={`d-inline-block p-3 rounded ${message.sender_id === user.user_id ? 'text-white' : 'bg-light'}`}
+                                       style={{ 
+                                         background: message.sender_id === user.user_id ? accent : '#f8f9fa',
+                                         maxWidth: '70%'
+                                       }}>
+                                <div className="d-flex align-items-center">
+                                  <div className="flex-grow-1">{message.content}</div>
+                                  {message.sender_id === user.user_id && (
+                                    <button
+                                      type="button"
+                                          className="btn btn-sm btn-link ms-2 p-0 message-delete-btn"
+                                      title="Delete message"
+                                      onClick={() => handleDeleteMessage(message.message_id)}
+                                          style={{fontSize: '1.1rem', color: 'rgba(255,255,255,0.8)', transition: 'all 0.18s ease'}}
+                                    >
+                                      <i className="bi bi-trash"></i>
+                                    </button>
+                                  )}
+                                </div>
+                                    <small style={{ color: message.sender_id === user.user_id ? 'rgba(255,255,255,0.8)' : '#888' }}>
+                                  {new Date(message.sent_at).toLocaleString()}
+                                </small>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        {/* Send Message Form */}
+                        <form onSubmit={sendMessage} className="mt-3">
+                          <div className="input-group">
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Type your message..."
+                              value={newMessage}
+                              onChange={(e) => setNewMessage(e.target.value)}
+                              disabled={messagingLoading}
+                                  style={{ borderRadius: '20px 0 0 20px', border: '1.5px solid #eee' }}
+                            />
+                                <button type="submit" className="btn dashboard-btn" disabled={messagingLoading || !newMessage.trim()} style={{ background: accent, color: '#fff', border: 'none', borderRadius: '0 20px 20px 0', fontWeight: 600, transition: 'transform 0.18s, box-shadow 0.18s' }}>
+                              {messagingLoading ? 'Sending...' : 'Send'}
                             </button>
                           </div>
-                        ) : (
-                          <div className="table-responsive">
-                            <table className="table table-hover">
-                              <thead>
-                                <tr>
-                                  <th>Request</th>
-                                  <th>Status</th>
-                                  <th>Urgency</th>
-                                  <th>Created</th>
-                                  <th>Actions</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {requests.slice(0, 5).map((request) => (
-                                  <tr key={request.request_id}>
-                                    <td>
-                                      <div>
-                                        <strong>{request.title}</strong>
-                                        <br />
-                                        <small className="text-muted">{request.description.substring(0, 50)}...</small>
-                                      </div>
-                                    </td>
-                                    <td>{getStatusBadge(request.status)}</td>
-                                    <td>{getUrgencyBadge(request.urgency_level)}</td>
-                                    <td>{new Date(request.created_at).toLocaleDateString()}</td>
-                                    <td>
-                                      <button 
-                                        className="btn btn-sm btn-outline-primary"
-                                        onClick={() => {
-                                          setSelectedRequest(request);
-                                          fetchRecommendations(request.request_id);
-                                        }}
-                                      >
-                                        View Details
-                                      </button>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
+                        </form>
+                      </>
+                    ) : (
+                          <div className="text-center py-5" style={{ color: '#888' }}>
+                            <i className="bi bi-chat-dots fs-1" style={{ color: accent }}></i>
+                        <p>Select a conversation to start messaging</p>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
-            )}
-
-            {/* Requests Tab */}
-            {activeTab === 'requests' && (
-              <div className="tab-pane fade show active">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h4 className="mb-0">Freelancer Service Requests</h4>
-                  <button 
-                    className="btn btn-primary"
-                    onClick={() => setShowRequestForm(true)}
+            </div>
+          </div>
+        )}
+        {activeTab === 'change-password' && (
+          <div className="bg-white rounded-4 shadow-sm p-4 mt-3" style={{ maxWidth: 500, margin: '0 auto' }}>
+            <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Change Password</h5>
+            <form onSubmit={handleChangePassword} autoComplete="off" data-form-type="other">
+              <div className="mb-3">
+                <label className="form-label">Old Password</label>
+                <div className="position-relative">
+                  <input 
+                    type={showOldPassword ? "text" : "password"}
+                    name="oldPassword" 
+                    className="form-control" 
+                    value={changePwForm.oldPassword} 
+                    onChange={handleChangePwInput} 
+                    required 
+                    autoComplete="off"
+                    data-lpignore="true"
+                    data-form-type="other"
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn position-absolute"
+                    style={{
+                      right: '5px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      fontSize: '16px',
+                      padding: '5px'
+                    }}
+                    onClick={() => setShowOldPassword(!showOldPassword)}
                   >
-                    <i className="bi bi-plus-circle me-2"></i>
-                    Submit New Request
+                    <i className={`bi ${showOldPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                   </button>
                 </div>
-
-                {requestLoading ? (
-                  <div className="text-center py-4">
-                    <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="row">
-                    {requests.map((request) => (
-                      <div key={request.request_id} className="col-md-6 col-lg-4 mb-4">
-                        <div className="card border-0 shadow-sm h-100">
-                          <div className="card-body">
-                            <div className="d-flex justify-content-between align-items-start mb-2">
-                              <h6 className="card-title mb-0">{request.title}</h6>
-                              {getStatusBadge(request.status)}
-                            </div>
-                            
-                            <p className="card-text text-muted small mb-3">
-                              {request.description.substring(0, 100)}...
-                            </p>
-
-                            <div className="mb-3">
-                              <div className="d-flex justify-content-between mb-1">
-                                <small className="text-muted">Skills Required:</small>
-                                <small className="text-muted">{request.required_skills.length} skills</small>
-                              </div>
-                              <div className="d-flex flex-wrap gap-1">
-                                {request.required_skills.slice(0, 3).map((skill, index) => (
-                                  <span key={index} className="badge bg-light text-dark border px-2 py-1">
-                                    {skill}
-                                  </span>
-                                ))}
-                                {request.required_skills.length > 3 && (
-                                  <span className="badge bg-light text-dark border px-2 py-1">
-                                    +{request.required_skills.length - 3} more
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="row text-center mb-3">
-                              <div className="col-6">
-                                <small className="text-muted d-block">Experience</small>
-                                <strong>{request.min_experience || 0}+ years</strong>
-                              </div>
-                              <div className="col-6">
-                                <small className="text-muted d-block">Urgency</small>
-                                {getUrgencyBadge(request.urgency_level)}
-                              </div>
-                            </div>
-
-                            <div className="d-flex justify-content-between align-items-center">
-                              <small className="text-muted">
-                                {new Date(request.created_at).toLocaleDateString()}
-                              </small>
-                              <div className="d-flex gap-2">
-                                {request.status === 'provided' && (
-                                  <button 
-                                    className="btn btn-sm btn-outline-primary"
-                                    onClick={() => {
-                                      setSelectedRequest(request);
-                                      fetchRecommendations(request.request_id);
-                                    }}
-                                  >
-                                    View Recommendations
-                                  </button>
-                                )}
-                                <button 
-                                  className="btn btn-sm btn-outline-secondary"
-                                  onClick={() => {
-                                    setSelectedRequest(request);
-                                    fetchRecommendations(request.request_id);
-                                  }}
-                                >
-                                  Details
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+              </div>
+              <div className="mb-3">
+                <label className="form-label">New Password</label>
+                <div className="position-relative">
+                  <input 
+                    type={showNewPassword ? "text" : "password"}
+                    name="newPassword" 
+                    className="form-control" 
+                    value={changePwForm.newPassword} 
+                    onChange={handleChangePwInput} 
+                    required 
+                    autoComplete="new-password"
+                    data-lpignore="true"
+                    data-form-type="other"
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn position-absolute"
+                    style={{
+                      right: '5px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      fontSize: '16px',
+                      padding: '5px'
+                    }}
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    <i className={`bi ${showNewPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                  </button>
+                </div>
+                {/* Password strength indicator */}
+                {changePwForm.newPassword && (
+                  <div className="mt-2">
+                    <div className="d-flex align-items-center mb-1">
+                      <div className="me-2" style={{ fontSize: 12, fontWeight: 600, color: passwordStrength.color }}>
+                        {passwordStrength.strength.toUpperCase()}
+                      </div>
+                      <div className="flex-grow-1">
+                        <div className="progress" style={{ height: 4 }}>
+                          <div 
+                            className="progress-bar" 
+                            style={{ 
+                              width: `${(passwordStrength.score / 8) * 100}%`, 
+                              backgroundColor: passwordStrength.color 
+                            }}
+                          ></div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-
-                {requests.length === 0 && !requestLoading && (
-                  <div className="text-center py-5">
-                    <i className="bi bi-inbox text-muted" style={{ fontSize: '64px' }}></i>
-                    <h5 className="text-muted mt-3">No requests yet</h5>
-                    <p className="text-muted">Submit your first freelancer service request to get started.</p>
-                    <button 
-                      className="btn btn-primary btn-lg"
-                      onClick={() => setShowRequestForm(true)}
-                    >
-                      Submit Your First Request
-                    </button>
+                    </div>
+                    <small className="text-muted" style={{ fontSize: 11 }}>
+                      Requirements: 8+ chars, uppercase, lowercase, number, special char
+                    </small>
                   </div>
                 )}
               </div>
-            )}
+              <div className="mb-3">
+                <label className="form-label">Confirm New Password</label>
+                <div className="position-relative">
+                  <input 
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword" 
+                    className="form-control" 
+                    value={changePwForm.confirmPassword} 
+                    onChange={handleChangePwInput} 
+                    required 
+                    autoComplete="new-password"
+                    data-lpignore="true"
+                    data-form-type="other"
+                    style={{ paddingRight: '40px' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn position-absolute"
+                    style={{
+                      right: '5px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#666',
+                      fontSize: '16px',
+                      padding: '5px'
+                    }}
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
+                  </button>
+                </div>
+              </div>
+              {changePwError && <div className="alert alert-danger">{changePwError}</div>}
+              {changePwSuccess && <div className="alert alert-success">{changePwSuccess}</div>}
+              <div className="d-flex gap-2">
+                <button 
+                  type="submit" 
+                  className="btn dashboard-btn" 
+                  style={{ background: accent, color: '#fff', borderRadius: 30, fontWeight: 600, fontSize: 16, padding: '10px 28px' }} 
+                  disabled={changePwLoading || passwordStrength.score < 5}
+                >
+                  {changePwLoading ? 'Changing...' : 'Submit'}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+        {activeTab === 'my-requests' && (
+          <div className="tab-content">
+            <div className="card p-4 shadow-lg mb-4 rounded-4">
+              <div className="text-center mb-4">
+                <h4 style={{ color: accent, fontWeight: 600 }}>My Freelancer Requests</h4>
+                <p style={{ color: '#666', fontSize: 14 }}>Track your submitted requests and view ECS Admin recommendations</p>
+              </div>
+              
+              {requestsLoading ? (
+                <div className="text-center py-4">
+                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                  <p className="mt-2 text-muted">Loading your requests...</p>
+                </div>
+              ) : requests.length === 0 ? (
+                <div className="text-center py-4">
+                  <i className="bi bi-inbox display-4 text-muted"></i>
+                  <p className="mt-3 text-muted">No requests submitted yet</p>
+                  <p className="text-muted small">Submit a freelancer request to get started</p>
+                </div>
+              ) : (
+                <div className="row g-3">
+                  {requests.map((request) => (
+                    <div key={request.request_id} className="col-12">
+                      <div className="card border-0 shadow-sm h-100">
+                        <div className="card-body">
+                          <div className="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                              <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600 }}>
+                                {request.title}
+                              </h6>
+                              <p className="card-text text-muted small mb-2">
+                                {request.description.length > 100 
+                                  ? `${request.description.substring(0, 100)}...` 
+                                  : request.description}
+                              </p>
+                            </div>
+                            <div className="text-end">
+                              <span className={`badge ${
+                                request.status === 'pending' ? 'bg-warning' :
+                                request.status === 'reviewed' ? 'bg-info' :
+                                request.status === 'provided' ? 'bg-success' :
+                                request.status === 'completed' ? 'bg-primary' :
+                                'bg-secondary'
+                              }`}>
+                                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="row g-2 mb-3">
+                            <div className="col-md-6">
+                              <small className="text-muted">
+                                <i className="bi bi-gear me-1"></i>
+                                <strong>Skills:</strong> {request.required_skills.join(', ')}
+                              </small>
+                            </div>
+                            <div className="col-md-6">
+                              <small className="text-muted">
+                                <i className="bi bi-calendar me-1"></i>
+                                <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
+                              </small>
+                            </div>
+                          </div>
+
+                          {request.status === 'provided' && (
+                            <div className="d-flex justify-content-between align-items-center">
+                              <div>
+                                <small className="text-success">
+                                  <i className="bi bi-check-circle me-1"></i>
+                                  {request.recommendation_count} freelancer(s) recommended
+                                </small>
+                              </div>
+                              <button
+                                className="btn btn-sm"
+                                style={{ background: accent, color: '#fff', borderRadius: 20 }}
+                                onClick={() => fetchRecommendations(request.request_id)}
+                              >
+                                <i className="bi bi-eye me-1"></i>View Recommendations
+                              </button>
+                            </div>
+                          )}
+
+                          {request.status === 'pending' && (
+                            <div className="text-center py-2">
+                              <small className="text-muted">
+                                <i className="bi bi-clock me-1"></i>
+                                ECS Admin is reviewing your request
+                              </small>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      {/* Recent Activity */}
+            <div className="mt-5">
+              <h5 className="mb-3" style={{ color: '#444', fontWeight: 700 }}>Recent Activity</h5>
+        {activityLoading ? (
+                <div className="text-center py-4">
+                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                </div>
+        ) : (
+                <div className="bg-light rounded-3 p-3" style={{ maxHeight: '300px', overflowY: 'auto', background: '#f8f9fa' }}>
+          <ActivityTable activities={activities} />
+                </div>
+        )}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Request Submission Modal */}
-      {showRequestForm && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+      {/* Recommendations Modal */}
+      {showRecommendationsModal && (
+        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Submit Freelancer Service Request</h5>
-                <button 
-                  type="button" 
-                  className="btn-close"
-                  onClick={() => setShowRequestForm(false)}
-                ></button>
-              </div>
-              <form onSubmit={handleRequestSubmit}>
-                <div className="modal-body">
-                  <div className="row">
-                    <div className="col-md-8">
-                      <div className="mb-3">
-                        <label htmlFor="title" className="form-label">Request Title *</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="title"
-                          name="title"
-                          value={requestForm.title}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="e.g., Need React Developer for E-commerce App"
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="mb-3">
-                        <label htmlFor="urgency_level" className="form-label">Urgency Level</label>
-                        <select
-                          className="form-select"
-                          id="urgency_level"
-                          name="urgency_level"
-                          value={requestForm.urgency_level}
-                          onChange={handleInputChange}
-                        >
-                          <option value="low">Low</option>
-                          <option value="normal">Normal</option>
-                          <option value="high">High</option>
-                          <option value="urgent">Urgent</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="description" className="form-label">Project Description *</label>
-                    <textarea
-                      className="form-control"
-                      id="description"
-                      name="description"
-                      rows="4"
-                      value={requestForm.description}
-                      onChange={handleInputChange}
-                      required
-                      placeholder="Describe your project requirements, goals, and expectations..."
-                    ></textarea>
-                  </div>
-
-                  <div className="row">
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label htmlFor="required_skills" className="form-label">Required Skills *</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="required_skills"
-                          name="required_skills"
-                          value={requestForm.required_skills}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="e.g., React, Node.js, PostgreSQL (comma-separated)"
-                        />
-                        <div className="form-text">Separate multiple skills with commas</div>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label htmlFor="min_experience" className="form-label">Minimum Experience (years)</label>
-                        <input
-                          type="number"
-                          className="form-control"
-                          id="min_experience"
-                          name="min_experience"
-                          value={requestForm.min_experience}
-                          onChange={handleInputChange}
-                          min="0"
-                          placeholder="e.g., 3"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="row">
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label htmlFor="preferred_location" className="form-label">Preferred Location</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="preferred_location"
-                          name="preferred_location"
-                          value={requestForm.preferred_location}
-                          onChange={handleInputChange}
-                          placeholder="e.g., Remote, Johannesburg, Cape Town"
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label htmlFor="budget_range" className="form-label">Budget Range</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="budget_range"
-                          name="budget_range"
-                          value={requestForm.budget_range}
-                          onChange={handleInputChange}
-                          placeholder="e.g., R15,000 - R25,000"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary"
-                    onClick={() => setShowRequestForm(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    type="submit" 
-                    className="btn btn-primary"
-                    disabled={requestLoading}
-                  >
-                    {requestLoading ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                        Submitting...
-                      </>
-                    ) : (
-                      'Submit Request'
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Recommendations Modal */}
-      {showRecommendations && selectedRequest && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-xl">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  Freelancer Recommendations for: {selectedRequest.title}
+                <h5 className="modal-title" style={{ color: accent, fontWeight: 600 }}>
+                  <i className="bi bi-star me-2"></i>Freelancer Recommendations
                 </h5>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn-close"
-                  onClick={() => {
-                    setShowRecommendations(false);
-                    setSelectedRequest(null);
-                    setRecommendations([]);
-                  }}
+                  onClick={() => setShowRecommendationsModal(false)}
                 ></button>
               </div>
               <div className="modal-body">
                 {recommendationsLoading ? (
                   <div className="text-center py-4">
-                    <div className="spinner-border text-primary" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                    <p className="mt-2 text-muted">Loading recommendations...</p>
                   </div>
                 ) : recommendations.length === 0 ? (
                   <div className="text-center py-4">
-                    <i className="bi bi-people text-muted" style={{ fontSize: '48px' }}></i>
-                    <p className="text-muted mt-3">No recommendations available yet.</p>
-                    <p className="text-muted small">ECS Admin will provide curated freelancer options soon.</p>
+                    <i className="bi bi-inbox display-4 text-muted"></i>
+                    <p className="mt-3 text-muted">No recommendations available</p>
                   </div>
                 ) : (
-                  <div className="row">
+                  <div className="row g-3">
                     {recommendations.map((rec) => (
-                      <div key={rec.recommendation_id} className="col-md-6 mb-4">
-                        <div className={`card border-0 shadow-sm h-100 ${rec.is_highlighted ? 'border-primary border-2' : ''}`}>
+                      <div key={rec.recommendation_id} className="col-12">
+                        <div className={`card border-0 shadow-sm h-100 ${rec.is_highlighted ? 'border-warning border-2' : ''}`}>
                           <div className="card-body">
                             {rec.is_highlighted && (
-                              <div className="text-center mb-3">
-                                <span className="badge bg-primary px-3 py-2">
-                                  <i className="bi bi-star-fill me-2"></i>
-                                  ECS Admin Recommended
+                              <div className="text-center mb-2">
+                                <span className="badge bg-warning text-dark">
+                                  <i className="bi bi-star-fill me-1"></i>Top Recommendation
                                 </span>
                               </div>
                             )}
                             
-                            <div className="d-flex align-items-center mb-3">
-                              <div className="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style={{ width: '50px', height: '50px' }}>
-                                <span className="text-primary fw-bold">
-                                  {rec.first_name?.charAt(0)}{rec.last_name?.charAt(0)}
-                                </span>
-                              </div>
+                            <div className="d-flex justify-content-between align-items-start mb-3">
                               <div>
-                                <h6 className="mb-1">{rec.first_name} {rec.last_name}</h6>
-                                <p className="text-muted small mb-0">{rec.headline}</p>
+                                <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600 }}>
+                                  {rec.first_name} {rec.last_name}
+                                </h6>
+                                <p className="card-text text-muted small mb-2">
+                                  {rec.headline}
+                                </p>
+                              </div>
+                              <div className="text-end">
+                                <div className="mb-2">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <i
+                                      key={star}
+                                      className={`bi ${star <= rec.admin_rating ? 'bi-star-fill' : 'bi-star'}`}
+                                      style={{ color: star <= rec.admin_rating ? '#ffc107' : '#dee2e6' }}
+                                    ></i>
+                                  ))}
+                                  <small className="ms-1 text-muted">({rec.admin_rating}/5)</small>
+                                </div>
+                                <span className={`badge ${rec.is_available ? 'bg-success' : 'bg-secondary'}`}>
+                                  {rec.is_available ? 'Available' : 'Unavailable'}
+                                </span>
                               </div>
                             </div>
 
-                            <div className="mb-3">
-                              <div className="d-flex justify-content-between align-items-center mb-2">
-                                <small className="text-muted">ECS Admin Rating:</small>
-                                <div className="d-flex align-items-center">
-                                  {[...Array(5)].map((_, i) => (
-                                    <i 
-                                      key={i}
-                                      className={`bi ${i < (rec.admin_rating || 0) ? 'bi-star-fill text-warning' : 'bi-star text-muted'}`}
-                                    ></i>
-                                  ))}
-                                  <span className="ms-2 small text-muted">({rec.admin_rating || 0}/5)</span>
-                                </div>
+                            <div className="row g-2 mb-3">
+                              <div className="col-md-6">
+                                <small className="text-muted">
+                                  <i className="bi bi-envelope me-1"></i>
+                                  <strong>Email:</strong> {rec.email}
+                                </small>
+                              </div>
+                              <div className="col-md-6">
+                                <small className="text-muted">
+                                  <i className="bi bi-telephone me-1"></i>
+                                  <strong>Phone:</strong> {rec.phone || 'Not provided'}
+                                </small>
                               </div>
                             </div>
 
                             {rec.admin_notes && (
                               <div className="mb-3">
-                                <small className="text-muted d-block mb-1">ECS Admin Notes:</small>
-                                <p className="small mb-0 bg-light p-2 rounded">{rec.admin_notes}</p>
+                                <small className="text-muted">
+                                  <i className="bi bi-chat-quote me-1"></i>
+                                  <strong>Admin Notes:</strong> {rec.admin_notes}
+                                </small>
                               </div>
                             )}
 
-                            <div className="d-flex justify-content-between align-items-center">
-                              <small className="text-muted">
-                                <i className="bi bi-envelope me-1"></i>
-                                {rec.freelancer_email}
-                              </small>
-                              <div className="d-flex gap-2">
-                                <button 
-                                  className="btn btn-sm btn-outline-success"
-                                  onClick={() => {
-                                    setResponseForm({ response: 'interested', notes: '' });
-                                    handleResponseSubmit(rec.freelancer_id);
-                                  }}
-                                >
-                                  <i className="bi bi-check-circle me-1"></i>
-                                  Interested
-                                </button>
-                                <button 
-                                  className="btn btn-sm btn-outline-secondary"
-                                  onClick={() => {
-                                    setResponseForm({ response: 'not_interested', notes: '' });
-                                    handleResponseSubmit(rec.freelancer_id);
-                                  }}
-                                >
-                                  <i className="bi bi-x-circle me-1"></i>
-                                  Not Interested
-                                </button>
-                              </div>
+                            <div className="d-flex gap-2">
+                              <button
+                                className="btn btn-sm btn-success"
+                                onClick={() => handleRecommendationResponse(rec.freelancer_id, 'interested')}
+                              >
+                                <i className="bi bi-hand-thumbs-up me-1"></i>Interested
+                              </button>
+                              <button
+                                className="btn btn-sm btn-outline-secondary"
+                                onClick={() => handleRecommendationResponse(rec.freelancer_id, 'not_interested')}
+                              >
+                                <i className="bi bi-hand-thumbs-down me-1"></i>Not Interested
+                              </button>
+                              <button
+                                className="btn btn-sm btn-primary"
+                                onClick={() => handleRecommendationResponse(rec.freelancer_id, 'hired')}
+                              >
+                                <i className="bi bi-check-circle me-1"></i>Hire
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -771,14 +1423,10 @@ const AssociateDashboard = () => {
                 )}
               </div>
               <div className="modal-footer">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn btn-secondary"
-                  onClick={() => {
-                    setShowRecommendations(false);
-                    setSelectedRequest(null);
-                    setRecommendations([]);
-                  }}
+                  onClick={() => setShowRecommendationsModal(false)}
                 >
                   Close
                 </button>
@@ -787,8 +1435,46 @@ const AssociateDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Toast Notification */}
+      {toast.message && (
+        <div className={`toast-container position-fixed top-0 end-0 p-3`} style={{ zIndex: 9999 }}>
+          <div className={`toast show ${toast.type === 'success' ? 'bg-success text-white' : 'bg-danger text-white'}`}>
+            <div className="toast-body">
+              {toast.message}
+            </div>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              onClick={() => setToast({ message: '', type: '' })}
+            ></button>
+          </div>
+        </div>
+      )}
+
+      {/* Animation Styles */}
+      <style>{`
+        .dashboard-btn:hover, .dashboard-btn:focus {
+          transform: scale(1.07);
+          box-shadow: 0 4px 24px rgba(253,104,14,0.18);
+          z-index: 2;
+        }
+        .profile-upload-btn:hover, .profile-upload-btn:focus {
+          transform: scale(1.15);
+          box-shadow: 0 4px 16px rgba(253,104,14,0.25);
+          z-index: 2;
+        }
+        .message-delete-btn:hover, .message-delete-btn:focus {
+          transform: scale(1.2);
+          color: #fff !important;
+        }
+        .list-group-item:hover {
+          transform: translateX(4px);
+          box-shadow: 0 2px 8px rgba(253,104,14,0.1);
+        }
+      `}</style>
     </div>
   );
 };
 
-export default AssociateDashboard;
+export default AssociateDashboard; 
