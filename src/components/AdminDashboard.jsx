@@ -244,6 +244,54 @@ const ESCAdminDashboard = () => {
   ]);
   const [showDataModal, setShowDataModal] = useState(false);
   const [selectedDataItem, setSelectedDataItem] = useState(null);
+  const [documentItems, setDocumentItems] = useState([
+    {
+      name: "Executive Summary",
+      type: "PDF Document",
+      icon: "bi bi-file-earmark-pdf",
+      size: "2.4 MB",
+      created: "2024-01-15",
+      modified: "2024-01-20",
+      description: "Comprehensive executive summary of the project proposal including key objectives, timeline, and expected outcomes."
+    },
+    {
+      name: "Technical Specifications",
+      type: "Word Document",
+      icon: "bi bi-file-earmark-word",
+      size: "1.8 MB",
+      created: "2024-01-10",
+      modified: "2024-01-18",
+      description: "Detailed technical specifications and requirements for the project implementation phase."
+    },
+    {
+      name: "Project Timeline",
+      type: "Excel Spreadsheet",
+      icon: "bi bi-file-earmark-excel",
+      size: "856 KB",
+      created: "2024-01-12",
+      modified: "2024-01-19",
+      description: "Project timeline with milestones, deadlines, and resource allocation details."
+    },
+    {
+      name: "Budget Analysis",
+      type: "PDF Document",
+      icon: "bi bi-file-earmark-pdf",
+      size: "3.1 MB",
+      created: "2024-01-08",
+      modified: "2024-01-17",
+      description: "Comprehensive budget analysis including cost breakdown, resource allocation, and financial projections."
+    },
+    {
+      name: "Risk Assessment",
+      type: "Word Document",
+      icon: "bi bi-file-earmark-word",
+      size: "1.2 MB",
+      created: "2024-01-14",
+      modified: "2024-01-16",
+      description: "Risk assessment document identifying potential project risks and mitigation strategies."
+    }
+  ]);
+  const [selectedDocument, setSelectedDocument] = useState(null);
 
   useEffect(() => {
     checkAuth();
@@ -1088,6 +1136,24 @@ const ESCAdminDashboard = () => {
     closeDataModal();
   };
 
+  const openDocument = (document) => {
+    setSelectedDocument(document);
+  };
+
+  const shareDocument = (document) => {
+    // In a real application, this would open a sharing dialog
+    alert(`Sharing ${document.name}...`);
+  };
+
+  const deleteDocument = (document) => {
+    if (window.confirm(`Are you sure you want to delete "${document.name}"?`)) {
+      setDocumentItems(prev => prev.filter(item => item.name !== document.name));
+      if (selectedDocument && selectedDocument.name === document.name) {
+        setSelectedDocument(null);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <section className="contact section">
@@ -1260,6 +1326,25 @@ const ESCAdminDashboard = () => {
                 <i className="bi bi-table me-3"></i>
                 Data Management
               </button>
+
+              <button
+                className={`nav-item w-100 text-start ${activeTab === 'documents' ? 'active' : ''}`}
+                onClick={() => setActiveTab('documents')}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: activeTab === 'documents' ? accent : 'transparent',
+                  color: activeTab === 'documents' ? '#fff' : '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <i className="bi bi-folder me-3"></i>
+                Documents
+              </button>
         </div>
           </div>
 
@@ -1390,6 +1475,7 @@ const ESCAdminDashboard = () => {
               {activeTab === 'reports' && 'Reports'}
               {activeTab === 'settings' && 'Settings'}
               {activeTab === 'data-management' && 'Data Management'}
+              {activeTab === 'documents' && 'Documents'}
             </h1>
             <p className="text-muted mb-0">
               {activeTab === 'dashboard' && 'System overview and key metrics'}
@@ -1400,6 +1486,7 @@ const ESCAdminDashboard = () => {
               {activeTab === 'reports' && 'Generate and view system reports'}
               {activeTab === 'settings' && 'System configuration and preferences'}
               {activeTab === 'data-management' && 'Data management and analysis'}
+              {activeTab === 'documents' && 'Document management and organization'}
             </p>
           </div>
         </div>
@@ -3051,6 +3138,131 @@ const ESCAdminDashboard = () => {
                 >
                   Save Changes
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Documents Tab */}
+      {activeTab === 'documents' && (
+        <div className="documents-tab">
+          <div className="row">
+            {/* Documents Navigation Sidebar */}
+            <div className="col-md-4">
+              <div className="card">
+                <div className="card-header">
+                  <h6 className="mb-0">
+                    <i className="bi bi-folder me-2"></i>
+                    Documents
+                  </h6>
+                </div>
+                <div className="card-body p-0">
+                  <div className="list-group list-group-flush">
+                    {documentItems.map((item, index) => (
+                      <div key={index} className="list-group-item d-flex justify-content-between align-items-center p-3">
+                        <div className="d-flex align-items-center">
+                          <i className={`${item.icon} me-3`} style={{ color: accent, fontSize: '1.2rem' }}></i>
+                          <div>
+                            <div className="fw-medium">{item.name}</div>
+                            <small className="text-muted">{item.type}</small>
+                          </div>
+                        </div>
+                        <div className="dropdown">
+                          <button 
+                            className="btn btn-sm btn-outline-secondary" 
+                            type="button" 
+                            data-bs-toggle="dropdown"
+                            style={{ padding: '4px 8px' }}
+                          >
+                            <i className="bi bi-three-dots"></i>
+                          </button>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <a className="dropdown-item" href="#" onClick={() => openDocument(item)}>
+                                <i className="bi bi-folder me-2"></i>Open
+                              </a>
+                            </li>
+                            <li>
+                              <a className="dropdown-item" href="#" onClick={() => shareDocument(item)}>
+                                <i className="bi bi-share me-2"></i>Share
+                              </a>
+                            </li>
+                            <li><hr className="dropdown-divider" /></li>
+                            <li>
+                              <a className="dropdown-item text-danger" href="#" onClick={() => deleteDocument(item)}>
+                                <i className="bi bi-trash me-2"></i>Delete
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    ))}
+                    <div className="list-group-item p-3">
+                      <button className="btn btn-link text-muted p-0 text-decoration-none">
+                        <i className="bi bi-three-dots me-2"></i>
+                        More
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Document Content Area */}
+            <div className="col-md-8">
+              <div className="card">
+                <div className="card-header d-flex justify-content-between align-items-center">
+                  <h6 className="mb-0">
+                    {selectedDocument ? selectedDocument.name : 'Document Viewer'}
+                  </h6>
+                  <div className="d-flex gap-2">
+                    <button className="btn btn-outline-primary btn-sm">
+                      <i className="bi bi-download me-1"></i>Download
+                    </button>
+                    <button className="btn btn-outline-secondary btn-sm">
+                      <i className="bi bi-pencil me-1"></i>Edit
+                    </button>
+                  </div>
+                </div>
+                <div className="card-body">
+                  {selectedDocument ? (
+                    <div>
+                      <div className="row mb-3">
+                        <div className="col-md-6">
+                          <strong>Type:</strong> {selectedDocument.type}
+                        </div>
+                        <div className="col-md-6">
+                          <strong>Size:</strong> {selectedDocument.size}
+                        </div>
+                      </div>
+                      <div className="row mb-3">
+                        <div className="col-md-6">
+                          <strong>Created:</strong> {selectedDocument.created}
+                        </div>
+                        <div className="col-md-6">
+                          <strong>Modified:</strong> {selectedDocument.modified}
+                        </div>
+                      </div>
+                      <div className="mb-3">
+                        <strong>Description:</strong>
+                        <p className="text-muted mt-1">{selectedDocument.description}</p>
+                      </div>
+                      <div className="border rounded p-3 bg-light">
+                        <div className="text-center text-muted">
+                          <i className="bi bi-file-earmark-text" style={{ fontSize: '3rem' }}></i>
+                          <p className="mt-2">Document preview will be displayed here</p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-5">
+                      <i className="bi bi-file-earmark-text" style={{ fontSize: '3rem', color: accent }}></i>
+                      <h5 className="mt-3">Select a Document</h5>
+                      <p className="text-muted">Choose a document from the sidebar to view its details</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
