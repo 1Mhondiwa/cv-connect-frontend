@@ -135,6 +135,26 @@ const ESCAdminDashboard = () => {
   const [reportTimeRange, setReportTimeRange] = useState('30d');
   const [lastReportsUpdate, setLastReportsUpdate] = useState(null);
 
+  // Enhanced Security states
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [messageDetails, setMessageDetails] = useState(null);
+  const [messageDetailsLoading, setMessageDetailsLoading] = useState(false);
+  const [flagMessageModal, setFlagMessageModal] = useState(false);
+  const [blockUserModal, setBlockUserModal] = useState(false);
+  const [selectedUserForBlock, setSelectedUserForBlock] = useState(null);
+  const [securityAuditLog, setSecurityAuditLog] = useState([]);
+  const [auditLogLoading, setAuditLogLoading] = useState(false);
+  const [flagFormData, setFlagFormData] = useState({
+    flag_reason: '',
+    admin_notes: '',
+    risk_level: 'medium'
+  });
+  const [blockFormData, setBlockFormData] = useState({
+    block_reason: '',
+    admin_notes: '',
+    block_duration: 'temporary'
+  });
+
   // Chart data (static for now, will be real-time later)
   const chartData = [
     { date: "2024-04-01", desktop: 222, mobile: 150 },
@@ -443,6 +463,10 @@ const ESCAdminDashboard = () => {
   useEffect(() => {
     if (activeTab === 'reports') {
       fetchCurrentReport();
+      // Also fetch security audit log for security tab
+      if (activeReportTab === 'security') {
+        fetchSecurityAuditLog();
+      }
     }
   }, [activeTab]);
 
@@ -452,6 +476,13 @@ const ESCAdminDashboard = () => {
       fetchCurrentReport();
     }
   }, [reportTimeRange]);
+
+  // Fetch security audit log when security tab is activated
+  useEffect(() => {
+    if (activeTab === 'reports' && activeReportTab === 'security') {
+      fetchSecurityAuditLog();
+    }
+  }, [activeReportTab]);
 
   // Auto-refresh reports every 10 minutes when reports tab is active
   useEffect(() => {
@@ -1149,6 +1180,80 @@ const ESCAdminDashboard = () => {
       console.error('Error exporting report:', error);
       alert('Failed to export report');
     }
+  };
+
+  // Enhanced Security Functions
+  const fetchMessageDetails = async (messageId) => {
+    setMessageDetailsLoading(true);
+    try {
+      const response = await api.get(`/admin/security/message/${messageId}`);
+      if (response.data.success) {
+        setMessageDetails(response.data.data);
+        setSelectedMessage(messageId);
+      }
+    } catch (error) {
+      console.error('Error fetching message details:', error);
+      alert('Failed to fetch message details');
+    } finally {
+      setMessageDetailsLoading(false);
+    }
+  };
+
+  const flagMessage = async () => {
+    try {
+      const response = await api.post(`/admin/security/flag-message/${selectedMessage}`, flagFormData);
+      if (response.data.success) {
+        alert('Message flagged successfully');
+        setFlagMessageModal(false);
+        setFlagFormData({ flag_reason: '', admin_notes: '', risk_level: 'medium' });
+        // Refresh security reports
+        fetchSecurityReports();
+      }
+    } catch (error) {
+      console.error('Error flagging message:', error);
+      alert('Failed to flag message');
+    }
+  };
+
+  const blockUser = async () => {
+    try {
+      const response = await api.post(`/admin/security/block-user/${selectedUserForBlock}`, blockFormData);
+      if (response.data.success) {
+        alert('User blocked successfully');
+        setBlockUserModal(false);
+        setBlockFormData({ block_reason: '', admin_notes: '', block_duration: 'temporary' });
+        setSelectedUserForBlock(null);
+        // Refresh security reports
+        fetchSecurityReports();
+      }
+    } catch (error) {
+      console.error('Error blocking user:', error);
+      alert('Failed to block user');
+    }
+  };
+
+  const fetchSecurityAuditLog = async () => {
+    setAuditLogLoading(true);
+    try {
+      const response = await api.get('/admin/security/audit-log?days=30');
+      if (response.data.success) {
+        setSecurityAuditLog(response.data.data.activities);
+      }
+    } catch (error) {
+      console.error('Error fetching audit log:', error);
+    } finally {
+      setAuditLogLoading(false);
+    }
+  };
+
+  const openFlagMessageModal = (message) => {
+    setSelectedMessage(message.message_id);
+    setFlagMessageModal(true);
+  };
+
+  const openBlockUserModal = (user) => {
+    setSelectedUserForBlock(user.user_id);
+    setBlockUserModal(true);
   };
 
   // Fetch visitor data for dashboard chart
@@ -3206,9 +3311,22 @@ const ESCAdminDashboard = () => {
                                         </td>
                                         <td>{new Date(message.sent_at).toLocaleDateString()}</td>
                                         <td>
-                                          <button className="btn btn-sm btn-outline-primary">
-                                            <i className="bi bi-eye"></i>
-                                          </button>
+                                          <div className="btn-group btn-group-sm">
+                                            <button 
+                                              className="btn btn-outline-primary"
+                                              onClick={() => fetchMessageDetails(message.message_id)}
+                                              title="View Details"
+                                            >
+                                              <i className="bi bi-eye"></i>
+                                            </button>
+                                            <button 
+                                              className="btn btn-outline-warning"
+                                              onClick={() => openFlagMessageModal(message)}
+                                              title="Flag Message"
+                                            >
+                                              <i className="bi bi-flag"></i>
+                                            </button>
+                                          </div>
                                         </td>
                                       </tr>
                                     ))}
@@ -3240,6 +3358,7 @@ const ESCAdminDashboard = () => {
                                       <th>CV Uploads</th>
                                       <th>Activity Flags</th>
                                       <th>Last Login</th>
+                                      <th>Actions</th>
                                     </tr>
                                   </thead>
                                   <tbody>
@@ -3277,6 +3396,84 @@ const ESCAdminDashboard = () => {
                                           )}
                                         </td>
                                         <td>{user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                                        <td>
+                                          <div className="btn-group btn-group-sm">
+                                            <button 
+                                              className="btn btn-outline-warning"
+                                              onClick={() => openBlockUserModal(user)}
+                                              title="Block User"
+                                              disabled={!user.is_active}
+                                            >
+                                              <i className="bi bi-person-x"></i>
+                                            </button>
+                                            <button 
+                                              className="btn btn-outline-info"
+                                              title="View Profile"
+                                            >
+                                              <i className="bi bi-person"></i>
+                                            </button>
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Security Audit Log */}
+                        <div className="col-12">
+                          <div className="card">
+                            <div className="card-header d-flex justify-content-between align-items-center">
+                              <h6 className="mb-0">
+                                <i className="bi bi-journal-text me-2 text-secondary"></i>
+                                Security Audit Log
+                              </h6>
+                              <button 
+                                className="btn btn-sm btn-outline-primary"
+                                onClick={fetchSecurityAuditLog}
+                                disabled={auditLogLoading}
+                              >
+                                {auditLogLoading ? 'Loading...' : 'Refresh'}
+                              </button>
+                            </div>
+                            <div className="card-body p-0">
+                              <div className="table-responsive">
+                                <table className="table table-hover mb-0">
+                                  <thead className="table-light">
+                                    <tr>
+                                      <th>Date</th>
+                                      <th>Event Type</th>
+                                      <th>Description</th>
+                                      <th>User</th>
+                                      <th>Details</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {securityAuditLog.slice(0, 20).map((activity, index) => (
+                                      <tr key={index}>
+                                        <td>{new Date(activity.activity_date).toLocaleString()}</td>
+                                        <td>
+                                          <span className={`badge ${
+                                            activity.activity_type === 'Message Flagged' ? 'bg-warning' :
+                                            activity.activity_type === 'User Blocked' ? 'bg-danger' :
+                                            activity.activity_type === 'Login Attempt' ? 'bg-info' :
+                                            'bg-secondary'
+                                          }`}>
+                                            {activity.activity_type}
+                                          </span>
+                                        </td>
+                                        <td>{activity.description}</td>
+                                        <td>
+                                          {activity.user_display_name || activity.user_email || 'System'}
+                                        </td>
+                                        <td>
+                                          <small className="text-muted">
+                                            {activity.details ? JSON.stringify(activity.details).substring(0, 50) + '...' : 'No details'}
+                                          </small>
+                                        </td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -4160,6 +4357,301 @@ const ESCAdminDashboard = () => {
                     </div>
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Security Modals */}
+      
+      {/* Message Details Modal */}
+      {messageDetails && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="bi bi-shield-check me-2 text-warning"></i>
+                  Message Security Analysis
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setMessageDetails(null)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                {messageDetailsLoading ? (
+                  <div className="text-center py-4">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="row">
+                    <div className="col-md-8">
+                      <h6>Message Content</h6>
+                      <div className="border rounded p-3 bg-light mb-3">
+                        <p className="mb-0">{messageDetails.message.content}</p>
+                      </div>
+                      
+                      <h6>Sender Information</h6>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <strong>Name:</strong> {messageDetails.message.sender_name}
+                        </div>
+                        <div className="col-md-6">
+                          <strong>Type:</strong> 
+                          <span className={`badge ms-2 ${
+                            messageDetails.message.sender_type === 'associate' ? 'bg-primary' :
+                            messageDetails.message.sender_type === 'freelancer' ? 'bg-success' : 'bg-secondary'
+                          }`}>
+                            {messageDetails.message.sender_type}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="row mt-2">
+                        <div className="col-md-6">
+                          <strong>Email:</strong> {messageDetails.message.sender_email}
+                        </div>
+                        <div className="col-md-6">
+                          <strong>Status:</strong> 
+                          <span className={`badge ms-2 ${messageDetails.message.sender_active ? 'bg-success' : 'bg-danger'}`}>
+                            {messageDetails.message.sender_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="col-md-4">
+                      <h6>Security Analysis</h6>
+                      <div className="mb-3">
+                        <strong>Risk Score:</strong>
+                        <div className="progress mt-1" style={{ height: '20px' }}>
+                          <div 
+                            className={`progress-bar ${
+                              messageDetails.security_analysis.risk_score >= 70 ? 'bg-danger' :
+                              messageDetails.security_analysis.risk_score >= 40 ? 'bg-warning' : 'bg-success'
+                          }`}
+                            style={{ width: `${messageDetails.security_analysis.risk_score}%` }}
+                          >
+                            {messageDetails.security_analysis.risk_score}/100
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-3">
+                        <strong>Content Flags:</strong>
+                        <div className="mt-1">
+                          {messageDetails.security_analysis.content_flags.map((flag, index) => (
+                            <span key={index} className="badge bg-info me-1 mb-1">{flag}</span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="mb-3">
+                        <strong>User Risk:</strong>
+                        <span className={`badge ms-2 ${
+                          messageDetails.security_analysis.user_risk_profile.level === 'high' ? 'bg-danger' :
+                          messageDetails.security_analysis.user_risk_profile.level === 'medium' ? 'bg-warning' : 'bg-success'
+                        }`}>
+                          {messageDetails.security_analysis.user_risk_profile.level.toUpperCase()}
+                        </span>
+                      </div>
+                      
+                      <div className="mb-3">
+                        <strong>Recommendations:</strong>
+                        <ul className="mt-1 small">
+                          {messageDetails.security_analysis.recommended_actions.map((rec, index) => (
+                            <li key={index}>{rec}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-warning"
+                  onClick={() => openFlagMessageModal(messageDetails.message)}
+                >
+                  <i className="bi bi-flag me-1"></i>
+                  Flag Message
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setMessageDetails(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Flag Message Modal */}
+      {flagMessageModal && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="bi bi-flag me-2 text-warning"></i>
+                  Flag Suspicious Message
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setFlagMessageModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label className="form-label">Flag Reason *</label>
+                  <select 
+                    className="form-select"
+                    value={flagFormData.flag_reason}
+                    onChange={(e) => setFlagFormData(prev => ({ ...prev, flag_reason: e.target.value }))}
+                  >
+                    <option value="">Select a reason</option>
+                    <option value="spam">Spam Content</option>
+                    <option value="suspicious_keywords">Suspicious Keywords</option>
+                    <option value="excessive_volume">Excessive Message Volume</option>
+                    <option value="inappropriate_content">Inappropriate Content</option>
+                    <option value="phishing_attempt">Phishing Attempt</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div className="mb-3">
+                  <label className="form-label">Risk Level *</label>
+                  <select 
+                    className="form-select"
+                    value={flagFormData.risk_level}
+                    onChange={(e) => setFlagFormData(prev => ({ ...prev, risk_level: e.target.value }))}
+                  >
+                    <option value="low">Low Risk</option>
+                    <option value="medium">Medium Risk</option>
+                    <option value="high">High Risk</option>
+                    <option value="critical">Critical Risk</option>
+                  </select>
+                </div>
+                
+                <div className="mb-3">
+                  <label className="form-label">Admin Notes</label>
+                  <textarea 
+                    className="form-control"
+                    rows="3"
+                    placeholder="Additional notes about this flag..."
+                    value={flagFormData.admin_notes}
+                    onChange={(e) => setFlagFormData(prev => ({ ...prev, admin_notes: e.target.value }))}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-warning"
+                  onClick={flagMessage}
+                  disabled={!flagFormData.flag_reason}
+                >
+                  <i className="bi bi-flag me-1"></i>
+                  Flag Message
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setFlagMessageModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Block User Modal */}
+      {blockUserModal && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <i className="bi bi-person-x me-2 text-danger"></i>
+                  Block User
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setBlockUserModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="mb-3">
+                  <label className="form-label">Block Reason *</label>
+                  <select 
+                    className="form-select"
+                    value={blockFormData.block_reason}
+                    onChange={(e) => setBlockFormData(prev => ({ ...prev, block_reason: e.target.value }))}
+                  >
+                    <option value="">Select a reason</option>
+                    <option value="spam_activity">Spam Activity</option>
+                    <option value="suspicious_behavior">Suspicious Behavior</option>
+                    <option value="inappropriate_content">Inappropriate Content</option>
+                    <option value="security_violation">Security Violation</option>
+                    <option value="terms_violation">Terms of Service Violation</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div className="mb-3">
+                  <label className="form-label">Block Duration *</label>
+                  <select 
+                    className="form-select"
+                    value={blockFormData.block_duration}
+                    onChange={(e) => setBlockFormData(prev => ({ ...prev, block_duration: e.target.value }))}
+                  >
+                    <option value="temporary">Temporary (24 hours)</option>
+                    <option value="7d">7 Days</option>
+                    <option value="30d">30 Days</option>
+                    <option value="permanent">Permanent</option>
+                  </select>
+                </div>
+                
+                <div className="mb-3">
+                  <label className="form-label">Admin Notes</label>
+                  <textarea 
+                    className="form-control"
+                    rows="3"
+                    placeholder="Additional notes about this block..."
+                    value={blockFormData.admin_notes}
+                    onChange={(e) => setBlockFormData(prev => ({ ...prev, admin_notes: e.target.value }))}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-danger"
+                  onClick={blockUser}
+                  disabled={!blockFormData.block_reason}
+                >
+                  <i className="bi bi-person-x me-1"></i>
+                  Block User
+                </button>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setBlockUserModal(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
