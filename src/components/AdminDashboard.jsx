@@ -155,6 +155,20 @@ const ESCAdminDashboard = () => {
     block_duration: 'temporary'
   });
 
+  // Security Alerts states
+  const [securityAlerts, setSecurityAlerts] = useState([]);
+  const [alertsLoading, setAlertsLoading] = useState(false);
+  const [alertsSummary, setAlertsSummary] = useState(null);
+  const [selectedAlert, setSelectedAlert] = useState(null);
+  const [acknowledgeModal, setAcknowledgeModal] = useState(false);
+  const [resolveModal, setResolveModal] = useState(false);
+  const [acknowledgeFormData, setAcknowledgeFormData] = useState({
+    admin_notes: ''
+  });
+  const [resolveFormData, setResolveFormData] = useState({
+    resolution_notes: ''
+  });
+
   // Chart data (static for now, will be real-time later)
   const chartData = [
     { date: "2024-04-01", desktop: 222, mobile: 150 },
