@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line } from 'recharts';
 
 const accent = '#fd680e';
 
@@ -114,6 +114,26 @@ const ESCAdminDashboard = () => {
   const [lastAnalyticsUpdate, setLastAnalyticsUpdate] = useState(null);
   const [visitorData, setVisitorData] = useState([]);
   const [visitorDataLoading, setVisitorDataLoading] = useState(false);
+
+  // Reports & Documentation states
+  const [reportsData, setReportsData] = useState({
+    security: null,
+    performance: null,
+    business: null
+  });
+  const [reportsLoading, setReportsLoading] = useState({
+    security: false,
+    performance: false,
+    business: false
+  });
+  const [reportsError, setReportsError] = useState({
+    security: '',
+    performance: '',
+    business: ''
+  });
+  const [activeReportTab, setActiveReportTab] = useState('security');
+  const [reportTimeRange, setReportTimeRange] = useState('30d');
+  const [lastReportsUpdate, setLastReportsUpdate] = useState(null);
 
   // Chart data (static for now, will be real-time later)
   const chartData = [
@@ -412,6 +432,38 @@ const ESCAdminDashboard = () => {
     }
     
     // Cleanup interval when component unmounts or tab changes
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [activeTab]);
+
+  // Fetch reports when reports tab is activated
+  useEffect(() => {
+    if (activeTab === 'reports') {
+      fetchCurrentReport();
+    }
+  }, [activeTab]);
+
+  // Refetch reports when time range changes
+  useEffect(() => {
+    if (activeTab === 'reports') {
+      fetchCurrentReport();
+    }
+  }, [reportTimeRange]);
+
+  // Auto-refresh reports every 10 minutes when reports tab is active
+  useEffect(() => {
+    let intervalId;
+    
+    if (activeTab === 'reports') {
+      intervalId = setInterval(() => {
+        console.log('🔄 Auto-refreshing reports data...');
+        fetchCurrentReport();
+      }, 10 * 60 * 1000);
+    }
+    
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
@@ -938,6 +990,165 @@ const ESCAdminDashboard = () => {
     }
     
     return data;
+  };
+
+  // Fetch security and communication reports
+  const fetchSecurityReports = async () => {
+    setReportsLoading(prev => ({ ...prev, security: true }));
+    setReportsError(prev => ({ ...prev, security: '' }));
+    
+    try {
+      const getDaysFromTimeRange = (range) => {
+        switch (range) {
+          case '7d': return 7;
+          case '30d': return 30;
+          case '90d': return 90;
+          default: return 30;
+        }
+      };
+      
+      const days = getDaysFromTimeRange(reportTimeRange);
+      const response = await api.get(`/admin/reports/security-communication?days=${days}&includeContent=true`);
+      
+      if (response.data.success) {
+        setReportsData(prev => ({ ...prev, security: response.data.data }));
+        setLastReportsUpdate(new Date());
+      } else {
+        setReportsError(prev => ({ ...prev, security: response.data.message }));
+      }
+    } catch (error) {
+      console.error('Error fetching security reports:', error);
+      setReportsError(prev => ({ ...prev, security: 'Failed to fetch security reports' }));
+    } finally {
+      setReportsLoading(prev => ({ ...prev, security: false }));
+    }
+  };
+
+  // Fetch system performance reports
+  const fetchPerformanceReports = async () => {
+    setReportsLoading(prev => ({ ...prev, performance: true }));
+    setReportsError(prev => ({ ...prev, performance: '' }));
+    
+    try {
+      const getDaysFromTimeRange = (range) => {
+        switch (range) {
+          case '7d': return 7;
+          case '30d': return 30;
+          case '90d': return 90;
+          default: return 30;
+        }
+      };
+      
+      const days = getDaysFromTimeRange(reportTimeRange);
+      const response = await api.get(`/admin/reports/system-performance?days=${days}`);
+      
+      if (response.data.success) {
+        setReportsData(prev => ({ ...prev, performance: response.data.data }));
+        setLastReportsUpdate(new Date());
+      } else {
+        setReportsError(prev => ({ ...prev, performance: response.data.message }));
+      }
+    } catch (error) {
+      console.error('Error fetching performance reports:', error);
+      setReportsError(prev => ({ ...prev, performance: 'Failed to fetch performance reports' }));
+    } finally {
+      setReportsLoading(prev => ({ ...prev, performance: false }));
+    }
+  };
+
+  // Fetch business intelligence reports
+  const fetchBusinessReports = async () => {
+    setReportsLoading(prev => ({ ...prev, business: true }));
+    setReportsError(prev => ({ ...prev, business: '' }));
+    
+    try {
+      const getDaysFromTimeRange = (range) => {
+        switch (range) {
+          case '7d': return 7;
+          case '30d': return 30;
+          case '90d': return 90;
+          default: return 90;
+        }
+      };
+      
+      const days = getDaysFromTimeRange(reportTimeRange);
+      const response = await api.get(`/admin/reports/business-intelligence?days=${days}`);
+      
+      if (response.data.success) {
+        setReportsData(prev => ({ ...prev, business: response.data.data }));
+        setLastReportsUpdate(new Date());
+      } else {
+        setReportsError(prev => ({ ...prev, business: response.data.message }));
+      }
+    } catch (error) {
+      console.error('Error fetching business reports:', error);
+      setReportsError(prev => ({ ...prev, business: 'Failed to fetch business reports' }));
+    } finally {
+      setReportsLoading(prev => ({ ...prev, business: false }));
+    }
+  };
+
+  // Fetch all reports for current tab
+  const fetchCurrentReport = () => {
+    switch (activeReportTab) {
+      case 'security':
+        fetchSecurityReports();
+        break;
+      case 'performance':
+        fetchPerformanceReports();
+        break;
+      case 'business':
+        fetchBusinessReports();
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Export report data
+  const exportReport = async (type, format = 'json') => {
+    try {
+      const getDaysFromTimeRange = (range) => {
+        switch (range) {
+          case '7d': return 7;
+          case '30d': return 30;
+          case '90d': return 90;
+          default: return 30;
+        }
+      };
+      
+      const days = getDaysFromTimeRange(reportTimeRange);
+      const response = await api.get(`/admin/reports/export/${type}?format=${format}&days=${days}`, {
+        responseType: format === 'csv' ? 'blob' : 'json'
+      });
+      
+      if (format === 'csv') {
+        // Download CSV file
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${type}_report_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } else {
+        // Download JSON file
+        const dataStr = JSON.stringify(response.data, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = window.URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${type}_report_${new Date().toISOString().split('T')[0]}.json`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Error exporting report:', error);
+      alert('Failed to export report');
+    }
   };
 
   // Fetch visitor data for dashboard chart
@@ -2777,14 +2988,558 @@ const ESCAdminDashboard = () => {
 
           {/* Reports Tab */}
           {activeTab === 'reports' && (
-            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Reports & Documentation</h5>
-              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Generate and view system reports</p>
-              
-              <div className="text-center py-5">
-                <i className="bi bi-file-earmark-text display-1 text-muted"></i>
-                <h6 className="text-muted mt-3">Reports Coming Soon</h6>
-                <p className="text-muted">Comprehensive reporting and documentation features will be available here</p>
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1400, margin: '0 auto' }}>
+              {/* Reports Header */}
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                  <h5 style={{ color: accent, fontWeight: 700, marginBottom: 8 }}>Reports & Documentation</h5>
+                  <p style={{ color: '#666', fontSize: 14, margin: 0 }}>Comprehensive system insights and security monitoring</p>
+                </div>
+                <div className="d-flex gap-2">
+                  <select 
+                    className="form-select form-select-sm" 
+                    style={{ width: '120px' }}
+                    value={reportTimeRange}
+                    onChange={(e) => setReportTimeRange(e.target.value)}
+                  >
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                    <option value="90d">Last 90 Days</option>
+                  </select>
+                  <button 
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={fetchCurrentReport}
+                    disabled={reportsLoading[activeReportTab]}
+                  >
+                    {reportsLoading[activeReportTab] ? 'Loading...' : 'Refresh'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Last Update Indicator */}
+              {lastReportsUpdate && (
+                <div className="text-muted mb-3" style={{ fontSize: '12px' }}>
+                  <i className="bi bi-clock me-1"></i>
+                  Last updated: {lastReportsUpdate.toLocaleString()}
+                </div>
+              )}
+
+              {/* Reports Navigation Tabs */}
+              <div className="nav nav-tabs mb-4" style={{ borderBottom: '2px solid #e5e7eb' }}>
+                <button
+                  className={`nav-link ${activeReportTab === 'security' ? 'active' : ''}`}
+                  onClick={() => setActiveReportTab('security')}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: activeReportTab === 'security' ? accent : '#6b7280',
+                    borderBottom: activeReportTab === 'security' ? `3px solid ${accent}` : 'none',
+                    padding: '12px 20px',
+                    fontWeight: 600,
+                    borderRadius: '0'
+                  }}
+                >
+                  <i className="bi bi-shield-check me-2"></i>
+                  Security & Communication
+                </button>
+                <button
+                  className={`nav-link ${activeReportTab === 'performance' ? 'active' : ''}`}
+                  onClick={() => setActiveReportTab('performance')}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: activeReportTab === 'performance' ? accent : '#6b7280',
+                    borderBottom: activeReportTab === 'performance' ? `3px solid ${accent}` : 'none',
+                    padding: '12px 20px',
+                    fontWeight: 600,
+                    borderRadius: '0'
+                  }}
+                >
+                  <i className="bi bi-speedometer2 me-2"></i>
+                  System Performance
+                </button>
+                <button
+                  className={`nav-link ${activeReportTab === 'business' ? 'active' : ''}`}
+                  onClick={() => setActiveReportTab('business')}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: activeReportTab === 'business' ? accent : '#6b7280',
+                    borderBottom: activeReportTab === 'business' ? `3px solid ${accent}` : 'none',
+                    padding: '12px 20px',
+                    fontWeight: 600,
+                    borderRadius: '0'
+                  }}
+                >
+                  <i className="bi bi-graph-up me-2"></i>
+                  Business Intelligence
+                </button>
+              </div>
+
+              {/* Reports Content */}
+              <div className="reports-content">
+                {/* Security & Communication Reports */}
+                {activeReportTab === 'security' && (
+                  <div className="security-reports">
+                    {reportsLoading.security ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <p className="mt-3 text-muted">Loading security reports...</p>
+                      </div>
+                    ) : reportsError.security ? (
+                      <div className="alert alert-danger" role="alert">
+                        <i className="bi bi-exclamation-triangle me-2"></i>
+                        {reportsError.security}
+                      </div>
+                    ) : reportsData.security ? (
+                      <div className="row g-4">
+                        {/* Security Summary Cards */}
+                        <div className="col-12">
+                          <div className="row g-3">
+                            <div className="col-md-2">
+                              <div className="bg-danger bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-danger mb-1">{reportsData.security.security_summary.high_risk_messages}</div>
+                                <small className="text-muted">High Risk Messages</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-warning bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-warning mb-1">{reportsData.security.security_summary.medium_risk_messages}</div>
+                                <small className="text-muted">Medium Risk</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-info bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-info mb-1">{reportsData.security.security_summary.suspicious_users}</div>
+                                <small className="text-muted">Suspicious Users</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-secondary bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-secondary mb-1">{reportsData.security.security_summary.inactive_users}</div>
+                                <small className="text-muted">Inactive Users</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-primary bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-primary mb-1">{reportsData.security.security_summary.total_messages_analyzed}</div>
+                                <small className="text-muted">Total Analyzed</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-success bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-success mb-1">{reportsData.security.security_summary.high_volume_users}</div>
+                                <small className="text-muted">High Volume</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Export Button */}
+                        <div className="col-12">
+                          <div className="d-flex justify-content-end gap-2">
+                            <button 
+                              className="btn btn-outline-success btn-sm"
+                              onClick={() => exportReport('security', 'json')}
+                            >
+                              <i className="bi bi-download me-1"></i>
+                              Export JSON
+                            </button>
+                            <button 
+                              className="btn btn-outline-success btn-sm"
+                              onClick={() => exportReport('security', 'csv')}
+                            >
+                              <i className="bi bi-file-earmark-spreadsheet me-1"></i>
+                              Export CSV
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Suspicious Messages Table */}
+                        <div className="col-12">
+                          <div className="card">
+                            <div className="card-header">
+                              <h6 className="mb-0">
+                                <i className="bi bi-exclamation-triangle me-2 text-warning"></i>
+                                Suspicious Messages Analysis
+                              </h6>
+                            </div>
+                            <div className="card-body p-0">
+                              <div className="table-responsive">
+                                <table className="table table-hover mb-0">
+                                  <thead className="table-light">
+                                    <tr>
+                                      <th>Risk Level</th>
+                                      <th>Sender</th>
+                                      <th>User Type</th>
+                                      <th>Content Flags</th>
+                                      <th>Date</th>
+                                      <th>Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {reportsData.security.suspicious_messages.slice(0, 10).map((message, index) => (
+                                      <tr key={index}>
+                                        <td>
+                                          <span className={`badge ${
+                                            message.risk_level === 'high_risk' ? 'bg-danger' :
+                                            message.risk_level === 'medium_risk' ? 'bg-warning' : 'bg-success'
+                                          }`}>
+                                            {message.risk_level.replace('_', ' ').toUpperCase()}
+                                          </span>
+                                        </td>
+                                        <td>{message.sender_name || 'Unknown'}</td>
+                                        <td>
+                                          <span className={`badge ${
+                                            message.user_type === 'associate' ? 'bg-primary' :
+                                            message.user_type === 'freelancer' ? 'bg-success' : 'bg-secondary'
+                                          }`}>
+                                            {message.user_type}
+                                          </span>
+                                        </td>
+                                        <td>
+                                          {message.content_flags !== 'normal' && (
+                                            <span className="badge bg-info">{message.content_flags}</span>
+                                          )}
+                                        </td>
+                                        <td>{new Date(message.sent_at).toLocaleDateString()}</td>
+                                        <td>
+                                          <button className="btn btn-sm btn-outline-primary">
+                                            <i className="bi bi-eye"></i>
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* User Behavior Analysis */}
+                        <div className="col-12">
+                          <div className="card">
+                            <div className="card-header">
+                              <h6 className="mb-0">
+                                <i className="bi bi-person-check me-2 text-info"></i>
+                                User Behavior Analysis
+                              </h6>
+                            </div>
+                            <div className="card-body p-0">
+                              <div className="table-responsive">
+                                <table className="table table-hover mb-0">
+                                  <thead className="table-light">
+                                    <tr>
+                                      <th>User</th>
+                                      <th>Type</th>
+                                      <th>Status</th>
+                                      <th>Messages</th>
+                                      <th>CV Uploads</th>
+                                      <th>Activity Flags</th>
+                                      <th>Last Login</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {reportsData.security.user_behavior.slice(0, 10).map((user, index) => (
+                                      <tr key={index}>
+                                        <td>
+                                          <div>
+                                            <div className="fw-medium">{user.display_name || user.email}</div>
+                                            <small className="text-muted">{user.email}</small>
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <span className={`badge ${
+                                            user.user_type === 'associate' ? 'bg-primary' :
+                                            user.user_type === 'freelancer' ? 'bg-success' : 'bg-secondary'
+                                          }`}>
+                                            {user.user_type}
+                                          </span>
+                                        </td>
+                                        <td>
+                                          <span className={`badge ${user.is_active ? 'bg-success' : 'bg-danger'}`}>
+                                            {user.is_active ? 'Active' : 'Inactive'}
+                                          </span>
+                                        </td>
+                                        <td>{user.total_messages}</td>
+                                        <td>{user.cv_uploads}</td>
+                                        <td>
+                                          {user.activity_flags !== 'normal_activity' && (
+                                            <span className={`badge ${
+                                              user.activity_flags === 'high_message_volume' ? 'bg-warning' :
+                                              user.activity_flags === 'inactive_user' ? 'bg-secondary' : 'bg-info'
+                                            }`}>
+                                              {user.activity_flags.replace('_', ' ')}
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td>{user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-5">
+                        <i className="bi bi-shield-check display-1 text-muted"></i>
+                        <h6 className="text-muted mt-3">No Security Data Available</h6>
+                        <p className="text-muted">Click refresh to load security reports</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* System Performance Reports */}
+                {activeReportTab === 'performance' && (
+                  <div className="performance-reports">
+                    {reportsLoading.performance ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <p className="mt-3 text-muted">Loading performance reports...</p>
+                      </div>
+                    ) : reportsError.performance ? (
+                      <div className="alert alert-danger" role="alert">
+                        <i className="bi bi-exclamation-triangle me-2"></i>
+                        {reportsError.performance}
+                      </div>
+                    ) : reportsData.performance ? (
+                      <div className="row g-4">
+                        {/* System Health Cards */}
+                        <div className="col-12">
+                          <div className="row g-3">
+                            <div className="col-md-2">
+                              <div className="bg-primary bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-primary mb-1">{reportsData.performance.system_health.total_users}</div>
+                                <small className="text-muted">Total Users</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-success bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-success mb-1">{reportsData.performance.system_health.active_users}</div>
+                                <small className="text-muted">Active Users</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-info bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-info mb-1">{reportsData.performance.system_health.total_cvs}</div>
+                                <small className="text-muted">Total CVs</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-warning bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-warning mb-1">{reportsData.performance.system_health.total_messages}</div>
+                                <small className="text-muted">Messages</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-secondary bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-secondary mb-1">{reportsData.performance.system_health.total_conversations}</div>
+                                <small className="text-muted">Conversations</small>
+                              </div>
+                            </div>
+                            <div className="col-md-2">
+                              <div className="bg-success bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-success mb-1">{reportsData.performance.system_health.system_uptime}</div>
+                                <small className="text-muted">Uptime</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Export Button */}
+                        <div className="col-12">
+                          <div className="d-flex justify-content-end gap-2">
+                            <button 
+                              className="btn btn-outline-success btn-sm"
+                              onClick={() => exportReport('performance', 'json')}
+                            >
+                              <i className="bi bi-download me-1"></i>
+                              Export JSON
+                            </button>
+                            <button 
+                              className="btn btn-outline-success btn-sm"
+                              onClick={() => exportReport('performance', 'csv')}
+                            >
+                              <i className="bi bi-file-earmark-spreadsheet me-1"></i>
+                              Export CSV
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* CV Performance Chart */}
+                        <div className="col-12">
+                          <div className="card">
+                            <div className="card-header">
+                              <h6 className="mb-0">
+                                <i className="bi bi-file-earmark-text me-2 text-primary"></i>
+                                CV Processing Performance
+                              </h6>
+                            </div>
+                            <div className="card-body">
+                              <div style={{ height: '300px' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <AreaChart data={reportsData.performance.cv_performance}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="date" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Area type="monotone" dataKey="total_uploads" stackId="1" stroke="#8884d8" fill="#8884d8" />
+                                    <Area type="monotone" dataKey="approved_cvs" stackId="1" stroke="#82ca9d" fill="#82ca9d" />
+                                    <Area type="monotone" dataKey="rejected_cvs" stackId="1" stroke="#ffc658" fill="#ffc658" />
+                                  </AreaChart>
+                                </ResponsiveContainer>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-5">
+                        <i className="bi bi-speedometer2 display-1 text-muted"></i>
+                        <h6 className="text-muted mt-3">No Performance Data Available</h6>
+                        <p className="text-muted">Click refresh to load performance reports</p>
+                      </div>
+                      )}
+                  </div>
+                )}
+
+                {/* Business Intelligence Reports */}
+                {activeReportTab === 'business' && (
+                  <div className="business-reports">
+                    {reportsLoading.business ? (
+                      <div className="text-center py-5">
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <p className="mt-3 text-muted">Loading business intelligence...</p>
+                      </div>
+                      ) : reportsError.business ? (
+                      <div className="alert alert-danger" role="alert">
+                        <i className="bi bi-exclamation-triangle me-2"></i>
+                        {reportsError.business}
+                      </div>
+                    ) : reportsData.business ? (
+                      <div className="row g-4">
+                        {/* Platform Usage Cards */}
+                        <div className="col-12">
+                          <div className="row g-3">
+                            <div className="col-md-3">
+                              <div className="bg-primary bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-primary mb-1">{reportsData.business.platform_usage.total_registered_users}</div>
+                                <small className="text-muted">Total Users</small>
+                              </div>
+                            </div>
+                            <div className="col-md-3">
+                              <div className="bg-success bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-success mb-1">{reportsData.business.platform_usage.monthly_active_users}</div>
+                                <small className="text-muted">Monthly Active</small>
+                              </div>
+                            </div>
+                            <div className="col-md-3">
+                              <div className="bg-info bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-info mb-1">{reportsData.business.platform_usage.cv_upload_success_rate}%</div>
+                                <small className="text-muted">CV Success Rate</small>
+                              </div>
+                            </div>
+                            <div className="col-md-3">
+                              <div className="bg-warning bg-opacity-10 rounded-3 p-3 text-center">
+                                <div className="h4 text-warning mb-1">{reportsData.business.platform_usage.user_satisfaction_score}</div>
+                                <small className="text-muted">Satisfaction Score</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Export Button */}
+                        <div className="col-12">
+                          <div className="d-flex justify-content-end gap-2">
+                            <button 
+                              className="btn btn-outline-success btn-sm"
+                              onClick={() => exportReport('business', 'json')}
+                            >
+                              <i className="bi bi-download me-1"></i>
+                              Export JSON
+                            </button>
+                            <button 
+                              className="btn btn-outline-success btn-sm"
+                              onClick={() => exportReport('business', 'csv')}
+                            >
+                              <i className="bi bi-file-earmark-spreadsheet me-1"></i>
+                              Export CSV
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Skill Demand Chart */}
+                        <div className="col-12">
+                          <div className="card">
+                            <div className="card-header">
+                              <h6 className="mb-0">
+                                <i className="bi bi-lightning me-2 text-warning"></i>
+                                Top Skills Demand Analysis
+                              </h6>
+                            </div>
+                            <div className="card-body">
+                              <div style={{ height: '400px' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <BarChart data={reportsData.business.skill_demand.slice(0, 15)}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="skill_name" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Bar dataKey="requests_requiring_skill" fill="#8884d8" />
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* User Growth Chart */}
+                        <div className="col-12">
+                          <div className="card">
+                            <div className="card-header">
+                              <h6 className="mb-0">
+                                <i className="bi bi-people me-2 text-success"></i>
+                                User Growth Trends
+                              </h6>
+                            </div>
+                            <div className="card-body">
+                              <div style={{ height: '300px' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <LineChart data={reportsData.business.user_growth}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="month" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Line type="monotone" dataKey="new_users" stroke="#8884d8" strokeWidth={2} />
+                                    <Line type="monotone" dataKey="new_associates" stroke="#82ca9d" strokeWidth={2} />
+                                    <Line type="monotone" dataKey="new_freelancers" stroke="#ffc658" strokeWidth={2} />
+                                  </LineChart>
+                                </ResponsiveContainer>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-5">
+                        <i className="bi bi-graph-up display-1 text-muted"></i>
+                        <h6 className="text-muted mt-3">No Business Data Available</h6>
+                        <p className="text-muted">Click refresh to load business intelligence</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
