@@ -111,6 +111,7 @@ const ESCAdminDashboard = () => {
   });
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState('');
+  const [lastAnalyticsUpdate, setLastAnalyticsUpdate] = useState(null);
 
   // Chart data (static for now, will be real-time later)
   const chartData = [
@@ -381,6 +382,8 @@ const ESCAdminDashboard = () => {
   useEffect(() => {
     if (activeTab === 'analytics') {
       fetchAnalyticsData();
+      // Set initial last update time
+      setLastAnalyticsUpdate(new Date());
     }
     // eslint-disable-next-line
   }, [activeTab]);
@@ -392,6 +395,26 @@ const ESCAdminDashboard = () => {
     }
     // eslint-disable-next-line
   }, [timeRange]);
+
+  // Auto-refresh analytics data every 5 minutes when analytics tab is active
+  useEffect(() => {
+    let intervalId;
+    
+    if (activeTab === 'analytics') {
+      // Set up auto-refresh every 5 minutes (300,000 milliseconds)
+      intervalId = setInterval(() => {
+        console.log('🔄 Auto-refreshing analytics data...');
+        fetchAnalyticsData();
+      }, 5 * 60 * 1000);
+    }
+    
+    // Cleanup interval when component unmounts or tab changes
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [activeTab]);
 
   // Fetch system stats on dashboard tab
   useEffect(() => {
@@ -863,6 +886,9 @@ const ESCAdminDashboard = () => {
           { user: 'Evidencia Chengeta', messages: 2, conversations: 1, fill: '#fd680e' }
         ]
       });
+      
+      // Update the last update timestamp
+      setLastAnalyticsUpdate(new Date());
     } finally {
       setAnalyticsLoading(false);
     }
@@ -2269,6 +2295,20 @@ const ESCAdminDashboard = () => {
                   </button>
                 </div>
               </div>
+              
+              {/* Last Update Indicator */}
+              {lastAnalyticsUpdate && (
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <small className="text-muted">
+                    <i className="bi bi-clock me-1"></i>
+                    Last updated: {lastAnalyticsUpdate.toLocaleTimeString()}
+                  </small>
+                  <small className="text-muted">
+                    <i className="bi bi-arrow-clockwise me-1"></i>
+                    Auto-refreshes every 5 minutes
+                  </small>
+                </div>
+              )}
               
               {analyticsError && (
                 <div className="alert alert-warning mb-4">
