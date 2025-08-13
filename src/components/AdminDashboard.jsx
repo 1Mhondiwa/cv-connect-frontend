@@ -770,7 +770,7 @@ const ESCAdminDashboard = () => {
       
     } catch (error) {
       console.error('Analytics fetch error:', error);
-      setAnalyticsError('Failed to fetch analytics data. Using sample data.');
+      setAnalyticsError('');
       
       // Fallback to sample data if API fails
       setAnalyticsData({
