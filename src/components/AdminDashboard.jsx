@@ -385,6 +385,14 @@ const ESCAdminDashboard = () => {
     // eslint-disable-next-line
   }, [activeTab]);
 
+  // Refetch analytics data when time range changes
+  useEffect(() => {
+    if (activeTab === 'analytics') {
+      fetchAnalyticsData();
+    }
+    // eslint-disable-next-line
+  }, [timeRange]);
+
   // Fetch system stats on dashboard tab
   useEffect(() => {
     if (activeTab === 'dashboard') {
@@ -747,18 +755,41 @@ const ESCAdminDashboard = () => {
     setAnalyticsError('');
     
     try {
-      // Fetch registration trends (last 6 months)
-      const registrationResponse = await api.get('/admin/analytics/registration-trends');
+      // Calculate days based on time range
+      const getDaysFromTimeRange = (range) => {
+        switch (range) {
+          case '30d': return 30;
+          case '90d': return 90;
+          case '6m': return 180;
+          case '1y': return 365;
+          default: return 30;
+        }
+      };
+      
+      const days = getDaysFromTimeRange(timeRange);
+      
+      // Fetch registration trends with time range parameter
+      const registrationResponse = await api.get(`/admin/analytics/registration-trends?days=${days}`);
       const userTypeResponse = await api.get('/admin/analytics/user-type-distribution');
       const userActivityResponse = await api.get('/admin/analytics/user-activity-status');
-      const cvUploadResponse = await api.get('/admin/analytics/cv-upload-trends');
+      const cvUploadResponse = await api.get(`/admin/analytics/cv-upload-trends?days=${days}`);
       const topSkillsResponse = await api.get('/admin/analytics/top-skills');
       const cvFileTypesResponse = await api.get('/admin/analytics/cv-file-types');
-      const messageTrendsResponse = await api.get('/admin/analytics/message-trends');
+      const messageTrendsResponse = await api.get(`/admin/analytics/message-trends?days=${days}`);
       const communicationActivityResponse = await api.get('/admin/analytics/user-communication-activity');
       
+      // Format the registration trends data to use proper dates
+      const formattedRegistrationTrends = (registrationResponse.data.data || []).map(item => ({
+        ...item,
+        // Format the date for display (e.g., "2024-01-15" -> "Jan 15")
+        formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric' 
+        })
+      }));
+      
       setAnalyticsData({
-        registrationTrends: registrationResponse.data.data || [],
+        registrationTrends: formattedRegistrationTrends,
         userTypeDistribution: userTypeResponse.data.data || [],
         userActivityStatus: userActivityResponse.data.data || [],
         cvUploadTrends: cvUploadResponse.data.data || [],
@@ -775,12 +806,12 @@ const ESCAdminDashboard = () => {
       // Fallback to sample data if API fails
       setAnalyticsData({
         registrationTrends: [
-          { month: 'Jan', users: 45, associates: 12, freelancers: 33 },
-          { month: 'Feb', users: 52, associates: 15, freelancers: 37 },
-          { month: 'Mar', users: 48, associates: 18, freelancers: 30 },
-          { month: 'Apr', users: 61, associates: 22, freelancers: 39 },
-          { month: 'May', users: 67, associates: 25, freelancers: 42 },
-          { month: 'Jun', users: 73, associates: 28, freelancers: 45 }
+          { date: '2024-01-01', formattedDate: 'Jan 1', users: 45, associates: 12, freelancers: 33 },
+          { date: '2024-01-02', formattedDate: 'Jan 2', users: 52, associates: 15, freelancers: 37 },
+          { date: '2024-01-03', formattedDate: 'Jan 3', users: 48, associates: 18, freelancers: 30 },
+          { date: '2024-01-04', formattedDate: 'Jan 4', users: 61, associates: 22, freelancers: 39 },
+          { date: '2024-01-05', formattedDate: 'Jan 5', users: 67, associates: 25, freelancers: 42 },
+          { date: '2024-01-06', formattedDate: 'Jan 6', users: 73, associates: 28, freelancers: 45 }
         ],
         userTypeDistribution: [
           { type: 'Freelancers', count: 226, fill: '#fd680e' },
@@ -793,12 +824,12 @@ const ESCAdminDashboard = () => {
           { status: 'Pending', count: 8, fill: '#f59e0b' }
         ],
         cvUploadTrends: [
-          { month: 'Jan', uploads: 28, approved: 25, rejected: 3 },
-          { month: 'Feb', uploads: 35, approved: 32, rejected: 3 },
-          { month: 'Mar', uploads: 31, approved: 28, rejected: 3 },
-          { month: 'Apr', uploads: 42, approved: 38, rejected: 4 },
-          { month: 'May', uploads: 48, approved: 44, rejected: 4 },
-          { month: 'Jun', uploads: 55, approved: 50, rejected: 5 }
+          { date: '2024-01-01', uploads: 28, approved: 25, rejected: 3 },
+          { date: '2024-01-02', uploads: 35, approved: 32, rejected: 3 },
+          { date: '2024-01-03', uploads: 31, approved: 28, rejected: 3 },
+          { date: '2024-01-04', uploads: 42, approved: 38, rejected: 4 },
+          { date: '2024-01-05', uploads: 48, approved: 44, rejected: 4 },
+          { date: '2024-01-06', uploads: 55, approved: 50, rejected: 5 }
         ],
         topSkills: [
           { skill: 'JavaScript', count: 89, fill: '#fd680e' },
@@ -815,12 +846,12 @@ const ESCAdminDashboard = () => {
           { type: 'TXT', count: 12, fill: '#f59e0b' }
         ],
         messageTrends: [
-          { month: 'Jan', messages: 156, conversations: 23 },
-          { month: 'Feb', messages: 189, conversations: 28 },
-          { month: 'Mar', messages: 167, conversations: 25 },
-          { month: 'Apr', messages: 234, conversations: 34 },
-          { month: 'May', messages: 278, conversations: 41 },
-          { month: 'Jun', messages: 312, conversations: 47 }
+          { date: '2024-01-01', messages: 156, conversations: 23 },
+          { date: '2024-01-02', messages: 189, conversations: 28 },
+          { date: '2024-01-03', messages: 167, conversations: 25 },
+          { date: '2024-01-04', messages: 234, conversations: 34 },
+          { date: '2024-01-05', messages: 278, conversations: 41 },
+          { date: '2024-01-06', messages: 312, conversations: 47 }
         ],
         userCommunicationActivity: [
           { user: 'John Doe', messages: 45, conversations: 8, fill: '#fd680e' },
@@ -2254,44 +2285,59 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <AreaChart data={analyticsData.registrationTrends}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis dataKey="month" stroke="#666" />
-                          <YAxis stroke="#666" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#fff', 
-                              border: '1px solid #ddd',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="users" 
-                            stackId="1" 
-                            stroke="#fd680e" 
-                            fill="#fd680e" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="associates" 
-                            stackId="1" 
-                            stroke="#10b981" 
-                            fill="#10b981" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="freelancers" 
-                            stackId="1" 
-                            stroke="#3b82f6" 
-                            fill="#3b82f6" 
-                            fillOpacity={0.6}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      {analyticsLoading ? (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                          <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      ) : analyticsData.registrationTrends.length === 0 ? (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                          <div className="text-center text-muted">
+                            <i className="bi bi-graph-up display-4"></i>
+                            <p className="mt-2">No registration data available for the selected time period</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <AreaChart data={analyticsData.registrationTrends}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="formattedDate" stroke="#666" />
+                            <YAxis stroke="#666" />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#fff', 
+                                border: '1px solid #ddd',
+                                borderRadius: '8px'
+                              }}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="users" 
+                              stackId="1" 
+                              stroke="#fd680e" 
+                              fill="#fd680e" 
+                              fillOpacity={0.6}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="associates" 
+                              stackId="1" 
+                              stroke="#10b981" 
+                              fill="#10b981" 
+                              fillOpacity={0.6}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="freelancers" 
+                              stackId="1" 
+                              stroke="#3b82f6" 
+                              fill="#3b82f6" 
+                              fillOpacity={0.6}
+                            />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -2372,7 +2418,7 @@ const ESCAdminDashboard = () => {
                       <ResponsiveContainer width="100%" height={300}>
                         <AreaChart data={analyticsData.cvUploadTrends}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis dataKey="month" stroke="#666" />
+                          <XAxis dataKey="date" stroke="#666" />
                           <YAxis stroke="#666" />
                           <Tooltip 
                             contentStyle={{ 
@@ -2490,7 +2536,7 @@ const ESCAdminDashboard = () => {
                       <ResponsiveContainer width="100%" height={300}>
                         <AreaChart data={analyticsData.messageTrends}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis dataKey="month" stroke="#666" />
+                          <XAxis dataKey="date" stroke="#666" />
                           <YAxis stroke="#666" />
                           <Tooltip 
                             contentStyle={{ 
