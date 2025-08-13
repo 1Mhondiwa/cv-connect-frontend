@@ -2236,7 +2236,7 @@ const ESCAdminDashboard = () => {
                   </button>
                 </div>
               </div>
-
+              
               {analyticsError && (
                 <div className="alert alert-warning mb-4">
                   <i className="bi bi-exclamation-triangle me-2"></i>
