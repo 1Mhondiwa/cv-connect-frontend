@@ -856,11 +856,11 @@ const ESCAdminDashboard = () => {
           { date: '2025-08-11', messages: 45, conversations: 13 }
         ],
         userCommunicationActivity: [
-          { user: 'John Doe', messages: 12, conversations: 3, fill: '#fd680e' },
-          { user: 'Jane Smith', messages: 10, conversations: 2, fill: '#10b981' },
-          { user: 'Bob Johnson', messages: 8, conversations: 2, fill: '#3b82f6' },
-          { user: 'Alice Brown', messages: 6, conversations: 1, fill: '#8b5cf6' },
-          { user: 'Mike Wilson', messages: 5, conversations: 1, fill: '#f59e0b' }
+          { user: 'josh', messages: 6, conversations: 2, fill: '#10b981' },
+          { user: 'Gunna Wunna', messages: 5, conversations: 2, fill: '#10b981' },
+          { user: 'Jane Smith', messages: 3, conversations: 1, fill: '#10b981' },
+          { user: 'Natasha Joy', messages: 2, conversations: 1, fill: '#10b981' },
+          { user: 'Evidencia Chengeta', messages: 2, conversations: 1, fill: '#fd680e' }
         ]
       });
     } finally {
