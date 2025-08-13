@@ -2386,8 +2386,8 @@ const ESCAdminDashboard = () => {
                             </div>
                           </div>
                         ) : (
-                          <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={filteredChartData}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={filteredChartData}>
                             <defs>
                               <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor={accent} stopOpacity={1.0} />
@@ -2874,44 +2874,44 @@ const ESCAdminDashboard = () => {
                           </div>
                         </div>
                       ) : (
-                        <ResponsiveContainer width="100%" height={300}>
-                          <AreaChart data={analyticsData.registrationTrends}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={analyticsData.registrationTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis dataKey="formattedDate" stroke="#666" />
-                            <YAxis stroke="#666" />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: '#fff', 
-                                border: '1px solid #ddd',
-                                borderRadius: '8px'
-                              }}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="users" 
-                              stackId="1" 
-                              stroke="#fd680e" 
-                              fill="#fd680e" 
-                              fillOpacity={0.6}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="associates" 
-                              stackId="1" 
-                              stroke="#10b981" 
-                              fill="#10b981" 
-                              fillOpacity={0.6}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="freelancers" 
-                              stackId="1" 
-                              stroke="#3b82f6" 
-                              fill="#3b82f6" 
-                              fillOpacity={0.6}
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="users" 
+                            stackId="1" 
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="associates" 
+                            stackId="1" 
+                            stroke="#10b981" 
+                            fill="#10b981" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="freelancers" 
+                            stackId="1" 
+                            stroke="#3b82f6" 
+                            fill="#3b82f6" 
+                            fillOpacity={0.6}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
                       )}
                     </div>
                   </div>
@@ -3286,12 +3286,12 @@ const ESCAdminDashboard = () => {
                 {activeReportTab === 'security' && (
                   <div className="security-reports">
                     {reportsLoading.security ? (
-                      <div className="text-center py-5">
+              <div className="text-center py-5">
                         <div className="spinner-border text-primary" role="status">
                           <span className="visually-hidden">Loading...</span>
-                        </div>
+              </div>
                         <p className="mt-3 text-muted">Loading security reports...</p>
-                      </div>
+            </div>
                     ) : reportsError.security ? (
                       <div className="alert alert-danger" role="alert">
                         <i className="bi bi-exclamation-triangle me-2"></i>
