@@ -806,59 +806,61 @@ const ESCAdminDashboard = () => {
       // Fallback to sample data if API fails
       setAnalyticsData({
         registrationTrends: [
-          { date: '2024-01-01', formattedDate: 'Jan 1', users: 45, associates: 12, freelancers: 33 },
-          { date: '2024-01-02', formattedDate: 'Jan 2', users: 52, associates: 15, freelancers: 37 },
-          { date: '2024-01-03', formattedDate: 'Jan 3', users: 48, associates: 18, freelancers: 30 },
-          { date: '2024-01-04', formattedDate: 'Jan 4', users: 61, associates: 22, freelancers: 39 },
-          { date: '2024-01-05', formattedDate: 'Jan 5', users: 67, associates: 25, freelancers: 42 },
-          { date: '2024-01-06', formattedDate: 'Jan 6', users: 73, associates: 28, freelancers: 45 }
+          { date: '2025-06-19', formattedDate: 'Jun 19', users: 9, associates: 2, freelancers: 6, admins: 1 },
+          { date: '2025-06-20', formattedDate: 'Jun 20', users: 12, associates: 3, freelancers: 8, admins: 1 },
+          { date: '2025-06-21', formattedDate: 'Jun 21', users: 15, associates: 4, freelancers: 10, admins: 1 },
+          { date: '2025-07-01', formattedDate: 'Jul 1', users: 18, associates: 5, freelancers: 12, admins: 1 },
+          { date: '2025-07-15', formattedDate: 'Jul 15', users: 25, associates: 6, freelancers: 16, admins: 3 },
+          { date: '2025-07-31', formattedDate: 'Jul 31', users: 30, associates: 7, freelancers: 20, admins: 3 },
+          { date: '2025-08-01', formattedDate: 'Aug 1', users: 35, associates: 9, freelancers: 22, admins: 4 },
+          { date: '2025-08-11', formattedDate: 'Aug 11', users: 52, associates: 20, freelancers: 28, admins: 4 }
         ],
         userTypeDistribution: [
-          { type: 'Freelancers', count: 226, fill: '#fd680e' },
-          { type: 'Associates', count: 120, fill: '#10b981' },
-          { type: 'Admins', count: 5, fill: '#3b82f6' }
+          { type: 'Freelancers', count: 28, fill: '#fd680e' },
+          { type: 'Associates', count: 20, fill: '#10b981' },
+          { type: 'Admins', count: 4, fill: '#3b82f6' }
         ],
         userActivityStatus: [
-          { status: 'Active', count: 298, fill: '#10b981' },
-          { status: 'Inactive', count: 45, fill: '#6b7280' },
-          { status: 'Pending', count: 8, fill: '#f59e0b' }
+          { status: 'Active', count: 52, fill: '#10b981' },
+          { status: 'Inactive', count: 0, fill: '#6b7280' },
+          { status: 'Pending', count: 0, fill: '#f59e0b' }
         ],
         cvUploadTrends: [
-          { date: '2024-01-01', uploads: 28, approved: 25, rejected: 3 },
-          { date: '2024-01-02', uploads: 35, approved: 32, rejected: 3 },
-          { date: '2024-01-03', uploads: 31, approved: 28, rejected: 3 },
-          { date: '2024-01-04', uploads: 42, approved: 38, rejected: 4 },
-          { date: '2024-01-05', uploads: 48, approved: 44, rejected: 4 },
-          { date: '2024-01-06', uploads: 55, approved: 50, rejected: 5 }
+          { date: '2025-06-19', uploads: 5, approved: 4, rejected: 1 },
+          { date: '2025-06-25', uploads: 8, approved: 7, rejected: 1 },
+          { date: '2025-07-01', uploads: 12, approved: 11, rejected: 1 },
+          { date: '2025-07-15', uploads: 15, approved: 14, rejected: 1 },
+          { date: '2025-07-31', uploads: 18, approved: 17, rejected: 1 },
+          { date: '2025-08-11', uploads: 22, approved: 21, rejected: 1 }
         ],
         topSkills: [
-          { skill: 'JavaScript', count: 89, fill: '#fd680e' },
-          { skill: 'React', count: 76, fill: '#10b981' },
-          { skill: 'Python', count: 65, fill: '#3b82f6' },
-          { skill: 'Node.js', count: 58, fill: '#8b5cf6' },
-          { skill: 'SQL', count: 52, fill: '#f59e0b' },
-          { skill: 'AWS', count: 45, fill: '#ef4444' }
+          { skill: 'JavaScript', count: 18, fill: '#fd680e' },
+          { skill: 'React', count: 15, fill: '#10b981' },
+          { skill: 'Python', count: 12, fill: '#3b82f6' },
+          { skill: 'Node.js', count: 10, fill: '#8b5cf6' },
+          { skill: 'SQL', count: 8, fill: '#f59e0b' },
+          { skill: 'AWS', count: 6, fill: '#ef4444' }
         ],
         cvFileTypes: [
-          { type: 'PDF', count: 156, fill: '#ef4444' },
-          { type: 'DOCX', count: 89, fill: '#3b82f6' },
-          { type: 'DOC', count: 34, fill: '#10b981' },
-          { type: 'TXT', count: 12, fill: '#f59e0b' }
+          { type: 'PDF', count: 15, fill: '#ef4444' },
+          { type: 'DOCX', count: 8, fill: '#3b82f6' },
+          { type: 'DOC', count: 3, fill: '#10b981' },
+          { type: 'TXT', count: 1, fill: '#f59e0b' }
         ],
         messageTrends: [
-          { date: '2024-01-01', messages: 156, conversations: 23 },
-          { date: '2024-01-02', messages: 189, conversations: 28 },
-          { date: '2024-01-03', messages: 167, conversations: 25 },
-          { date: '2024-01-04', messages: 234, conversations: 34 },
-          { date: '2024-01-05', messages: 278, conversations: 41 },
-          { date: '2024-01-06', messages: 312, conversations: 47 }
+          { date: '2025-06-19', messages: 12, conversations: 3 },
+          { date: '2025-06-25', messages: 18, conversations: 5 },
+          { date: '2025-07-01', messages: 25, conversations: 7 },
+          { date: '2025-07-15', messages: 32, conversations: 9 },
+          { date: '2025-07-31', messages: 38, conversations: 11 },
+          { date: '2025-08-11', messages: 45, conversations: 13 }
         ],
         userCommunicationActivity: [
-          { user: 'John Doe', messages: 45, conversations: 8, fill: '#fd680e' },
-          { user: 'Jane Smith', messages: 38, conversations: 6, fill: '#10b981' },
-          { user: 'Bob Johnson', messages: 32, conversations: 5, fill: '#3b82f6' },
-          { user: 'Alice Brown', messages: 28, conversations: 4, fill: '#8b5cf6' },
-          { user: 'Mike Wilson', messages: 25, conversations: 3, fill: '#f59e0b' }
+          { user: 'John Doe', messages: 12, conversations: 3, fill: '#fd680e' },
+          { user: 'Jane Smith', messages: 10, conversations: 2, fill: '#10b981' },
+          { user: 'Bob Johnson', messages: 8, conversations: 2, fill: '#3b82f6' },
+          { user: 'Alice Brown', messages: 6, conversations: 1, fill: '#8b5cf6' },
+          { user: 'Mike Wilson', messages: 5, conversations: 1, fill: '#f59e0b' }
         ]
       });
     } finally {
