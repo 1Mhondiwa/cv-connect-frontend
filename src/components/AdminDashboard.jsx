@@ -1270,6 +1270,91 @@ const ESCAdminDashboard = () => {
     setBlockUserModal(true);
   };
 
+  // Security Alerts Functions
+  const fetchSecurityAlerts = async (status = 'active') => {
+    setAlertsLoading(true);
+    try {
+      const response = await api.get(`/admin/security/alerts?status=${status}`);
+      if (response.data.success) {
+        setSecurityAlerts(response.data.data.alerts);
+      }
+    } catch (error) {
+      console.error('Error fetching security alerts:', error);
+    } finally {
+      setAlertsLoading(false);
+    }
+  };
+
+  const fetchAlertsSummary = async () => {
+    try {
+      const response = await api.get('/admin/security/alerts/summary');
+      if (response.data.success) {
+        setAlertsSummary(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching alerts summary:', error);
+    }
+  };
+
+  const runSecurityScan = async () => {
+    try {
+      const response = await api.post('/admin/security/scan');
+      if (response.data.success) {
+        alert(`Security scan completed! Generated ${response.data.data.alerts_generated.length} new alerts.`);
+        // Refresh alerts and summary
+        fetchSecurityAlerts();
+        fetchAlertsSummary();
+      }
+    } catch (error) {
+      console.error('Error running security scan:', error);
+      alert('Failed to run security scan');
+    }
+  };
+
+  const acknowledgeAlert = async () => {
+    try {
+      const response = await api.put(`/admin/security/alerts/${selectedAlert.alert_id}/acknowledge`, acknowledgeFormData);
+      if (response.data.success) {
+        alert('Alert acknowledged successfully');
+        setAcknowledgeModal(false);
+        setAcknowledgeFormData({ admin_notes: '' });
+        // Refresh alerts
+        fetchSecurityAlerts();
+        fetchAlertsSummary();
+      }
+    } catch (error) {
+      console.error('Error acknowledging alert:', error);
+      alert('Failed to acknowledge alert');
+    }
+  };
+
+  const resolveAlert = async () => {
+    try {
+      const response = await api.put(`/admin/security/alerts/${selectedAlert.alert_id}/resolve`, resolveFormData);
+      if (response.data.success) {
+        alert('Alert resolved successfully');
+        setResolveModal(false);
+        setResolveFormData({ resolution_notes: '' });
+        // Refresh alerts
+        fetchSecurityAlerts();
+        fetchAlertsSummary();
+      }
+    } catch (error) {
+      console.error('Error resolving alert:', error);
+      alert('Failed to resolve alert');
+    }
+  };
+
+  const openAcknowledgeModal = (alert) => {
+    setSelectedAlert(alert);
+    setAcknowledgeModal(true);
+  };
+
+  const openResolveModal = (alert) => {
+    setSelectedAlert(alert);
+    setResolveModal(true);
+  };
+
   // Fetch visitor data for dashboard chart
   const fetchVisitorData = async () => {
     setVisitorDataLoading(true);
