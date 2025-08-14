@@ -161,6 +161,18 @@ const ESCAdminDashboard = () => {
   const [reportsError, setReportsError] = useState('');
   const [lastReportUpdate, setLastReportUpdate] = useState(null);
 
+  // Enhanced Security Monitoring state
+  const [activeSecuritySection, setActiveSecuritySection] = useState(null);
+  const [securityData, setSecurityData] = useState({
+    dashboard: null,
+    communications: null,
+    audit: null,
+    threats: null
+  });
+  const [securityLoading, setSecurityLoading] = useState(false);
+  const [securityError, setSecurityError] = useState('');
+  const [lastSecurityUpdate, setLastSecurityUpdate] = useState(null);
+
   const [recommendationNotes, setRecommendationNotes] = useState('');
   const [submittingRecommendations, setSubmittingRecommendations] = useState(false);
   const [dataTableData, setDataTableData] = useState([
@@ -1019,24 +1031,7 @@ const ESCAdminDashboard = () => {
     ]
   });
 
-  const generateFallbackSecurityData = () => ({
-    securityOverview: {
-      totalThreats: 3,
-      blockedAttempts: 12,
-      securityScore: 'A+',
-      lastAudit: '2 days ago'
-    },
-    communicationMonitoring: {
-      totalMessages: 156,
-      flaggedMessages: 2,
-      suspiciousUsers: 1,
-      complianceScore: '98.5%'
-    },
-    recentAlerts: [
-      { alert: 'Suspicious login attempt detected', severity: 'medium', timestamp: '3 hours ago' },
-      { alert: 'Unusual message pattern detected', severity: 'low', timestamp: '1 day ago' }
-    ]
-  });
+
 
   const generateFallbackOperationsData = () => ({
     workflowEfficiency: {
@@ -1082,6 +1077,133 @@ const ESCAdminDashboard = () => {
     } catch (error) {
       console.error('❌ Error exporting report data:', error);
       alert('Failed to export report data. Please try again.');
+    }
+  };
+
+  // Enhanced Security Monitoring Functions
+  const fetchSecurityData = async (section) => {
+    setSecurityLoading(true);
+    setSecurityError('');
+    try {
+      console.log(`🔒 Fetching security data for section: ${section}`);
+      
+      let response;
+      switch (section) {
+        case 'dashboard':
+          response = await api.get('/admin/security/dashboard');
+          break;
+        case 'communications':
+          response = await api.get('/admin/security/communications');
+          break;
+        case 'audit':
+          response = await api.get('/admin/security/audit-log');
+          break;
+        case 'threats':
+          response = await api.get('/admin/security/threat-intelligence');
+          break;
+        default:
+          throw new Error('Invalid security section');
+      }
+
+      if (response.data.success) {
+        setSecurityData(prev => ({
+          ...prev,
+          [section]: response.data.data
+        }));
+        setLastSecurityUpdate(new Date());
+        console.log(`✅ Security data fetched for ${section}`);
+      } else {
+        throw new Error(response.data.message || 'Failed to fetch security data');
+      }
+    } catch (error) {
+      console.error(`❌ Error fetching security data for ${section}:`, error);
+      setSecurityError(`Failed to fetch ${section} data: ${error.message}`);
+      
+      // Set fallback data for demonstration
+      setSecurityData(prev => ({
+        ...prev,
+        [section]: generateFallbackSecurityData(section)
+      }));
+    } finally {
+      setSecurityLoading(false);
+    }
+  };
+
+  const generateFallbackSecurityData = (section) => {
+    switch (section) {
+      case 'dashboard':
+        return {
+          realTimeMetrics: {
+            totalUsers: 52,
+            activeUsers24h: 41,
+            activeUsers7d: 48,
+            suspiciousUsers: 1
+          },
+          recentLogins: [
+            { user: 'admin@cvconnect.com', timestamp: '2 minutes ago', ip: '192.168.1.1', status: 'success' },
+            { user: 'john.doe@company.com', timestamp: '5 minutes ago', ip: '192.168.1.100', status: 'success' }
+          ],
+          communicationThreats: {
+            totalMessages: 156,
+            spamMessages: 2,
+            suspiciousMessages: 1,
+            inappropriateMessages: 0
+          },
+          threatLevel: 'LOW',
+          lastUpdated: new Date().toISOString()
+        };
+      case 'communications':
+        return {
+          patterns: [],
+          topCommunicators: [],
+          flaggedMessages: [],
+          analysisPeriod: '7 days',
+          userTypeFilter: 'All Users'
+        };
+      case 'audit':
+        return {
+          logEntries: [],
+          totalEntries: 0,
+          analysisPeriod: '30 days',
+          actionFilter: 'All Actions'
+        };
+      case 'threats':
+        return {
+          messageThreats: { spam: 0, scam: 0, phishing: 0, suspicious: 0 },
+          ipThreats: [],
+          userAnomalies: [],
+          overallThreatLevel: 'LOW',
+          recommendations: []
+        };
+      default:
+        return null;
+    }
+  };
+
+  const flagMessage = async (messageId, flagReason, adminNotes) => {
+    try {
+      console.log(`🚩 Flagging message ${messageId} with reason: ${flagReason}`);
+      
+      const response = await api.post('/admin/security/flag-message', {
+        messageId,
+        flagReason,
+        adminNotes
+      });
+
+      if (response.data.success) {
+        console.log('✅ Message flagged successfully');
+        // Refresh communications data
+        if (activeSecuritySection === 'communications') {
+          fetchSecurityData('communications');
+        }
+        return true;
+      } else {
+        throw new Error(response.data.message || 'Failed to flag message');
+      }
+    } catch (error) {
+      console.error('❌ Error flagging message:', error);
+      alert(`Failed to flag message: ${error.message}`);
+      return false;
     }
   };
 
@@ -2068,8 +2190,8 @@ const ESCAdminDashboard = () => {
                             </div>
                           </div>
                         ) : (
-                          <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={filteredChartData}>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <AreaChart data={filteredChartData}>
                             <defs>
                               <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor={accent} stopOpacity={1.0} />
@@ -2556,44 +2678,44 @@ const ESCAdminDashboard = () => {
                           </div>
                         </div>
                       ) : (
-                        <ResponsiveContainer width="100%" height={300}>
-                          <AreaChart data={analyticsData.registrationTrends}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={analyticsData.registrationTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis dataKey="formattedDate" stroke="#666" />
-                            <YAxis stroke="#666" />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: '#fff', 
-                                border: '1px solid #ddd',
-                                borderRadius: '8px'
-                              }}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="users" 
-                              stackId="1" 
-                              stroke="#fd680e" 
-                              fill="#fd680e" 
-                              fillOpacity={0.6}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="associates" 
-                              stackId="1" 
-                              stroke="#10b981" 
-                              fill="#10b981" 
-                              fillOpacity={0.6}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="freelancers" 
-                              stackId="1" 
-                              stroke="#3b82f6" 
-                              fill="#3b82f6" 
-                              fillOpacity={0.6}
-                            />
-                          </AreaChart>
-                        </ResponsiveContainer>
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="users" 
+                            stackId="1" 
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="associates" 
+                            stackId="1" 
+                            stroke="#10b981" 
+                            fill="#10b981" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="freelancers" 
+                            stackId="1" 
+                            stroke="#3b82f6" 
+                            fill="#3b82f6" 
+                            fillOpacity={0.6}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
                       )}
                     </div>
                   </div>
@@ -2997,11 +3119,11 @@ const ESCAdminDashboard = () => {
 
               {/* Default View */}
               {!activeReportSection && (
-                <div className="text-center py-5">
-                  <i className="bi bi-file-earmark-text display-1 text-muted"></i>
+              <div className="text-center py-5">
+                <i className="bi bi-file-earmark-text display-1 text-muted"></i>
                   <h6 className="text-muted mt-3">Select a Report Category</h6>
                   <p className="text-muted">Choose from the categories above to view detailed reports and insights</p>
-                </div>
+              </div>
               )}
             </div>
           )}
@@ -3866,126 +3988,65 @@ const ESCAdminDashboard = () => {
         </div>
       )}
 
-      {/* Security & Compliance Report Component */}
+      {/* Enhanced Security & Compliance Report Component */}
       {activeReportSection === 'security' && (
         <div className="bg-white rounded-4 shadow-sm p-4 mt-4">
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h6 style={{ color: '#ef4444', fontWeight: 600 }}>Security & Compliance Report</h6>
-            <small className="text-muted">
-              <i className="bi bi-clock me-1"></i>
-              {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
-            </small>
-          </div>
-          
-          {reportsData.security ? (
-            <div className="row g-4">
-              {/* Security Overview */}
-              <div className="col-md-6">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-danger text-white">
-                    <h6 className="mb-0"><i className="bi bi-shield-check me-2"></i>Security Overview</h6>
-                  </div>
-                  <div className="card-body">
-                    <div className="row text-center">
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4 text-danger mb-1">{reportsData.security.securityOverview.totalThreats}</div>
-                          <small className="text-muted">Total Threats</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4 text-success mb-1">{reportsData.security.securityOverview.blockedAttempts}</div>
-                          <small className="text-muted">Blocked Attempts</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4 text-warning mb-1">{reportsData.security.securityOverview.securityScore}</div>
-                          <small className="text-muted">Security Score</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4 text-info mb-1">{reportsData.security.securityOverview.lastAudit}</div>
-                          <small className="text-muted">Last Audit</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Communication Monitoring */}
-              <div className="col-md-6">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-warning text-dark">
-                    <h6 className="mb-0"><i className="bi bi-chat-dots me-2"></i>Communication Monitoring</h6>
-                  </div>
-                  <div className="card-body">
-                    <div className="row text-center">
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4 text-info mb-1">{reportsData.security.communicationMonitoring.totalMessages}</div>
-                          <small className="text-muted">Total Messages</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4 text-warning mb-1">{reportsData.security.communicationMonitoring.flaggedMessages}</div>
-                          <small className="text-muted">Flagged Messages</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4 text-danger mb-1">{reportsData.security.communicationMonitoring.suspiciousUsers}</div>
-                          <small className="text-muted">Suspicious Users</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4 text-success mb-1">{reportsData.security.communicationMonitoring.complianceScore}</div>
-                          <small className="text-muted">Compliance Score</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Alerts */}
-              <div className="col-12">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-info text-white">
-                    <h6 className="mb-0"><i className="bi bi-bell me-2"></i>Recent Security Alerts</h6>
-                  </div>
-                  <div className="card-body">
-                    {reportsData.security.recentAlerts.map((alert, index) => (
-                      <div key={index} className="d-flex justify-content-between align-items-center p-2 border-bottom">
-                        <div>
-                          <strong>{alert.alert}</strong>
-                          <br />
-                          <small className="text-muted">{alert.timestamp}</small>
-                        </div>
-                        <span className={`badge ${
-                          alert.severity === 'high' ? 'bg-danger' :
-                          alert.severity === 'medium' ? 'bg-warning' :
-                          'bg-info'
-                        }`}>
-                          {alert.severity}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+            <h6 style={{ color: '#ef4444', fontWeight: 600 }}>Enhanced Security & Communication Monitoring</h6>
+            <div className="d-flex gap-2">
+              <button 
+                className="btn btn-sm btn-outline-danger"
+                onClick={() => setActiveSecuritySection('dashboard')}
+              >
+                Security Dashboard
+              </button>
+              <button 
+                className="btn btn-sm btn-outline-warning"
+                onClick={() => setActiveSecuritySection('communications')}
+              >
+                Communication Analysis
+              </button>
+              <button 
+                className="btn btn-sm btn-outline-info"
+                onClick={() => setActiveSecuritySection('audit')}
+              >
+                Audit Log
+              </button>
+              <button 
+                className="btn btn-sm btn-outline-dark"
+                onClick={() => setActiveSecuritySection('threats')}
+              >
+                Threat Intelligence
+              </button>
             </div>
-          ) : (
-            <div className="text-center py-4">
-              <div className="spinner-border text-danger" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-              <p className="mt-2">Loading security data...</p>
+          </div>
+
+          {/* Security Dashboard */}
+          {activeSecuritySection === 'dashboard' && (
+            <SecurityDashboard />
+          )}
+
+          {/* Communication Analysis */}
+          {activeSecuritySection === 'communications' && (
+            <CommunicationAnalysis />
+          )}
+
+          {/* Audit Log */}
+          {activeSecuritySection === 'audit' && (
+            <AuditLog />
+          )}
+
+          {/* Threat Intelligence */}
+          {activeSecuritySection === 'threats' && (
+            <ThreatIntelligence />
+          )}
+
+          {/* Default Security View */}
+          {!activeSecuritySection && (
+            <div className="text-center py-5">
+              <i className="bi bi-shield-check display-1 text-danger"></i>
+              <h6 className="text-danger mt-3">Security Monitoring Dashboard</h6>
+              <p className="text-muted">Select a security monitoring option above to view detailed information</p>
             </div>
           )}
         </div>
@@ -4107,6 +4168,497 @@ const ESCAdminDashboard = () => {
               <p className="mt-2">Loading operations data...</p>
               </div>
           )}
+        </div>
+      )}
+
+      {/* Security Component Functions */}
+      {/* Security Dashboard Component */}
+      {activeSecuritySection === 'dashboard' && (
+        <div className="row g-4">
+          {/* Real-time Security Metrics */}
+          <div className="col-md-6">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-danger text-white">
+                <h6 className="mb-0"><i className="bi bi-shield-check me-2"></i>Real-time Security Metrics</h6>
+              </div>
+              <div className="card-body">
+                {securityData.dashboard ? (
+                  <div className="row text-center">
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-success mb-1">{securityData.dashboard.realTimeMetrics.totalUsers}</div>
+                        <small className="text-muted">Total Users</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-info mb-1">{securityData.dashboard.realTimeMetrics.activeUsers24h}</div>
+                        <small className="text-muted">Active (24h)</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-warning mb-1">{securityData.dashboard.realTimeMetrics.activeUsers7d}</div>
+                        <small className="text-muted">Active (7d)</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-danger mb-1">{securityData.dashboard.realTimeMetrics.suspiciousUsers}</div>
+                        <small className="text-muted">Suspicious Users</small>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-danger" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Communication Threats */}
+          <div className="col-md-6">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-warning text-dark">
+                <h6 className="mb-0"><i className="bi bi-chat-dots me-2"></i>Communication Threats (24h)</h6>
+              </div>
+              <div className="card-body">
+                {securityData.dashboard ? (
+                  <div className="row text-center">
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-info mb-1">{securityData.dashboard.communicationThreats.totalMessages}</div>
+                        <small className="text-muted">Total Messages</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-warning mb-1">{securityData.dashboard.communicationThreats.spamMessages}</div>
+                        <small className="text-muted">Spam Messages</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-danger mb-1">{securityData.dashboard.communicationThreats.suspiciousMessages}</div>
+                        <small className="text-muted">Suspicious</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-danger mb-1">{securityData.dashboard.communicationThreats.inappropriateMessages}</div>
+                        <small className="text-muted">Inappropriate</small>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-warning" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Login Attempts */}
+          <div className="col-12">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-info text-white">
+                <h6 className="mb-0"><i className="bi bi-person-check me-2"></i>Recent Login Attempts</h6>
+              </div>
+              <div className="card-body">
+                {securityData.dashboard ? (
+                  <div className="table-responsive">
+                    <table className="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>User</th>
+                          <th>IP Address</th>
+                          <th>Status</th>
+                          <th>Timestamp</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {securityData.dashboard.recentLogins.map((login, index) => (
+                          <tr key={index}>
+                            <td>{login.user}</td>
+                            <td><code>{login.ip}</code></td>
+                            <td>
+                              <span className={`badge ${
+                                login.status === 'success' ? 'bg-success' : 'bg-danger'
+                              }`}>
+                                {login.status}
+                              </span>
+                            </td>
+                            <td>{login.timestamp}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-info" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Communication Analysis Component */}
+      {activeSecuritySection === 'communications' && (
+        <div className="row g-4">
+          {/* Communication Patterns */}
+          <div className="col-md-8">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-primary text-white">
+                <h6 className="mb-0"><i className="bi bi-graph-up me-2"></i>Communication Patterns</h6>
+              </div>
+              <div className="card-body">
+                {securityData.communications ? (
+                  <div className="table-responsive">
+                    <table className="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Total Messages</th>
+                          <th>Spam</th>
+                          <th>Suspicious</th>
+                          <th>Inappropriate</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {securityData.communications.patterns.map((pattern, index) => (
+                          <tr key={index}>
+                            <td>{new Date(pattern.date).toLocaleDateString()}</td>
+                            <td>{pattern.total_messages}</td>
+                            <td>
+                              {pattern.spam_count > 0 && (
+                                <span className="badge bg-warning">{pattern.spam_count}</span>
+                              )}
+                            </td>
+                            <td>
+                              {pattern.suspicious_count > 0 && (
+                                <span className="badge bg-danger">{pattern.suspicious_count}</span>
+                              )}
+                            </td>
+                            <td>
+                              {pattern.inappropriate_count > 0 && (
+                                <span className="badge bg-danger">{pattern.inappropriate_count}</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Top Communicators */}
+          <div className="col-md-4">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-success text-white">
+                <h6 className="mb-0"><i className="bi bi-people me-2"></i>Top Communicators</h6>
+              </div>
+              <div className="card-body">
+                {securityData.communications ? (
+                  <div className="list-group list-group-flush">
+                    {securityData.communications.topCommunicators.slice(0, 5).map((user, index) => (
+                      <div key={index} className="list-group-item d-flex justify-content-between align-items-center p-2">
+                        <div>
+                          <div className="fw-medium">{user.user_name}</div>
+                          <small className="text-muted">{user.user_type}</small>
+                        </div>
+                        <div className="text-end">
+                          <div className="fw-bold">{user.message_count}</div>
+                          {user.spam_count > 0 && (
+                            <small className="text-danger">+{user.spam_count} spam</small>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-success" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Flagged Messages */}
+          <div className="col-12">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-warning text-dark">
+                <h6 className="mb-0"><i className="bi bi-flag me-2"></i>Flagged Messages for Review</h6>
+              </div>
+              <div className="card-body">
+                {securityData.communications ? (
+                  <div className="table-responsive">
+                    <table className="table table-sm">
+                      <thead>
+                        <tr>
+                          <th>Sender</th>
+                          <th>Message Content</th>
+                          <th>Flag Reason</th>
+                          <th>Timestamp</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {securityData.communications.flaggedMessages.slice(0, 10).map((message, index) => (
+                          <tr key={index}>
+                            <td>
+                              <div>{message.sender_name}</div>
+                              <small className="text-muted">{message.sender_email}</small>
+                            </td>
+                            <td>
+                              <div className="text-truncate" style={{ maxWidth: '200px' }} title={message.content}>
+                                {message.content}
+                              </div>
+                            </td>
+                            <td>
+                              <span className={`badge ${
+                                message.flag_reason === 'spam' ? 'bg-warning' :
+                                message.flag_reason === 'suspicious' ? 'bg-danger' :
+                                'bg-secondary'
+                              }`}>
+                                {message.flag_reason}
+                              </span>
+                            </td>
+                            <td>{new Date(message.sent_at).toLocaleString()}</td>
+                            <td>
+                              <button 
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={() => flagMessage(message.message_id, message.flag_reason, 'Admin review')}
+                              >
+                                <i className="bi bi-flag"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-warning" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Audit Log Component */}
+      {activeSecuritySection === 'audit' && (
+        <div className="card border-0 shadow-sm">
+          <div className="card-header bg-dark text-white">
+            <h6 className="mb-0"><i className="bi bi-journal-text me-2"></i>System Audit Log</h6>
+          </div>
+          <div className="card-body">
+            {securityData.audit ? (
+              <div className="table-responsive">
+                <table className="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Timestamp</th>
+                      <th>User</th>
+                      <th>Action</th>
+                      <th>Details</th>
+                      <th>IP Address</th>
+                      <th>Severity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {securityData.audit.logEntries.map((entry, index) => (
+                      <tr key={index}>
+                        <td>{new Date(entry.timestamp).toLocaleString()}</td>
+                        <td>{entry.user}</td>
+                        <td>
+                          <span className="badge bg-secondary">{entry.action}</span>
+                        </td>
+                        <td>{entry.details}</td>
+                        <td><code>{entry.ip_address}</code></td>
+                        <td>
+                          <span className={`badge ${
+                            entry.severity === 'HIGH' ? 'bg-danger' :
+                            entry.severity === 'MEDIUM' ? 'bg-warning' :
+                            entry.severity === 'LOW' ? 'bg-info' :
+                            'bg-secondary'
+                          }`}>
+                            {entry.severity}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-3">
+                <div className="spinner-border text-dark" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Threat Intelligence Component */}
+      {activeSecuritySection === 'threats' && (
+        <div className="row g-4">
+          {/* Message Threats */}
+          <div className="col-md-6">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-danger text-white">
+                <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>Message Threats (7 days)</h6>
+              </div>
+              <div className="card-body">
+                {securityData.threats ? (
+                  <div className="row text-center">
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-warning mb-1">{securityData.threats.messageThreats.spam}</div>
+                        <small className="text-muted">Spam</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-danger mb-1">{securityData.threats.messageThreats.scam}</div>
+                        <small className="text-muted">Scam</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-danger mb-1">{securityData.threats.messageThreats.phishing}</div>
+                        <small className="text-muted">Phishing</small>
+                      </div>
+                    </div>
+                    <div className="col-6">
+                      <div className="mb-3">
+                        <div className="h4 text-warning mb-1">{securityData.threats.messageThreats.suspicious}</div>
+                        <small className="text-muted">Suspicious</small>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-danger" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* IP Threats */}
+          <div className="col-md-6">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-warning text-dark">
+                <h6 className="mb-0"><i className="bi bi-globe me-2"></i>IP-based Threats</h6>
+              </div>
+              <div className="card-body">
+                {securityData.threats ? (
+                  <div className="list-group list-group-flush">
+                    {securityData.threats.ipThreats.map((threat, index) => (
+                      <div key={index} className="list-group-item d-flex justify-content-between align-items-center p-2">
+                        <div>
+                          <div className="fw-medium"><code>{threat.ip}</code></div>
+                          <small className="text-muted">{threat.threat}</small>
+                        </div>
+                        <div className="text-end">
+                          <span className={`badge ${
+                            threat.severity === 'HIGH' ? 'bg-danger' :
+                            threat.severity === 'MEDIUM' ? 'bg-warning' :
+                            'bg-info'
+                          }`}>
+                            {threat.severity}
+                          </span>
+                          <br />
+                          <small className="text-muted">{threat.lastSeen}</small>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-warning" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Recommendations */}
+          <div className="col-12">
+            <div className="card border-0 shadow-sm">
+              <div className="card-header bg-info text-white">
+                <h6 className="mb-0"><i className="bi bi-lightbulb me-2"></i>Security Recommendations</h6>
+              </div>
+              <div className="card-body">
+                {securityData.threats ? (
+                  <div className="row">
+                    {securityData.threats.recommendations.map((recommendation, index) => (
+                      <div key={index} className="col-md-6 mb-3">
+                        <div className="d-flex align-items-start">
+                          <i className="bi bi-arrow-right-circle text-info me-2 mt-1"></i>
+                          <span>{recommendation}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <div className="spinner-border text-info" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Auto-fetch security data when section changes */}
+      {activeSecuritySection && !securityData[activeSecuritySection] && (
+        <div className="text-center py-4">
+          <button 
+            className="btn btn-primary"
+            onClick={() => fetchSecurityData(activeSecuritySection)}
+          >
+            <i className="bi bi-download me-2"></i>
+            Load {activeSecuritySection.charAt(0).toUpperCase() + activeSecuritySection.slice(1)} Data
+          </button>
         </div>
       )}
     </div>
