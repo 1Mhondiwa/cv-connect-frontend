@@ -3266,7 +3266,11 @@ const ESCAdminDashboard = () => {
               <div className="row g-3 mb-2">
                 {/* System Performance */}
                 <div className="col-md-6 col-lg-3">
-                  <div className="card h-100 border-0 shadow-sm">
+                  <div className="card h-100 border-0 shadow-sm" style={{ 
+                    border: activeReportSection === 'performance' ? `2px solid ${accent}` : 'none',
+                    backgroundColor: activeReportSection === 'performance' ? '#fff8f0' : 'white',
+                    boxShadow: activeReportSection === 'performance' ? `0 0 15px ${accent}30` : '0 2px 8px rgba(0,0,0,0.1)'
+                  }}>
                     <div className="card-body text-center p-3">
                       <div className="mb-2">
                         <i className="bi bi-speedometer2" style={{ fontSize: '2rem', color: accent }}></i>
@@ -3274,7 +3278,13 @@ const ESCAdminDashboard = () => {
                       <h6 className="card-title mb-2">System Performance</h6>
                       <p className="card-text small text-muted">Response times, error rates, system health</p>
                       <button 
-                        className="btn btn-sm btn-outline-primary"
+                        className="btn btn-sm"
+                        style={{ 
+                          backgroundColor: accent, 
+                          color: 'white', 
+                          border: `1px solid ${accent}`,
+                          boxShadow: '0 2px 4px rgba(253,104,14,0.2)'
+                        }}
                         onClick={() => {
                           console.log('🔍 Performance report clicked');
                           setActiveReportSection('performance');
