@@ -2110,7 +2110,7 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-speedometer2 me-3"></i>
                 Performance Monitor
-              </button>
+          </button>
         </div>
             </div>
 
@@ -3353,118 +3353,7 @@ const ESCAdminDashboard = () => {
               {/* Report Content */}
               {activeReportSection && (
                 <div className="mt-4">
-                  {activeReportSection === 'performance' && (
-                    <div className="bg-white rounded-4 shadow-sm p-4">
-                      <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h6 style={{ color: '#fd680e', fontWeight: 600 }}>System Performance Report</h6>
-                        <small className="text-muted">
-                          <i className="bi bi-clock me-1"></i>
-                          {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
-                        </small>
-                      </div>
-                      
-                      {console.log('🔍 Rendering performance report, data:', reportsData.performance)}
-                      {reportsData.performance ? (
-                        <div className="row g-4">
-                          {/* System Health */}
-                          <div className="col-md-6">
-                            <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-success text-white">
-                                <h6 className="mb-0"><i className="bi bi-heart-pulse me-2"></i>System Health</h6>
-                              </div>
-                              <div className="card-body">
-                                <div className="row text-center">
-                                  <div className="col-6">
-                                    <div className="mb-3">
-                                      <div className="h4 text-success mb-1">{reportsData.performance.systemHealth.uptime}</div>
-                                      <small className="text-muted">Uptime</small>
-                                    </div>
-                                  </div>
-                                  <div className="col-6">
-                                    <div className="mb-3">
-                                      <div className="h4 text-info mb-1">{reportsData.performance.systemHealth.responseTime}</div>
-                                      <small className="text-muted">Response Time</small>
-                                    </div>
-                                  </div>
-                                  <div className="col-6">
-                                    <div className="mb-3">
-                                      <div className="h4 text-warning mb-1">{reportsData.performance.systemHealth.errorRate}</div>
-                                      <small className="text-muted">Error Rate</small>
-                                    </div>
-                                  </div>
-                                  <div className="col-6">
-                                    <div className="mb-3">
-                                      <div className="h4 text-primary mb-1">{reportsData.performance.systemHealth.activeConnections}</div>
-                                      <small className="text-muted">Active Connections</small>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
 
-                          {/* Performance Metrics */}
-                          <div className="col-md-6">
-                            <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-primary text-white">
-                                <h6 className="mb-0"><i className="bi bi-speedometer2 me-2"></i>Performance Metrics</h6>
-                              </div>
-                              <div className="card-body">
-                                {reportsData.performance.performanceMetrics.map((metric, index) => (
-                                  <div key={index} className="d-flex justify-content-between align-items-center p-2 border-bottom">
-                                    <span>{metric.metric}</span>
-                                    <div className="d-flex align-items-center">
-                                      <span className={`badge ${
-                                        metric.status === 'excellent' ? 'bg-success' :
-                                        metric.status === 'good' ? 'bg-primary' :
-                                        'bg-warning'
-                                      }`}>
-                                        {metric.value}
-                                      </span>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Recent Issues */}
-                          <div className="col-12">
-                            <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-warning text-dark">
-                                <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>Recent System Issues</h6>
-                              </div>
-                              <div className="card-body">
-                                {reportsData.performance.recentIssues.map((issue, index) => (
-                                  <div key={index} className="d-flex justify-content-between align-items-center p-2 border-bottom">
-                                    <div>
-                                      <strong>{issue.issue}</strong>
-                                      <br />
-                                      <small className="text-muted">{issue.timestamp}</small>
-                                    </div>
-                                    <span className={`badge ${
-                                      issue.severity === 'high' ? 'bg-danger' :
-                                      issue.severity === 'medium' ? 'bg-warning' :
-                                      'bg-info'
-                                    }`}>
-                                      {issue.severity}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="text-center py-4">
-                          <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                          </div>
-                          <p className="mt-2">Loading performance data...</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
 
                   {activeReportSection === 'business' && (
                     <div className="bg-white rounded-4 shadow-sm p-4">
