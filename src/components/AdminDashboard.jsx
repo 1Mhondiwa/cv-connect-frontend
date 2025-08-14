@@ -3298,15 +3298,25 @@ const ESCAdminDashboard = () => {
 
                 {/* Business Intelligence */}
                 <div className="col-md-6 col-lg-3">
-                  <div className="card h-100 border-0 shadow-sm">
+                  <div className="card h-100 border-0 shadow-sm" style={{ 
+                    border: activeReportSection === 'business' ? `2px solid ${accent}` : 'none',
+                    backgroundColor: activeReportSection === 'business' ? '#fff8f0' : 'white',
+                    boxShadow: activeReportSection === 'business' ? `0 0 15px ${accent}30` : '0 2px 8px rgba(0,0,0,0.1)'
+                  }}>
                     <div className="card-body text-center p-3">
                       <div className="mb-2">
-                        <i className="bi bi-graph-up-arrow" style={{ fontSize: '2rem', color: '#10b981' }}></i>
+                        <i className="bi bi-graph-up-arrow" style={{ fontSize: '2rem', color: accent }}></i>
                       </div>
                       <h6 className="card-title mb-2">Business Intelligence</h6>
                       <p className="card-text small text-muted">Growth trends, matching efficiency, ROI</p>
                       <button 
-                        className="btn btn-sm btn-outline-success"
+                        className="btn btn-sm"
+                        style={{ 
+                          backgroundColor: accent, 
+                          color: 'white', 
+                          border: `1px solid ${accent}`,
+                          boxShadow: '0 2px 4px rgba(253,104,14,0.2)'
+                        }}
                         onClick={() => {
                           console.log('🔍 Business report clicked');
                           setActiveReportSection('business');
@@ -3320,15 +3330,25 @@ const ESCAdminDashboard = () => {
 
                 {/* Security & Compliance */}
                 <div className="col-md-6 col-lg-3">
-                  <div className="card h-100 border-0 shadow-sm">
+                  <div className="card h-100 border-0 shadow-sm" style={{ 
+                    border: activeReportSection === 'security' ? `2px solid ${accent}` : 'none',
+                    backgroundColor: activeReportSection === 'security' ? '#fff8f0' : 'white',
+                    boxShadow: activeReportSection === 'security' ? `0 0 15px ${accent}30` : '0 2px 8px rgba(0,0,0,0.1)'
+                  }}>
                     <div className="card-body text-center p-3">
                       <div className="mb-2">
-                        <i className="bi bi-shield-check" style={{ fontSize: '2rem', color: '#ef4444' }}></i>
+                        <i className="bi bi-shield-check" style={{ fontSize: '2rem', color: accent }}></i>
                       </div>
                       <h6 className="card-title mb-2">Security & Compliance</h6>
                       <p className="card-text small text-muted">Communication monitoring, threat detection</p>
                       <button 
-                        className="btn btn-sm btn-outline-danger"
+                        className="btn btn-sm"
+                        style={{ 
+                          backgroundColor: accent, 
+                          color: 'white', 
+                          border: `1px solid ${accent}`,
+                          boxShadow: '0 2px 4px rgba(253,104,14,0.2)'
+                        }}
                         onClick={() => {
                           console.log('🔍 Security report clicked');
                           setActiveReportSection('security');
@@ -3342,15 +3362,25 @@ const ESCAdminDashboard = () => {
 
                 {/* Operational Reports */}
                 <div className="col-md-6 col-lg-3">
-                  <div className="card h-100 border-0 shadow-sm">
+                  <div className="card h-100 border-0 shadow-sm" style={{ 
+                    border: activeReportSection === 'operations' ? `2px solid ${accent}` : 'none',
+                    backgroundColor: activeReportSection === 'operations' ? '#fff8f0' : 'white',
+                    boxShadow: activeReportSection === 'operations' ? `0 0 15px ${accent}30` : '0 2px 8px rgba(0,0,0,0.1)'
+                  }}>
                     <div className="card-body text-center p-3">
                       <div className="mb-2">
-                        <i className="bi bi-clipboard-data" style={{ fontSize: '2rem', color: '#8b5cf6' }}></i>
+                        <i className="bi bi-clipboard-data" style={{ fontSize: '2rem', color: accent }}></i>
                       </div>
                       <h6 className="card-title mb-2">Operations</h6>
                       <p className="card-text small text-muted">Workflow efficiency, quality metrics</p>
                       <button 
-                        className="btn btn-sm btn-outline-purple"
+                        className="btn btn-sm"
+                        style={{ 
+                          backgroundColor: accent, 
+                          color: 'white', 
+                          border: `1px solid ${accent}`,
+                          boxShadow: '0 2px 4px rgba(253,104,14,0.2)'
+                        }}
                         onClick={() => {
                           console.log('🔍 Operations report clicked');
                           setActiveReportSection('operations');
