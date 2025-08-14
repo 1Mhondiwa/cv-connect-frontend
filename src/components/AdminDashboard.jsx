@@ -2178,11 +2178,14 @@ const ESCAdminDashboard = () => {
               </div>
 
       {/* Main Content Area */}
-      <div className="main-content" style={{ 
-        marginLeft: '280px', 
-        padding: '24px',
+      <div className="main-content flex-grow-1" style={{ 
+        marginLeft: '300px',
+        padding: '20px',
         minHeight: '100vh',
-        background: '#f9fafb'
+        background: '#f9fafb',
+        width: 'calc(100% - 300px)',
+        maxWidth: '100%',
+        overflowX: 'hidden'
       }}>
         {/* Page Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
@@ -2210,7 +2213,7 @@ const ESCAdminDashboard = () => {
             </div>
         </div>
         {/* Main Dashboard Content */}
-        <div style={{ flex: 1, padding: '40px 32px', background: 'transparent', minHeight: 0, overflowY: 'auto' }}>
+        <div className="px-3 py-4" style={{ width: '100%', maxWidth: '100%' }}>
           {/* Add Associate Form (Dashboard Tab) */}
           {activeTab === 'dashboard' && (
             <>
@@ -3235,8 +3238,8 @@ const ESCAdminDashboard = () => {
 
           {/* Reports Tab */}
           {activeTab === 'reports' && (
-            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1400, margin: '0 auto' }}>
-              <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+              <div className="d-flex justify-content-between align-items-center mb-3">
                 <div>
                   <h5 style={{ color: accent, fontWeight: 700, marginBottom: 8 }}>Reports & Documentation</h5>
                   <p style={{ color: '#666', fontSize: 14, margin: 0 }}>Comprehensive system insights and security monitoring</p>
@@ -3260,7 +3263,7 @@ const ESCAdminDashboard = () => {
               </div>
 
               {/* Report Categories */}
-              <div className="row g-4 mb-4">
+              <div className="row g-3 mb-2">
                 {/* System Performance */}
                 <div className="col-md-6 col-lg-3">
                   <div className="card h-100 border-0 shadow-sm">
@@ -3352,13 +3355,201 @@ const ESCAdminDashboard = () => {
 
               {/* Report Content */}
               {activeReportSection && (
-                <div className="mt-4">
+                <div className="mt-3">
+                  {activeReportSection === 'performance' && (
+                    <div className="bg-light rounded-3 p-4" style={{ border: `2px solid ${accent}`, backgroundColor: '#fff8f0' }}>
+                      <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h6 style={{ color: accent, fontWeight: 600 }}>System Performance Report</h6>
+                        <small className="text-muted">
+                          <i className="bi bi-clock me-1"></i>
+                          {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
+                        </small>
+                      </div>
+                      
+                      {reportsData.performance ? (
+                        <div className="row g-3">
+                          {/* System Health Overview */}
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3">
+                            <div className="card border-0 shadow-sm h-100">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-heart-pulse me-2"></i>System Health</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.uptime}</div>
+                                      <small className="text-muted">Uptime</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.responseTime}</div>
+                                      <small className="text-muted">Response Time</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.errorRate}</div>
+                                      <small className="text-muted">Error Rate</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.connectionUtilization || '--'}</div>
+                                      <small className="text-muted">Connection Usage</small>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="mt-3">
+                                  <small className="text-muted">
+                                    <strong>Database Connections:</strong> {reportsData.performance.systemHealth.activeConnections || '--'} active / {reportsData.performance.systemHealth.totalConnections || '--'} total
+                                  </small>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
 
+                          {/* System Resources */}
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3">
+                            <div className="card border-0 shadow-sm h-100">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-cpu me-2"></i>System Resources</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.cpuUsage || '--'}</div>
+                                      <small className="text-muted">CPU Usage</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.memoryUsage || '--'}</div>
+                                      <small className="text-muted">Memory Usage</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.diskUsage || '--'}</div>
+                                      <small className="text-muted">Disk Usage</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.networkLatency || '--'}</div>
+                                      <small className="text-muted">Network Latency</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Performance Metrics */}
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3">
+                            <div className="card border-0 shadow-sm h-100">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-speedometer2 me-2"></i>Performance Metrics</h6>
+                              </div>
+                              <div className="card-body">
+                                {reportsData.performance.performanceMetrics.map((metric, index) => (
+                                  <div key={index} className="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
+                                    <span className="small fw-medium">{metric.metric}</span>
+                                    <span className="badge" style={{ backgroundColor: accent, color: 'white', fontSize: '0.8rem' }}>
+                                      {metric.value}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* User Activity Insights */}
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3">
+                            <div className="card border-0 shadow-sm h-100">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-people me-2"></i>User Activity</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.totalUsers || '--'}</div>
+                                      <small className="text-muted">Total Users</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.active7d || '--'}</div>
+                                      <small className="text-muted">Active (7d)</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.newUsers30d || '--'}</div>
+                                      <small className="text-muted">New (30d)</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6 col-sm-6 mb-3">
+                                    <div className="mb-2">
+                                      <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.userActivityRate || '--'}</div>
+                                      <small className="text-muted">Activity Rate</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* System Issues & Alerts */}
+                          <div className="col-12 mb-3">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>System Issues & Alerts</h6>
+                              </div>
+                              <div className="card-body">
+                                {reportsData.performance.recentIssues.map((issue, index) => (
+                                  <div key={index} className="d-flex justify-content-between align-items-start p-3 border-bottom">
+                                    <div className="flex-grow-1">
+                                      <div className="d-flex align-items-center mb-2">
+                                        <strong className="me-2">{issue.issue}</strong>
+                                        <span className="badge" style={{ backgroundColor: accent, color: 'white' }}>
+                                          {issue.severity}
+                                        </span>
+                                      </div>
+                                      <small className="text-muted d-block mb-1">
+                                        <i className="bi bi-clock me-1"></i>
+                                        {issue.timestamp}
+                                      </small>
+                                      {issue.details && (
+                                        <small className="text-muted d-block">
+                                          {issue.details}
+                                        </small>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <div className="spinner-border" style={{ color: accent }} role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                          <p className="mt-2">Loading performance data...</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {activeReportSection === 'business' && (
                     <div className="bg-white rounded-4 shadow-sm p-4">
                       <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h6 style={{ color: '#10b981', fontWeight: 600 }}>Business Intelligence Report</h6>
+                        <h6 style={{ color: accent, fontWeight: 600 }}>Business Intelligence Report</h6>
                         <small className="text-muted">
                           <i className="bi bi-clock me-1"></i>
                           {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
@@ -3477,9 +3668,13 @@ const ESCAdminDashboard = () => {
                   )}
 
                   {activeReportSection === 'security' && (
-                    <div className="bg-white rounded-4 shadow-sm p-4">
+                    <div className="bg-white rounded-4 shadow-sm p-4" style={{ 
+                      border: `3px solid ${accent}`, 
+                      backgroundColor: '#fff8f0',
+                      boxShadow: `0 0 20px ${accent}40`
+                    }}>
                       <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h6 style={{ color: '#ef4444', fontWeight: 600 }}>Security & Compliance Report</h6>
+                        <h6 style={{ color: accent, fontWeight: 600 }}>Security & Compliance Report</h6>
                         <small className="text-muted">
                           <i className="bi bi-clock me-1"></i>
                           {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
@@ -3601,9 +3796,13 @@ const ESCAdminDashboard = () => {
                   )}
 
                   {activeReportSection === 'operations' && (
-                    <div className="bg-white rounded-4 shadow-sm p-4">
+                    <div className="bg-white rounded-4 shadow-sm p-4" style={{ 
+                      border: `3px solid ${accent}`, 
+                      backgroundColor: '#fff8f0',
+                      boxShadow: `0 0 20px ${accent}40`
+                    }}>
                       <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h6 style={{ color: '#8b5cf6', fontWeight: 600 }}>Operations Report</h6>
+                        <h6 style={{ color: accent, fontWeight: 600 }}>Operations Report</h6>
                         <small className="text-muted">
                           <i className="bi bi-clock me-1"></i>
                           {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
@@ -4481,6 +4680,41 @@ const ESCAdminDashboard = () => {
         .sidebar * {
           transition: all 0.2s ease;
         }
+        
+        /* Responsive design for mobile devices */
+        @media (max-width: 768px) {
+          .sidebar {
+            width: 100% !important;
+            position: relative !important;
+            height: auto !important;
+          }
+          
+          .main-content {
+            marginLeft: 0 !important;
+            width: 100% !important;
+            padding: 16px !important;
+          }
+          
+          .admin-dashboard {
+            flex-direction: column;
+          }
+        }
+        
+        /* Force layout fixes */
+        .main-content {
+          margin-left: 300px !important;
+          width: calc(100% - 300px) !important;
+        }
+        
+        .row {
+          margin-left: 0 !important;
+          margin-right: 0 !important;
+        }
+        
+        .col-xl-6, .col-lg-6, .col-md-12 {
+          padding-left: 8px !important;
+          padding-right: 8px !important;
+        }
       `}</style>
 
       {/* Documents Tab */}
@@ -4608,203 +4842,15 @@ const ESCAdminDashboard = () => {
         </div>
       )}
 
-      {/* Report Components */}
-      {/* System Performance Report Component */}
-      {activeReportSection === 'performance' && (
-        <div className="bg-white rounded-4 shadow-sm p-4 mt-4">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h6 style={{ color: accent, fontWeight: 600 }}>System Performance Report</h6>
-            <small className="text-muted">
-              <i className="bi bi-clock me-1"></i>
-              {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
-            </small>
-          </div>
-          
-          {reportsData.performance ? (
-            <div className="row g-4">
-              {/* System Health Overview */}
-              <div className="col-md-6">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                    <h6 className="mb-0"><i className="bi bi-heart-pulse me-2"></i>System Health</h6>
-                  </div>
-                  <div className="card-body">
-                    <div className="row text-center">
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.uptime}</div>
-                          <small className="text-muted">Uptime</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.responseTime}</div>
-                          <small className="text-muted">Response Time</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.errorRate}</div>
-                          <small className="text-muted">Error Rate</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.connectionUtilization || '--'}</div>
-                          <small className="text-muted">Connection Usage</small>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-3">
-                      <small className="text-muted">
-                        <strong>Database Connections:</strong> {reportsData.performance.systemHealth.activeConnections || '--'} active / {reportsData.performance.systemHealth.totalConnections || '--'} total
-                      </small>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* System Resources */}
-              <div className="col-md-6">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                    <h6 className="mb-0"><i className="bi bi-cpu me-2"></i>System Resources</h6>
-                  </div>
-                  <div className="card-body">
-                    <div className="row text-center">
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.cpuUsage || '--'}</div>
-                          <small className="text-muted">CPU Usage</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.memoryUsage || '--'}</div>
-                          <small className="text-muted">Memory Usage</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.diskUsage || '--'}</div>
-                          <small className="text-muted">Disk Usage</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.networkLatency || '--'}</div>
-                          <small className="text-muted">Network Latency</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Performance Metrics */}
-              <div className="col-md-6">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                    <h6 className="mb-0"><i className="bi bi-speedometer2 me-2"></i>Performance Metrics</h6>
-                  </div>
-                  <div className="card-body">
-                    {reportsData.performance.performanceMetrics.map((metric, index) => (
-                      <div key={index} className="d-flex justify-content-between align-items-center mb-2">
-                        <span className="small">{metric.metric}</span>
-                        <div className="d-flex align-items-center">
-                          <span className="badge me-2" style={{ backgroundColor: accent, color: 'white' }}>
-                            {metric.value}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* User Activity Insights */}
-              <div className="col-md-6">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                    <h6 className="mb-0"><i className="bi bi-people me-2"></i>User Activity</h6>
-                  </div>
-                  <div className="card-body">
-                    <div className="row text-center">
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.totalUsers || '--'}</div>
-                          <small className="text-muted">Total Users</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.active7d || '--'}</div>
-                          <small className="text-muted">Active (7d)</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.newUsers30d || '--'}</div>
-                          <small className="text-muted">New (30d)</small>
-                        </div>
-                      </div>
-                      <div className="col-6">
-                        <div className="mb-3">
-                          <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.userActivityRate || '--'}</div>
-                          <small className="text-muted">Activity Rate</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* System Issues & Alerts */}
-              <div className="col-12">
-                <div className="card border-0 shadow-sm">
-                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                    <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>System Issues & Alerts</h6>
-                  </div>
-                  <div className="card-body">
-                    {reportsData.performance.recentIssues.map((issue, index) => (
-                      <div key={index} className="d-flex justify-content-between align-items-start p-3 border-bottom">
-                        <div className="flex-grow-1">
-                          <div className="d-flex align-items-center mb-2">
-                            <strong className="me-2">{issue.issue}</strong>
-                            <span className="badge" style={{ backgroundColor: accent, color: 'white' }}>
-                              {issue.severity}
-                            </span>
-                          </div>
-                          <small className="text-muted d-block mb-1">
-                            <i className="bi bi-clock me-1"></i>
-                            {issue.timestamp}
-                          </small>
-                          {issue.details && (
-                            <small className="text-muted d-block">
-                              {issue.details}
-                            </small>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-4">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-              <p className="mt-2">Loading performance data...</p>
-            </div>
-          )}
-        </div>
-      )}
+      
 
       {/* Business Intelligence Report Component */}
       {activeReportSection === 'business' && (
-        <div className="bg-white rounded-4 shadow-sm p-4 mt-4">
+        <div className="bg-white rounded-4 shadow-sm p-4 mt-4" style={{ 
+          border: `3px solid ${accent}`, 
+          backgroundColor: '#fff8f0',
+          boxShadow: `0 0 20px ${accent}40`
+        }}>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h6 style={{ color: accent, fontWeight: 600 }}>Business Intelligence Report</h6>
             <small className="text-muted">
