@@ -2,23 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const features = [
-  { icon: 'bi bi-cpu', label: 'AI-Powered CV Parsing' },
-  { icon: 'bi bi-people', label: 'Smart Talent Matching' },
-  { icon: 'bi bi-chat-dots', label: 'Real-time Messaging' }
+  { icon: 'bi bi-briefcase', label: 'Get Hired Fast' },
+  { icon: 'bi bi-people', label: 'Find Top Talent' },
+  { icon: 'bi bi-chat-dots', label: 'Direct Communication' }
 ];
 
 const stats = [
-  { value: '1000+', label: 'Active Freelancers' },
-  { value: '500+', label: 'Trusted Associates' },
-  { value: '98%', label: 'Match Success Rate' }
+  { value: '1000+', label: 'Freelancers Hired' },
+  { value: '500+', label: 'Companies Hiring' },
+  { value: '98%', label: 'Job Success Rate' }
 ];
 
 const taglines = [
-  "Where Talent Meets Opportunity",
-  "Automated CV Parsing. Instant Profiles.",
-  "Smart Matching for Freelancers & Associates",
-  "Connect. Collaborate. Succeed.",
-  "Your Next Opportunity Starts Here"
+  "Get Your Next Job Today",
+  "Hire the Best Freelancers",
+  "Connect. Get Hired. Succeed.",
+  "Your Skills, Our Network",
+  "Find Your Perfect Match"
 ];
 
 const Home = () => {
@@ -93,8 +93,8 @@ const Home = () => {
                 </span>
             </div>
         <p style={{ fontSize: '1.1rem', marginBottom: 28 }}>
-          Connect with top freelancers and trusted associates through advanced CV parsing and smart matching. Upload your CV, get discovered, and unlock new opportunities in the digital marketplace.
-            </p>
+          Join thousands of freelancers who are already getting hired through CV-Connect. Upload your CV, get matched with companies, and start earning. For companies, find skilled professionals ready to work on your projects.
+        </p>
         {/* Features */}
         <div className="d-flex justify-content-center gap-3 mb-4 flex-wrap">
           {features.map((f) => (
@@ -183,11 +183,10 @@ const Home = () => {
                 <i className="bi bi-building"></i>
               </div>
               <h2 style={{ color: '#333', fontWeight: 700, marginBottom: 16 }}>
-                Are You a Company Looking for Talent?
+                Need Skilled Freelancers for Your Projects?
               </h2>
               <p style={{ fontSize: 18, color: '#666', marginBottom: 32, lineHeight: 1.6 }}>
-                Join CV-Connect as an associate company and gain access to our curated pool of skilled freelancers. 
-                ESC reviews all applications to ensure quality partnerships.
+                Companies are already hiring talented freelancers through CV-Connect. Join as an associate and access our pool of verified professionals ready to work on your projects.
               </p>
               <div className="d-flex justify-content-center gap-3 flex-wrap">
                 <Link
