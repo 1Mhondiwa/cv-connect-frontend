@@ -1064,17 +1064,33 @@ const ESCAdminDashboard = () => {
       uptime: '99.8%',
       responseTime: '245ms',
       errorRate: '0.2%',
-      activeConnections: 48
+      activeConnections: 48,
+      totalConnections: 50,
+      connectionUtilization: '96%'
+    },
+    systemResources: {
+      cpuUsage: '23%',
+      memoryUsage: '68%',
+      diskUsage: '45%',
+      networkLatency: '12ms'
     },
     performanceMetrics: [
-      { metric: 'Page Load Time', value: '1.2s', status: 'good' },
-      { metric: 'API Response Time', value: '245ms', status: 'good' },
       { metric: 'Database Query Time', value: '89ms', status: 'excellent' },
-      { metric: 'Memory Usage', value: '68%', status: 'good' }
+      { metric: 'Connection Pool Usage', value: '48/50', status: 'good' },
+      { metric: 'Slow Query Rate', value: '0.2%', status: 'excellent' },
+      { metric: 'Memory Usage', value: '68%', status: 'good' },
+      { metric: 'CPU Usage', value: '23%', status: 'excellent' },
+      { metric: 'Disk Usage', value: '45%', status: 'excellent' }
     ],
+    userInsights: {
+      totalUsers: 52,
+      active24h: 12,
+      active7d: 41,
+      newUsers30d: 8,
+      userActivityRate: '78.8%'
+    },
     recentIssues: [
-      { issue: 'High memory usage detected', severity: 'medium', timestamp: '2 hours ago' },
-      { issue: 'Database connection pool exhausted', severity: 'low', timestamp: '1 day ago' }
+      { issue: 'System operating normally', severity: 'low', timestamp: 'Current', details: 'All metrics within normal ranges' }
     ]
   });
 
@@ -2071,7 +2087,7 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-file-earmark-text me-3"></i>
                 Reports
-              </button>
+          </button>
               
               <button
                 className="nav-item w-100 text-start"
@@ -4720,33 +4736,75 @@ const ESCAdminDashboard = () => {
               {/* System Health Overview */}
               <div className="col-md-6">
                 <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-primary text-white">
+                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
                     <h6 className="mb-0"><i className="bi bi-heart-pulse me-2"></i>System Health</h6>
                   </div>
                   <div className="card-body">
                     <div className="row text-center">
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-success mb-1">{reportsData.performance.systemHealth.uptime}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.uptime}</div>
                           <small className="text-muted">Uptime</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-info mb-1">{reportsData.performance.systemHealth.responseTime}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.responseTime}</div>
                           <small className="text-muted">Response Time</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-warning mb-1">{reportsData.performance.systemHealth.errorRate}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.errorRate}</div>
                           <small className="text-muted">Error Rate</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-primary mb-1">{reportsData.performance.systemHealth.activeConnections}</div>
-                          <small className="text-muted">Active Connections</small>
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemHealth.connectionUtilization || '--'}</div>
+                          <small className="text-muted">Connection Usage</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <small className="text-muted">
+                        <strong>Database Connections:</strong> {reportsData.performance.systemHealth.activeConnections || '--'} active / {reportsData.performance.systemHealth.totalConnections || '--'} total
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* System Resources */}
+              <div className="col-md-6">
+                <div className="card border-0 shadow-sm">
+                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                    <h6 className="mb-0"><i className="bi bi-cpu me-2"></i>System Resources</h6>
+                  </div>
+                  <div className="card-body">
+                    <div className="row text-center">
+                      <div className="col-6">
+                        <div className="mb-3">
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.cpuUsage || '--'}</div>
+                          <small className="text-muted">CPU Usage</small>
+                        </div>
+                      </div>
+                      <div className="col-6">
+                        <div className="mb-3">
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.memoryUsage || '--'}</div>
+                          <small className="text-muted">Memory Usage</small>
+                        </div>
+                      </div>
+                      <div className="col-6">
+                        <div className="mb-3">
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.diskUsage || '--'}</div>
+                          <small className="text-muted">Disk Usage</small>
+                        </div>
+                      </div>
+                      <div className="col-6">
+                        <div className="mb-3">
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.systemResources?.networkLatency || '--'}</div>
+                          <small className="text-muted">Network Latency</small>
                         </div>
                       </div>
                     </div>
@@ -4757,20 +4815,15 @@ const ESCAdminDashboard = () => {
               {/* Performance Metrics */}
               <div className="col-md-6">
                 <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-success text-white">
+                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
                     <h6 className="mb-0"><i className="bi bi-speedometer2 me-2"></i>Performance Metrics</h6>
                   </div>
                   <div className="card-body">
                     {reportsData.performance.performanceMetrics.map((metric, index) => (
                       <div key={index} className="d-flex justify-content-between align-items-center mb-2">
-                        <span>{metric.metric}</span>
+                        <span className="small">{metric.metric}</span>
                         <div className="d-flex align-items-center">
-                          <span className={`badge me-2 ${
-                            metric.status === 'excellent' ? 'bg-success' :
-                            metric.status === 'good' ? 'bg-primary' :
-                            metric.status === 'warning' ? 'bg-warning' :
-                            'bg-danger'
-                          }`}>
+                          <span className="badge me-2" style={{ backgroundColor: accent, color: 'white' }}>
                             {metric.value}
                           </span>
                         </div>
@@ -4780,27 +4833,69 @@ const ESCAdminDashboard = () => {
                 </div>
               </div>
 
-              {/* Recent Issues */}
+              {/* User Activity Insights */}
+              <div className="col-md-6">
+                <div className="card border-0 shadow-sm">
+                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                    <h6 className="mb-0"><i className="bi bi-people me-2"></i>User Activity</h6>
+                  </div>
+                  <div className="card-body">
+                    <div className="row text-center">
+                      <div className="col-6">
+                        <div className="mb-3">
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.totalUsers || '--'}</div>
+                          <small className="text-muted">Total Users</small>
+                        </div>
+                      </div>
+                      <div className="col-6">
+                        <div className="mb-3">
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.active7d || '--'}</div>
+                          <small className="text-muted">Active (7d)</small>
+                        </div>
+                      </div>
+                      <div className="col-6">
+                        <div className="mb-3">
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.newUsers30d || '--'}</div>
+                          <small className="text-muted">New (30d)</small>
+                        </div>
+                      </div>
+                      <div className="col-6">
+                        <div className="mb-3">
+                          <div className="h4" style={{ color: accent }}>{reportsData.performance.userInsights?.userActivityRate || '--'}</div>
+                          <small className="text-muted">Activity Rate</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* System Issues & Alerts */}
               <div className="col-12">
                 <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-warning text-dark">
-                    <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>Recent Issues</h6>
+                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                    <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>System Issues & Alerts</h6>
                   </div>
                   <div className="card-body">
                     {reportsData.performance.recentIssues.map((issue, index) => (
-                      <div key={index} className="d-flex justify-content-between align-items-center p-2 border-bottom">
-                        <div>
-                          <strong>{issue.issue}</strong>
-                          <br />
-                          <small className="text-muted">{issue.timestamp}</small>
+                      <div key={index} className="d-flex justify-content-between align-items-start p-3 border-bottom">
+                        <div className="flex-grow-1">
+                          <div className="d-flex align-items-center mb-2">
+                            <strong className="me-2">{issue.issue}</strong>
+                            <span className="badge" style={{ backgroundColor: accent, color: 'white' }}>
+                              {issue.severity}
+                            </span>
+                          </div>
+                          <small className="text-muted d-block mb-1">
+                            <i className="bi bi-clock me-1"></i>
+                            {issue.timestamp}
+                          </small>
+                          {issue.details && (
+                            <small className="text-muted d-block">
+                              {issue.details}
+                            </small>
+                          )}
                         </div>
-                        <span className={`badge ${
-                          issue.severity === 'high' ? 'bg-danger' :
-                          issue.severity === 'medium' ? 'bg-warning' :
-                          'bg-info'
-                        }`}>
-                          {issue.severity}
-                        </span>
                       </div>
                     ))}
                   </div>
@@ -4822,7 +4917,7 @@ const ESCAdminDashboard = () => {
       {activeReportSection === 'business' && (
         <div className="bg-white rounded-4 shadow-sm p-4 mt-4">
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h6 style={{ color: '#10b981', fontWeight: 600 }}>Business Intelligence Report</h6>
+            <h6 style={{ color: accent, fontWeight: 600 }}>Business Intelligence Report</h6>
             <small className="text-muted">
               <i className="bi bi-clock me-1"></i>
               {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
@@ -4834,32 +4929,32 @@ const ESCAdminDashboard = () => {
               {/* User Growth */}
               <div className="col-md-6">
                 <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-success text-white">
+                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
                     <h6 className="mb-0"><i className="bi bi-graph-up me-2"></i>User Growth</h6>
                   </div>
                   <div className="card-body">
                     <div className="row text-center">
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-success mb-1">{reportsData.business.userGrowth.totalUsers}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.business.userGrowth.totalUsers}</div>
                           <small className="text-muted">Total Users</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-info mb-1">{reportsData.business.userGrowth.monthlyGrowth}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.business.userGrowth.monthlyGrowth}</div>
                           <small className="text-muted">Monthly Growth</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-warning mb-1">{reportsData.business.userGrowth.userRetention}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.business.userGrowth.userRetention}</div>
                           <small className="text-muted">User Retention</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-primary mb-1">{reportsData.business.userGrowth.activeUsers}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.business.userGrowth.activeUsers}</div>
                           <small className="text-muted">Active Users</small>
                         </div>
                       </div>
@@ -4871,32 +4966,32 @@ const ESCAdminDashboard = () => {
               {/* Matching Efficiency */}
               <div className="col-md-6">
                 <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-info text-white">
+                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
                     <h6 className="mb-0"><i className="bi bi-people me-2"></i>Matching Efficiency</h6>
                   </div>
                   <div className="card-body">
                     <div className="row text-center">
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-success mb-1">{reportsData.business.matchingEfficiency.totalRequests}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.business.matchingEfficiency.totalRequests}</div>
                           <small className="text-muted">Total Requests</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-info mb-1">{reportsData.business.matchingEfficiency.successfulMatches}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.business.matchingEfficiency.successfulMatches}</div>
                           <small className="text-muted">Successful Matches</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-warning mb-1">{reportsData.business.matchingEfficiency.matchRate}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.business.matchingEfficiency.matchRate}</div>
                           <small className="text-muted">Match Rate</small>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="mb-3">
-                          <div className="h4 text-primary mb-1">{reportsData.business.matchingEfficiency.averageResponseTime}</div>
+                          <div className="h4" style={{ color: accent }}>{reportsData.business.matchingEfficiency.averageResponseTime}</div>
                           <small className="text-muted">Avg Response Time</small>
                         </div>
                       </div>
@@ -4908,7 +5003,7 @@ const ESCAdminDashboard = () => {
               {/* Business Metrics */}
               <div className="col-12">
                 <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-primary text-white">
+                  <div className="card-header text-white" style={{ backgroundColor: accent }}>
                     <h6 className="mb-0"><i className="bi bi-bar-chart me-2"></i>Business Metrics</h6>
                   </div>
                   <div className="card-body">
