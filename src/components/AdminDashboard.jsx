@@ -3717,7 +3717,9 @@ const ESCAdminDashboard = () => {
                         <h6 style={{ color: accent, fontWeight: 600 }}>Security & Compliance Report</h6>
                         <small className="text-muted">
                           <i className="bi bi-clock me-1"></i>
-                          {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
+                          {reportsData.security?.reportGenerated ? 
+                            `Last updated: ${new Date(reportsData.security.reportGenerated).toLocaleString()}` : 
+                            'Not generated yet'}
                         </small>
                       </div>
                       
@@ -3726,35 +3728,40 @@ const ESCAdminDashboard = () => {
                           {/* Security Overview */}
                           <div className="col-md-6">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-danger text-white">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-shield-check me-2"></i>Security Overview</h6>
                               </div>
                               <div className="card-body">
                                 <div className="row text-center">
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-danger mb-1">{reportsData.security.securityOverview.totalThreats}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.security.securityOverview.totalThreats}</div>
                                       <small className="text-muted">Total Threats</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-success mb-1">{reportsData.security.securityOverview.blockedAttempts}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.security.securityOverview.blockedAttempts}</div>
                                       <small className="text-muted">Blocked Attempts</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-warning mb-1">{reportsData.security.securityOverview.securityScore}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.security.securityOverview.securityScore}</div>
                                       <small className="text-muted">Security Score</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-info mb-1">{reportsData.security.securityOverview.lastAudit}</div>
-                                      <small className="text-muted">Last Audit</small>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.security.securityOverview.totalUsersCommunicating}</div>
+                                      <small className="text-muted">Active Users</small>
                                     </div>
                                   </div>
+                                </div>
+                                <div className="mt-3">
+                                  <small className="text-muted">
+                                    <strong>Last Audit:</strong> {reportsData.security.securityOverview.lastAudit}
+                                  </small>
                                 </div>
                               </div>
                             </div>
@@ -3763,33 +3770,117 @@ const ESCAdminDashboard = () => {
                           {/* Communication Monitoring */}
                           <div className="col-md-6">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-warning text-dark">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-chat-dots me-2"></i>Communication Monitoring</h6>
                               </div>
                               <div className="card-body">
                                 <div className="row text-center">
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-info mb-1">{reportsData.security.communicationMonitoring.totalMessages}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.security.communicationMonitoring.totalMessages}</div>
                                       <small className="text-muted">Total Messages</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-warning mb-1">{reportsData.security.communicationMonitoring.flaggedMessages}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.security.communicationMonitoring.flaggedMessages}</div>
                                       <small className="text-muted">Flagged Messages</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-danger mb-1">{reportsData.security.communicationMonitoring.suspiciousUsers}</div>
-                                      <small className="text-muted">Suspicious Users</small>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.security.communicationMonitoring.suspiciousMessages}</div>
+                                      <small className="text-muted">Suspicious Messages</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-success mb-1">{reportsData.security.communicationMonitoring.complianceScore}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.security.communicationMonitoring.complianceScore}</div>
                                       <small className="text-muted">Compliance Score</small>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="mt-3">
+                                  <small className="text-muted">
+                                    <strong>Status:</strong> {reportsData.security.auditTrail?.complianceStatus}
+                                  </small>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Real-Time Metrics */}
+                          <div className="col-12">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-activity me-2"></i>Real-Time Activity Metrics</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.security.realTimeMetrics?.messageVolume?.today || 0}</div>
+                                      <small className="text-muted">Messages Today</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.security.realTimeMetrics?.messageVolume?.week || 0}</div>
+                                      <small className="text-muted">Messages This Week</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.security.realTimeMetrics?.activeConversations || 0}</div>
+                                      <small className="text-muted">Active Conversations</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.security.realTimeMetrics?.systemStatus || 'N/A'}</div>
+                                      <small className="text-muted">System Status</small>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="mt-3 text-center">
+                                  <small className="text-muted">
+                                    <strong>Last Message:</strong> {reportsData.security.realTimeMetrics?.lastMessageTime || 'Never'}
+                                  </small>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Audit Trail Summary */}
+                          <div className="col-12">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-clipboard-data me-2"></i>Audit Trail Summary</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.security.auditTrail?.totalMessagesAnalyzed || 0}</div>
+                                      <small className="text-muted">Messages Analyzed</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.security.auditTrail?.threatsDetected || 0}</div>
+                                      <small className="text-muted">Threats Detected</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.security.auditTrail?.suspiciousActivity || 0}</div>
+                                      <small className="text-muted">Suspicious Activity</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.security.auditTrail?.complianceStatus || 'N/A'}</div>
+                                      <small className="text-muted">Compliance Status</small>
                                     </div>
                                   </div>
                                 </div>
@@ -3797,36 +3888,147 @@ const ESCAdminDashboard = () => {
                             </div>
                           </div>
 
-                          {/* Recent Alerts */}
+                          {/* Recent Security Alerts */}
                           <div className="col-12">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-info text-white">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-bell me-2"></i>Recent Security Alerts</h6>
                               </div>
                               <div className="card-body">
-                                {reportsData.security.recentAlerts.map((alert, index) => (
-                                  <div key={index} className="d-flex justify-content-between align-items-center p-2 border-bottom">
-                                    <div>
-                                      <strong>{alert.alert}</strong>
-                                      <br />
-                                      <small className="text-muted">{alert.timestamp}</small>
+                                {reportsData.security.recentAlerts && reportsData.security.recentAlerts.length > 0 ? (
+                                  reportsData.security.recentAlerts.map((alert, index) => (
+                                    <div key={index} className="d-flex justify-content-between align-items-center p-3 border-bottom">
+                                      <div className="flex-grow-1">
+                                        <div className="d-flex align-items-center mb-2">
+                                          <strong className="me-2">{alert.alert}</strong>
+                                          <span className={`badge ${
+                                            alert.severity === 'high' ? 'bg-danger' :
+                                            alert.severity === 'medium' ? 'bg-warning' :
+                                            'bg-info'
+                                          }`}>
+                                            {alert.severity.toUpperCase()}
+                                          </span>
+                                        </div>
+                                        <div className="mb-2">
+                                          <small className="text-muted">
+                                            <strong>Reason:</strong> {alert.flagReason} | 
+                                            <strong>Time:</strong> {alert.timestamp}
+                                          </small>
+                                        </div>
+                                        <div className="mb-2">
+                                          <small className="text-muted">
+                                            <strong>Sender:</strong> {alert.senderName} ({alert.senderEmail})
+                                          </small>
+                                        </div>
+                                        <div className="bg-light p-2 rounded">
+                                          <small className="text-muted">
+                                            <strong>Message Preview:</strong> {alert.content}
+                                          </small>
+                                        </div>
+                                      </div>
                                     </div>
-                                    <span className={`badge ${
-                                      alert.severity === 'high' ? 'bg-danger' :
-                                      alert.severity === 'medium' ? 'bg-warning' :
-                                      'bg-info'
-                                    }`}>
-                                      {alert.severity}
-                                    </span>
+                                  ))
+                                ) : (
+                                  <div className="text-center py-3">
+                                    <i className="bi bi-check-circle text-success" style={{ fontSize: '2rem' }}></i>
+                                    <p className="mt-2 text-muted">No security alerts detected. System is secure!</p>
                                   </div>
-                                ))}
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* All Communicating Users - Accountability Section */}
+                          <div className="col-12">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-people me-2"></i>All Communicating Users - Accountability</h6>
+                                <small className="text-white-50">Complete audit trail for legal and compliance purposes</small>
+                              </div>
+                              <div className="card-body">
+                                {reportsData.security.allCommunicatingUsers && reportsData.security.allCommunicatingUsers.length > 0 ? (
+                                  <div className="table-responsive">
+                                    <table className="table table-sm table-hover">
+                                      <thead>
+                                        <tr>
+                                          <th>User</th>
+                                          <th>Type</th>
+                                          <th>Email</th>
+                                          <th>Messages</th>
+                                          <th>Last Activity</th>
+                                          <th>Threats</th>
+                                          <th>Suspicious</th>
+                                          <th>Risk Level</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {reportsData.security.allCommunicatingUsers.map((user, index) => {
+                                          const threatCount = parseInt(user.threat_count) || 0;
+                                          const suspiciousCount = parseInt(user.suspicious_count) || 0;
+                                          const riskLevel = threatCount > 0 || suspiciousCount > 0 ? 
+                                            (threatCount > 2 || suspiciousCount > 3 ? 'High' : 'Medium') : 'Low';
+                                          
+                                          return (
+                                            <tr key={index} className={
+                                              riskLevel === 'High' ? 'table-danger' :
+                                              riskLevel === 'Medium' ? 'table-warning' : ''
+                                            }>
+                                              <td>
+                                                <strong>{user.display_name}</strong>
+                                                <br />
+                                                <small className="text-muted">ID: {user.user_id}</small>
+                                              </td>
+                                              <td>
+                                                <span className={`badge ${
+                                                  user.user_type === 'associate' ? 'bg-primary' : 'bg-success'
+                                                }`}>
+                                                  {user.user_type}
+                                                </span>
+                                              </td>
+                                              <td>{user.email}</td>
+                                              <td>{user.message_count}</td>
+                                              <td>
+                                                {user.last_message ? 
+                                                  new Date(user.last_message).toLocaleDateString() : 'Never'}
+                                              </td>
+                                              <td>
+                                                <span className={threatCount > 0 ? 'text-danger' : 'text-muted'}>
+                                                  {threatCount}
+                                                </span>
+                                              </td>
+                                              <td>
+                                                <span className={suspiciousCount > 0 ? 'text-warning' : 'text-muted'}>
+                                                  {suspiciousCount}
+                                                </span>
+                                              </td>
+                                              <td>
+                                                <span className={`badge ${
+                                                  riskLevel === 'High' ? 'bg-danger' :
+                                                  riskLevel === 'Medium' ? 'bg-warning' :
+                                                  'bg-success'
+                                                }`}>
+                                                  {riskLevel}
+                                                </span>
+                                              </td>
+                                            </tr>
+                                          );
+                                        })}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                ) : (
+                                  <div className="text-center py-3">
+                                    <i className="bi bi-info-circle text-info" style={{ fontSize: '2rem' }}></i>
+                                    <p className="mt-2 text-muted">No communication data available for the selected period.</p>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
                         </div>
                       ) : (
                         <div className="text-center py-4">
-                          <div className="spinner-border text-danger" role="status">
+                          <div className="spinner-border" style={{ color: accent }} role="status">
                             <span className="visually-hidden">Loading...</span>
                           </div>
                           <p className="mt-2">Loading security data...</p>
