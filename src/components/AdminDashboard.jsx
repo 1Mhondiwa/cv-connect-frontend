@@ -398,6 +398,18 @@ const ESCAdminDashboard = () => {
     }
   }, [user]);
 
+  // Auto-generate reports when report section changes
+  useEffect(() => {
+    console.log('🔄 useEffect triggered - activeReportSection:', activeReportSection);
+    console.log('🔄 Current reportsData:', reportsData);
+    if (activeReportSection && !reportsData[activeReportSection]) {
+      console.log('🔄 Generating report for section:', activeReportSection);
+      generateComprehensiveReport();
+    } else {
+      console.log('🔄 Report data already exists for section:', activeReportSection);
+    }
+  }, [activeReportSection]);
+
   // Helper to get image URL
   const getAdminImageUrl = () => {
     if (adminImage) {
@@ -957,6 +969,7 @@ const ESCAdminDashboard = () => {
     setReportsError('');
     try {
       console.log('📊 Generating comprehensive report...');
+      console.log('📊 Current activeReportSection:', activeReportSection);
       
       // Fetch all report data in parallel
       const [performanceRes, businessRes, securityRes, operationsRes] = await Promise.all([
@@ -965,6 +978,13 @@ const ESCAdminDashboard = () => {
         api.get('/admin/reports/security'),
         api.get('/admin/reports/operations')
       ]);
+
+      console.log('📊 API Responses:', {
+        performance: performanceRes.data,
+        business: businessRes.data,
+        security: securityRes.data,
+        operations: operationsRes.data
+      });
 
       // Update reports data
       setReportsData({
@@ -976,17 +996,26 @@ const ESCAdminDashboard = () => {
 
       setLastReportUpdate(new Date());
       console.log('✅ Comprehensive report generated successfully');
+      console.log('✅ Updated reportsData:', {
+        performance: performanceRes.data.success ? performanceRes.data.data : null,
+        business: businessRes.data.success ? businessRes.data.data : null,
+        security: securityRes.data.success ? securityRes.data.data : null,
+        operations: operationsRes.data.success ? operationsRes.data.data : null
+      });
     } catch (error) {
       console.error('❌ Error generating comprehensive report:', error);
       setReportsError('Failed to generate comprehensive report. Please try again.');
       
       // Set fallback data for demonstration
-      setReportsData({
+      const fallbackData = {
         performance: generateFallbackPerformanceData(),
         business: generateFallbackBusinessData(),
-        security: generateFallbackSecurityData(),
+        security: generateFallbackBasicSecurityData(),
         operations: generateFallbackOperationsData()
-      });
+      };
+      
+      setReportsData(fallbackData);
+      console.log('✅ Fallback data set:', fallbackData);
     } finally {
       setReportsLoading(false);
     }
@@ -1051,6 +1080,25 @@ const ESCAdminDashboard = () => {
       'Improve freelancer matching accuracy',
       'Enhance communication monitoring',
       'Optimize system performance'
+    ]
+  });
+
+  const generateFallbackBasicSecurityData = () => ({
+    securityOverview: {
+      totalThreats: 3,
+      blockedAttempts: 12,
+      securityScore: 'A+',
+      lastAudit: '2 days ago'
+    },
+    communicationMonitoring: {
+      totalMessages: 156,
+      flaggedMessages: 2,
+      suspiciousUsers: 1,
+      complianceScore: '98.5%'
+    },
+    recentAlerts: [
+      { alert: 'Suspicious login attempt detected', severity: 'medium', timestamp: '3 hours ago' },
+      { alert: 'Unusual message pattern detected', severity: 'low', timestamp: '1 day ago' }
     ]
   });
 
@@ -3033,7 +3081,10 @@ const ESCAdminDashboard = () => {
                       <p className="card-text small text-muted">Response times, error rates, system health</p>
                       <button 
                         className="btn btn-sm btn-outline-primary"
-                        onClick={() => setActiveReportSection('performance')}
+                        onClick={() => {
+                          console.log('🔍 Performance report clicked');
+                          setActiveReportSection('performance');
+                        }}
                       >
                         View Report
                       </button>
@@ -3052,7 +3103,10 @@ const ESCAdminDashboard = () => {
                       <p className="card-text small text-muted">Growth trends, matching efficiency, ROI</p>
                       <button 
                         className="btn btn-sm btn-outline-success"
-                        onClick={() => setActiveReportSection('business')}
+                        onClick={() => {
+                          console.log('🔍 Business report clicked');
+                          setActiveReportSection('business');
+                        }}
                       >
                         View Report
                       </button>
@@ -3071,7 +3125,10 @@ const ESCAdminDashboard = () => {
                       <p className="card-text small text-muted">Communication monitoring, threat detection</p>
                       <button 
                         className="btn btn-sm btn-outline-danger"
-                        onClick={() => setActiveReportSection('security')}
+                        onClick={() => {
+                          console.log('🔍 Security report clicked');
+                          setActiveReportSection('security');
+                        }}
                       >
                         View Report
                       </button>
@@ -3090,7 +3147,10 @@ const ESCAdminDashboard = () => {
                       <p className="card-text small text-muted">Workflow efficiency, quality metrics</p>
                       <button 
                         className="btn btn-sm btn-outline-purple"
-                        onClick={() => setActiveReportSection('operations')}
+                        onClick={() => {
+                          console.log('🔍 Operations report clicked');
+                          setActiveReportSection('operations');
+                        }}
                       >
                         View Report
                       </button>
@@ -3103,16 +3163,479 @@ const ESCAdminDashboard = () => {
               {activeReportSection && (
                 <div className="mt-4">
                   {activeReportSection === 'performance' && (
-                    <SystemPerformanceReport />
+                    <div className="bg-white rounded-4 shadow-sm p-4">
+                      <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h6 style={{ color: '#fd680e', fontWeight: 600 }}>System Performance Report</h6>
+                        <small className="text-muted">
+                          <i className="bi bi-clock me-1"></i>
+                          {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
+                        </small>
+                      </div>
+                      
+                      {console.log('🔍 Rendering performance report, data:', reportsData.performance)}
+                      {reportsData.performance ? (
+                        <div className="row g-4">
+                          {/* System Health */}
+                          <div className="col-md-6">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-success text-white">
+                                <h6 className="mb-0"><i className="bi bi-heart-pulse me-2"></i>System Health</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-success mb-1">{reportsData.performance.systemHealth.uptime}</div>
+                                      <small className="text-muted">Uptime</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-info mb-1">{reportsData.performance.systemHealth.responseTime}</div>
+                                      <small className="text-muted">Response Time</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-warning mb-1">{reportsData.performance.systemHealth.errorRate}</div>
+                                      <small className="text-muted">Error Rate</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-primary mb-1">{reportsData.performance.systemHealth.activeConnections}</div>
+                                      <small className="text-muted">Active Connections</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Performance Metrics */}
+                          <div className="col-md-6">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-primary text-white">
+                                <h6 className="mb-0"><i className="bi bi-speedometer2 me-2"></i>Performance Metrics</h6>
+                              </div>
+                              <div className="card-body">
+                                {reportsData.performance.performanceMetrics.map((metric, index) => (
+                                  <div key={index} className="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                    <span>{metric.metric}</span>
+                                    <div className="d-flex align-items-center">
+                                      <span className={`badge ${
+                                        metric.status === 'excellent' ? 'bg-success' :
+                                        metric.status === 'good' ? 'bg-primary' :
+                                        'bg-warning'
+                                      }`}>
+                                        {metric.value}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Recent Issues */}
+                          <div className="col-12">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-warning text-dark">
+                                <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>Recent System Issues</h6>
+                              </div>
+                              <div className="card-body">
+                                {reportsData.performance.recentIssues.map((issue, index) => (
+                                  <div key={index} className="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                    <div>
+                                      <strong>{issue.issue}</strong>
+                                      <br />
+                                      <small className="text-muted">{issue.timestamp}</small>
+                                    </div>
+                                    <span className={`badge ${
+                                      issue.severity === 'high' ? 'bg-danger' :
+                                      issue.severity === 'medium' ? 'bg-warning' :
+                                      'bg-info'
+                                    }`}>
+                                      {issue.severity}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                          <p className="mt-2">Loading performance data...</p>
+                        </div>
+                      )}
+                    </div>
                   )}
+
                   {activeReportSection === 'business' && (
-                    <BusinessIntelligenceReport />
+                    <div className="bg-white rounded-4 shadow-sm p-4">
+                      <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h6 style={{ color: '#10b981', fontWeight: 600 }}>Business Intelligence Report</h6>
+                        <small className="text-muted">
+                          <i className="bi bi-clock me-1"></i>
+                          {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
+                        </small>
+                      </div>
+                      
+                      {reportsData.business ? (
+                        <div className="row g-4">
+                          {/* User Growth */}
+                          <div className="col-md-6">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-success text-white">
+                                <h6 className="mb-0"><i className="bi bi-people me-2"></i>User Growth</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-success mb-1">{reportsData.business.userGrowth.totalUsers}</div>
+                                      <small className="text-muted">Total Users</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-info mb-1">{reportsData.business.userGrowth.monthlyGrowth}</div>
+                                      <small className="text-muted">Monthly Growth</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-warning mb-1">{reportsData.business.userGrowth.userRetention}</div>
+                                      <small className="text-muted">User Retention</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-primary mb-1">{reportsData.business.userGrowth.activeUsers}</div>
+                                      <small className="text-muted">Active Users (7d)</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Matching Efficiency */}
+                          <div className="col-md-6">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-primary text-white">
+                                <h6 className="mb-0"><i className="bi bi-link me-2"></i>Matching Efficiency</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-primary mb-1">{reportsData.business.matchingEfficiency.totalRequests}</div>
+                                      <small className="text-muted">Total Requests</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-success mb-1">{reportsData.business.matchingEfficiency.successfulMatches}</div>
+                                      <small className="text-muted">Successful Matches</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-warning mb-1">{reportsData.business.matchingEfficiency.matchRate}</div>
+                                      <small className="text-muted">Match Rate</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-info mb-1">{reportsData.business.matchingEfficiency.averageResponseTime}</div>
+                                      <small className="text-muted">Avg Response Time</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Business Metrics */}
+                          <div className="col-12">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-info text-white">
+                                <h6 className="mb-0"><i className="bi bi-graph-up me-2"></i>Business Metrics</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row">
+                                  {reportsData.business.businessMetrics.map((metric, index) => (
+                                    <div key={index} className="col-md-4 mb-3">
+                                      <div className="d-flex align-items-center">
+                                        <i className={`bi bi-arrow-${metric.trend === 'up' ? 'up-circle text-success' : 'down-circle text-danger'} me-2`}></i>
+                                        <div>
+                                          <div className="fw-medium">{metric.metric}</div>
+                                          <div className="h5 mb-0">{metric.value}</div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <div className="spinner-border text-success" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                          <p className="mt-2">Loading business data...</p>
+                        </div>
+                      )}
+                    </div>
                   )}
+
                   {activeReportSection === 'security' && (
-                    <SecurityComplianceReport />
+                    <div className="bg-white rounded-4 shadow-sm p-4">
+                      <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h6 style={{ color: '#ef4444', fontWeight: 600 }}>Security & Compliance Report</h6>
+                        <small className="text-muted">
+                          <i className="bi bi-clock me-1"></i>
+                          {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
+                        </small>
+                      </div>
+                      
+                      {reportsData.security ? (
+                        <div className="row g-4">
+                          {/* Security Overview */}
+                          <div className="col-md-6">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-danger text-white">
+                                <h6 className="mb-0"><i className="bi bi-shield-check me-2"></i>Security Overview</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-danger mb-1">{reportsData.security.securityOverview.totalThreats}</div>
+                                      <small className="text-muted">Total Threats</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-success mb-1">{reportsData.security.securityOverview.blockedAttempts}</div>
+                                      <small className="text-muted">Blocked Attempts</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-warning mb-1">{reportsData.security.securityOverview.securityScore}</div>
+                                      <small className="text-muted">Security Score</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-info mb-1">{reportsData.security.securityOverview.lastAudit}</div>
+                                      <small className="text-muted">Last Audit</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Communication Monitoring */}
+                          <div className="col-md-6">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-warning text-dark">
+                                <h6 className="mb-0"><i className="bi bi-chat-dots me-2"></i>Communication Monitoring</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-info mb-1">{reportsData.security.communicationMonitoring.totalMessages}</div>
+                                      <small className="text-muted">Total Messages</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-warning mb-1">{reportsData.security.communicationMonitoring.flaggedMessages}</div>
+                                      <small className="text-muted">Flagged Messages</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-danger mb-1">{reportsData.security.communicationMonitoring.suspiciousUsers}</div>
+                                      <small className="text-muted">Suspicious Users</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-success mb-1">{reportsData.security.communicationMonitoring.complianceScore}</div>
+                                      <small className="text-muted">Compliance Score</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Recent Alerts */}
+                          <div className="col-12">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-info text-white">
+                                <h6 className="mb-0"><i className="bi bi-bell me-2"></i>Recent Security Alerts</h6>
+                              </div>
+                              <div className="card-body">
+                                {reportsData.security.recentAlerts.map((alert, index) => (
+                                  <div key={index} className="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                    <div>
+                                      <strong>{alert.alert}</strong>
+                                      <br />
+                                      <small className="text-muted">{alert.timestamp}</small>
+                                    </div>
+                                    <span className={`badge ${
+                                      alert.severity === 'high' ? 'bg-danger' :
+                                      alert.severity === 'medium' ? 'bg-warning' :
+                                      'bg-info'
+                                    }`}>
+                                      {alert.severity}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <div className="spinner-border text-danger" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                          <p className="mt-2">Loading security data...</p>
+                        </div>
+                      )}
+                    </div>
                   )}
+
                   {activeReportSection === 'operations' && (
-                    <OperationalReport />
+                    <div className="bg-white rounded-4 shadow-sm p-4">
+                      <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h6 style={{ color: '#8b5cf6', fontWeight: 600 }}>Operations Report</h6>
+                        <small className="text-muted">
+                          <i className="bi bi-clock me-1"></i>
+                          {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
+                        </small>
+                      </div>
+                      
+                      {reportsData.operations ? (
+                        <div className="row g-4">
+                          {/* Workflow Efficiency */}
+                          <div className="col-md-6">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header text-white" style={{ backgroundColor: '#8b5cf6' }}>
+                                <h6 className="mb-0"><i className="bi bi-gear me-2"></i>Workflow Efficiency</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-info mb-1">{reportsData.operations.workflowEfficiency.averageProcessingTime}</div>
+                                      <small className="text-muted">Avg Processing Time</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-success mb-1">{reportsData.operations.workflowEfficiency.completedTasks}</div>
+                                      <small className="text-muted">Completed Tasks</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-warning mb-1">{reportsData.operations.workflowEfficiency.pendingTasks}</div>
+                                      <small className="text-muted">Pending Tasks</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-primary mb-1">{reportsData.operations.workflowEfficiency.efficiencyScore}</div>
+                                      <small className="text-muted">Efficiency Score</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Quality Metrics */}
+                          <div className="col-md-6">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-info text-white">
+                                <h6 className="mb-0"><i className="bi bi-award me-2"></i>Quality Metrics</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-success mb-1">{reportsData.operations.qualityMetrics.userSatisfaction}</div>
+                                      <small className="text-muted">User Satisfaction</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-warning mb-1">{reportsData.operations.qualityMetrics.errorRate}</div>
+                                      <small className="text-muted">Error Rate</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-info mb-1">{reportsData.operations.qualityMetrics.responseTime}</div>
+                                      <small className="text-muted">Response Time</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-6">
+                                    <div className="mb-3">
+                                      <div className="h4 text-primary mb-1">{reportsData.operations.qualityMetrics.qualityScore}</div>
+                                      <small className="text-muted">Quality Score</small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Areas for Improvement */}
+                          <div className="col-12">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header bg-warning text-dark">
+                                <h6 className="mb-0"><i className="bi bi-lightbulb me-2"></i>Areas for Improvement</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row">
+                                  {reportsData.operations.improvementAreas.map((area, index) => (
+                                    <div key={index} className="col-md-6 mb-3">
+                                      <div className="d-flex align-items-start">
+                                        <i className="bi bi-arrow-right-circle text-warning me-2 mt-1"></i>
+                                        <span>{area}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <div className="spinner-border text-purple" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                          <p className="mt-2">Loading operations data...</p>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               )}
@@ -4068,7 +4591,7 @@ const ESCAdminDashboard = () => {
               {/* Workflow Efficiency */}
               <div className="col-md-6">
                 <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-purple text-white">
+                                                <div className="card-header text-white" style={{ backgroundColor: '#8b5cf6' }}>
                     <h6 className="mb-0"><i className="bi bi-gear me-2"></i>Workflow Efficiency</h6>
                   </div>
                   <div className="card-body">
@@ -4658,6 +5181,19 @@ const ESCAdminDashboard = () => {
           >
             <i className="bi bi-download me-2"></i>
             Load {activeSecuritySection.charAt(0).toUpperCase() + activeSecuritySection.slice(1)} Data
+          </button>
+        </div>
+      )}
+
+      {/* Auto-generate reports when report section changes */}
+      {activeReportSection && !reportsData[activeReportSection] && (
+        <div className="text-center py-4">
+          <button 
+            className="btn btn-primary"
+            onClick={() => generateComprehensiveReport()}
+          >
+            <i className="bi bi-download me-2"></i>
+            Load Report Data
           </button>
         </div>
       )}
