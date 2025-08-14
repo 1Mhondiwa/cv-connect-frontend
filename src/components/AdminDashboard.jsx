@@ -3587,7 +3587,11 @@ const ESCAdminDashboard = () => {
                   )}
 
                   {activeReportSection === 'business' && (
-                    <div className="bg-white rounded-4 shadow-sm p-4">
+                    <div className="bg-white rounded-4 shadow-sm p-4" style={{ 
+                      border: `3px solid ${accent}`, 
+                      backgroundColor: '#fff8f0',
+                      boxShadow: `0 0 20px ${accent}40`
+                    }}>
                       <div className="d-flex justify-content-between align-items-center mb-4">
                         <h6 style={{ color: accent, fontWeight: 600 }}>Business Intelligence Report</h6>
                         <small className="text-muted">
@@ -3601,32 +3605,32 @@ const ESCAdminDashboard = () => {
                           {/* User Growth */}
                           <div className="col-md-6">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-success text-white">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-people me-2"></i>User Growth</h6>
                               </div>
                               <div className="card-body">
                                 <div className="row text-center">
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-success mb-1">{reportsData.business.userGrowth.totalUsers}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.business.userGrowth.totalUsers}</div>
                                       <small className="text-muted">Total Users</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-info mb-1">{reportsData.business.userGrowth.monthlyGrowth}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.business.userGrowth.monthlyGrowth}</div>
                                       <small className="text-muted">Monthly Growth</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-warning mb-1">{reportsData.business.userGrowth.userRetention}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.business.userGrowth.userRetention}</div>
                                       <small className="text-muted">User Retention</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-primary mb-1">{reportsData.business.userGrowth.activeUsers}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.business.userGrowth.activeUsers}</div>
                                       <small className="text-muted">Active Users (7d)</small>
                                     </div>
                                   </div>
@@ -3638,32 +3642,32 @@ const ESCAdminDashboard = () => {
                           {/* Matching Efficiency */}
                           <div className="col-md-6">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-primary text-white">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-link me-2"></i>Matching Efficiency</h6>
                               </div>
                               <div className="card-body">
                                 <div className="row text-center">
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-primary mb-1">{reportsData.business.matchingEfficiency.totalRequests}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.business.matchingEfficiency.totalRequests}</div>
                                       <small className="text-muted">Total Requests</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-success mb-1">{reportsData.business.matchingEfficiency.successfulMatches}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.business.matchingEfficiency.successfulMatches}</div>
                                       <small className="text-muted">Successful Matches</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-warning mb-1">{reportsData.business.matchingEfficiency.matchRate}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.business.matchingEfficiency.matchRate}</div>
                                       <small className="text-muted">Match Rate</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-info mb-1">{reportsData.business.matchingEfficiency.averageResponseTime}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.business.matchingEfficiency.averageResponseTime}</div>
                                       <small className="text-muted">Avg Response Time</small>
                                     </div>
                                   </div>
@@ -3675,7 +3679,7 @@ const ESCAdminDashboard = () => {
                           {/* Business Metrics */}
                           <div className="col-12">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-info text-white">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-graph-up me-2"></i>Business Metrics</h6>
                               </div>
                               <div className="card-body">
@@ -3683,10 +3687,10 @@ const ESCAdminDashboard = () => {
                                   {reportsData.business.businessMetrics.map((metric, index) => (
                                     <div key={index} className="col-md-4 mb-3">
                                       <div className="d-flex align-items-center">
-                                        <i className={`bi bi-arrow-${metric.trend === 'up' ? 'up-circle text-success' : 'down-circle text-danger'} me-2`}></i>
+                                        <i className={`bi bi-arrow-${metric.trend === 'up' ? 'up-circle' : 'down-circle'}`} style={{ color: accent }}></i>
                                         <div>
                                           <div className="fw-medium">{metric.metric}</div>
-                                          <div className="h5 mb-0">{metric.value}</div>
+                                          <div className="h5 mb-0" style={{ color: accent }}>{metric.value}</div>
                                         </div>
                                       </div>
                                     </div>
@@ -3698,7 +3702,7 @@ const ESCAdminDashboard = () => {
                         </div>
                       ) : (
                         <div className="text-center py-4">
-                          <div className="spinner-border text-success" role="status">
+                          <div className="spinner-border" style={{ color: accent }} role="status">
                             <span className="visually-hidden">Loading...</span>
                           </div>
                           <p className="mt-2">Loading business data...</p>
