@@ -4056,32 +4056,32 @@ const ESCAdminDashboard = () => {
                           {/* Workflow Efficiency */}
                           <div className="col-md-6">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header text-white" style={{ backgroundColor: '#8b5cf6' }}>
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-gear me-2"></i>Workflow Efficiency</h6>
                               </div>
                               <div className="card-body">
                                 <div className="row text-center">
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-info mb-1">{reportsData.operations.workflowEfficiency.averageProcessingTime}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.operations.workflowEfficiency.averageProcessingTime}</div>
                                       <small className="text-muted">Avg Processing Time</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-success mb-1">{reportsData.operations.workflowEfficiency.completedTasks}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.operations.workflowEfficiency.completedTasks}</div>
                                       <small className="text-muted">Completed Tasks</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-warning mb-1">{reportsData.operations.workflowEfficiency.pendingTasks}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.operations.workflowEfficiency.pendingTasks}</div>
                                       <small className="text-muted">Pending Tasks</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-primary mb-1">{reportsData.operations.workflowEfficiency.efficiencyScore}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.operations.workflowEfficiency.efficiencyScore}</div>
                                       <small className="text-muted">Efficiency Score</small>
                                     </div>
                                   </div>
@@ -4093,32 +4093,32 @@ const ESCAdminDashboard = () => {
                           {/* Quality Metrics */}
                           <div className="col-md-6">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-info text-white">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-award me-2"></i>Quality Metrics</h6>
                               </div>
                               <div className="card-body">
                                 <div className="row text-center">
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-success mb-1">{reportsData.operations.qualityMetrics.userSatisfaction}</div>
+                                      <div className="h4" style={{ color: accent }}>{reportsData.operations.qualityMetrics.userSatisfaction}</div>
                                       <small className="text-muted">User Satisfaction</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-warning mb-1">{reportsData.operations.qualityMetrics.errorRate}</div>
+                                      <div className="h5" style={{ color: accent }}>{reportsData.operations.qualityMetrics.errorRate}</div>
                                       <small className="text-muted">Error Rate</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-info mb-1">{reportsData.operations.qualityMetrics.responseTime}</div>
+                                      <div className="h5" style={{ color: accent }}>{reportsData.operations.qualityMetrics.responseTime}</div>
                                       <small className="text-muted">Response Time</small>
                                     </div>
                                   </div>
                                   <div className="col-6">
                                     <div className="mb-3">
-                                      <div className="h4 text-primary mb-1">{reportsData.operations.qualityMetrics.qualityScore}</div>
+                                      <div className="h5" style={{ color: accent }}>{reportsData.operations.qualityMetrics.qualityScore}</div>
                                       <small className="text-muted">Quality Score</small>
                                     </div>
                                   </div>
@@ -4127,10 +4127,54 @@ const ESCAdminDashboard = () => {
                             </div>
                           </div>
 
+                          {/* Real-Time Activity Metrics */}
+                          <div className="col-12">
+                            <div className="card border-0 shadow-sm">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
+                                <h6 className="mb-0"><i className="bi bi-activity me-2"></i>Real-Time Activity Metrics</h6>
+                              </div>
+                              <div className="card-body">
+                                <div className="row text-center">
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.operations.realTimeMetrics?.messageVolume?.today || 0}</div>
+                                      <small className="text-muted">Messages Today</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.operations.realTimeMetrics?.messageVolume?.week || 0}</div>
+                                      <small className="text-muted">Messages This Week</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.operations.realTimeMetrics?.activeConversations || 0}</div>
+                                      <small className="text-muted">Active Conversations</small>
+                                    </div>
+                                  </div>
+                                  <div className="col-3">
+                                    <div className="mb-3">
+                                      <div className="h5" style={{ color: accent }}>{reportsData.operations.realTimeMetrics?.activeUsers || 0}</div>
+                                      <small className="text-muted">Active Users (7d)</small>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="mt-3 text-center">
+                                  <small className="text-muted">
+                                    <strong>Total Users:</strong> {reportsData.operations.realTimeMetrics?.totalUsers || 0} | 
+                                    <strong>Engagement Rate:</strong> {reportsData.operations.realTimeMetrics?.totalUsers > 0 ? 
+                                      Math.round((reportsData.operations.realTimeMetrics.activeUsers / reportsData.operations.realTimeMetrics.totalUsers) * 100) : 0}%
+                                  </small>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
                           {/* Areas for Improvement */}
                           <div className="col-12">
                             <div className="card border-0 shadow-sm">
-                              <div className="card-header bg-warning text-dark">
+                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-lightbulb me-2"></i>Areas for Improvement</h6>
                               </div>
                               <div className="card-body">
@@ -4138,7 +4182,7 @@ const ESCAdminDashboard = () => {
                                   {reportsData.operations.improvementAreas.map((area, index) => (
                                     <div key={index} className="col-md-6 mb-3">
                                       <div className="d-flex align-items-start">
-                                        <i className="bi bi-arrow-right-circle text-warning me-2 mt-1"></i>
+                                        <i className="bi bi-arrow-right-circle me-2 mt-1" style={{ color: accent }}></i>
                                         <span>{area}</span>
                                       </div>
                                     </div>
