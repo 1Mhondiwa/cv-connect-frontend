@@ -5213,69 +5213,7 @@ const ESCAdminDashboard = () => {
         </div>
       )}
 
-      {/* Enhanced Security & Compliance Report Component */}
-      {activeReportSection === 'security' && (
-        <div className="bg-white rounded-4 shadow-sm p-4 mt-4">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h6 style={{ color: '#ef4444', fontWeight: 600 }}>Enhanced Security & Communication Monitoring</h6>
-            <div className="d-flex gap-2">
-              <button 
-                className="btn btn-sm btn-outline-danger"
-                onClick={() => setActiveSecuritySection('dashboard')}
-              >
-                Security Dashboard
-              </button>
-              <button 
-                className="btn btn-sm btn-outline-warning"
-                onClick={() => setActiveSecuritySection('communications')}
-              >
-                Communication Analysis
-              </button>
-              <button 
-                className="btn btn-sm btn-outline-info"
-                onClick={() => setActiveSecuritySection('audit')}
-              >
-                Audit Log
-              </button>
-              <button 
-                className="btn btn-sm btn-outline-dark"
-                onClick={() => setActiveSecuritySection('threats')}
-              >
-                Threat Intelligence
-              </button>
-            </div>
-          </div>
 
-          {/* Security Dashboard */}
-          {activeSecuritySection === 'dashboard' && (
-            <SecurityDashboard />
-          )}
-
-          {/* Communication Analysis */}
-          {activeSecuritySection === 'communications' && (
-            <CommunicationAnalysis />
-          )}
-
-          {/* Audit Log */}
-          {activeSecuritySection === 'audit' && (
-            <AuditLog />
-          )}
-
-          {/* Threat Intelligence */}
-          {activeSecuritySection === 'threats' && (
-            <ThreatIntelligence />
-          )}
-
-          {/* Default Security View */}
-          {!activeSecuritySection && (
-            <div className="text-center py-5">
-              <i className="bi bi-shield-check display-1 text-danger"></i>
-              <h6 className="text-danger mt-3">Security Monitoring Dashboard</h6>
-              <p className="text-muted">Select a security monitoring option above to view detailed information</p>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Operational Report Component */}
       {activeReportSection === 'operations' && (
