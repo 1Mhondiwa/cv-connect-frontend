@@ -77,7 +77,8 @@ function AppRoutes() {
     location.pathname.startsWith('/freelancer/welcome') ||
     location.pathname.startsWith('/associate/dashboard') ||
     location.pathname.startsWith('/associate/temp-password-change') ||
-    location.pathname.startsWith('/admin/dashboard');
+    location.pathname.startsWith('/admin/dashboard') ||
+    location.pathname.startsWith('/ecs-employee-dashboard');
 
   return (
     <>
