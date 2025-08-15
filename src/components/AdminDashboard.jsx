@@ -13,17 +13,7 @@ const ESCAdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Associate request management states
-  const [associateRequests, setAssociateRequests] = useState([]);
-  const [associateRequestsLoading, setAssociateRequestsLoading] = useState(false);
-  const [associateRequestsError, setAssociateRequestsError] = useState('');
-  const [selectedRequest, setSelectedRequest] = useState(null);
-  const [reviewLoading, setReviewLoading] = useState(false);
-  const [reviewFormData, setReviewFormData] = useState({
-    status: 'approved',
-    review_notes: '',
-    password: ''
-  });
+
   
   // Legacy associate management (keeping for backward compatibility)
   const [associateFormData, setAssociateFormData] = useState({
@@ -46,7 +36,7 @@ const ESCAdminDashboard = () => {
   const [toggleLoading, setToggleLoading] = useState({});
   
   // Enhanced freelancer management
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associate-requests', 'associates', 'freelancers'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associates', 'freelancers'
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
@@ -321,13 +311,7 @@ const ESCAdminDashboard = () => {
     // eslint-disable-next-line
   }, [activeTab]);
 
-  // Fetch associate requests when associate-requests tab is activated
-  useEffect(() => {
-    if (activeTab === 'associate-requests') {
-      fetchAssociateRequests();
-    }
-    // eslint-disable-next-line
-  }, [activeTab]);
+
 
   // Fetch freelancer requests when freelancer-requests tab is activated
   useEffect(() => {
@@ -734,60 +718,7 @@ const ESCAdminDashboard = () => {
     }
   };
 
-  // Associate Request Management Functions
-  const fetchAssociateRequests = async () => {
-    setAssociateRequestsLoading(true);
-    setAssociateRequestsError('');
-    try {
-      const res = await api.get('/associate-request/requests');
-      if (res.data.success) {
-        setAssociateRequests(res.data.data.requests);
-      } else {
-        setAssociateRequestsError(res.data.message || 'Failed to fetch associate requests');
-      }
-    } catch (err) {
-      setAssociateRequestsError(err.response?.data?.message || 'Failed to fetch associate requests');
-    } finally {
-      setAssociateRequestsLoading(false);
-    }
-  };
 
-  const handleReviewRequest = async (requestId) => {
-    setReviewLoading(true);
-    try {
-      console.log('🔍 Sending review request:', {
-        url: `/associate-request/requests/${requestId}/review`,
-        data: reviewFormData,
-        requestId
-      });
-      
-      const res = await api.put(`/associate-request/requests/${requestId}/review`, reviewFormData);
-      console.log('✅ Review response:', res.data);
-      
-      if (res.data.success) {
-        // Refresh the requests list
-        fetchAssociateRequests();
-        setSelectedRequest(null);
-        setReviewFormData({ status: 'approved', review_notes: '', password: '' });
-        alert(`Request ${reviewFormData.status} successfully`);
-      } else {
-        alert(res.data.message || 'Failed to review request');
-      }
-    } catch (err) {
-      console.error('❌ Review request error:', err);
-      console.error('Error response:', err.response?.data);
-      alert(err.response?.data?.message || 'Failed to review request');
-    } finally {
-      setReviewLoading(false);
-    }
-  };
-
-  const handleReviewFormChange = (e) => {
-    setReviewFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-  };
 
   // Analytics Functions
   const fetchAnalyticsData = async () => {
@@ -1957,28 +1888,7 @@ const ESCAdminDashboard = () => {
               
 
 
-              <button
-                className={`nav-item w-100 text-start ${activeTab === 'associate-requests' ? 'active' : ''}`}
-                onClick={() => setActiveTab('associate-requests')}
-                style={{
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: activeTab === 'associate-requests' ? accent : 'transparent',
-                  color: activeTab === 'associate-requests' ? '#fff' : '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease',
-                  height: '48px',
-                  lineHeight: '24px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <i className="bi bi-person-plus me-3"></i>
-                Associate Requests
-                </button>
+
 
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'freelancer-requests' ? 'active' : ''}`}
@@ -2192,7 +2102,7 @@ const ESCAdminDashboard = () => {
           <div>
             <h1 className="h3 mb-0" style={{ color: '#111827', fontWeight: 600 }}>
               {activeTab === 'dashboard' && 'Dashboard'}
-              {activeTab === 'associate-requests' && 'Associate Requests'}
+
               {activeTab === 'freelancer-requests' && 'Associate Freelancer Requests'}
               {activeTab === 'analytics' && 'Analytics'}
               {activeTab === 'reports' && 'Reports'}
@@ -2202,7 +2112,7 @@ const ESCAdminDashboard = () => {
             </h1>
             <p className="text-muted mb-0">
               {activeTab === 'dashboard' && 'System overview and key metrics'}
-              {activeTab === 'associate-requests' && 'Review associate join requests'}
+
               {activeTab === 'freelancer-requests' && 'Handle associate freelancer requests'}
               {activeTab === 'analytics' && 'Performance insights and trends'}
               {activeTab === 'reports' && 'Generate and view system reports'}
@@ -2321,7 +2231,7 @@ const ESCAdminDashboard = () => {
                         </div>
                         </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
-                      {statsLoading ? '...' : statsError ? '--' : stats?.associate_requests?.pending ?? '--'}
+                      0
                         </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
@@ -2514,166 +2424,7 @@ const ESCAdminDashboard = () => {
             </>
           )}
           {/* Associate Requests Table (Associate Requests Tab) */}
-          {activeTab === 'associate-requests' && (
-            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Associate Requests</h5>
-              {associateRequestsLoading ? (
-                <div>Loading associate requests...</div>
-              ) : associateRequestsError ? (
-                <div style={{ color: '#df1529', fontWeight: 500 }}>{associateRequestsError}</div>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table className="table table-bordered" style={{ minWidth: 700 }}>
-                    <thead style={{ background: '#f8f9fa' }}>
-                      <tr>
-                        <th>Email</th>
-                        <th>Company Name</th>
-                        <th>Contact Person</th>
-                        <th>Industry</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th>Requested</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {associateRequests.map(request => (
-                        <tr key={request.request_id}>
-                          <td>{request.email}</td>
-                          <td>{request.company_name || 'N/A'}</td>
-                          <td>{request.contact_person}</td>
-                          <td>{request.industry}</td>
-                          <td>{request.phone}</td>
-                          <td>
-                            <span className={`badge ${request.status === 'pending' ? 'bg-warning' : request.status === 'approved' ? 'bg-success' : 'bg-danger'}`}>
-                              {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                            </span>
-                          </td>
-                          <td>{request.created_at ? new Date(request.created_at).toLocaleDateString() : ''}</td>
-                          <td>
-                            {request.status === 'pending' && (
-                              <button
-                                className="btn btn-sm btn-primary me-2"
-                                onClick={() => setSelectedRequest(request)}
-                                style={{ borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px' }}
-                              >
-                                Review
-                              </button>
-                            )}
-                            {request.status !== 'pending' && (
-                              <div>
-                                <small className="text-muted">
-                                  {request.reviewed_at ? `Reviewed: ${new Date(request.reviewed_at).toLocaleDateString()}` : ''}
-                                </small>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
 
-              {/* Review Modal */}
-              {selectedRequest && (
-                <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-                  <div className="modal-dialog modal-lg">
-                    <div className="modal-content">
-                      <div className="modal-header">
-                        <h5 className="modal-title">Review Associate Request</h5>
-                        <button type="button" className="btn-close" onClick={() => setSelectedRequest(null)}></button>
-                      </div>
-                      <div className="modal-body">
-                        <div className="row mb-3">
-                          <div className="col-md-6">
-                            <strong>Email:</strong> {selectedRequest.email}
-                          </div>
-                          <div className="col-md-6">
-                            <strong>Company:</strong> {selectedRequest.company_name || 'N/A'}
-                          </div>
-                        </div>
-                        <div className="row mb-3">
-                          <div className="col-md-6">
-                            <strong>Contact Person:</strong> {selectedRequest.contact_person}
-                          </div>
-                          <div className="col-md-6">
-                            <strong>Industry:</strong> {selectedRequest.industry}
-                          </div>
-                        </div>
-                        <div className="row mb-3">
-                          <div className="col-md-6">
-                            <strong>Phone:</strong> {selectedRequest.phone}
-                          </div>
-                          <div className="col-md-6">
-                            <strong>Website:</strong> {selectedRequest.website || 'N/A'}
-                          </div>
-                        </div>
-                        {selectedRequest.request_reason && (
-                          <div className="mb-3">
-                            <strong>Reason:</strong> {selectedRequest.request_reason}
-                          </div>
-                        )}
-                        <hr />
-                        <form>
-                          <div className="mb-3">
-                            <label className="form-label">Decision:</label>
-                            <select 
-                              name="status" 
-                              className="form-select" 
-                              value={reviewFormData.status}
-                              onChange={handleReviewFormChange}
-                            >
-                              <option value="approved">Approve</option>
-                              <option value="rejected">Reject</option>
-                            </select>
-                          </div>
-                          {reviewFormData.status === 'approved' && (
-                            <div className="mb-3">
-                              <label className="form-label">Set Password:</label>
-                              <input 
-                                type="password" 
-                                name="password" 
-                                className="form-control" 
-                                placeholder="Enter password for the new account"
-                                value={reviewFormData.password}
-                                onChange={handleReviewFormChange}
-                                required
-                              />
-                            </div>
-                          )}
-                          <div className="mb-3">
-                            <label className="form-label">Review Notes (Optional):</label>
-                            <textarea 
-                              name="review_notes" 
-                              className="form-control" 
-                              rows="3"
-                              placeholder="Add any notes about this decision"
-                              value={reviewFormData.review_notes}
-                              onChange={handleReviewFormChange}
-                            ></textarea>
-                          </div>
-                        </form>
-                      </div>
-                      <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={() => setSelectedRequest(null)}>
-                          Cancel
-                        </button>
-                        <button 
-                          type="button" 
-                          className="btn btn-primary" 
-                          onClick={() => handleReviewRequest(selectedRequest.request_id)}
-                          disabled={reviewLoading || (reviewFormData.status === 'approved' && !reviewFormData.password)}
-                        >
-                          {reviewLoading ? 'Processing...' : `Submit ${reviewFormData.status}`}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
           {/* Associates Table (Associates Tab) */}
           {activeTab === 'associates' && (
             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
