@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../utils/axios';
 
 const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) => {
   const [formData, setFormData] = useState({
-    project_title: request?.title || '',
-    project_description: request?.description || '',
+    project_title: '',
+    project_description: '',
     agreed_terms: '',
     agreed_rate: '',
     rate_type: 'hourly',
@@ -15,6 +15,25 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  useEffect(() => {
+    if (request) {
+      setFormData({
+        project_title: request.title || '',
+        project_description: request.description || '',
+        agreed_terms: '',
+        agreed_rate: '',
+        rate_type: 'hourly',
+        start_date: '',
+        expected_end_date: '',
+        associate_notes: ''
+      });
+    }
+  }, [request]);
+
+  if (!isOpen || !freelancer || !request) {
+    return null;
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,23 +60,9 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
 
       if (response.data.success) {
         setSuccess('Freelancer hired successfully!');
-        setFormData({
-          project_title: '',
-          project_description: '',
-          agreed_terms: '',
-          agreed_rate: '',
-          rate_type: 'hourly',
-          start_date: '',
-          expected_end_date: '',
-          associate_notes: ''
-        });
-        
-        // Call success callback to refresh data
         if (onHireSuccess) {
           onHireSuccess();
         }
-        
-        // Close modal after 2 seconds
         setTimeout(() => {
           onClose();
         }, 2000);
@@ -70,27 +75,24 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
     }
   };
 
-  if (!isOpen || !freelancer || !request) return null;
-
   return (
-    <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
+    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">
+            <h5 className="modal-title" style={{ color: '#007bff', fontWeight: 600 }}>
               <i className="bi bi-briefcase me-2"></i>
               Hire {freelancer.first_name} {freelancer.last_name}
             </h5>
-            <button 
-              type="button" 
-              className="btn-close" 
+            <button
+              type="button"
+              className="btn-close"
               onClick={onClose}
               disabled={loading}
             ></button>
           </div>
           
           <div className="modal-body">
-            {/* Success Message */}
             {success && (
               <div className="alert alert-success alert-dismissible fade show mb-3" role="alert">
                 <i className="bi bi-check-circle me-2"></i>
@@ -99,7 +101,6 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
               </div>
             )}
 
-            {/* Error Message */}
             {error && (
               <div className="alert alert-danger alert-dismissible fade show mb-3" role="alert">
                 <i className="bi bi-exclamation-triangle me-2"></i>
@@ -108,7 +109,6 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
               </div>
             )}
 
-            {/* Freelancer Info */}
             <div className="row mb-4">
               <div className="col-md-6">
                 <h6 className="fw-bold">Freelancer Details</h6>
@@ -127,12 +127,11 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
               <div className="col-md-6">
                 <h6 className="fw-bold">Project Request</h6>
                 <p><strong>Title:</strong> {request.title}</p>
-                <p><strong>Skills:</strong> {request.required_skills.join(', ')}</p>
-                <p><strong>Experience:</strong> {request.min_experience} years</p>
+                <p><strong>Skills:</strong> {Array.isArray(request.required_skills) ? request.required_skills.join(', ') : 'Not specified'}</p>
+                <p><strong>Experience:</strong> {request.min_experience || 'Not specified'} years</p>
               </div>
             </div>
 
-            {/* Hiring Form */}
             <form onSubmit={handleSubmit}>
               <div className="row">
                 <div className="col-md-6 mb-3">
@@ -239,41 +238,40 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
                   placeholder="Any additional notes or special requirements"
                 ></textarea>
               </div>
-
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={onClose}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Hiring...
-                    </>
-                  ) : (
-                    <>
-                      <i className="bi bi-briefcase me-2"></i>
-                      Hire Freelancer
-                    </>
-                  )}
-                </button>
-              </div>
             </form>
+          </div>
+
+          <div className="modal-footer">
+            <button 
+              type="button" 
+              className="btn btn-secondary" 
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={loading}
+              onClick={handleSubmit}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Hiring...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-briefcase me-2"></i>
+                  Hire Freelancer
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
-      
-      {/* Backdrop */}
-      <div className="modal-backdrop fade show"></div>
     </div>
   );
 };

@@ -287,7 +287,11 @@ const AssociateDashboard = () => {
       const response = await api.get(`/associate/freelancer-requests/${requestId}/recommendations`);
       if (response.data.success) {
         setRecommendations(response.data.recommendations);
-        setSelectedRequest(requestId);
+        
+        // Find the full request object from the requests array
+        const fullRequest = requests.find(req => req.request_id === requestId);
+        setSelectedRequest(fullRequest || { request_id: requestId });
+        
         setShowRecommendationsModal(true);
         
         // Refresh the requests list to update recommendation counts
@@ -303,7 +307,7 @@ const AssociateDashboard = () => {
   // Submit response to a recommendation
   const handleRecommendationResponse = async (freelancerId, response, notes = '') => {
     try {
-      const responseData = await api.post(`/associate/freelancer-requests/${selectedRequest}/respond`, {
+      const responseData = await api.post(`/associate/freelancer-requests/${selectedRequest.request_id}/respond`, {
         freelancer_id: freelancerId,
         response,
         notes
@@ -311,7 +315,7 @@ const AssociateDashboard = () => {
 
       if (responseData.data.success) {
         // Refresh recommendations
-        await fetchRecommendations(selectedRequest);
+        await fetchRecommendations(selectedRequest.request_id);
         // Show success message
         setToast({ message: 'Response submitted successfully!', type: 'success' });
       }
@@ -344,8 +348,23 @@ const AssociateDashboard = () => {
 
   // Hiring functions
   const openHiringModal = (freelancer) => {
+    console.log('Opening hiring modal for freelancer:', freelancer);
+    console.log('Current selectedRequest:', selectedRequest);
+    console.log('selectedRequest type:', typeof selectedRequest);
+    console.log('selectedRequest properties:', selectedRequest ? Object.keys(selectedRequest) : 'null');
+    
+    if (!selectedRequest || !selectedRequest.request_id) {
+      console.error('No valid request selected for hiring!');
+      setToast({ 
+        message: 'Error: No valid request selected. Please try again.', 
+        type: 'error' 
+      });
+      return;
+    }
+    
     setSelectedFreelancerForHiring(freelancer);
     setShowHiringModal(true);
+    console.log('Modal state set to true');
   };
 
   const closeHiringModal = () => {
@@ -355,8 +374,8 @@ const AssociateDashboard = () => {
 
   const handleHireSuccess = () => {
     // Refresh recommendations and requests
-    if (selectedRequest) {
-      fetchRecommendations(selectedRequest);
+    if (selectedRequest && selectedRequest.request_id) {
+      fetchRecommendations(selectedRequest.request_id);
     }
     fetchRequests();
     
