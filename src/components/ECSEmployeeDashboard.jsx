@@ -88,6 +88,7 @@ const ECSEmployeeDashboard = () => {
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [allFreelancers, setAllFreelancers] = useState([]);
   const [availableFreelancers, setAvailableFreelancers] = useState([]);
+  const [recommendationSuccessMessage, setRecommendationSuccessMessage] = useState('');
   
   // Simple search state
   const [searchSkills, setSearchSkills] = useState('');
@@ -429,29 +430,39 @@ const ECSEmployeeDashboard = () => {
       
       // Get ALL freelancers for comprehensive recommendations
       const res = await api.get('/admin/freelancers?availability_status=all&approval_status=all');
-      console.log('🔍 API Response:', res);
-      console.log('🔍 Response Status:', res.status);
-      console.log('🔍 Response Data:', res.data);
+      console.log('🔍 API Response Status:', res.status);
+      console.log('🔍 API Response Data:', res.data);
       
       if (res.data.success) {
-        console.log('🔍 Fetched Freelancers:', res.data.freelancers.length);
-        if (res.data.freelancers.length > 0) {
-          console.log('🔍 Sample Freelancer:', res.data.freelancers[0]);
+        const freelancers = res.data.freelancers || [];
+        console.log('🔍 Fetched Freelancers:', freelancers.length);
+        
+        if (freelancers.length > 0) {
+          console.log('🔍 Sample Freelancer:', freelancers[0]);
+          console.log('🔍 Sample Freelancer Skills:', freelancers[0].skills);
+          console.log('🔍 Sample Freelancer Experience:', freelancers[0].experience_years);
+          console.log('🔍 Sample Freelancer Rating:', freelancers[0].admin_rating);
         } else {
           console.log('🔍 No freelancers returned from API');
         }
-        setAllFreelancers(res.data.freelancers);
-        setAvailableFreelancers(res.data.freelancers);
-        console.log('🔍 State updated - allFreelancers:', res.data.freelancers.length);
-        console.log('🔍 State updated - availableFreelancers:', res.data.freelancers.length);
+        
+        setAllFreelancers(freelancers);
+        setAvailableFreelancers(freelancers);
+        console.log('🔍 State updated - allFreelancers:', freelancers.length);
+        console.log('🔍 State updated - availableFreelancers:', freelancers.length);
       } else {
         console.error('🔍 API returned success: false:', res.data);
+        console.error('🔍 Error message:', res.data.message);
       }
     } catch (err) {
-      console.error('Error fetching available freelancers:', err);
-      console.error('Error details:', err.response?.data);
-      console.error('Error status:', err.response?.status);
-      console.error('Error message:', err.message);
+      console.error('❌ Error fetching available freelancers:', err);
+      console.error('❌ Error details:', err.response?.data);
+      console.error('❌ Error status:', err.response?.status);
+      console.error('❌ Error message:', err.message);
+      
+      // Set empty arrays to prevent UI errors
+      setAllFreelancers([]);
+      setAvailableFreelancers([]);
     }
   };
 
@@ -506,8 +517,31 @@ const ECSEmployeeDashboard = () => {
       return;
     }
 
+    if (!selectedFreelancerRequest || !selectedFreelancerRequest.request_id) {
+      alert('No request selected for recommendations');
+      return;
+    }
+
+    // Validate freelancer data
+    const validFreelancers = selectedFreelancers.filter(id => {
+      const freelancer = allFreelancers.find(f => f.freelancer_id === id);
+      return freelancer && freelancer.freelancer_id;
+    });
+
+    if (validFreelancers.length !== selectedFreelancers.length) {
+      alert('Some selected freelancers are invalid. Please refresh and try again.');
+      return;
+    }
+
     setRecommendationsLoading(true);
     try {
+      console.log('🔍 Submitting recommendations:', {
+        requestId: selectedFreelancerRequest.request_id,
+        freelancerIds: selectedFreelancers,
+        adminNotes: adminNotes,
+        highlightedFreelancers: highlightedFreelancers
+      });
+
       const res = await api.post(`/admin/associate-requests/${selectedFreelancerRequest.request_id}/recommendations`, {
         freelancer_ids: selectedFreelancers,
         admin_notes: adminNotes,
@@ -515,15 +549,24 @@ const ECSEmployeeDashboard = () => {
       });
 
       if (res.data.success) {
-        alert('Recommendations submitted successfully!');
+        console.log('✅ Recommendations submitted successfully:', res.data);
+        setRecommendationSuccessMessage(`Successfully submitted ${selectedFreelancers.length} recommendation${selectedFreelancers.length !== 1 ? 's' : ''}!`);
         setShowRecommendationsModal(false);
-        fetchFreelancerRequests();
+        setSelectedFreelancers([]);
+        setHighlightedFreelancers([]);
+        setAdminNotes('');
+        await fetchFreelancerRequests();
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setRecommendationSuccessMessage(''), 5000);
       } else {
+        console.error('❌ API returned success: false:', res.data);
         alert(res.data.message || 'Failed to submit recommendations');
       }
     } catch (err) {
-      console.error('Error submitting recommendations:', err);
-      alert(err.response?.data?.message || 'Failed to submit recommendations');
+      console.error('❌ Error submitting recommendations:', err);
+      console.error('Error response:', err.response?.data);
+      alert(err.response?.data?.message || 'Failed to submit recommendations. Please try again.');
     } finally {
       setRecommendationsLoading(false);
     }
@@ -796,10 +839,10 @@ const ECSEmployeeDashboard = () => {
               >
                 <i className="bi bi-folder me-3"></i>
                 Documents
-                </button>
+        </button>
         </div>
-          </div>
-
+      </div>
+      
           {/* Management Tools */}
           <div className="nav-section mb-4">
             <h6 className="nav-section-title" style={{ 
@@ -881,8 +924,8 @@ const ECSEmployeeDashboard = () => {
                 <i className="bi bi-speedometer2 me-3"></i>
                 Performance Monitor
           </button>
+          </div>
         </div>
-            </div>
 
           {/* System */}
           <div className="nav-section">
@@ -1236,54 +1279,54 @@ const ECSEmployeeDashboard = () => {
                   <table className="table table-bordered" style={{ minWidth: 700 }}>
                     <thead style={{ background: '#f8f9fa' }}>
                       <tr>
-                        <th>Email</th>
+                <th>Email</th>
                         <th>Company Name</th>
                         <th>Contact Person</th>
-                        <th>Industry</th>
+                <th>Industry</th>
                         <th>Phone</th>
-                        <th>Status</th>
+                <th>Status</th>
                         <th>Requested</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
                       {associateRequests.map(request => (
-                        <tr key={request.request_id}>
-                          <td>{request.email}</td>
+                <tr key={request.request_id}>
+                  <td>{request.email}</td>
                           <td>{request.company_name || 'N/A'}</td>
                           <td>{request.contact_person}</td>
-                          <td>{request.industry}</td>
+                  <td>{request.industry}</td>
                           <td>{request.phone}</td>
-                          <td>
+                  <td>
                             <span className={`badge ${request.status === 'pending' ? 'bg-warning' : request.status === 'approved' ? 'bg-success' : 'bg-danger'}`}>
                               {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                            </span>
-                          </td>
+                    </span>
+                  </td>
                           <td>{request.created_at ? new Date(request.created_at).toLocaleDateString() : ''}</td>
-                          <td>
-                            {request.status === 'pending' && (
-                              <button
+                  <td>
+                    {request.status === 'pending' && (
+                        <button 
                                 className="btn btn-sm btn-primary me-2"
                                 onClick={() => setSelectedRequest(request)}
                                 style={{ borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px' }}
-                              >
+                        >
                                 Review
-                              </button>
+                        </button>
                             )}
                             {request.status !== 'pending' && (
                               <div>
                                 <small className="text-muted">
                                   {request.reviewed_at ? `Reviewed: ${new Date(request.reviewed_at).toLocaleDateString()}` : ''}
                                 </small>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
               {/* Review Modal */}
               {selectedRequest && (
@@ -1376,8 +1419,8 @@ const ECSEmployeeDashboard = () => {
                           disabled={reviewLoading || (reviewFormData.status === 'approved' && !reviewFormData.password)}
                         >
                           {reviewLoading ? 'Processing...' : `Submit ${reviewFormData.status}`}
-                        </button>
-                      </div>
+        </button>
+      </div>
                     </div>
                   </div>
                 </div>
@@ -1396,9 +1439,9 @@ const ECSEmployeeDashboard = () => {
                   {associatesLoading ? (
                     <div className="text-center py-4">
                       <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
-                    </div>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
                   ) : associatesError ? (
                     <div className="alert alert-danger" role="alert">
                       {associatesError}
@@ -1408,20 +1451,20 @@ const ECSEmployeeDashboard = () => {
                       <i className="bi bi-building fs-1"></i>
                       <p className="mt-2">No associates found</p>
                     </div>
-                  ) : (
-                    <div className="table-responsive">
+      ) : (
+        <div className="table-responsive">
                       <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>Company</th>
-                            <th>Contact Person</th>
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Contact Person</th>
                             <th>Industry</th>
-                            <th>Status</th>
+                <th>Status</th>
                             <th>Date</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
                           {associates.map((associate) => (
                             <tr key={associate.associate_id}>
                               <td>{associate.company_name || 'N/A'}</td>
@@ -1430,13 +1473,13 @@ const ECSEmployeeDashboard = () => {
                               <td>
                                 <span className={`badge bg-${associate.verified ? 'success' : 'warning'}`}>
                                   {associate.verified ? 'Verified' : 'Pending'}
-                                </span>
-                              </td>
+                    </span>
+                  </td>
                               <td>{new Date(associate.created_at).toLocaleDateString()}</td>
                               <td>
                                 <button className="btn btn-sm btn-outline-primary">
                                   View Details
-                                </button>
+                      </button>
                               </td>
                             </tr>
                           ))}
@@ -1502,24 +1545,33 @@ const ECSEmployeeDashboard = () => {
                               <td>
                                 <button className="btn btn-sm btn-outline-primary">
                                   View Details
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
               </div>
             </div>
           )}
 
-          {/* Freelancer Requests Tab */}
-          {activeTab === 'freelancer-requests' && (
-            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>ECS Employee Freelancer Request Management</h5>
-              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Review associate requests for freelancer services and provide curated recommendations</p>
+                     {/* Freelancer Requests Tab */}
+           {activeTab === 'freelancer-requests' && (
+             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+               <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>ECS Employee Freelancer Request Management</h5>
+               <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Review associate requests for freelancer services and provide curated recommendations</p>
+               
+               {/* Success Message */}
+               {recommendationSuccessMessage && (
+                 <div className="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                   <i className="bi bi-check-circle me-2"></i>
+                   {recommendationSuccessMessage}
+                   <button type="button" className="btn-close" onClick={() => setRecommendationSuccessMessage('')}></button>
+            </div>
+               )}
               
               {freelancerRequestsLoading ? (
                 <div className="text-center py-4">
@@ -1540,7 +1592,7 @@ const ECSEmployeeDashboard = () => {
                       <div className="card border-0 shadow-sm h-100">
                         <div className="card-body">
                           <div className="d-flex justify-content-between align-items-start mb-3">
-                            <div>
+                <div>
                               <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600 }}>
                                 {request.title}
                               </h6>
@@ -1549,7 +1601,7 @@ const ECSEmployeeDashboard = () => {
                                   ? `${request.description.substring(0, 150)}...` 
                                   : request.description}
                               </p>
-                            </div>
+                  </div>
                             <div className="text-end">
                               <span className={`badge ${
                                 request.status === 'pending' ? 'bg-warning' :
@@ -1560,7 +1612,7 @@ const ECSEmployeeDashboard = () => {
                               }`}>
                                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                               </span>
-                            </div>
+                </div>
                           </div>
                           
                           <div className="row g-2 mb-3">
@@ -1569,13 +1621,13 @@ const ECSEmployeeDashboard = () => {
                                 <i className="bi bi-building me-1"></i>
                                 <strong>Company:</strong> {request.associate_email}
                               </small>
-                            </div>
+                  </div>
                             <div className="col-md-4">
                               <small className="text-muted">
                                 <i className="bi bi-gear me-1"></i>
                                 <strong>Skills:</strong> {request.required_skills.join(', ')}
                               </small>
-                            </div>
+                </div>
                             <div className="col-md-4">
                               <small className="text-muted">
                                 <i className="bi bi-calendar me-1"></i>
@@ -1590,7 +1642,7 @@ const ECSEmployeeDashboard = () => {
                                 <i className="bi bi-clock me-1"></i>
                                 <strong>Urgency:</strong> {request.urgency_level}
                               </small>
-                            </div>
+                </div>
                             <div className="col-md-3">
                               <small className="text-muted">
                                 <i className="bi bi-currency-dollar me-1"></i>
@@ -1612,7 +1664,7 @@ const ECSEmployeeDashboard = () => {
                           </div>
 
                           <div className="d-flex justify-content-between align-items-center">
-                            <div>
+                <div>
                               <small className="text-muted">
                                 <i className="bi bi-calendar me-1"></i>
                                 <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
@@ -1625,16 +1677,16 @@ const ECSEmployeeDashboard = () => {
                             >
                               <i className="bi bi-star me-1"></i>Provide Recommendations
                             </button>
-                          </div>
-                        </div>
+                  </div>
+                  </div>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
-          )}
-
+                </div>
+              )}
+              
           {/* Analytics Tab */}
           {activeTab === 'analytics' && (
             <div className="analytics-tab">
@@ -1642,7 +1694,7 @@ const ECSEmployeeDashboard = () => {
                 <div className="card-header bg-transparent border-0">
                   <div className="d-flex justify-content-between align-items-center">
                     <h5 className="card-title mb-0">Analytics</h5>
-                    <select
+                    <select 
                       className="form-select form-select-sm w-auto"
                       value={timeRange}
                       onChange={(e) => setTimeRange(e.target.value)}
@@ -1661,9 +1713,9 @@ const ECSEmployeeDashboard = () => {
                     <small>Select a time range to view detailed analytics</small>
                   </div>
                 </div>
-              </div>
-            </div>
-                     )}
+                  </div>
+                </div>
+              )}
 
            {/* Freelancer Request Details Modal */}
            {showFreelancerRequestDetailsModal && selectedFreelancerRequest && (
@@ -1715,14 +1767,14 @@ const ECSEmployeeDashboard = () => {
                          )}
                        </div>
                      </div>
-                   </div>
-                   <div className="modal-footer">
+            </div>
+            <div className="modal-footer">
                      <button type="button" className="btn btn-secondary" onClick={() => setShowFreelancerRequestDetailsModal(false)}>
                        Close
-                     </button>
+                </button>
                      {selectedFreelancerRequest.status === 'pending' && (
-                       <button
-                         type="button"
+                <button 
+                  type="button" 
                          className="btn btn-primary"
                          onClick={() => {
                            setShowFreelancerRequestDetailsModal(false);
@@ -1730,7 +1782,7 @@ const ECSEmployeeDashboard = () => {
                          }}
                        >
                          <i className="bi bi-star me-1"></i>Provide Recommendations
-                       </button>
+                </button>
                      )}
                    </div>
                  </div>
@@ -1814,14 +1866,14 @@ const ECSEmployeeDashboard = () => {
                         </div>
                         <div className="col-md-2 d-flex align-items-end">
                           <div className="d-flex gap-2 w-100">
-                            <button 
+                <button 
                               className="btn w-100" 
                               style={{ background: accent, color: '#fff' }}
                               onClick={handleSearch}
                             >
                               <i className="bi bi-search me-1"></i>Search
-                            </button>
-                            <button 
+                </button>
+                <button 
                               className="btn btn-outline-secondary w-100" 
                               onClick={() => {
                                 setSearchSkills('');
@@ -1831,7 +1883,7 @@ const ECSEmployeeDashboard = () => {
                               }}
                             >
                               <i className="bi bi-arrow-clockwise"></i>
-                            </button>
+                </button>
                           </div>
                         </div>
                       </div>
@@ -1840,7 +1892,7 @@ const ECSEmployeeDashboard = () => {
                         <p className="text-muted mb-0">
                           Showing {availableFreelancers.length} of {availableFreelancers.length} freelancers. Use the search above to find specific freelancers.
                         </p>
-                      </div>
+            </div>
 
                       <div className="row g-3">
                         {availableFreelancers.map((freelancer) => (
@@ -1855,7 +1907,7 @@ const ECSEmployeeDashboard = () => {
                                       checked={selectedFreelancers.includes(freelancer.freelancer_id)}
                                       onChange={(e) => handleFreelancerSelection(freelancer.freelancer_id, e.target.checked)}
                                     />
-                                  </div>
+          </div>
                                   <div className="flex-grow-1">
                                     <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600, fontSize: '14px' }}>
                                       {`${freelancer.first_name} ${freelancer.last_name}`}
@@ -1863,12 +1915,12 @@ const ECSEmployeeDashboard = () => {
                                     <small className="text-muted">
                                       ID: {freelancer.freelancer_id} | Selected: {selectedFreelancers.includes(freelancer.freelancer_id) ? 'Yes' : 'No'} | Checkbox visible: Yes
                                     </small>
-                                  </div>
-                                </div>
+        </div>
+      </div>
 
                                 <div className="mb-2">
                                   <strong>Role:</strong> {freelancer.headline || 'Not specified'}
-                                </div>
+        </div>
 
                                 <div className="mb-2">
                                   <strong>Skills:</strong> 
@@ -1882,36 +1934,36 @@ const ECSEmployeeDashboard = () => {
                                     ) : (
                                       <span className="text-muted">No skills listed</span>
                                     )}
-                                  </div>
+      </div>
                                 </div>
 
                                 <div className="mb-2">
                                   <strong>Experience:</strong> Exp: {freelancer.experience_years || 0} years
-                                </div>
+            </div>
 
                                 <div className="mb-2">
                                   <strong>Email:</strong> {freelancer.email || 'Not specified'}
-                                </div>
+            </div>
 
                                 <div className="mb-2">
                                   <strong>Phone:</strong> {freelancer.phone || 'Not specified'}
-                                </div>
+          </div>
 
-                                <div className="mb-2">
-                                  <strong>Rating:</strong> 
-                                  <div className="mt-1">
-                                    {[...Array(5)].map((_, index) => (
-                                      <i 
-                                        key={index} 
-                                        className={`bi bi-star${index < (freelancer.rating || 0) ? '-fill' : ''}`} 
-                                        style={{ 
-                                          color: index < (freelancer.rating || 0) ? '#ffc107' : '#dee2e6',
-                                          fontSize: '14px'
-                                        }}
-                                      ></i>
-                                    ))}
-                                  </div>
-                                </div>
+                                                                 <div className="mb-2">
+                                   <strong>Rating:</strong> 
+                                   <div className="mt-1">
+                                     {[...Array(5)].map((_, index) => (
+                                       <i 
+                                         key={index} 
+                                         className={`bi bi-star${index < (freelancer.admin_rating || 0) ? '-fill' : ''}`} 
+                                         style={{ 
+                                           color: index < (freelancer.admin_rating || 0) ? '#ffc107' : '#dee2e6',
+                                           fontSize: '14px'
+                                         }}
+                                       ></i>
+                                     ))}
+        </div>
+      </div>
 
                                 <div className="d-flex gap-1 mb-2">
                                   <span className={`badge ${freelancer.is_available ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
@@ -1944,8 +1996,8 @@ const ECSEmployeeDashboard = () => {
                    <div className="modal-footer">
                      <button type="button" className="btn btn-secondary" onClick={() => setShowRecommendationsModal(false)}>
                        Cancel
-                     </button>
-                                            <button
+              </button>
+              <button 
                          type="button"
                          className="btn"
                          style={{ background: accent, color: '#fff' }}
@@ -1953,16 +2005,16 @@ const ECSEmployeeDashboard = () => {
                          disabled={recommendationsLoading || selectedFreelancers.length === 0}
                        >
                          {recommendationsLoading ? 'Submitting...' : `Submit ${selectedFreelancers.length} Recommendation${selectedFreelancers.length !== 1 ? 's' : ''}`}
-                       </button>
-                   </div>
-                 </div>
-               </div>
-             </div>
+              </button>
+            </div>
+          </div>
+          </div>
+        </div>
            )}
-         </div>
+      </div>
        </div>
-     </div>
-   );
- };
+    </div>
+  );
+};
 
 export default ECSEmployeeDashboard;

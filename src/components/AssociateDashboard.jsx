@@ -283,6 +283,9 @@ const AssociateDashboard = () => {
         setRecommendations(response.data.recommendations);
         setSelectedRequest(requestId);
         setShowRecommendationsModal(true);
+        
+        // Refresh the requests list to update recommendation counts
+        await fetchRequests();
       }
     } catch (error) {
       console.error('Error fetching recommendations:', error);
@@ -1329,7 +1332,11 @@ const AssociateDashboard = () => {
                 <button
                   type="button"
                   className="btn-close"
-                  onClick={() => setShowRecommendationsModal(false)}
+                  onClick={async () => {
+                    setShowRecommendationsModal(false);
+                    // Refresh requests to ensure accurate counts
+                    await fetchRequests();
+                  }}
                 ></button>
               </div>
               <div className="modal-body">
