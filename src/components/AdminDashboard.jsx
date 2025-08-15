@@ -164,7 +164,6 @@ const ESCAdminDashboard = () => {
   const [hiredFreelancersCount, setHiredFreelancersCount] = useState(0);
   const [hiredFreelancersLoading, setHiredFreelancersLoading] = useState(false);
   const [lastHiredFreelancersUpdate, setLastHiredFreelancersUpdate] = useState(null);
-  const [dataSource, setDataSource] = useState('stats'); // 'stats' or 'fallback'
 
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds
@@ -1189,49 +1188,24 @@ const ESCAdminDashboard = () => {
       setHiredFreelancersLoading(true);
       console.log('🔍 Fetching hired freelancers count...');
       
-      // Try the stats endpoint first
-      try {
-        const response = await api.get('/hiring/stats');
-        
-        console.log('🔍 API Response:', response.data);
-        console.log('🔍 Response structure:', {
-          success: response.data.success,
-          stats: response.data.stats,
-          total_hires: response.data.stats?.total_hires
-        });
-        
-        if (response.data.success) {
-          const count = response.data.stats.total_hires || 0;
-          setHiredFreelancersCount(count);
-          setLastHiredFreelancersUpdate(new Date());
-          setDataSource('stats');
-          console.log('✅ Hired freelancers count updated from stats:', count);
-          return;
-        }
-      } catch (statsError) {
-        console.log('⚠️ Stats endpoint failed, trying recent-hires as fallback...');
-      }
+      const response = await api.get('/hiring/stats');
       
-      // Fallback: get count from recent-hires endpoint
-      try {
-        const fallbackResponse = await api.get('/hiring/recent-hires');
-        console.log('🔍 Fallback API Response:', fallbackResponse.data);
-        
-        if (fallbackResponse.data.success) {
-          const count = fallbackResponse.data.hires?.length || 0;
-          setHiredFreelancersCount(count);
-          setLastHiredFreelancersUpdate(new Date());
-          setDataSource('fallback');
-          console.log('✅ Hired freelancers count updated from fallback:', count);
-        } else {
-          console.error('❌ Fallback endpoint also failed');
-          setHiredFreelancersCount(0);
-        }
-      } catch (fallbackError) {
-        console.error('❌ Both endpoints failed');
+      console.log('🔍 API Response:', response.data);
+      console.log('🔍 Response structure:', {
+        success: response.data.success,
+        stats: response.data.stats,
+        total_hires: response.data.stats?.total_hires
+      });
+      
+      if (response.data.success) {
+        const count = response.data.stats.total_hires || 0;
+        setHiredFreelancersCount(count);
+        setLastHiredFreelancersUpdate(new Date());
+        console.log('✅ Hired freelancers count updated:', count);
+      } else {
+        console.error('❌ Failed to fetch hired freelancers count:', response.data.message);
         setHiredFreelancersCount(0);
       }
-      
     } catch (error) {
       console.error('❌ Error fetching hired freelancers count:', error);
       console.error('❌ Error details:', {
@@ -2053,33 +2027,8 @@ const ESCAdminDashboard = () => {
                         <span style={{ fontWeight: 500 }}>Growing steadily</span>
                       </div>
                       <div className="text-muted">Real-time system data</div>
-                      {lastHiredFreelancersUpdate && (
-                        <div className="text-muted" style={{ fontSize: '10px' }}>
-                          <i className="bi bi-clock me-1"></i>
-                          Last updated: {lastHiredFreelancersUpdate.toLocaleTimeString()}
-                          <span className="ms-1" style={{ color: '#10b981' }}>
-                            <i className="bi bi-wifi"></i>
-                          </span>
-                          <span className="ms-2" style={{ fontSize: '9px', color: dataSource === 'fallback' ? '#f59e0b' : '#10b981' }}>
-                            {dataSource === 'fallback' ? 'Fallback' : 'Primary'}
-                          </span>
-                        </div>
-                      )}
-                      <div className="mt-2">
-                        <button 
-                          className="btn btn-sm btn-outline-primary"
-                          onClick={fetchHiredFreelancersCount}
-                          disabled={hiredFreelancersLoading}
-                          style={{ fontSize: '10px', padding: '4px 8px' }}
-                          title="Refresh count"
-                        >
-                          {hiredFreelancersLoading ? (
-                            <i className="bi bi-arrow-clockwise spin"></i>
-                          ) : (
-                            <i className="bi bi-arrow-clockwise"></i>
-                          )}
-                        </button>
-                      </div>
+
+
                     </div>
                   </div>
                 </div>
@@ -4220,19 +4169,7 @@ const ESCAdminDashboard = () => {
           padding-right: 8px !important;
         }
         
-        /* Spinning animation for refresh buttons */
-        .spin {
-          animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
+
       `}</style>
 
 
