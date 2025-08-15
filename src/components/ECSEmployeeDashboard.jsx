@@ -1744,7 +1744,7 @@ const ECSEmployeeDashboard = () => {
                <div className="modal-dialog modal-xl">
                  <div className="modal-content">
                    <div className="modal-header">
-                     <h5 className="modal-title">Provide Freelancer Recommendations</h5>
+                     <h5 className="modal-title" style={{ color: accent, fontWeight: 700 }}>All Registered Freelancers</h5>
                      <button type="button" className="btn-close" onClick={() => setShowRecommendationsModal(false)}></button>
                    </div>
                    <div className="modal-body">
@@ -1778,119 +1778,182 @@ const ECSEmployeeDashboard = () => {
                        </div>
                      </div>
 
-                     <div className="row mb-3">
-                       <div className="col-md-4">
-                         <input
-                           type="text"
-                           className="form-control"
-                           placeholder="Search by skills..."
-                           value={searchSkills}
-                           onChange={(e) => setSearchSkills(e.target.value)}
-                         />
-                       </div>
-                       <div className="col-md-3">
-                         <input
-                           type="text"
-                           className="form-control"
-                           placeholder="Min experience (years)"
-                           value={searchExperience}
-                           onChange={(e) => setSearchExperience(e.target.value)}
-                         />
-                       </div>
-                       <div className="col-md-3">
-                         <select
-                           className="form-select"
-                           value={searchStatus}
-                           onChange={(e) => setSearchStatus(e.target.value)}
-                         >
-                           <option value="all">All Status</option>
-                           <option value="available">Available</option>
-                           <option value="unavailable">Unavailable</option>
-                         </select>
-                       </div>
-                       <div className="col-md-2">
-                         <button className="btn btn-primary w-100" onClick={handleSearch}>
-                           <i className="bi bi-search"></i>
-                         </button>
-                       </div>
-                     </div>
+                                           <div className="row mb-3">
+                        <div className="col-md-4">
+                          <label className="form-label fw-bold">Search by Skills:</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="e.g., React, Node.js"
+                            value={searchSkills}
+                            onChange={(e) => setSearchSkills(e.target.value)}
+                          />
+                        </div>
+                        <div className="col-md-3">
+                          <label className="form-label fw-bold">Minimum Experience (years):</label>
+                          <input
+                            type="number"
+                            className="form-control"
+                            placeholder="e.g., 3"
+                            value={searchExperience}
+                            onChange={(e) => setSearchExperience(e.target.value)}
+                            min="0"
+                          />
+                        </div>
+                        <div className="col-md-3">
+                          <label className="form-label fw-bold">Status:</label>
+                          <select
+                            className="form-select"
+                            value={searchStatus}
+                            onChange={(e) => setSearchStatus(e.target.value)}
+                          >
+                            <option value="all">All Statuses</option>
+                            <option value="available">Available</option>
+                            <option value="unavailable">Unavailable</option>
+                          </select>
+                        </div>
+                        <div className="col-md-2 d-flex align-items-end">
+                          <div className="d-flex gap-2 w-100">
+                            <button 
+                              className="btn w-100" 
+                              style={{ background: accent, color: '#fff' }}
+                              onClick={handleSearch}
+                            >
+                              <i className="bi bi-search me-1"></i>Search
+                            </button>
+                            <button 
+                              className="btn btn-outline-secondary w-100" 
+                              onClick={() => {
+                                setSearchSkills('');
+                                setSearchExperience('');
+                                setSearchStatus('all');
+                                setAvailableFreelancers(allFreelancers);
+                              }}
+                            >
+                              <i className="bi bi-arrow-clockwise"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
-                     <div className="table-responsive" style={{ maxHeight: '400px' }}>
-                       <table className="table table-hover">
-                         <thead style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
-                           <tr>
-                             <th>Select</th>
-                             <th>Highlight</th>
-                             <th>Name</th>
-                             <th>Skills</th>
-                             <th>Experience</th>
-                             <th>Status</th>
-                             <th>Location</th>
-                           </tr>
-                         </thead>
-                         <tbody>
-                           {availableFreelancers.map((freelancer) => (
-                             <tr key={freelancer.freelancer_id}>
-                               <td>
-                                 <input
-                                   type="checkbox"
-                                   className="form-check-input"
-                                   checked={selectedFreelancers.includes(freelancer.freelancer_id)}
-                                   onChange={(e) => handleFreelancerSelection(freelancer.freelancer_id, e.target.checked)}
-                                 />
-                               </td>
-                               <td>
-                                 <input
-                                   type="checkbox"
-                                   className="form-check-input"
-                                   checked={highlightedFreelancers.includes(freelancer.freelancer_id)}
-                                   onChange={(e) => handleHighlightFreelancer(freelancer.freelancer_id, e.target.checked)}
-                                 />
-                               </td>
-                               <td>{`${freelancer.first_name} ${freelancer.last_name}`}</td>
-                               <td>
-                                 {freelancer.skills && freelancer.skills.length > 0 ? (
-                                   <div className="d-flex flex-wrap gap-1">
-                                     {freelancer.skills.slice(0, 3).map((skill, index) => (
-                                       <span key={index} className="badge bg-light text-dark" style={{ fontSize: '10px' }}>
-                                         {skill}
-                                       </span>
-                                     ))}
-                                     {freelancer.skills.length > 3 && (
-                                       <span className="badge bg-secondary" style={{ fontSize: '10px' }}>
-                                         +{freelancer.skills.length - 3}
-                                       </span>
-                                     )}
-                                   </div>
-                                 ) : (
-                                   <span className="text-muted">No skills listed</span>
-                                 )}
-                               </td>
-                               <td>{freelancer.experience_years || 0} years</td>
-                               <td>
-                                 <span className={`badge ${freelancer.is_available ? 'bg-success' : 'bg-secondary'}`}>
-                                   {freelancer.is_available ? 'Available' : 'Unavailable'}
-                                 </span>
-                               </td>
-                               <td>{freelancer.location || 'Not specified'}</td>
-                             </tr>
-                           ))}
-                         </tbody>
-                       </table>
-                     </div>
+                                           <div className="mb-3">
+                        <p className="text-muted mb-0">
+                          Showing {availableFreelancers.length} of {availableFreelancers.length} freelancers. Use the search above to find specific freelancers.
+                        </p>
+                      </div>
+
+                      <div className="row g-3">
+                        {availableFreelancers.map((freelancer) => (
+                          <div key={freelancer.freelancer_id} className="col-md-6 col-lg-4">
+                            <div className="card border-0 shadow-sm h-100" style={{ minHeight: '280px' }}>
+                              <div className="card-body p-3">
+                                <div className="d-flex align-items-start mb-2">
+                                  <div className="form-check me-2">
+                                    <input
+                                      type="checkbox"
+                                      className="form-check-input"
+                                      checked={selectedFreelancers.includes(freelancer.freelancer_id)}
+                                      onChange={(e) => handleFreelancerSelection(freelancer.freelancer_id, e.target.checked)}
+                                    />
+                                  </div>
+                                  <div className="flex-grow-1">
+                                    <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600, fontSize: '14px' }}>
+                                      {`${freelancer.first_name} ${freelancer.last_name}`}
+                                    </h6>
+                                    <small className="text-muted">
+                                      ID: {freelancer.freelancer_id} | Selected: {selectedFreelancers.includes(freelancer.freelancer_id) ? 'Yes' : 'No'} | Checkbox visible: Yes
+                                    </small>
+                                  </div>
+                                </div>
+
+                                <div className="mb-2">
+                                  <strong>Role:</strong> {freelancer.headline || 'Not specified'}
+                                </div>
+
+                                <div className="mb-2">
+                                  <strong>Skills:</strong> 
+                                  <div className="mt-1">
+                                    {freelancer.skills && freelancer.skills.length > 0 ? (
+                                      freelancer.skills.slice(0, 3).map((skill, index) => (
+                                        <span key={index} className="badge bg-light text-dark me-1" style={{ fontSize: '10px' }}>
+                                          {skill}
+                                        </span>
+                                      ))
+                                    ) : (
+                                      <span className="text-muted">No skills listed</span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="mb-2">
+                                  <strong>Experience:</strong> Exp: {freelancer.experience_years || 0} years
+                                </div>
+
+                                <div className="mb-2">
+                                  <strong>Email:</strong> {freelancer.email || 'Not specified'}
+                                </div>
+
+                                <div className="mb-2">
+                                  <strong>Phone:</strong> {freelancer.phone || 'Not specified'}
+                                </div>
+
+                                <div className="mb-2">
+                                  <strong>Rating:</strong> 
+                                  <div className="mt-1">
+                                    {[...Array(5)].map((_, index) => (
+                                      <i 
+                                        key={index} 
+                                        className={`bi bi-star${index < (freelancer.rating || 0) ? '-fill' : ''}`} 
+                                        style={{ 
+                                          color: index < (freelancer.rating || 0) ? '#ffc107' : '#dee2e6',
+                                          fontSize: '14px'
+                                        }}
+                                      ></i>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div className="d-flex gap-1 mb-2">
+                                  <span className={`badge ${freelancer.is_available ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
+                                    {freelancer.is_available ? 'Available' : 'Unavailable'}
+                                  </span>
+                                  <span className={`badge ${freelancer.is_approved ? 'bg-primary' : 'bg-warning'}`} style={{ fontSize: '10px' }}>
+                                    {freelancer.is_approved ? 'Approved' : 'Pending'}
+                                  </span>
+                                </div>
+
+                                <div className="mt-auto">
+                                  <div className="form-check">
+                                    <input
+                                      type="checkbox"
+                                      className="form-check-input"
+                                      checked={highlightedFreelancers.includes(freelancer.freelancer_id)}
+                                      onChange={(e) => handleHighlightFreelancer(freelancer.freelancer_id, e.target.checked)}
+                                    />
+                                    <label className="form-check-label small">
+                                      Highlight as top recommendation
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                    </div>
                    <div className="modal-footer">
                      <button type="button" className="btn btn-secondary" onClick={() => setShowRecommendationsModal(false)}>
                        Cancel
                      </button>
-                     <button
-                       type="button"
-                       className="btn btn-primary"
-                       onClick={submitRecommendations}
-                       disabled={recommendationsLoading || selectedFreelancers.length === 0}
-                     >
-                       {recommendationsLoading ? 'Submitting...' : `Submit ${selectedFreelancers.length} Recommendation${selectedFreelancers.length !== 1 ? 's' : ''}`}
-                     </button>
+                                            <button
+                         type="button"
+                         className="btn"
+                         style={{ background: accent, color: '#fff' }}
+                         onClick={submitRecommendations}
+                         disabled={recommendationsLoading || selectedFreelancers.length === 0}
+                       >
+                         {recommendationsLoading ? 'Submitting...' : `Submit ${selectedFreelancers.length} Recommendation${selectedFreelancers.length !== 1 ? 's' : ''}`}
+                       </button>
                    </div>
                  </div>
                </div>
