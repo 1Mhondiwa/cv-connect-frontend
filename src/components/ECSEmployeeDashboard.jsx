@@ -68,6 +68,10 @@ const ECSEmployeeDashboard = () => {
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState('');
   
+  // Real-time monitoring states
+  const [recentHires, setRecentHires] = useState([]);
+  const [recentHiresLoading, setRecentHiresLoading] = useState(false);
+  
   // ECS Employee profile management
   const [employeeImage, setEmployeeImage] = useState(null);
   const [employeeImageUploading, setEmployeeImageUploading] = useState(false);
@@ -122,11 +126,30 @@ const ECSEmployeeDashboard = () => {
     loadUserData();
   }, [navigate]);
 
-  // Load statistics
+  // Load statistics and real-time data for home tab
   useEffect(() => {
     if (activeTab === 'dashboard') {
       loadStats();
+      fetchRecentHires();
     }
+  }, [activeTab]);
+
+  // Auto-refresh data every 2 minutes for real-time updates
+  useEffect(() => {
+    let intervalId;
+    
+    if (activeTab === 'dashboard') {
+      intervalId = setInterval(() => {
+        console.log('🔄 Auto-refreshing home tab data...');
+        fetchRecentHires();
+      }, 2 * 60 * 1000); // 2 minutes
+    }
+    
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [activeTab]);
 
   // Load associate requests
@@ -176,6 +199,23 @@ const ECSEmployeeDashboard = () => {
       setStatsError('Failed to load statistics');
     } finally {
       setStatsLoading(false);
+    }
+  };
+
+  // Fetch recent hires (associate responses to freelancer recommendations)
+  const fetchRecentHires = async () => {
+    setRecentHiresLoading(true);
+    try {
+      const response = await api.get('/admin/recent-hires');
+      if (response.data.success) {
+        setRecentHires(response.data.hires);
+      }
+    } catch (error) {
+      console.error('Error fetching recent hires:', error);
+      // Fallback to local data if API fails
+      setRecentHires([]);
+    } finally {
+      setRecentHiresLoading(false);
     }
   };
 
@@ -658,8 +698,8 @@ const ECSEmployeeDashboard = () => {
                   transition: 'all 0.2s ease'
                 }}
               >
-                <i className="bi bi-speedometer2 me-3"></i>
-                Dashboard
+                <i className="bi bi-house-door me-3"></i>
+                Home
                 </button>
               
 
@@ -795,13 +835,13 @@ const ECSEmployeeDashboard = () => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <div>
             <h1 className="h3 mb-0" style={{ color: '#111827', fontWeight: 600 }}>
-              {activeTab === 'dashboard' && 'Dashboard'}
+              {activeTab === 'dashboard' && 'Home'}
               {activeTab === 'associate-requests' && 'Associate Requests'}
               {activeTab === 'freelancer-requests' && 'Associate Freelancer Requests'}
               {activeTab === 'settings' && 'Settings'}
             </h1>
             <p className="text-muted mb-0">
-              {activeTab === 'dashboard' && 'Pending requests overview'}
+              {activeTab === 'dashboard' && 'Operational tasks and associate response tracking'}
               {activeTab === 'associate-requests' && 'Review associate join requests'}
               {activeTab === 'freelancer-requests' && 'Handle associate freelancer requests'}
               {activeTab === 'settings' && 'System configuration and preferences'}
@@ -810,13 +850,42 @@ const ECSEmployeeDashboard = () => {
         </div>
         {/* Main Dashboard Content */}
         <div className="px-3 py-4" style={{ width: '100%', maxWidth: '100%' }}>
-          {/* Add Associate Form (Dashboard Tab) */}
+          {/* Home Tab - Operational Center */}
           {activeTab === 'dashboard' && (
             <>
-              {/* Pending Requests Card */}
+              {/* Welcome Section */}
+              <div className="row mb-4">
+                <div className="col-12">
+                  <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <div className="d-flex align-items-center justify-content-between">
+                      <div>
+                        <h4 className="mb-2" style={{ color: accent, fontWeight: 600 }}>
+                          <i className="bi bi-house-door me-2"></i>
+                          Welcome back, {user?.first_name || 'ECS Employee'}!
+                        </h4>
+                        <p className="text-muted mb-0">
+                          Manage associate requests, handle freelancer recommendations, and track associate responses
+                        </p>
+                      </div>
+                      <div className="text-end">
+                        <div className="h5 mb-1" style={{ color: '#10b981' }}>
+                          {new Date().toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </div>
+                        <small className="text-muted">Ready to work</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions Row */}
               <div className="row g-4 mb-4">
-                <div className="col-lg-4 col-md-6 mx-auto">
-                  {/* Pending Requests Card */}
+                <div className="col-lg-4 col-md-6">
                   <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
@@ -844,11 +913,142 @@ const ECSEmployeeDashboard = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className="col-lg-4 col-md-6">
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <div className="mb-3">
+                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
+                        <i className="bi bi-people-fill"></i>
+                      </div>
+                      <div style={{ color: '#6c757d', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Freelancer Requests
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
+                      {freelancerRequestsLoading ? '...' : freelancerRequests.length || '--'}
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
+                        <i className="bi bi-hand-thumbs-up me-1"></i>
+                        Active
+                      </span>
+                    </div>
+                    <div className="mt-3 text-sm text-muted">
+                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
+                        <i className="bi bi-people" style={{ color: accent }}></i>
+                        <span style={{ fontWeight: 500 }}>Manage requests</span>
+                      </div>
+                      <div className="text-muted">Provide freelancer recommendations</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-lg-4 col-md-6">
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <div className="mb-3">
+                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
+                        <i className="bi bi-briefcase"></i>
+                      </div>
+                      <div style={{ color: '#6c757d', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Recent Responses
+                      </div>
+                    </div>
+                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
+                      {recentHiresLoading ? '...' : recentHires.length || '0'}
+                    </div>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
+                        <i className="bi bi-chat-dots me-1"></i>
+                        New
+                      </span>
+                    </div>
+                    <div className="mt-3 text-sm text-muted">
+                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
+                        <i className="bi bi-briefcase" style={{ color: accent }}></i>
+                        <span style={{ fontWeight: 500 }}>Associate feedback</span>
+                      </div>
+                      <div className="text-muted">Track recommendation responses</div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-                
-
-
+              {/* Recent Hires - Associate Responses */}
+              <div className="row g-4">
+                <div className="col-12">
+                  <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h5 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-briefcase me-2"></i>
+                        Recent Associate Responses & Hires
+                      </h5>
+                      <button 
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={fetchRecentHires}
+                        disabled={recentHiresLoading}
+                      >
+                        {recentHiresLoading ? '...' : 'Refresh'}
+                      </button>
+                    </div>
+                    {recentHiresLoading ? (
+                      <div className="text-center py-4">
+                        <div className="spinner-border text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    ) : recentHires.length === 0 ? (
+                      <div className="text-center py-4 text-muted">
+                        <i className="bi bi-inbox fs-1"></i>
+                        <p className="mt-2">No recent responses yet</p>
+                        <small>Associate responses to your freelancer recommendations will appear here</small>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {recentHires.slice(0, 8).map((hire, index) => (
+                          <div key={index} className="d-flex align-items-center p-3 border rounded" style={{ background: '#f8f9fa' }}>
+                            <div className="flex-shrink-0 me-3">
+                              <div style={{ 
+                                width: '40px', 
+                                height: '40px', 
+                                background: hire.response === 'hired' ? '#10b981' : 
+                                           hire.response === 'interested' ? '#3b82f6' : '#f59e0b',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#fff'
+                              }}>
+                                <i className={`bi ${
+                                  hire.response === 'hired' ? 'bi-check-lg' : 
+                                  hire.response === 'interested' ? 'bi-heart' : 'bi-clock'
+                                }`}></i>
+                              </div>
+                            </div>
+                            <div className="flex-grow-1">
+                              <div className="fw-bold">{hire.associate_name}</div>
+                              <div className="text-muted small">
+                                {hire.freelancer_name} • {hire.project_title}
+                              </div>
+                              <div className="text-muted small">
+                                {new Date(hire.response_date).toLocaleDateString()}
+                              </div>
+                            </div>
+                            <div className="text-end">
+                              <span className={`badge ${
+                                hire.response === 'hired' ? 'bg-success' : 
+                                hire.response === 'interested' ? 'bg-info' : 'bg-warning'
+                              }`}>
+                                {hire.response === 'hired' ? 'Hired' : 
+                                 hire.response === 'interested' ? 'Interested' : 'Pending'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </>
           )}
 
