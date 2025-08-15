@@ -95,24 +95,11 @@ const ECSEmployeeDashboard = () => {
   const [searchExperience, setSearchExperience] = useState('');
   const [searchStatus, setSearchStatus] = useState('all');
 
-  // Analytics tab state
-  const [timeRange, setTimeRange] = useState('90d');
-  const [filteredChartData, setFilteredChartData] = useState([]);
+
 
   // Analytics data states
-  const [analyticsData, setAnalyticsData] = useState({
-    registrationTrends: [],
-    userTypeDistribution: [],
-    userActivityStatus: [],
-    cvUploadTrends: [],
-    topSkills: [],
-    cvFileTypes: [],
-    messageTrends: [],
-    userCommunicationActivity: []
-  });
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
-  const [analyticsError, setAnalyticsError] = useState('');
-  const [lastAnalyticsUpdate, setLastAnalyticsUpdate] = useState(null);
+
+
   const [visitorData, setVisitorData] = useState([]);
   const [visitorDataLoading, setVisitorDataLoading] = useState(false);
 
@@ -205,26 +192,16 @@ const ECSEmployeeDashboard = () => {
     }
   }, [activeTab]);
 
-  // Load analytics data
-  useEffect(() => {
-    if (activeTab === 'analytics') {
-      loadAnalyticsData();
-    }
-  }, [activeTab, timeRange]);
 
-  // Fetch visitor data when time range changes
+
+  // Fetch visitor data when dashboard tab is activated
   useEffect(() => {
     if (activeTab === 'dashboard') {
       fetchVisitorData();
     }
-  }, [timeRange]);
-
-  // Fetch analytics data when analytics tab is activated
-  useEffect(() => {
-    if (activeTab === 'analytics') {
-      fetchAnalyticsData();
-    }
   }, [activeTab]);
+
+
 
   const loadStats = async () => {
     setStatsLoading(true);
@@ -315,15 +292,7 @@ const ECSEmployeeDashboard = () => {
     }
   };
 
-  const loadAnalyticsData = async () => {
-    try {
-      // Load analytics data based on timeRange
-      // This would be implemented based on your analytics endpoints
-      console.log('Loading analytics data for:', timeRange);
-    } catch (error) {
-      console.error('Error loading analytics data:', error);
-    }
-  };
+
 
   const fetchVisitorData = async () => {
     setVisitorDataLoading(true);
@@ -339,30 +308,7 @@ const ECSEmployeeDashboard = () => {
     }
   };
 
-  const fetchAnalyticsData = async () => {
-    setAnalyticsLoading(true);
-    setAnalyticsError('');
-    try {
-      // Simulate API call for analytics data
-      setTimeout(() => {
-        setAnalyticsData({
-          registrationTrends: [],
-          userTypeDistribution: [],
-          userActivityStatus: [],
-          cvUploadTrends: [],
-          topSkills: [],
-          cvFileTypes: [],
-          messageTrends: [],
-          userCommunicationActivity: []
-        });
-        setAnalyticsLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error('Error fetching analytics data:', error);
-      setAnalyticsError('Failed to load analytics data');
-      setAnalyticsLoading(false);
-    }
-  };
+
 
   // Associate Request Management Functions
   const handleReviewRequest = async (requestId) => {
@@ -818,114 +764,11 @@ const ECSEmployeeDashboard = () => {
 
 
 
-              <button
-                className={`nav-item w-100 text-start ${activeTab === 'documents' ? 'active' : ''}`}
-                onClick={() => setActiveTab('documents')}
-                style={{
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: activeTab === 'documents' ? accent : 'transparent',
-                  color: activeTab === 'documents' ? '#fff' : '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease',
-                  height: '48px',
-                  lineHeight: '24px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <i className="bi bi-folder me-3"></i>
-                Documents
-        </button>
+
         </div>
       </div>
       
-          {/* Management Tools */}
-          <div className="nav-section mb-4">
-            <h6 className="nav-section-title" style={{ 
-              color: '#6b7280', 
-              fontSize: '12px', 
-              fontWeight: 600, 
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-              paddingLeft: '8px'
-            }}>
-              Management Tools
-            </h6>
-            <div className="nav-items">
-              <button
-                className="nav-item w-100 text-start"
-                onClick={() => setActiveTab('analytics')}
-                style={{
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: 'transparent',
-                  color: '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease',
-                  height: '48px',
-                  lineHeight: '24px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <i className="bi bi-graph-up me-3"></i>
-                Analytics
-              </button>
-              
-              <button
-                className="nav-item w-100 text-start"
-                onClick={() => setActiveTab('reports')}
-                style={{
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: 'transparent',
-                  color: '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease',
-                  height: '48px',
-                  lineHeight: '24px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <i className="bi bi-file-earmark-text me-3"></i>
-                Reports
-          </button>
-              
-              <button
-                className="nav-item w-100 text-start"
-                onClick={() => setActiveTab('performance')}
-                style={{
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: 'transparent',
-                  color: '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease',
-                  height: '48px',
-                  lineHeight: '24px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <i className="bi bi-speedometer2 me-3"></i>
-                Performance Monitor
-          </button>
-          </div>
-        </div>
+
 
           {/* System */}
           <div className="nav-section">
@@ -1007,21 +850,13 @@ const ECSEmployeeDashboard = () => {
               {activeTab === 'dashboard' && 'Dashboard'}
               {activeTab === 'associate-requests' && 'Associate Requests'}
               {activeTab === 'freelancer-requests' && 'Associate Freelancer Requests'}
-              {activeTab === 'analytics' && 'Analytics'}
-              {activeTab === 'reports' && 'Reports'}
               {activeTab === 'settings' && 'Settings'}
-              
-              {activeTab === 'documents' && 'Documents'}
             </h1>
             <p className="text-muted mb-0">
               {activeTab === 'dashboard' && 'System overview and key metrics'}
               {activeTab === 'associate-requests' && 'Review associate join requests'}
               {activeTab === 'freelancer-requests' && 'Handle associate freelancer requests'}
-              {activeTab === 'analytics' && 'Performance insights and trends'}
-              {activeTab === 'reports' && 'Generate and view system reports'}
               {activeTab === 'settings' && 'System configuration and preferences'}
-              
-              {activeTab === 'documents' && 'Document management and organization'}
             </p>
             </div>
         </div>
@@ -1178,54 +1013,7 @@ const ECSEmployeeDashboard = () => {
                           >
                             {visitorDataLoading ? 'Loading...' : 'Refresh'}
                           </button>
-                          {/* Time Range Toggle Group */}
-                          <div className="btn-group" role="group">
-                            <button
-                              type="button"
-                              className={`btn btn-sm ${timeRange === '90d' ? '' : 'btn-outline-primary'}`}
-                              onClick={() => setTimeRange('90d')}
-                              style={{ 
-                                fontSize: '12px', 
-                                padding: '6px 12px',
-                                background: timeRange === '90d' ? accent : 'transparent',
-                                color: timeRange === '90d' ? '#fff' : accent,
-                                border: `1px solid ${accent}`,
-                                borderRadius: timeRange === '90d' ? '6px 0 0 6px' : '6px 0 0 6px'
-                              }}
-                            >
-                              Last 3 months
-                            </button>
-                            <button
-                              type="button"
-                              className={`btn btn-sm ${timeRange === '30d' ? '' : 'btn-outline-primary'}`}
-                              onClick={() => setTimeRange('30d')}
-                              style={{ 
-                                fontSize: '12px', 
-                                padding: '6px 12px',
-                                background: timeRange === '30d' ? accent : 'transparent',
-                                color: timeRange === '30d' ? accent : '#374151',
-                                border: `1px solid ${accent}`,
-                                borderRadius: '0'
-                              }}
-                            >
-                              Last 30 days
-                            </button>
-                            <button
-                              type="button"
-                              className={`btn btn-sm ${timeRange === '7d' ? '' : 'btn-outline-primary'}`}
-                              onClick={() => setTimeRange('7d')}
-                              style={{ 
-                                fontSize: '12px', 
-                                padding: '6px 12px',
-                                background: timeRange === '7d' ? accent : 'transparent',
-                                color: timeRange === '7d' ? accent : '#374151',
-                                border: `1px solid ${accent}`,
-                                borderRadius: '0 6px 6px 0'
-                              }}
-                            >
-                              Last 7 days
-                            </button>
-                          </div>
+
                         </div>
                       </div>
                     </div>
@@ -1687,35 +1475,7 @@ const ECSEmployeeDashboard = () => {
                 </div>
               )}
               
-          {/* Analytics Tab */}
-          {activeTab === 'analytics' && (
-            <div className="analytics-tab">
-              <div className="card border-0 shadow-sm">
-                <div className="card-header bg-transparent border-0">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="card-title mb-0">Analytics</h5>
-                    <select 
-                      className="form-select form-select-sm w-auto"
-                      value={timeRange}
-                      onChange={(e) => setTimeRange(e.target.value)}
-                    >
-                      <option value="7d">Last 7 days</option>
-                      <option value="30d">Last 30 days</option>
-                      <option value="90d">Last 90 days</option>
-                      <option value="1y">Last year</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="card-body">
-                  <div className="text-center py-4 text-muted">
-                    <i className="bi bi-graph-up fs-1"></i>
-                    <p className="mt-2">Analytics data will be displayed here</p>
-                    <small>Select a time range to view detailed analytics</small>
-                  </div>
-                </div>
-                  </div>
-                </div>
-              )}
+
 
            {/* Freelancer Request Details Modal */}
            {showFreelancerRequestDetailsModal && selectedFreelancerRequest && (
