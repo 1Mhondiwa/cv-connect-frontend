@@ -996,7 +996,7 @@ const ECSEmployeeDashboard = () => {
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h5 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                         <i className="bi bi-briefcase me-2"></i>
-                        Recent Associate Responses & Hires
+                        Recent Freelancer Hires
                       </h5>
                       <button 
                         className="btn btn-sm btn-outline-primary"
@@ -1015,8 +1015,8 @@ const ECSEmployeeDashboard = () => {
                     ) : recentHires.length === 0 ? (
                       <div className="text-center py-4 text-muted">
                         <i className="bi bi-inbox fs-1"></i>
-                        <p className="mt-2">No recent responses yet</p>
-                        <small>Associate responses to your freelancer recommendations will appear here</small>
+                        <p className="mt-2">No recent hires yet</p>
+                        <small>When associates hire freelancers, the information will appear here</small>
                       </div>
                     ) : (
                       <div className="space-y-3">
@@ -1026,36 +1026,35 @@ const ECSEmployeeDashboard = () => {
                               <div style={{ 
                                 width: '40px', 
                                 height: '40px', 
-                                background: hire.response === 'hired' ? '#10b981' : 
-                                           hire.response === 'interested' ? '#3b82f6' : '#f59e0b',
+                                background: '#10b981',
                                 borderRadius: '50%',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 color: '#fff'
                               }}>
-                                <i className={`bi ${
-                                  hire.response === 'hired' ? 'bi-check-lg' : 
-                                  hire.response === 'interested' ? 'bi-heart' : 'bi-clock'
-                                }`}></i>
+                                <i className="bi bi-check-lg"></i>
                               </div>
                             </div>
                             <div className="flex-grow-1">
                               <div className="fw-bold">{hire.associate_name}</div>
                               <div className="text-muted small">
-                                {hire.freelancer_name} • {hire.project_title}
+                                {hire.freelancer_first_name} {hire.freelancer_last_name} • {hire.freelancer_role}
                               </div>
                               <div className="text-muted small">
-                                {new Date(hire.response_date).toLocaleDateString()}
+                                {hire.project_title}
+                              </div>
+                              <div className="text-muted small">
+                                {new Date(hire.hire_date).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
                               </div>
                             </div>
                             <div className="text-end">
-                              <span className={`badge ${
-                                hire.response === 'hired' ? 'bg-success' : 
-                                hire.response === 'interested' ? 'bg-info' : 'bg-warning'
-                              }`}>
-                                {hire.response === 'hired' ? 'Hired' : 
-                                 hire.response === 'interested' ? 'Interested' : 'Pending'}
+                              <span className="badge bg-success">
+                                Successful
                               </span>
                             </div>
                           </div>
