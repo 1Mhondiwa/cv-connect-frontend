@@ -1017,8 +1017,8 @@ const ECSEmployeeDashboard = () => {
                         <i className="bi bi-inbox fs-1"></i>
                         <p className="mt-2">No recent hires yet</p>
                         <small>When associates hire freelancers, the information will appear here</small>
-                      </div>
-                    ) : (
+        </div>
+      ) : (
                       <div className="space-y-3">
                         {recentHires.slice(0, 8).map((hire, index) => (
                           <div key={index} className="d-flex align-items-center p-3 border rounded" style={{ background: '#f8f9fa' }}>

@@ -65,10 +65,7 @@ const ESCAdminDashboard = () => {
   const [adminImageSuccess, setAdminImageSuccess] = useState('');
   const adminImageInputRef = useRef(null);
 
-  // Freelancer request management
-  const [freelancerRequests, setFreelancerRequests] = useState([]);
-  const [freelancerRequestsLoading, setFreelancerRequestsLoading] = useState(false);
-  const [freelancerRequestsError, setFreelancerRequestsError] = useState('');
+
   const [selectedFreelancerRequest, setSelectedFreelancerRequest] = useState(null);
   const [showFreelancerRequestDetailsModal, setShowFreelancerRequestDetailsModal] = useState(false);
   const [showRecommendationsModal, setShowRecommendationsModal] = useState(false);
@@ -313,13 +310,7 @@ const ESCAdminDashboard = () => {
 
 
 
-  // Fetch freelancer requests when freelancer-requests tab is activated
-  useEffect(() => {
-    if (activeTab === 'freelancer-requests') {
-      fetchFreelancerRequests();
-    }
-    // eslint-disable-next-line
-  }, [activeTab]);
+
 
   // Fetch analytics data when analytics tab is activated
   useEffect(() => {
@@ -1355,22 +1346,7 @@ const ESCAdminDashboard = () => {
   });
 
   // Freelancer Request Management Functions
-  const fetchFreelancerRequests = async () => {
-    setFreelancerRequestsLoading(true);
-    setFreelancerRequestsError('');
-    try {
-      const res = await api.get('/admin/associate-requests');
-      if (res.data.success) {
-        setFreelancerRequests(res.data.requests);
-      } else {
-        setFreelancerRequestsError(res.data.message || 'Failed to fetch freelancer requests');
-      }
-    } catch (err) {
-      setFreelancerRequestsError(err.response?.data?.message || 'Failed to fetch freelancer requests');
-    } finally {
-      setFreelancerRequestsLoading(false);
-    }
-  };
+
 
   const fetchAvailableFreelancers = async () => {
     try {
@@ -1467,7 +1443,6 @@ const ESCAdminDashboard = () => {
       if (res.data.success) {
         alert('Recommendations submitted successfully!');
         setShowRecommendationsModal(false);
-        fetchFreelancerRequests();
       } else {
         alert(res.data.message || 'Failed to submit recommendations');
       }
@@ -1488,7 +1463,6 @@ const ESCAdminDashboard = () => {
 
       if (res.data.success) {
         alert('Request status updated successfully!');
-        fetchFreelancerRequests();
       } else {
         alert(res.data.message || 'Failed to update request status');
       }
@@ -1890,28 +1864,7 @@ const ESCAdminDashboard = () => {
 
 
 
-              <button
-                className={`nav-item w-100 text-start ${activeTab === 'freelancer-requests' ? 'active' : ''}`}
-                onClick={() => setActiveTab('freelancer-requests')}
-                style={{
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: activeTab === 'freelancer-requests' ? accent : 'transparent',
-                  color: activeTab === 'freelancer-requests' ? '#fff' : '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.2s ease',
-                  height: '48px',
-                  lineHeight: '24px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <i className="bi bi-people-fill me-3"></i>
-                Associate Freelancer Requests
-                </button>
+
 
 
 
@@ -2103,7 +2056,7 @@ const ESCAdminDashboard = () => {
             <h1 className="h3 mb-0" style={{ color: '#111827', fontWeight: 600 }}>
               {activeTab === 'dashboard' && 'Dashboard'}
 
-              {activeTab === 'freelancer-requests' && 'Associate Freelancer Requests'}
+
               {activeTab === 'analytics' && 'Analytics'}
               {activeTab === 'reports' && 'Reports'}
               {activeTab === 'settings' && 'Settings'}
@@ -2113,7 +2066,7 @@ const ESCAdminDashboard = () => {
             <p className="text-muted mb-0">
               {activeTab === 'dashboard' && 'System overview and key metrics'}
 
-              {activeTab === 'freelancer-requests' && 'Handle associate freelancer requests'}
+
               {activeTab === 'analytics' && 'Performance insights and trends'}
               {activeTab === 'reports' && 'Generate and view system reports'}
               {activeTab === 'settings' && 'System configuration and preferences'}
@@ -2477,125 +2430,8 @@ const ESCAdminDashboard = () => {
             </div>
           )}
 
-          {/* Freelancer Requests Tab */}
-          {activeTab === 'freelancer-requests' && (
-            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>ECS Admin Freelancer Request Management</h5>
-              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Review associate requests for freelancer services and provide curated recommendations</p>
-              
-              {freelancerRequestsLoading ? (
-                <div className="text-center py-4">
-                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
-                  <p className="mt-2 text-muted">Loading freelancer requests...</p>
-        </div>
-              ) : freelancerRequestsError ? (
-                <div className="alert alert-danger">{freelancerRequestsError}</div>
-              ) : freelancerRequests.length === 0 ? (
-                <div className="text-center py-4">
-                  <i className="bi bi-inbox display-4 text-muted"></i>
-                  <p className="mt-3 text-muted">No freelancer requests submitted yet</p>
-      </div>
-              ) : (
-                <div className="row g-3">
-                  {freelancerRequests.map((request) => (
-                    <div key={request.request_id} className="col-12">
-                      <div className="card border-0 shadow-sm h-100">
-                        <div className="card-body">
-                          <div className="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                              <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600 }}>
-                                {request.title}
-                              </h6>
-                              <p className="card-text text-muted small mb-2">
-                                {request.description.length > 150 
-                                  ? `${request.description.substring(0, 150)}...` 
-                                  : request.description}
-                              </p>
-                            </div>
-                            <div className="text-end">
-                              <span className={`badge ${
-                                request.status === 'pending' ? 'bg-warning' :
-                                request.status === 'reviewed' ? 'bg-info' :
-                                request.status === 'provided' ? 'bg-success' :
-                                request.status === 'completed' ? 'bg-primary' :
-                                'bg-secondary'
-                              }`}>
-                                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <div className="row g-2 mb-3">
-                <div className="col-md-4">
-                              <small className="text-muted">
-                                <i className="bi bi-building me-1"></i>
-                                <strong>Company:</strong> {request.associate_email}
-                              </small>
-                            </div>
-                            <div className="col-md-4">
-                              <small className="text-muted">
-                                <i className="bi bi-gear me-1"></i>
-                                <strong>Skills:</strong> {request.required_skills.join(', ')}
-                              </small>
-                            </div>
-                            <div className="col-md-4">
-                              <small className="text-muted">
-                                <i className="bi bi-calendar me-1"></i>
-                                <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
-                              </small>
-                            </div>
-                          </div>
 
-                          <div className="row g-2 mb-3">
-                            <div className="col-md-3">
-                              <small className="text-muted">
-                                <i className="bi bi-clock me-1"></i>
-                                <strong>Urgency:</strong> {request.urgency_level}
-                              </small>
-                            </div>
-                            <div className="col-md-3">
-                              <small className="text-muted">
-                                <i className="bi bi-currency-dollar me-1"></i>
-                                <strong>Budget:</strong> {request.budget_range || 'Not specified'}
-                              </small>
-                            </div>
-                            <div className="col-md-3">
-                              <small className="text-muted">
-                                <i className="bi bi-geo-alt me-1"></i>
-                                <strong>Location:</strong> {request.preferred_location || 'Any'}
-                              </small>
-                            </div>
-                            <div className="col-md-3">
-                              <small className="text-muted">
-                                <i className="bi bi-star me-1"></i>
-                                <strong>Experience:</strong> {request.min_experience}+ years
-                              </small>
-                            </div>
-                          </div>
 
-                          <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                              <small className="text-muted">
-                                <i className="bi bi-calendar me-1"></i>
-                                <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
-                              </small>
-                            </div>
-                            <button
-                              className="btn btn-sm"
-                              style={{ background: accent, color: '#fff', borderRadius: 20 }}
-                              onClick={() => openRecommendationsModal(request)}
-                            >
-                              <i className="bi bi-star me-1"></i>Provide Recommendations
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
           {/* Analytics Tab */}
           {activeTab === 'analytics' && (
             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1400, margin: '0 auto' }}>
