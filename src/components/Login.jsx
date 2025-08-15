@@ -70,6 +70,8 @@ const Login = () => {
             }
           } else if (result.user.user_type === 'admin') {
             navigate('/admin/dashboard');
+          } else if (result.user.user_type === 'ecs_employee') {
+            navigate('/ecs-employee/dashboard');
           } else {
             navigate('/dashboard');
           }

@@ -13,7 +13,9 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import FreelancerDashboard from './components/FreelancerDashboard';
 import AdminCreate from './components/AdminCreate';
+import ECSEmployeeCreate from './components/ECSEmployeeCreate';
 import ESCAdminDashboard from './components/AdminDashboard';
+import ECSEmployeeDashboard from './components/ECSEmployeeDashboard';
 import AssociateDashboard from './components/AssociateDashboard';
 import NotFound from './components/NotFound';
 import Footer from './components/Footer';
@@ -101,7 +103,9 @@ function AppRoutes() {
             <Route path="/associate/temp-password-change" element={<ProtectedRoute requiredRole="associate"><AssociateTempPasswordChange /></ProtectedRoute>} />
           {/* Admin Routes - Not linked in public navigation */}
                       <Route path="/admin/create" element={<AdminCreate />} />
+                      <Route path="/ecs-employee/create" element={<ECSEmployeeCreate />} />
             <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><ESCAdminDashboard /></ProtectedRoute>} />
+            <Route path="/ecs-employee/dashboard" element={<ProtectedRoute requiredRole="ecs_employee"><ECSEmployeeDashboard /></ProtectedRoute>} />
             <Route path="/associate-request" element={<AssociateRequestForm />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
