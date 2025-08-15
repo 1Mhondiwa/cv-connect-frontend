@@ -120,19 +120,15 @@ const ECSEmployeeCreate = () => {
       const response = await axios.post('/api/auth/create-ecs-employee', requestData);
 
       if (response.data.success) {
-        setSuccessMessage('ECS Employee account created successfully! Redirecting to login...');
+        setSuccessMessage('ECS Employee account created successfully! You can now log in with your email and password. Redirecting to login page...');
         
-        // Store token and user data
-        localStorage.setItem('token', response.data.data.token);
-        localStorage.setItem('user', JSON.stringify({
-          user_id: response.data.data.user_id,
-          email: response.data.data.email,
-          user_type: 'ecs_employee'
-        }));
+        // Clear any existing session data
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         
-        // Redirect to admin dashboard after a short delay
+        // Redirect to login page after a short delay
         setTimeout(() => {
-          navigate('/admin/dashboard');
+          navigate('/login');
         }, 2000);
       } else {
         setErrorMessage(response.data.message || 'ECS Employee creation failed');
