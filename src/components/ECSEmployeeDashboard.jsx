@@ -245,9 +245,11 @@ const ECSEmployeeDashboard = () => {
     setAssociateRequestsLoading(true);
     setAssociateRequestsError('');
     try {
-      const response = await api.get('/admin/associate-requests');
+      const response = await api.get('/associate-request/requests');
       if (response.data.success) {
-        setAssociateRequests(response.data.requests);
+        setAssociateRequests(response.data.data.requests);
+      } else {
+        setAssociateRequestsError(response.data.message || 'Failed to load associate requests');
       }
     } catch (error) {
       console.error('Error loading associate requests:', error);
@@ -359,6 +361,47 @@ const ECSEmployeeDashboard = () => {
       setAnalyticsError('Failed to load analytics data');
       setAnalyticsLoading(false);
     }
+  };
+
+  // Associate Request Management Functions
+  const handleReviewRequest = async (requestId) => {
+    setReviewLoading(true);
+    try {
+      console.log('🔍 Sending review request:', {
+        url: `/associate-request/requests/${requestId}/review`,
+        data: reviewFormData,
+        requestId
+      });
+      
+      const res = await api.put(`/associate-request/requests/${requestId}/review`, reviewFormData);
+      console.log('✅ Review response:', res.data);
+      
+      if (res.data.success) {
+        // Refresh the requests list
+        loadAssociateRequests();
+        setSelectedRequest(null);
+        setReviewFormData({ status: 'approved', review_notes: '', password: '' });
+        setSuccessMessage(`Request ${reviewFormData.status} successfully`);
+        setTimeout(() => setSuccessMessage(''), 5000); // Clear after 5 seconds
+      } else {
+        setErrorMessage(res.data.message || 'Failed to review request');
+        setTimeout(() => setErrorMessage(''), 5000); // Clear after 5 seconds
+      }
+    } catch (err) {
+      console.error('❌ Review request error:', err);
+      console.error('Error response:', err.response?.data);
+      setErrorMessage(err.response?.data?.message || 'Failed to review request');
+      setTimeout(() => setErrorMessage(''), 5000); // Clear after 5 seconds
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  const handleReviewFormChange = (e) => {
+    setReviewFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   const handleLogout = () => {
@@ -947,65 +990,180 @@ const ECSEmployeeDashboard = () => {
 
           {/* Associate Requests Tab */}
           {activeTab === 'associate-requests' && (
-            <div className="associate-requests-tab">
-              <div className="card border-0 shadow-sm">
-                <div className="card-header bg-transparent border-0">
-                  <h5 className="card-title mb-0">Associate Requests</h5>
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Associate Requests</h5>
+              
+              {/* Success and Error Messages */}
+              {successMessage && (
+                <div className="alert alert-success alert-dismissible fade show mb-3" role="alert">
+                  <i className="bi bi-check-circle me-2"></i>
+                  {successMessage}
+                  <button type="button" className="btn-close" onClick={() => setSuccessMessage('')}></button>
                 </div>
-                <div className="card-body">
-                  {associateRequestsLoading ? (
-                    <div className="text-center py-4">
-                      <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
+              )}
+              
+              {errorMessage && (
+                <div className="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                  <i className="bi bi-exclamation-triangle me-2"></i>
+                  {errorMessage}
+                  <button type="button" className="btn-close" onClick={() => setErrorMessage('')}></button>
+                </div>
+              )}
+              {associateRequestsLoading ? (
+                <div>Loading associate requests...</div>
+              ) : associateRequestsError ? (
+                <div style={{ color: '#df1529', fontWeight: 500 }}>{associateRequestsError}</div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="table table-bordered" style={{ minWidth: 700 }}>
+                    <thead style={{ background: '#f8f9fa' }}>
+                      <tr>
+                        <th>Email</th>
+                        <th>Company Name</th>
+                        <th>Contact Person</th>
+                        <th>Industry</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {associateRequests.map(request => (
+                        <tr key={request.request_id}>
+                          <td>{request.email}</td>
+                          <td>{request.company_name || 'N/A'}</td>
+                          <td>{request.contact_person}</td>
+                          <td>{request.industry}</td>
+                          <td>{request.phone}</td>
+                          <td>
+                            <span className={`badge ${request.status === 'pending' ? 'bg-warning' : request.status === 'approved' ? 'bg-success' : 'bg-danger'}`}>
+                              {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                            </span>
+                          </td>
+                          <td>{request.created_at ? new Date(request.created_at).toLocaleDateString() : ''}</td>
+                          <td>
+                            {request.status === 'pending' && (
+                              <button
+                                className="btn btn-sm btn-primary me-2"
+                                onClick={() => setSelectedRequest(request)}
+                                style={{ borderRadius: 20, fontWeight: 600, fontSize: 14, padding: '6px 18px' }}
+                              >
+                                Review
+                              </button>
+                            )}
+                            {request.status !== 'pending' && (
+                              <div>
+                                <small className="text-muted">
+                                  {request.reviewed_at ? `Reviewed: ${new Date(request.reviewed_at).toLocaleDateString()}` : ''}
+                                </small>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Review Modal */}
+              {selectedRequest && (
+                <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1050 }}>
+                  <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">Review Associate Request</h5>
+                        <button type="button" className="btn-close" onClick={() => setSelectedRequest(null)}></button>
+                      </div>
+                      <div className="modal-body">
+                        <div className="row mb-3">
+                          <div className="col-md-6">
+                            <strong>Email:</strong> {selectedRequest.email}
+                          </div>
+                          <div className="col-md-6">
+                            <strong>Company:</strong> {selectedRequest.company_name || 'N/A'}
+                          </div>
+                        </div>
+                        <div className="row mb-3">
+                          <div className="col-md-6">
+                            <strong>Contact Person:</strong> {selectedRequest.contact_person}
+                          </div>
+                          <div className="col-md-6">
+                            <strong>Industry:</strong> {selectedRequest.industry}
+                          </div>
+                        </div>
+                        <div className="row mb-3">
+                          <div className="col-md-6">
+                            <strong>Phone:</strong> {selectedRequest.phone}
+                          </div>
+                          <div className="col-md-6">
+                            <strong>Website:</strong> {selectedRequest.website || 'N/A'}
+                          </div>
+                        </div>
+                        {selectedRequest.request_reason && (
+                          <div className="mb-3">
+                            <strong>Reason:</strong> {selectedRequest.request_reason}
+                          </div>
+                        )}
+                        <hr />
+                        <form>
+                          <div className="mb-3">
+                            <label className="form-label">Decision:</label>
+                            <select 
+                              name="status" 
+                              className="form-select" 
+                              value={reviewFormData.status}
+                              onChange={handleReviewFormChange}
+                            >
+                              <option value="approved">Approve</option>
+                              <option value="rejected">Reject</option>
+                            </select>
+                          </div>
+                          {reviewFormData.status === 'approved' && (
+                            <div className="mb-3">
+                              <label className="form-label">Set Password:</label>
+                              <input 
+                                type="password" 
+                                name="password" 
+                                className="form-control" 
+                                placeholder="Enter password for the new account"
+                                value={reviewFormData.password}
+                                onChange={handleReviewFormChange}
+                                required
+                              />
+                            </div>
+                          )}
+                          <div className="mb-3">
+                            <label className="form-label">Review Notes (Optional):</label>
+                            <textarea 
+                              name="review_notes" 
+                              className="form-control" 
+                              rows="3"
+                              placeholder="Add any notes about this decision"
+                              value={reviewFormData.review_notes}
+                              onChange={handleReviewFormChange}
+                            ></textarea>
+                          </div>
+                        </form>
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={() => setSelectedRequest(null)}>
+                          Cancel
+                        </button>
+                        <button 
+                          type="button" 
+                          className="btn btn-primary" 
+                          onClick={() => handleReviewRequest(selectedRequest.request_id)}
+                          disabled={reviewLoading || (reviewFormData.status === 'approved' && !reviewFormData.password)}
+                        >
+                          {reviewLoading ? 'Processing...' : `Submit ${reviewFormData.status}`}
+                        </button>
                       </div>
                     </div>
-                  ) : associateRequestsError ? (
-                    <div className="alert alert-danger" role="alert">
-                      {associateRequestsError}
-                    </div>
-                  ) : associateRequests.length === 0 ? (
-                    <div className="text-center py-4 text-muted">
-                      <i className="bi bi-inbox fs-1"></i>
-                      <p className="mt-2">No associate requests found</p>
-                    </div>
-                  ) : (
-                    <div className="table-responsive">
-                      <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>Company</th>
-                            <th>Contact Person</th>
-                            <th>Industry</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {associateRequests.map((request) => (
-                            <tr key={request.request_id}>
-                              <td>{request.company_name || 'N/A'}</td>
-                              <td>{request.contact_person}</td>
-                              <td>{request.industry}</td>
-                              <td>
-                                <span className={`badge bg-${request.status === 'pending' ? 'warning' : request.status === 'approved' ? 'success' : 'danger'}`}>
-                                  {request.status}
-                                </span>
-                              </td>
-                              <td>{new Date(request.created_at).toLocaleDateString()}</td>
-                              <td>
-                                <button className="btn btn-sm btn-outline-primary">
-                                  View Details
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
