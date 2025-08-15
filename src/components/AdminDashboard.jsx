@@ -160,6 +160,11 @@ const ESCAdminDashboard = () => {
   const [securityError, setSecurityError] = useState('');
   const [lastSecurityUpdate, setLastSecurityUpdate] = useState(null);
 
+  // Hired freelancers tracking state
+  const [hiredFreelancersCount, setHiredFreelancersCount] = useState(0);
+  const [hiredFreelancersLoading, setHiredFreelancersLoading] = useState(false);
+  const [lastHiredFreelancersUpdate, setLastHiredFreelancersUpdate] = useState(null);
+  const [dataSource, setDataSource] = useState('stats'); // 'stats' or 'fallback'
 
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds
@@ -227,6 +232,8 @@ const ESCAdminDashboard = () => {
 
   useEffect(() => {
     checkAuth();
+    // Fetch initial hired freelancers count
+    fetchHiredFreelancersCount();
   }, []);
 
   // Fetch visitor data when time range changes
@@ -319,8 +326,29 @@ const ESCAdminDashboard = () => {
     if (activeTab === 'dashboard') {
       fetchStats();
       fetchVisitorData();
+      fetchHiredFreelancersCount(); // Add hired freelancers count
     }
     // eslint-disable-next-line
+  }, [activeTab]);
+
+  // Auto-refresh hired freelancers count every 2 minutes when dashboard tab is active
+  useEffect(() => {
+    let intervalId;
+    
+    if (activeTab === 'dashboard') {
+      // Set up auto-refresh every 2 minutes (120,000 milliseconds)
+      intervalId = setInterval(() => {
+        console.log('🔄 Auto-refreshing hired freelancers count...');
+        fetchHiredFreelancersCount();
+      }, 2 * 60 * 1000);
+    }
+    
+    // Cleanup interval when component unmounts or tab changes
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [activeTab]);
 
   // Fetch admin image on user load
@@ -1155,7 +1183,74 @@ const ESCAdminDashboard = () => {
     }
   };
 
-
+  // Fetch hired freelancers count for real-time updates
+  const fetchHiredFreelancersCount = async () => {
+    try {
+      setHiredFreelancersLoading(true);
+      console.log('🔍 Fetching hired freelancers count...');
+      
+      // Try the stats endpoint first
+      try {
+        const response = await api.get('/hiring/stats');
+        
+        console.log('🔍 API Response:', response.data);
+        console.log('🔍 Response structure:', {
+          success: response.data.success,
+          stats: response.data.stats,
+          total_hires: response.data.stats?.total_hires
+        });
+        
+        if (response.data.success) {
+          const count = response.data.stats.total_hires || 0;
+          setHiredFreelancersCount(count);
+          setLastHiredFreelancersUpdate(new Date());
+          setDataSource('stats');
+          console.log('✅ Hired freelancers count updated from stats:', count);
+          return;
+        }
+      } catch (statsError) {
+        console.log('⚠️ Stats endpoint failed, trying recent-hires as fallback...');
+      }
+      
+      // Fallback: get count from recent-hires endpoint
+      try {
+        const fallbackResponse = await api.get('/hiring/recent-hires');
+        console.log('🔍 Fallback API Response:', fallbackResponse.data);
+        
+        if (fallbackResponse.data.success) {
+          const count = fallbackResponse.data.hires?.length || 0;
+          setHiredFreelancersCount(count);
+          setLastHiredFreelancersUpdate(new Date());
+          setDataSource('fallback');
+          console.log('✅ Hired freelancers count updated from fallback:', count);
+        } else {
+          console.error('❌ Fallback endpoint also failed');
+          setHiredFreelancersCount(0);
+        }
+      } catch (fallbackError) {
+        console.error('❌ Both endpoints failed');
+        setHiredFreelancersCount(0);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error fetching hired freelancers count:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      if (error.response?.status === 401) {
+        console.error('❌ Authentication error - user may not have admin privileges');
+      } else if (error.response?.status === 403) {
+        console.error('❌ Forbidden - user does not have permission to access hiring stats');
+      }
+      
+      setHiredFreelancersCount(0);
+    } finally {
+      setHiredFreelancersLoading(false);
+    }
+  };
 
   // Freelancer Request Management Functions
 
@@ -1926,35 +2021,68 @@ const ESCAdminDashboard = () => {
                   </div>
                 </div>
 
-                <div className="col-lg-3 col-md-6">
-                  {/* Pending Requests Card */}
+                                <div className="col-lg-3 col-md-6">
+                  {/* Total Freelancers Hired Card */}
                   <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
-                        <i className="bi bi-envelope"></i>
-              </div>
+                        <i className="bi bi-briefcase"></i>
+                      </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
-                        Pending Requests
-                        </div>
-                        </div>
+                        Total Freelancers Hired
+                      </div>
+                    </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
-                      0
+                      {hiredFreelancersLoading ? (
+                        <div className="spinner-border spinner-border-sm text-primary" role="status">
+                          <span className="visually-hidden">Loading...</span>
                         </div>
+                      ) : (
+                        hiredFreelancersCount
+                      )}
+                    </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
-                      <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
-                        <i className="bi bi-clock me-1"></i>
-                        Awaiting
+                      <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
+                        <i className="bi bi-check-circle me-1"></i>
+                        Successfully Hired
                       </span>
-                        </div>
+                    </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
-                        <i className="bi bi-clock" style={{ color: '#f59e0b' }}></i>
-                        <span style={{ fontWeight: 500 }}>Review required</span>
+                        <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
+                        <span style={{ fontWeight: 500 }}>Growing steadily</span>
+                      </div>
+                      <div className="text-muted">Real-time system data</div>
+                      {lastHiredFreelancersUpdate && (
+                        <div className="text-muted" style={{ fontSize: '10px' }}>
+                          <i className="bi bi-clock me-1"></i>
+                          Last updated: {lastHiredFreelancersUpdate.toLocaleTimeString()}
+                          <span className="ms-1" style={{ color: '#10b981' }}>
+                            <i className="bi bi-wifi"></i>
+                          </span>
+                          <span className="ms-2" style={{ fontSize: '9px', color: dataSource === 'fallback' ? '#f59e0b' : '#10b981' }}>
+                            {dataSource === 'fallback' ? 'Fallback' : 'Primary'}
+                          </span>
                         </div>
-                      <div className="text-muted">ECS Admin attention needed</div>
-                        </div>
-                        </div>
-                        </div>
+                      )}
+                      <div className="mt-2">
+                        <button 
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={fetchHiredFreelancersCount}
+                          disabled={hiredFreelancersLoading}
+                          style={{ fontSize: '10px', padding: '4px 8px' }}
+                          title="Refresh count"
+                        >
+                          {hiredFreelancersLoading ? (
+                            <i className="bi bi-arrow-clockwise spin"></i>
+                          ) : (
+                            <i className="bi bi-arrow-clockwise"></i>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Total Visitors Graph */}
@@ -3556,7 +3684,7 @@ const ESCAdminDashboard = () => {
                 <i className="bi bi-file-earmark-text display-1 text-muted"></i>
                   <h6 className="text-muted mt-3">Select a Report Category</h6>
                   <p className="text-muted">Choose from the categories above to view detailed reports and insights</p>
-              </div>
+                </div>
               )}
             </div>
           )}
@@ -4090,6 +4218,20 @@ const ESCAdminDashboard = () => {
         .col-xl-6, .col-lg-6, .col-md-12 {
           padding-left: 8px !important;
           padding-right: 8px !important;
+        }
+        
+        /* Spinning animation for refresh buttons */
+        .spin {
+          animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
 
