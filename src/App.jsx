@@ -14,6 +14,7 @@ import Dashboard from './components/Dashboard';
 import FreelancerDashboard from './components/FreelancerDashboard';
 import AdminCreate from './components/AdminCreate';
 import ECSEmployeeCreate from './components/ECSEmployeeCreate';
+import ECSEmployeeDashboard from './components/ECSEmployeeDashboard';
 import ESCAdminDashboard from './components/AdminDashboard';
 import AssociateDashboard from './components/AssociateDashboard';
 import NotFound from './components/NotFound';
@@ -103,6 +104,7 @@ function AppRoutes() {
           {/* Admin Routes - Not linked in public navigation */}
                       <Route path="/admin/create" element={<AdminCreate />} />
                       <Route path="/ecs-employee/create" element={<ECSEmployeeCreate />} />
+                      <Route path="/ecs-employee-dashboard" element={<ProtectedRoute requiredRole="ecs_employee"><ECSEmployeeDashboard /></ProtectedRoute>} />
             <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="admin"><ESCAdminDashboard /></ProtectedRoute>} />
             <Route path="/associate-request" element={<AssociateRequestForm />} />
             <Route path="*" element={<NotFound />} />
