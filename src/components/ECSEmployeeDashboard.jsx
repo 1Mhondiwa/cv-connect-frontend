@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+
 
 const accent = '#fd680e';
 
@@ -100,42 +100,7 @@ const ECSEmployeeDashboard = () => {
   // Analytics data states
 
 
-  const [visitorData, setVisitorData] = useState([]);
-  const [visitorDataLoading, setVisitorDataLoading] = useState(false);
 
-  // Chart data (static for now, will be real-time later)
-  const chartData = [
-    { date: "2024-04-01", desktop: 222, mobile: 150 },
-    { date: "2024-04-02", desktop: 199, mobile: 221 },
-    { date: "2024-04-03", desktop: 250, mobile: 194 },
-    { date: "2024-04-04", desktop: 222, mobile: 150 },
-    { date: "2024-04-05", desktop: 199, mobile: 221 },
-    { date: "2024-04-06", desktop: 250, mobile: 194 },
-    { date: "2024-04-07", desktop: 222, mobile: 150 },
-    { date: "2024-04-08", desktop: 199, mobile: 221 },
-    { date: "2024-04-09", desktop: 250, mobile: 194 },
-    { date: "2024-04-10", desktop: 222, mobile: 150 },
-    { date: "2024-04-11", desktop: 199, mobile: 221 },
-    { date: "2024-04-12", desktop: 250, mobile: 194 },
-    { date: "2024-04-13", desktop: 222, mobile: 150 },
-    { date: "2024-04-14", desktop: 199, mobile: 221 },
-    { date: "2024-04-15", desktop: 250, mobile: 194 },
-    { date: "2024-04-16", desktop: 222, mobile: 150 },
-    { date: "2024-04-17", desktop: 199, mobile: 221 },
-    { date: "2024-04-18", desktop: 250, mobile: 194 },
-    { date: "2024-04-19", desktop: 222, mobile: 150 },
-    { date: "2024-04-20", desktop: 199, mobile: 221 },
-    { date: "2024-04-21", desktop: 250, mobile: 194 },
-    { date: "2024-04-22", desktop: 222, mobile: 150 },
-    { date: "2024-04-23", desktop: 199, mobile: 221 },
-    { date: "2024-04-24", desktop: 250, mobile: 194 },
-    { date: "2024-04-25", desktop: 222, mobile: 150 },
-    { date: "2024-04-26", desktop: 199, mobile: 221 },
-    { date: "2024-04-27", desktop: 250, mobile: 194 },
-    { date: "2024-04-28", desktop: 222, mobile: 150 },
-    { date: "2024-04-29", desktop: 199, mobile: 221 },
-    { date: "2024-04-30", desktop: 250, mobile: 194 }
-  ];
 
   // Load user data on component mount
   useEffect(() => {
@@ -194,12 +159,7 @@ const ECSEmployeeDashboard = () => {
 
 
 
-  // Fetch visitor data when dashboard tab is activated
-  useEffect(() => {
-    if (activeTab === 'dashboard') {
-      fetchVisitorData();
-    }
-  }, [activeTab]);
+
 
 
 
@@ -294,19 +254,7 @@ const ECSEmployeeDashboard = () => {
 
 
 
-  const fetchVisitorData = async () => {
-    setVisitorDataLoading(true);
-    try {
-      // Simulate API call for visitor data
-      setTimeout(() => {
-        setVisitorData(chartData);
-        setVisitorDataLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error('Error fetching visitor data:', error);
-      setVisitorDataLoading(false);
-    }
-  };
+
 
 
 
@@ -853,7 +801,7 @@ const ECSEmployeeDashboard = () => {
               {activeTab === 'settings' && 'Settings'}
             </h1>
             <p className="text-muted mb-0">
-              {activeTab === 'dashboard' && 'System overview and key metrics'}
+              {activeTab === 'dashboard' && 'Pending requests overview'}
               {activeTab === 'associate-requests' && 'Review associate join requests'}
               {activeTab === 'freelancer-requests' && 'Handle associate freelancer requests'}
               {activeTab === 'settings' && 'System configuration and preferences'}
@@ -865,175 +813,42 @@ const ECSEmployeeDashboard = () => {
           {/* Add Associate Form (Dashboard Tab) */}
           {activeTab === 'dashboard' && (
             <>
-              {/* System Stats Row */}
+              {/* Pending Requests Card */}
               <div className="row g-4 mb-4">
-                <div className="col-lg-3 col-md-6">
-                  {/* Total Users Card */}
-                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                    <div className="mb-3">
-                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
-                        <i className="bi bi-people"></i>
-                    </div>
-                      <div style={{ color: '#6c757d', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
-                        Total Users
-                  </div>
-                </div>
-                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
-                      {statsLoading ? '...' : statsError ? '--' : stats?.users ? Object.values(stats.users).reduce((a, b) => a + b, 0) : '--'}
-                    </div>
-                    <div className="d-flex align-items-center justify-content-center gap-2">
-                      <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
-                        <i className="bi bi-arrow-up me-1"></i>
-                        +12.5%
-                      </span>
-                  </div>
-                    <div className="mt-3 text-sm text-muted">
-                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
-                        <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
-                        <span style={{ fontWeight: 500 }}>Growing steadily</span>
-                </div>
-                      <div className="text-muted">Active users</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-lg-3 col-md-6">
-                  {/* Total CVs Card */}
-                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                    <div className="mb-3">
-                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
-                        <i className="bi bi-file-earmark-text"></i>
-                    </div>
-                      <div style={{ color: '#6c757d', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
-                        Total CVs
-                      </div>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
-                      {statsLoading ? '...' : statsError ? '--' : stats?.total_cvs ?? '--'}
-                    </div>
-                    <div className="d-flex align-items-center justify-content-center gap-2">
-                      <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
-                        <i className="bi bi-arrow-up me-1"></i>
-                        +8.2%
-                      </span>
-                    </div>
-                    <div className="mt-3 text-sm text-muted">
-                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
-                        <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
-                        <span style={{ fontWeight: 500 }}>CV uploads increasing</span>
-                      </div>
-                      <div className="text-muted">Professional profiles added</div>
-                  </div>
-                </div>
-              </div>
-              
-                <div className="col-lg-3 col-md-6">
-                  {/* Total Messages Card */}
-                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
-                    <div className="mb-3">
-                      <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
-                        <i className="bi bi-chat-dots"></i>
-                    </div>
-                      <div style={{ color: '#6c757d', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
-                        Total Messages
-                  </div>
-                </div>
-                    <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
-                      {statsLoading ? '...' : statsError ? '--' : stats?.total_messages ?? '--'}
-                    </div>
-                    <div className="d-flex align-items-center justify-content-center gap-2">
-                      <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
-                        <i className="bi bi-arrow-up me-1"></i>
-                        +15.3%
-                      </span>
-                  </div>
-                    <div className="mt-3 text-sm text-muted">
-                      <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
-                        <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
-                        <span style={{ fontWeight: 500 }}>Communication active</span>
-                </div>
-                      <div className="text-muted">High engagement levels</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-lg-3 col-md-6">
+                <div className="col-lg-4 col-md-6 mx-auto">
                   {/* Pending Requests Card */}
                   <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-envelope"></i>
-              </div>
+                      </div>
                       <div style={{ color: '#6c757d', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Pending Requests
-                        </div>
-                        </div>
+                      </div>
+                    </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {statsLoading ? '...' : statsError ? '--' : stats?.associate_requests?.pending ?? '--'}
-                        </div>
+                    </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
                         <i className="bi bi-clock me-1"></i>
                         Awaiting
                       </span>
-                        </div>
+                    </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-clock" style={{ color: '#f59e0b' }}></i>
                         <span style={{ fontWeight: 500 }}>Review required</span>
-                        </div>
-                      <div className="text-muted">ECS Admin attention needed</div>
-                        </div>
-                        </div>
-                        </div>
-              </div>
-
-              {/* Total Visitors Graph */}
-              <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
-                {/* Interactive Chart Component */}
-                <div className="chart-container">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0 pb-0">
-                      <div className="d-flex justify-content-between align-items-start flex-wrap">
-                        <div>
-                          <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600, fontSize: '18px' }}>
-                            Total Visitors
-                          </h6>
-                          <p className="card-text text-muted small mb-0">
-                            Total for the last 3 months
-                          </p>
-                        </div>
-                        <div className="d-flex gap-2 mt-2">
-                          {/* Refresh Button */}
-                          <button 
-                            className="btn btn-sm btn-outline-primary me-2"
-                            onClick={fetchVisitorData}
-                            disabled={visitorDataLoading}
-                            style={{ fontSize: '12px', padding: '6px 12px' }}
-                          >
-                            {visitorDataLoading ? 'Loading...' : 'Refresh'}
-                          </button>
-
-                        </div>
                       </div>
-                    </div>
-                    <div className="card-body">
-                      <div style={{ height: '300px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={visitorData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="date" />
-                            <YAxis />
-                            <Tooltip />
-                            <Area type="monotone" dataKey="desktop" stroke={accent} fill={accent} fillOpacity={0.3} />
-                            <Area type="monotone" dataKey="mobile" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} />
-                          </AreaChart>
-                        </ResponsiveContainer>
-                      </div>
+                      <div className="text-muted">ECS Employee attention needed</div>
                     </div>
                   </div>
                 </div>
               </div>
+
+                
+
+
             </>
           )}
 
