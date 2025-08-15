@@ -771,14 +771,7 @@ const ESCAdminDashboard = () => {
           { date: '2025-07-31', messages: 40, conversations: 15 },
           { date: '2025-08-11', messages: 48, conversations: 18 }
         ],
-        hiredFreelancersTrends: [
-          { date: '2025-06-19', hires: 0, active_hires: 0, completed_hires: 0 },
-          { date: '2025-06-25', hires: 1, active_hires: 1, completed_hires: 0 },
-          { date: '2025-07-01', hires: 2, active_hires: 2, completed_hires: 0 },
-          { date: '2025-07-15', hires: 3, active_hires: 3, completed_hires: 0 },
-          { date: '2025-07-31', hires: 4, active_hires: 4, completed_hires: 0 },
-          { date: '2025-08-11', hires: 5, active_hires: 4, completed_hires: 1 }
-        ],
+        hiredFreelancersTrends: [],
         userCommunicationActivity: [
           { user: 'josh', messages: 6, conversations: 2, fill: '#10b981' },
           { user: 'Gunna Wunna', messages: 5, conversations: 2, fill: '#10b981' },
@@ -2006,17 +1999,17 @@ const ESCAdminDashboard = () => {
                   </div>
                 </div>
 
-                                <div className="col-lg-3 col-md-6">
+                <div className="col-lg-3 col-md-6">
                   {/* Total Freelancers Hired Card */}
                   <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-briefcase"></i>
-                      </div>
+              </div>
                       <div style={{ color: '#6b7280', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
                         Total Freelancers Hired
-                      </div>
-                    </div>
+                        </div>
+                        </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {hiredFreelancersLoading ? (
                         <div className="spinner-border spinner-border-sm text-primary" role="status">
@@ -2025,24 +2018,24 @@ const ESCAdminDashboard = () => {
                       ) : (
                         hiredFreelancersCount
                       )}
-                    </div>
+                        </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span className="badge" style={{ background: '#10b981', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
                         <i className="bi bi-check-circle me-1"></i>
                         Successfully Hired
                       </span>
-                    </div>
+                        </div>
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-arrow-up" style={{ color: '#10b981' }}></i>
                         <span style={{ fontWeight: 500 }}>Growing steadily</span>
-                      </div>
+                        </div>
                       <div className="text-muted">Real-time system data</div>
 
 
-                    </div>
-                  </div>
-                </div>
+                        </div>
+                        </div>
+                        </div>
               </div>
 
               {/* Total Visitors Graph */}
@@ -2645,13 +2638,31 @@ const ESCAdminDashboard = () => {
                         <ResponsiveContainer width="100%" height={300}>
                           <AreaChart data={analyticsData.hiredFreelancersTrends}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis dataKey="date" stroke="#666" />
+                            <XAxis 
+                              dataKey="date" 
+                              stroke="#666"
+                              tickFormatter={(date) => {
+                                const d = new Date(date);
+                                return d.toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                });
+                              }}
+                            />
                             <YAxis stroke="#666" />
                             <Tooltip 
                               contentStyle={{ 
                                 backgroundColor: '#fff', 
                                 border: '1px solid #ddd',
                                 borderRadius: '8px'
+                              }}
+                              labelFormatter={(date) => {
+                                const d = new Date(date);
+                                return d.toLocaleDateString('en-US', { 
+                                  year: 'numeric',
+                                  month: 'long', 
+                                  day: 'numeric' 
+                                });
                               }}
                             />
                             <Area 
