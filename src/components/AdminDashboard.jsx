@@ -94,7 +94,8 @@ const ESCAdminDashboard = () => {
     topSkills: [],
     cvFileTypes: [],
     messageTrends: [],
-    userCommunicationActivity: []
+    userCommunicationActivity: [],
+    hiredFreelancersTrends: []
   });
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState('');
@@ -690,6 +691,7 @@ const ESCAdminDashboard = () => {
       const cvFileTypesResponse = await api.get('/admin/analytics/cv-file-types');
       const messageTrendsResponse = await api.get(`/admin/analytics/message-trends?days=${days}`);
       const communicationActivityResponse = await api.get('/admin/analytics/user-communication-activity');
+      const hiredFreelancersTrendsResponse = await api.get(`/admin/analytics/hired-freelancers-trends?days=${days}`);
       
       // Format the registration trends data to use proper dates
       const formattedRegistrationTrends = (registrationResponse.data.data || []).map(item => ({
@@ -709,7 +711,8 @@ const ESCAdminDashboard = () => {
         topSkills: topSkillsResponse.data.data || [],
         cvFileTypes: cvFileTypesResponse.data.data || [],
         messageTrends: messageTrendsResponse.data.data || [],
-        userCommunicationActivity: communicationActivityResponse.data.data || []
+        userCommunicationActivity: communicationActivityResponse.data.data || [],
+        hiredFreelancersTrends: hiredFreelancersTrendsResponse.data.data || []
       });
       
     } catch (error) {
@@ -763,10 +766,18 @@ const ESCAdminDashboard = () => {
         messageTrends: [
           { date: '2025-06-19', messages: 12, conversations: 3 },
           { date: '2025-06-25', messages: 18, conversations: 5 },
-          { date: '2025-07-01', messages: 25, conversations: 7 },
-          { date: '2025-07-15', messages: 32, conversations: 9 },
-          { date: '2025-07-31', messages: 38, conversations: 11 },
-          { date: '2025-08-11', messages: 45, conversations: 13 }
+          { date: '2025-07-01', messages: 25, conversations: 8 },
+          { date: '2025-07-15', messages: 32, conversations: 12 },
+          { date: '2025-07-31', messages: 40, conversations: 15 },
+          { date: '2025-08-11', messages: 48, conversations: 18 }
+        ],
+        hiredFreelancersTrends: [
+          { date: '2025-06-19', hires: 0, active_hires: 0, completed_hires: 0 },
+          { date: '2025-06-25', hires: 1, active_hires: 1, completed_hires: 0 },
+          { date: '2025-07-01', hires: 2, active_hires: 2, completed_hires: 0 },
+          { date: '2025-07-15', hires: 3, active_hires: 3, completed_hires: 0 },
+          { date: '2025-07-31', hires: 4, active_hires: 4, completed_hires: 0 },
+          { date: '2025-08-11', hires: 5, active_hires: 4, completed_hires: 1 }
         ],
         userCommunicationActivity: [
           { user: 'josh', messages: 6, conversations: 2, fill: '#10b981' },
@@ -2602,6 +2613,74 @@ const ESCAdminDashboard = () => {
                           />
                         </AreaChart>
                       </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Hired Freelancers Trends - Line Chart */}
+              <div className="row g-4 mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-briefcase me-2"></i>Hired Freelancers Trends
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      {analyticsLoading ? (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                          <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      ) : analyticsData.hiredFreelancersTrends.length === 0 ? (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                          <div className="text-center text-muted">
+                            <i className="bi bi-briefcase display-4"></i>
+                            <p className="mt-2">No hiring data available for the selected time period</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <ResponsiveContainer width="100%" height={300}>
+                          <AreaChart data={analyticsData.hiredFreelancersTrends}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="date" stroke="#666" />
+                            <YAxis stroke="#666" />
+                            <Tooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#fff', 
+                                border: '1px solid #ddd',
+                                borderRadius: '8px'
+                              }}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="hires" 
+                              stackId="1" 
+                              stroke="#fd680e" 
+                              fill="#fd680e" 
+                              fillOpacity={0.6}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="active_hires" 
+                              stackId="1" 
+                              stroke="#10b981" 
+                              fill="#10b981" 
+                              fillOpacity={0.6}
+                            />
+                            <Area 
+                              type="monotone" 
+                              dataKey="completed_hires" 
+                              stackId="1" 
+                              stroke="#3b82f6" 
+                              fill="#3b82f6" 
+                              fillOpacity={0.6}
+                            />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      )}
                     </div>
                   </div>
                 </div>
