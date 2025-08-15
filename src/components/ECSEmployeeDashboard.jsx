@@ -131,6 +131,7 @@ const ECSEmployeeDashboard = () => {
     if (activeTab === 'dashboard') {
       loadStats();
       fetchRecentHires();
+      fetchPendingFreelancerRequestsCount(); // Fetch pending freelancer requests count
     }
   }, [activeTab]);
 
@@ -142,6 +143,7 @@ const ECSEmployeeDashboard = () => {
       intervalId = setInterval(() => {
         console.log('🔄 Auto-refreshing home tab data...');
         fetchRecentHires();
+        fetchPendingFreelancerRequestsCount(); // Refresh pending freelancer requests count
       }, 2 * 60 * 1000); // 2 minutes
     }
     
@@ -216,6 +218,20 @@ const ECSEmployeeDashboard = () => {
       setRecentHires([]);
     } finally {
       setRecentHiresLoading(false);
+    }
+  };
+
+  // Fetch pending associate freelancer requests count
+  const fetchPendingFreelancerRequestsCount = async () => {
+    try {
+      const response = await api.get('/admin/associate-requests?status=pending');
+      if (response.data.success) {
+        // Update the freelancerRequests state with pending requests only
+        setFreelancerRequests(response.data.requests || []);
+      }
+    } catch (error) {
+      console.error('Error fetching pending freelancer requests count:', error);
+      // Keep existing data if API fails
     }
   };
 
@@ -868,7 +884,7 @@ const ECSEmployeeDashboard = () => {
                         </p>
                       </div>
                       <div className="text-end">
-                        <div className="h5 mb-1" style={{ color: '#10b981' }}>
+                        <div className="h5 mb-1" style={{ color: accent }}>
                           {new Date().toLocaleDateString('en-US', { 
                             weekday: 'long', 
                             year: 'numeric', 
@@ -892,7 +908,7 @@ const ECSEmployeeDashboard = () => {
                         <i className="bi bi-envelope"></i>
                       </div>
                       <div style={{ color: '#6c757d', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
-                        Pending Requests
+                        Associate Pending Requests
                       </div>
                     </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
@@ -921,11 +937,11 @@ const ECSEmployeeDashboard = () => {
                         <i className="bi bi-people-fill"></i>
                       </div>
                       <div style={{ color: '#6c757d', fontSize: '14px', fontWeight: 500, textTransform: 'uppercase' }}>
-                        Freelancer Requests
+                        Pending Associate Freelancer Requests
                       </div>
                     </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
-                      {freelancerRequestsLoading ? '...' : freelancerRequests.length || '--'}
+                      {freelancerRequestsLoading ? '...' : freelancerRequests.length === 0 ? '0' : freelancerRequests.length || '--'}
                     </div>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span className="badge" style={{ background: '#f59e0b', color: '#fff', fontSize: '12px', padding: '4px 8px' }}>
@@ -936,9 +952,9 @@ const ECSEmployeeDashboard = () => {
                     <div className="mt-3 text-sm text-muted">
                       <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
                         <i className="bi bi-people" style={{ color: accent }}></i>
-                        <span style={{ fontWeight: 500 }}>Manage requests</span>
+                        <span style={{ fontWeight: 500 }}>Pending requests</span>
                       </div>
-                      <div className="text-muted">Provide freelancer recommendations</div>
+                      <div className="text-muted">Awaiting freelancer recommendations</div>
                     </div>
                   </div>
                 </div>
