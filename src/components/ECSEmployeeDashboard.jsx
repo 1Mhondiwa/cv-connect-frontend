@@ -82,17 +82,17 @@ const ECSEmployeeDashboard = () => {
   const [selectedFreelancerRequest, setSelectedFreelancerRequest] = useState(null);
   const [showFreelancerRequestDetailsModal, setShowFreelancerRequestDetailsModal] = useState(false);
   const [showRecommendationsModal, setShowRecommendationsModal] = useState(false);
-  const [availableFreelancers, setAvailableFreelancers] = useState([]);
-  const [allFreelancers, setAllFreelancers] = useState([]); // Store original list for filtering
   const [selectedFreelancers, setSelectedFreelancers] = useState([]);
   const [highlightedFreelancers, setHighlightedFreelancers] = useState([]);
   const [adminNotes, setAdminNotes] = useState('');
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+  const [allFreelancers, setAllFreelancers] = useState([]);
+  const [availableFreelancers, setAvailableFreelancers] = useState([]);
   
   // Simple search state
   const [searchSkills, setSearchSkills] = useState('');
   const [searchExperience, setSearchExperience] = useState('');
-  const [searchStatus, setSearchStatus] = useState('');
+  const [searchStatus, setSearchStatus] = useState('all');
 
   // Analytics tab state
   const [timeRange, setTimeRange] = useState('90d');
@@ -200,7 +200,7 @@ const ECSEmployeeDashboard = () => {
   // Load freelancer requests
   useEffect(() => {
     if (activeTab === 'freelancer-requests') {
-      loadFreelancerRequests();
+      fetchFreelancerRequests();
     }
   }, [activeTab]);
 
@@ -402,6 +402,224 @@ const ECSEmployeeDashboard = () => {
       ...prev,
       [e.target.name]: e.target.value
     }));
+  };
+
+  // Freelancer Request Management Functions
+  const fetchFreelancerRequests = async () => {
+    setFreelancerRequestsLoading(true);
+    setFreelancerRequestsError('');
+    try {
+      const res = await api.get('/admin/associate-requests');
+      if (res.data.success) {
+        setFreelancerRequests(res.data.requests);
+      } else {
+        setFreelancerRequestsError(res.data.message || 'Failed to fetch freelancer requests');
+      }
+    } catch (err) {
+      setFreelancerRequestsError(err.response?.data?.message || 'Failed to fetch freelancer requests');
+    } finally {
+      setFreelancerRequestsLoading(false);
+    }
+  };
+
+  const fetchAvailableFreelancers = async () => {
+    try {
+      console.log('🔍 Starting to fetch freelancers...');
+      console.log('🔍 API URL: /admin/freelancers?availability_status=all&approval_status=all');
+      
+      // Get ALL freelancers for comprehensive recommendations
+      const res = await api.get('/admin/freelancers?availability_status=all&approval_status=all');
+      console.log('🔍 API Response:', res);
+      console.log('🔍 Response Status:', res.status);
+      console.log('🔍 Response Data:', res.data);
+      
+      if (res.data.success) {
+        console.log('🔍 Fetched Freelancers:', res.data.freelancers.length);
+        if (res.data.freelancers.length > 0) {
+          console.log('🔍 Sample Freelancer:', res.data.freelancers[0]);
+        } else {
+          console.log('🔍 No freelancers returned from API');
+        }
+        setAllFreelancers(res.data.freelancers);
+        setAvailableFreelancers(res.data.freelancers);
+        console.log('🔍 State updated - allFreelancers:', res.data.freelancers.length);
+        console.log('🔍 State updated - availableFreelancers:', res.data.freelancers.length);
+      } else {
+        console.error('🔍 API returned success: false:', res.data);
+      }
+    } catch (err) {
+      console.error('Error fetching available freelancers:', err);
+      console.error('Error details:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      console.error('Error message:', err.message);
+    }
+  };
+
+  const openFreelancerRequestDetails = async (request) => {
+    setSelectedFreelancerRequest(request);
+    setShowFreelancerRequestDetailsModal(true);
+    await fetchAvailableFreelancers();
+  };
+
+  const openRecommendationsModal = async (request) => {
+    console.log('🔍 Opening recommendations modal for request:', request);
+    setSelectedFreelancerRequest(request);
+    setShowRecommendationsModal(true);
+    setSelectedFreelancers([]);
+    setHighlightedFreelancers([]);
+    setAdminNotes('');
+    
+    // Fetch all freelancers when opening recommendations modal
+    console.log('🔍 Fetching freelancers...');
+    await fetchAvailableFreelancers();
+    console.log('🔍 Freelancers fetched, modal should show data now');
+  };
+
+  const handleFreelancerSelection = (freelancerId, isSelected) => {
+    console.log('🔍 handleFreelancerSelection called:', { freelancerId, isSelected });
+    if (isSelected) {
+      setSelectedFreelancers(prev => {
+        const newSelection = [...prev, freelancerId];
+        console.log('🔍 Added freelancer to selection:', newSelection);
+        return newSelection;
+      });
+    } else {
+      setSelectedFreelancers(prev => {
+        const newSelection = prev.filter(id => id !== freelancerId);
+        console.log('🔍 Removed freelancer from selection:', newSelection);
+        return newSelection;
+      });
+    }
+  };
+
+  const handleHighlightFreelancer = (freelancerId, isHighlighted) => {
+    if (isHighlighted) {
+      setHighlightedFreelancers(prev => [...prev, freelancerId]);
+    } else {
+      setHighlightedFreelancers(prev => prev.filter(id => id !== freelancerId));
+    }
+  };
+
+  const submitRecommendations = async () => {
+    if (selectedFreelancers.length === 0) {
+      alert('Please select at least one freelancer');
+      return;
+    }
+
+    setRecommendationsLoading(true);
+    try {
+      const res = await api.post(`/admin/associate-requests/${selectedFreelancerRequest.request_id}/recommendations`, {
+        freelancer_ids: selectedFreelancers,
+        admin_notes: adminNotes,
+        highlighted_freelancers: highlightedFreelancers
+      });
+
+      if (res.data.success) {
+        alert('Recommendations submitted successfully!');
+        setShowRecommendationsModal(false);
+        fetchFreelancerRequests();
+      } else {
+        alert(res.data.message || 'Failed to submit recommendations');
+      }
+    } catch (err) {
+      console.error('Error submitting recommendations:', err);
+      alert(err.response?.data?.message || 'Failed to submit recommendations');
+    } finally {
+      setRecommendationsLoading(false);
+    }
+  };
+
+  const updateRequestStatus = async (requestId, status, notes = '') => {
+    try {
+      const res = await api.put(`/admin/associate-requests/${requestId}/status`, {
+        status,
+        admin_notes: notes
+      });
+
+      if (res.data.success) {
+        alert('Request status updated successfully!');
+        fetchFreelancerRequests();
+      } else {
+        alert(res.data.message || 'Failed to update request status');
+      }
+    } catch (err) {
+      console.error('Error updating request status:', err);
+      alert(err.response?.data?.message || 'Failed to update request status');
+    }
+  };
+
+  // Simple search function
+  const handleSearch = () => {
+    console.log('🔍 Search function called with:', { searchSkills, searchExperience, searchStatus });
+    console.log('🔍 allFreelancers count:', allFreelancers.length);
+    console.log('🔍 Sample freelancer data:', allFreelancers[0]);
+    
+    let filtered = [...allFreelancers];
+    console.log('🔍 Starting with all freelancers:', filtered.length);
+    
+    // Filter by skills
+    if (searchSkills.trim()) {
+      console.log('🔍 Filtering by skills:', searchSkills);
+      filtered = filtered.filter(f => {
+        const hasSkills = f.skills?.some(skill => skill.toLowerCase().includes(searchSkills.toLowerCase()));
+        const hasHeadline = f.headline?.toLowerCase().includes(searchSkills.toLowerCase());
+        const matches = hasSkills || hasHeadline;
+        
+        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
+          skills: f.skills,
+          headline: f.headline,
+          searchTerm: searchSkills,
+          hasSkills,
+          hasHeadline,
+          matches
+        });
+        
+        return matches;
+      });
+      console.log('🔍 After skills filter:', filtered.length);
+    }
+    
+    // Filter by experience
+    if (searchExperience.trim()) {
+      console.log('🔍 Filtering by experience:', searchExperience);
+      const minExp = parseInt(searchExperience);
+      if (!isNaN(minExp)) {
+        filtered = filtered.filter(f => {
+          const experience = f.experience_years || 0;
+          const matches = experience >= minExp;
+          
+          console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
+            experience,
+            minRequired: minExp,
+            matches
+          });
+          
+          return matches;
+        });
+        console.log('🔍 After experience filter:', filtered.length);
+      }
+    }
+    
+    // Filter by status
+    if (searchStatus && searchStatus !== 'all') {
+      console.log('🔍 Filtering by status:', searchStatus);
+      filtered = filtered.filter(f => {
+        const status = f.is_available ? 'available' : 'unavailable';
+        const matches = status === searchStatus;
+        
+        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
+          status,
+          searchTerm: searchStatus,
+          matches
+        });
+        
+        return matches;
+      });
+      console.log('🔍 After status filter:', filtered.length);
+    }
+    
+    setAvailableFreelancers(filtered);
+    console.log('🔍 Final filtered results:', filtered.length);
   };
 
   const handleLogout = () => {
@@ -1299,63 +1517,121 @@ const ECSEmployeeDashboard = () => {
 
           {/* Freelancer Requests Tab */}
           {activeTab === 'freelancer-requests' && (
-            <div className="freelancer-requests-tab">
-              <div className="card border-0 shadow-sm">
-                <div className="card-header bg-transparent border-0">
-                  <h5 className="card-title mb-0">Freelancer Requests</h5>
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+              <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>ECS Employee Freelancer Request Management</h5>
+              <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Review associate requests for freelancer services and provide curated recommendations</p>
+              
+              {freelancerRequestsLoading ? (
+                <div className="text-center py-4">
+                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                  <p className="mt-2 text-muted">Loading freelancer requests...</p>
                 </div>
-                <div className="card-body">
-                  {freelancerRequestsLoading ? (
-                    <div className="text-center py-4">
-                      <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
+              ) : freelancerRequestsError ? (
+                <div className="alert alert-danger">{freelancerRequestsError}</div>
+              ) : freelancerRequests.length === 0 ? (
+                <div className="text-center py-4">
+                  <i className="bi bi-inbox display-4 text-muted"></i>
+                  <p className="mt-3 text-muted">No freelancer requests submitted yet</p>
+                </div>
+              ) : (
+                <div className="row g-3">
+                  {freelancerRequests.map((request) => (
+                    <div key={request.request_id} className="col-12">
+                      <div className="card border-0 shadow-sm h-100">
+                        <div className="card-body">
+                          <div className="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                              <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600 }}>
+                                {request.title}
+                              </h6>
+                              <p className="card-text text-muted small mb-2">
+                                {request.description.length > 150 
+                                  ? `${request.description.substring(0, 150)}...` 
+                                  : request.description}
+                              </p>
+                            </div>
+                            <div className="text-end">
+                              <span className={`badge ${
+                                request.status === 'pending' ? 'bg-warning' :
+                                request.status === 'reviewed' ? 'bg-info' :
+                                request.status === 'provided' ? 'bg-success' :
+                                request.status === 'completed' ? 'bg-primary' :
+                                'bg-secondary'
+                              }`}>
+                                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="row g-2 mb-3">
+                            <div className="col-md-4">
+                              <small className="text-muted">
+                                <i className="bi bi-building me-1"></i>
+                                <strong>Company:</strong> {request.associate_email}
+                              </small>
+                            </div>
+                            <div className="col-md-4">
+                              <small className="text-muted">
+                                <i className="bi bi-gear me-1"></i>
+                                <strong>Skills:</strong> {request.required_skills.join(', ')}
+                              </small>
+                            </div>
+                            <div className="col-md-4">
+                              <small className="text-muted">
+                                <i className="bi bi-calendar me-1"></i>
+                                <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
+                              </small>
+                            </div>
+                          </div>
+
+                          <div className="row g-2 mb-3">
+                            <div className="col-md-3">
+                              <small className="text-muted">
+                                <i className="bi bi-clock me-1"></i>
+                                <strong>Urgency:</strong> {request.urgency_level}
+                              </small>
+                            </div>
+                            <div className="col-md-3">
+                              <small className="text-muted">
+                                <i className="bi bi-currency-dollar me-1"></i>
+                                <strong>Budget:</strong> {request.budget_range || 'Not specified'}
+                              </small>
+                            </div>
+                            <div className="col-md-3">
+                              <small className="text-muted">
+                                <i className="bi bi-geo-alt me-1"></i>
+                                <strong>Location:</strong> {request.preferred_location || 'Any'}
+                              </small>
+                            </div>
+                            <div className="col-md-3">
+                              <small className="text-muted">
+                                <i className="bi bi-star me-1"></i>
+                                <strong>Experience:</strong> {request.min_experience}+ years
+                              </small>
+                            </div>
+                          </div>
+
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                              <small className="text-muted">
+                                <i className="bi bi-calendar me-1"></i>
+                                <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
+                              </small>
+                            </div>
+                            <button
+                              className="btn btn-sm"
+                              style={{ background: accent, color: '#fff', borderRadius: 20 }}
+                              onClick={() => openRecommendationsModal(request)}
+                            >
+                              <i className="bi bi-star me-1"></i>Provide Recommendations
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  ) : freelancerRequestsError ? (
-                    <div className="alert alert-danger" role="alert">
-                      {freelancerRequestsError}
-                    </div>
-                  ) : freelancerRequests.length === 0 ? (
-                    <div className="text-center py-4 text-muted">
-                      <i className="bi bi-clipboard-data fs-1"></i>
-                      <p className="mt-2">No freelancer requests found</p>
-                    </div>
-                  ) : (
-                    <div className="table-responsive">
-                      <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>Title</th>
-                            <th>Associate</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {freelancerRequests.map((request) => (
-                            <tr key={request.request_id}>
-                              <td>{request.title}</td>
-                              <td>{request.associate_name || 'N/A'}</td>
-                              <td>
-                                <span className={`badge bg-${request.status === 'pending' ? 'warning' : request.status === 'completed' ? 'success' : 'info'}`}>
-                                  {request.status}
-                                </span>
-                              </td>
-                              <td>{new Date(request.created_at).toLocaleDateString()}</td>
-                              <td>
-                                <button className="btn btn-sm btn-outline-primary">
-                                  View Details
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                  ))}
                 </div>
-              </div>
+              )}
             </div>
           )}
 
@@ -1387,11 +1663,243 @@ const ECSEmployeeDashboard = () => {
                 </div>
               </div>
             </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+                     )}
+
+           {/* Freelancer Request Details Modal */}
+           {showFreelancerRequestDetailsModal && selectedFreelancerRequest && (
+             <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1050 }}>
+               <div className="modal-dialog modal-lg">
+                 <div className="modal-content">
+                   <div className="modal-header">
+                     <h5 className="modal-title">Freelancer Request Details</h5>
+                     <button type="button" className="btn-close" onClick={() => setShowFreelancerRequestDetailsModal(false)}></button>
+                   </div>
+                   <div className="modal-body">
+                     <div className="row mb-3">
+                       <div className="col-md-6">
+                         <p><strong>Title:</strong> {selectedFreelancerRequest.title}</p>
+                         <p><strong>Description:</strong> {selectedFreelancerRequest.description}</p>
+                         <p><strong>Required Skills:</strong> {selectedFreelancerRequest.required_skills.join(', ')}</p>
+                         <p><strong>Minimum Experience:</strong> {selectedFreelancerRequest.min_experience} years</p>
+                       </div>
+                       <div className="col-md-6">
+                         <p><strong>Budget Range:</strong> {selectedFreelancerRequest.budget_range || 'Not specified'}</p>
+                         <p><strong>Urgency Level:</strong> {selectedFreelancerRequest.urgency_level}</p>
+                         <p><strong>Preferred Location:</strong> {selectedFreelancerRequest.preferred_location || 'Any'}</p>
+                       </div>
+                     </div>
+                     
+                     <div className="row mb-3">
+                       <div className="col-md-6">
+                         <p><strong>Status:</strong> 
+                           <span className={`badge ms-2 ${
+                             selectedFreelancerRequest.status === 'pending' ? 'bg-warning' :
+                             selectedFreelancerRequest.status === 'reviewed' ? 'bg-info' :
+                             selectedFreelancerRequest.status === 'provided' ? 'bg-success' :
+                             selectedFreelancerRequest.status === 'completed' ? 'bg-primary' :
+                             'bg-secondary'
+                           }`}>
+                             {selectedFreelancerRequest.status.charAt(0).toUpperCase() + selectedFreelancerRequest.status.slice(1)}
+                           </span>
+                         </p>
+                         <p><strong>Email:</strong> {selectedFreelancerRequest.associate_email}</p>
+                         <p><strong>Contact Person:</strong> {selectedFreelancerRequest.contact_person}</p>
+                         <p><strong>Industry:</strong> {selectedFreelancerRequest.industry}</p>
+                         <p><strong>Submitted:</strong> {new Date(selectedFreelancerRequest.created_at).toLocaleDateString()}</p>
+                       </div>
+                       <div className="col-md-6">
+                         <p><strong>Recommendations:</strong> {selectedFreelancerRequest.recommendation_count || 0}</p>
+                         <p><strong>Responses:</strong> {selectedFreelancerRequest.response_count || 0}</p>
+                         {selectedFreelancerRequest.reviewed_at && (
+                           <p><strong>Reviewed:</strong> {new Date(selectedFreelancerRequest.reviewed_at).toLocaleDateString()}</p>
+                         )}
+                       </div>
+                     </div>
+                   </div>
+                   <div className="modal-footer">
+                     <button type="button" className="btn btn-secondary" onClick={() => setShowFreelancerRequestDetailsModal(false)}>
+                       Close
+                     </button>
+                     {selectedFreelancerRequest.status === 'pending' && (
+                       <button
+                         type="button"
+                         className="btn btn-primary"
+                         onClick={() => {
+                           setShowFreelancerRequestDetailsModal(false);
+                           openRecommendationsModal(selectedFreelancerRequest);
+                         }}
+                       >
+                         <i className="bi bi-star me-1"></i>Provide Recommendations
+                       </button>
+                     )}
+                   </div>
+                 </div>
+               </div>
+             </div>
+           )}
+
+           {/* Recommendations Modal */}
+           {showRecommendationsModal && selectedFreelancerRequest && (
+             <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1050 }}>
+               <div className="modal-dialog modal-xl">
+                 <div className="modal-content">
+                   <div className="modal-header">
+                     <h5 className="modal-title">Provide Freelancer Recommendations</h5>
+                     <button type="button" className="btn-close" onClick={() => setShowRecommendationsModal(false)}></button>
+                   </div>
+                   <div className="modal-body">
+                     <div className="row mb-4">
+                       <div className="col-md-8">
+                         <h6 style={{ color: accent, fontWeight: 600 }}>Request: {selectedFreelancerRequest.title}</h6>
+                         <p className="text-muted mb-2">{selectedFreelancerRequest.description}</p>
+                         <div className="row g-2">
+                           <div className="col-md-4">
+                             <small><strong>Skills:</strong> {selectedFreelancerRequest.required_skills.join(', ')}</small>
+                           </div>
+                           <div className="col-md-4">
+                             <small><strong>Experience:</strong> {selectedFreelancerRequest.min_experience}+ years</small>
+                           </div>
+                           <div className="col-md-4">
+                             <small><strong>Location:</strong> {selectedFreelancerRequest.preferred_location || 'Any'}</small>
+                           </div>
+                         </div>
+                       </div>
+                       <div className="col-md-4">
+                         <div className="mb-3">
+                           <label className="form-label">Admin Notes:</label>
+                           <textarea
+                             className="form-control"
+                             rows="3"
+                             placeholder="Add any notes about these recommendations..."
+                             value={adminNotes}
+                             onChange={(e) => setAdminNotes(e.target.value)}
+                           ></textarea>
+                         </div>
+                       </div>
+                     </div>
+
+                     <div className="row mb-3">
+                       <div className="col-md-4">
+                         <input
+                           type="text"
+                           className="form-control"
+                           placeholder="Search by skills..."
+                           value={searchSkills}
+                           onChange={(e) => setSearchSkills(e.target.value)}
+                         />
+                       </div>
+                       <div className="col-md-3">
+                         <input
+                           type="text"
+                           className="form-control"
+                           placeholder="Min experience (years)"
+                           value={searchExperience}
+                           onChange={(e) => setSearchExperience(e.target.value)}
+                         />
+                       </div>
+                       <div className="col-md-3">
+                         <select
+                           className="form-select"
+                           value={searchStatus}
+                           onChange={(e) => setSearchStatus(e.target.value)}
+                         >
+                           <option value="all">All Status</option>
+                           <option value="available">Available</option>
+                           <option value="unavailable">Unavailable</option>
+                         </select>
+                       </div>
+                       <div className="col-md-2">
+                         <button className="btn btn-primary w-100" onClick={handleSearch}>
+                           <i className="bi bi-search"></i>
+                         </button>
+                       </div>
+                     </div>
+
+                     <div className="table-responsive" style={{ maxHeight: '400px' }}>
+                       <table className="table table-hover">
+                         <thead style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
+                           <tr>
+                             <th>Select</th>
+                             <th>Highlight</th>
+                             <th>Name</th>
+                             <th>Skills</th>
+                             <th>Experience</th>
+                             <th>Status</th>
+                             <th>Location</th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           {availableFreelancers.map((freelancer) => (
+                             <tr key={freelancer.freelancer_id}>
+                               <td>
+                                 <input
+                                   type="checkbox"
+                                   className="form-check-input"
+                                   checked={selectedFreelancers.includes(freelancer.freelancer_id)}
+                                   onChange={(e) => handleFreelancerSelection(freelancer.freelancer_id, e.target.checked)}
+                                 />
+                               </td>
+                               <td>
+                                 <input
+                                   type="checkbox"
+                                   className="form-check-input"
+                                   checked={highlightedFreelancers.includes(freelancer.freelancer_id)}
+                                   onChange={(e) => handleHighlightFreelancer(freelancer.freelancer_id, e.target.checked)}
+                                 />
+                               </td>
+                               <td>{`${freelancer.first_name} ${freelancer.last_name}`}</td>
+                               <td>
+                                 {freelancer.skills && freelancer.skills.length > 0 ? (
+                                   <div className="d-flex flex-wrap gap-1">
+                                     {freelancer.skills.slice(0, 3).map((skill, index) => (
+                                       <span key={index} className="badge bg-light text-dark" style={{ fontSize: '10px' }}>
+                                         {skill}
+                                       </span>
+                                     ))}
+                                     {freelancer.skills.length > 3 && (
+                                       <span className="badge bg-secondary" style={{ fontSize: '10px' }}>
+                                         +{freelancer.skills.length - 3}
+                                       </span>
+                                     )}
+                                   </div>
+                                 ) : (
+                                   <span className="text-muted">No skills listed</span>
+                                 )}
+                               </td>
+                               <td>{freelancer.experience_years || 0} years</td>
+                               <td>
+                                 <span className={`badge ${freelancer.is_available ? 'bg-success' : 'bg-secondary'}`}>
+                                   {freelancer.is_available ? 'Available' : 'Unavailable'}
+                                 </span>
+                               </td>
+                               <td>{freelancer.location || 'Not specified'}</td>
+                             </tr>
+                           ))}
+                         </tbody>
+                       </table>
+                     </div>
+                   </div>
+                   <div className="modal-footer">
+                     <button type="button" className="btn btn-secondary" onClick={() => setShowRecommendationsModal(false)}>
+                       Cancel
+                     </button>
+                     <button
+                       type="button"
+                       className="btn btn-primary"
+                       onClick={submitRecommendations}
+                       disabled={recommendationsLoading || selectedFreelancers.length === 0}
+                     >
+                       {recommendationsLoading ? 'Submitting...' : `Submit ${selectedFreelancers.length} Recommendation${selectedFreelancers.length !== 1 ? 's' : ''}`}
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           )}
+         </div>
+       </div>
+     </div>
+   );
+ };
 
 export default ECSEmployeeDashboard;
