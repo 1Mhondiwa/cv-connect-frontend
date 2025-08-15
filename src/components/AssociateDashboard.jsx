@@ -333,9 +333,18 @@ const AssociateDashboard = () => {
       });
 
       if (response.data.success) {
+        // Close the recommendations modal first
+        setShowRecommendationsModal(false);
+        
         // Navigate to messages tab and select the conversation
         setActiveTab('messages');
-        setSelectedConversation(response.data.conversation);
+        
+        // Set the conversation ID correctly
+        const conversationId = response.data.conversation.conversation_id;
+        setSelectedConversation(conversationId);
+        
+        // Load the conversation messages
+        await loadConversation(conversationId);
         
         // Show success message
         setToast({ message: `Conversation started with ${firstName} ${lastName}!`, type: 'success' });
