@@ -208,7 +208,7 @@ const ECSEmployeeDashboard = () => {
   const fetchRecentHires = async () => {
     setRecentHiresLoading(true);
     try {
-      const response = await api.get('/admin/recent-hires');
+      const response = await api.get('/hiring/recent-hires');
       if (response.data.success) {
         setRecentHires(response.data.hires);
       }
@@ -330,7 +330,7 @@ const ECSEmployeeDashboard = () => {
       if (res.data.success) {
         // Refresh the requests list
         loadAssociateRequests();
-        setSelectedRequest(null);
+    setSelectedRequest(null);
         setReviewFormData({ status: 'approved', review_notes: '', password: '' });
         setSuccessMessage(`Request ${reviewFormData.status} successfully`);
         setTimeout(() => setSuccessMessage(''), 5000); // Clear after 5 seconds
@@ -716,7 +716,7 @@ const ECSEmployeeDashboard = () => {
               >
                 <i className="bi bi-house-door me-3"></i>
                 Home
-                </button>
+        </button>
               
 
 
@@ -1009,9 +1009,9 @@ const ECSEmployeeDashboard = () => {
                     {recentHiresLoading ? (
                       <div className="text-center py-4">
                         <div className="spinner-border text-primary" role="status">
-                          <span className="visually-hidden">Loading...</span>
-                        </div>
-                      </div>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
                     ) : recentHires.length === 0 ? (
                       <div className="text-center py-4 text-muted">
                         <i className="bi bi-inbox fs-1"></i>
@@ -1269,7 +1269,7 @@ const ECSEmployeeDashboard = () => {
                     <div className="text-center py-4 text-muted">
                       <i className="bi bi-building fs-1"></i>
                       <p className="mt-2">No associates found</p>
-                    </div>
+        </div>
       ) : (
         <div className="table-responsive">
                       <table className="table table-hover">
@@ -1516,7 +1516,7 @@ const ECSEmployeeDashboard = () => {
                    <div className="modal-header">
                      <h5 className="modal-title">Freelancer Request Details</h5>
                      <button type="button" className="btn-close" onClick={() => setShowFreelancerRequestDetailsModal(false)}></button>
-                   </div>
+                  </div>
                    <div className="modal-body">
                      <div className="row mb-3">
                        <div className="col-md-6">
@@ -1524,12 +1524,12 @@ const ECSEmployeeDashboard = () => {
                          <p><strong>Description:</strong> {selectedFreelancerRequest.description}</p>
                          <p><strong>Required Skills:</strong> {selectedFreelancerRequest.required_skills.join(', ')}</p>
                          <p><strong>Minimum Experience:</strong> {selectedFreelancerRequest.min_experience} years</p>
-                       </div>
+                  </div>
                        <div className="col-md-6">
                          <p><strong>Budget Range:</strong> {selectedFreelancerRequest.budget_range || 'Not specified'}</p>
                          <p><strong>Urgency Level:</strong> {selectedFreelancerRequest.urgency_level}</p>
                          <p><strong>Preferred Location:</strong> {selectedFreelancerRequest.preferred_location || 'Any'}</p>
-                       </div>
+                </div>
                      </div>
                      
                      <div className="row mb-3">

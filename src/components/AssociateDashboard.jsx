@@ -4,6 +4,7 @@ import api from '../utils/axios';
 import { useRef } from 'react';
 import ActivityTable from "./ActivityTable";
 import { useAuth } from '../contexts/AuthContext';
+import HiringModal from './HiringModal';
 // REMOVE: import io from 'socket.io-client';
 
 const accent = '#fd680e';
@@ -71,6 +72,11 @@ const AssociateDashboard = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [showRecommendationsModal, setShowRecommendationsModal] = useState(false);
+
+  // Hiring state
+  const [showHiringModal, setShowHiringModal] = useState(false);
+  const [selectedFreelancerForHiring, setSelectedFreelancerForHiring] = useState(null);
+  const [hiringLoading, setHiringLoading] = useState(false);
 
   // REMOVE: const socket = io('http://localhost:5000'); // Adjust if backend URL is different
 
@@ -317,34 +323,48 @@ const AssociateDashboard = () => {
 
   const handleStartConversation = async (freelancerId, firstName, lastName) => {
     try {
-      // Create or get conversation
-      const conversationResponse = await api.post('/message/conversations', {
-        recipient_id: freelancerId
+      // Create a new conversation or get existing one
+      const response = await api.post('/message/conversations', {
+        freelancer_id: freelancerId
       });
 
-      if (conversationResponse.data.success) {
-        const conversationId = conversationResponse.data.conversation_id;
-        
-        // Close recommendations modal
-        setShowRecommendationsModal(false);
-        
-        // Open messaging tab and load conversation
+      if (response.data.success) {
+        // Navigate to messages tab and select the conversation
         setActiveTab('messages');
-        await loadConversation(conversationId);
+        setSelectedConversation(response.data.conversation);
         
         // Show success message
-        setToast({ 
-          message: `Conversation started with ${firstName} ${lastName}!`, 
-          type: 'success' 
-        });
+        setToast({ message: `Conversation started with ${firstName} ${lastName}!`, type: 'success' });
       }
     } catch (error) {
       console.error('Error starting conversation:', error);
-      setToast({ 
-        message: 'Failed to start conversation. Please try again.', 
-        type: 'error' 
-      });
+      setToast({ message: 'Failed to start conversation. Please try again.', type: 'error' });
     }
+  };
+
+  // Hiring functions
+  const openHiringModal = (freelancer) => {
+    setSelectedFreelancerForHiring(freelancer);
+    setShowHiringModal(true);
+  };
+
+  const closeHiringModal = () => {
+    setShowHiringModal(false);
+    setSelectedFreelancerForHiring(null);
+  };
+
+  const handleHireSuccess = () => {
+    // Refresh recommendations and requests
+    if (selectedRequest) {
+      fetchRecommendations(selectedRequest);
+    }
+    fetchRequests();
+    
+    // Show success toast
+    setToast({ 
+      message: 'Freelancer hired successfully! ECS Employee has been notified.', 
+      type: 'success' 
+    });
   };
 
   const loadConversation = async (conversationId) => {
@@ -1429,9 +1449,10 @@ const AssociateDashboard = () => {
                               </button>
                               <button
                                 className="btn btn-sm btn-primary"
-                                onClick={() => handleRecommendationResponse(rec.freelancer_id, 'hired')}
+                                onClick={() => openHiringModal(rec)}
+                                title="Formally hire this freelancer with project details"
                               >
-                                <i className="bi bi-check-circle me-1"></i>Hire
+                                <i className="bi bi-briefcase me-1"></i>Hire Freelancer
                               </button>
                               <button
                                 className="btn btn-sm"
@@ -1479,6 +1500,15 @@ const AssociateDashboard = () => {
         </div>
       )}
 
+      {/* Hiring Modal */}
+      <HiringModal
+        isOpen={showHiringModal}
+        onClose={closeHiringModal}
+        freelancer={selectedFreelancerForHiring}
+        request={selectedRequest}
+        onHireSuccess={handleHireSuccess}
+      />
+
       {/* Animation Styles */}
       <style>{`
         .dashboard-btn:hover, .dashboard-btn:focus {
@@ -1504,4 +1534,4 @@ const AssociateDashboard = () => {
   );
 };
 
-export default AssociateDashboard; 
+export default AssociateDashboard;
