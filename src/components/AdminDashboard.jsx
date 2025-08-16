@@ -1465,7 +1465,12 @@ const ESCAdminDashboard = () => {
         </div>
 
         {/* Sidebar Content */}
-        <div className="sidebar-content" style={{ padding: '16px' }}>
+        <div className="sidebar-content" style={{ 
+          padding: '16px', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          height: 'calc(100vh - 120px)' 
+        }}>
           {/* Main Navigation */}
           <div className="nav-section mb-4">
             <h6 className="nav-section-title" style={{ 
@@ -1546,7 +1551,7 @@ const ESCAdminDashboard = () => {
                 Analytics
               </button>
               
-              <button
+                            <button
                 className={`nav-item w-100 text-start ${activeTab === 'reports' ? 'active' : ''}`}
                 onClick={() => setActiveTab('reports')}
                 style={{
@@ -1573,7 +1578,10 @@ const ESCAdminDashboard = () => {
         </div>
             </div>
 
-          {/* System */}
+          {/* Spacer to push bottom section down */}
+          <div style={{ flex: 1 }}></div>
+
+          {/* Bottom Section - Settings and Logout */}
           <div className="nav-section">
             <h6 className="nav-section-title" style={{ 
               color: '#6b7280', 
@@ -2159,8 +2167,8 @@ const ESCAdminDashboard = () => {
                                     dataKey="ecs_employees" 
                                     stroke="#8b5cf6" 
                                     fill="#8b5cf6" 
-                                    fillOpacity={0.6}
-                                  />
+                            fillOpacity={0.6}
+                          />
                         </AreaChart>
                       </ResponsiveContainer>
                             );
@@ -2388,34 +2396,34 @@ const ESCAdminDashboard = () => {
                           </div>
                         </div>
                       ) : (
-                        <ResponsiveContainer width="100%" height={300}>
+                      <ResponsiveContainer width="100%" height={300}>
                           <AreaChart data={analyticsData.hiredFreelancersTrends}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis dataKey="date" stroke="#666" />
-                            <YAxis stroke="#666" />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: '#fff', 
-                                border: '1px solid #ddd',
-                                borderRadius: '8px'
-                              }}
-                            />
-                            <Area 
-                              type="monotone" 
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis dataKey="date" stroke="#666" />
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
                               dataKey="hires" 
-                              stackId="1" 
-                              stroke="#fd680e" 
-                              fill="#fd680e" 
-                              fillOpacity={0.6}
-                            />
-                            <Area 
-                              type="monotone" 
+                            stackId="1" 
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
                               dataKey="active_hires" 
-                              stackId="1" 
-                              stroke="#10b981" 
-                              fill="#10b981" 
-                              fillOpacity={0.6}
-                            />
+                            stackId="1" 
+                            stroke="#10b981" 
+                            fill="#10b981" 
+                            fillOpacity={0.6}
+                          />
                             <Area 
                               type="monotone" 
                               dataKey="completed_hires" 
@@ -2424,8 +2432,8 @@ const ESCAdminDashboard = () => {
                               fill="#3b82f6" 
                               fillOpacity={0.6}
                             />
-                          </AreaChart>
-                        </ResponsiveContainer>
+                        </AreaChart>
+                      </ResponsiveContainer>
                       )}
                     </div>
                   </div>

@@ -685,7 +685,12 @@ const ECSEmployeeDashboard = () => {
         </div>
 
         {/* Sidebar Content */}
-        <div className="sidebar-content" style={{ padding: '16px' }}>
+        <div className="sidebar-content" style={{ 
+          padding: '16px', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          height: 'calc(100vh - 120px)' 
+        }}>
           {/* Main Navigation */}
           <div className="nav-section mb-4">
             <h6 className="nav-section-title" style={{ 
@@ -772,8 +777,10 @@ const ECSEmployeeDashboard = () => {
         </div>
       </div>
       
+          {/* Spacer to push bottom section down */}
+          <div style={{ flex: 1 }}></div>
 
-
+          {/* Bottom Section - Settings and Logout */}
           {/* System */}
           <div className="nav-section">
             <h6 className="nav-section-title" style={{ 
@@ -788,13 +795,13 @@ const ECSEmployeeDashboard = () => {
             </h6>
             <div className="nav-items">
               <button
-                className="nav-item w-100 text-start"
+                className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
                 onClick={() => setActiveTab('settings')}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
-                  background: 'transparent',
-                  color: '#374151',
+                  background: activeTab === 'settings' ? accent : 'transparent',
+                  color: activeTab === 'settings' ? '#fff' : '#374151',
                   borderRadius: '8px',
                   marginBottom: '4px',
                   fontSize: '14px',
