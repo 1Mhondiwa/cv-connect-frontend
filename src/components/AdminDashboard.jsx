@@ -704,36 +704,7 @@ const ESCAdminDashboard = () => {
         dataLength: analyticsData.registrationTrends.length
       });
       
-      // CRITICAL: Log the exact API response structure
-      console.log('🚨 API RESPONSE STRUCTURE:', {
-        status: registrationResponse.status,
-        success: registrationResponse.data.success,
-        dataKeys: registrationResponse.data.data ? Object.keys(registrationResponse.data.data[0]) : 'NO DATA',
-        firstItemRaw: registrationResponse.data.data ? registrationResponse.data.data[0] : 'NO DATA',
-        firstItemFormatted: analyticsData.registrationTrends[0]
-      });
-      
-      // Debug first few items in detail
-      if (analyticsData.registrationTrends.length > 0) {
-        console.log('🔍 First 3 registration trend items:', analyticsData.registrationTrends.slice(0, 3));
-        console.log('🔍 Sample item keys:', Object.keys(analyticsData.registrationTrends[0]));
-        console.log('🔍 Sample item values:', {
-          date: analyticsData.registrationTrends[0].date,
-          total_users: analyticsData.registrationTrends[0].total_users,
-          associates: analyticsData.registrationTrends[0].associates,
-          freelancers: analyticsData.registrationTrends[0].freelancers,
-          admins: analyticsData.registrationTrends[0].admins,
-          ecs_employees: analyticsData.registrationTrends[0].ecs_employees
-        });
-      }
-      
-      // CRITICAL DEBUG: Log the exact data being passed to the chart
-      console.log('🚨 CHART DATA DEBUG:', {
-        chartData: analyticsData.registrationTrends,
-        firstItem: analyticsData.registrationTrends[0],
-        lastItem: analyticsData.registrationTrends[analyticsData.registrationTrends.length - 1],
-        allKeys: analyticsData.registrationTrends.length > 0 ? Object.keys(analyticsData.registrationTrends[0]) : 'NO DATA'
-      });
+
       
     } catch (error) {
       console.error('❌ Analytics fetch error:', error);
@@ -2128,30 +2099,6 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      {/* Debug info */}
-                      <div style={{ fontSize: '11px', color: '#666', marginBottom: '10px', textAlign: 'center' }}>
-                        Data loaded: {analyticsData.registrationTrends.length} items
-                      </div>
-                      
-                      {/* TEMPORARY: Show raw data for debugging */}
-                      <div style={{ fontSize: '10px', color: '#999', marginBottom: '10px', maxHeight: '100px', overflow: 'auto', border: '1px solid #eee', padding: '5px' }}>
-                        <strong>Raw Data (First 3 items):</strong><br/>
-                        {analyticsData.registrationTrends.length > 0 ? 
-                          JSON.stringify(analyticsData.registrationTrends.slice(0, 3), null, 2) : 
-                          'No data available'
-                        }
-                      </div>
-                      
-                      {/* CRITICAL DEBUG: Check chart data structure */}
-                      <div style={{ fontSize: '10px', color: '#ff0000', marginBottom: '10px', border: '1px solid #ff0000', padding: '5px' }}>
-                        <strong>🚨 CHART DEBUG:</strong><br/>
-                        Data Length: {analyticsData.registrationTrends.length}<br/>
-                        First Item Keys: {analyticsData.registrationTrends.length > 0 ? Object.keys(analyticsData.registrationTrends[0]).join(', ') : 'N/A'}<br/>
-                        First Item Values: {analyticsData.registrationTrends.length > 0 ? 
-                          `date=${analyticsData.registrationTrends[0].date}, total_users=${analyticsData.registrationTrends[0].total_users}, associates=${analyticsData.registrationTrends[0].associates}` : 
-                          'N/A'
-                        }
-                      </div>
                       
                       {analyticsLoading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
@@ -2171,8 +2118,6 @@ const ESCAdminDashboard = () => {
                         {/* Chart Container with Error Boundary */}
                         {(() => {
                           try {
-                            console.log('🚨 Attempting to render chart with data:', analyticsData.registrationTrends);
-                            
                             if (!analyticsData.registrationTrends || analyticsData.registrationTrends.length === 0) {
                               return <div style={{ color: 'red', textAlign: 'center' }}>No data to render chart</div>;
                             }
@@ -2233,10 +2178,7 @@ const ESCAdminDashboard = () => {
                           }
                         })()}
                         
-                        {/* Chart Data Verification */}
-                        <div style={{ fontSize: '10px', color: '#0066cc', marginTop: '10px', textAlign: 'center' }}>
-                          Chart rendered with {analyticsData.registrationTrends.length} data points
-                        </div>
+
                       </div>
                       )}
                     </div>
