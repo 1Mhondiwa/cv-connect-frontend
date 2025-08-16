@@ -103,39 +103,8 @@ const ESCAdminDashboard = () => {
   const [visitorData, setVisitorData] = useState([]);
   const [visitorDataLoading, setVisitorDataLoading] = useState(false);
 
-  // Chart data (static for now, will be real-time later)
-  const chartData = [
-    { date: "2024-04-01", desktop: 222, mobile: 150 },
-    { date: "2024-04-02", desktop: 199, mobile: 221 },
-    { date: "2024-04-03", desktop: 250, mobile: 194 },
-    { date: "2024-04-04", desktop: 222, mobile: 150 },
-    { date: "2024-04-05", desktop: 199, mobile: 221 },
-    { date: "2024-04-06", desktop: 250, mobile: 194 },
-    { date: "2024-04-07", desktop: 222, mobile: 150 },
-    { date: "2024-04-08", desktop: 199, mobile: 221 },
-    { date: "2024-04-09", desktop: 250, mobile: 194 },
-    { date: "2024-04-10", desktop: 222, mobile: 150 },
-    { date: "2024-04-11", desktop: 199, mobile: 221 },
-    { date: "2024-04-12", desktop: 250, mobile: 194 },
-    { date: "2024-04-13", desktop: 222, mobile: 150 },
-    { date: "2024-04-14", desktop: 199, mobile: 221 },
-    { date: "2024-04-15", desktop: 250, mobile: 194 },
-    { date: "2024-04-16", desktop: 222, mobile: 150 },
-    { date: "2024-04-17", desktop: 199, mobile: 221 },
-    { date: "2024-04-18", desktop: 250, mobile: 194 },
-    { date: "2024-04-19", desktop: 222, mobile: 150 },
-    { date: "2024-04-20", desktop: 199, mobile: 221 },
-    { date: "2024-04-21", desktop: 250, mobile: 194 },
-    { date: "2024-04-22", desktop: 222, mobile: 150 },
-    { date: "2024-04-23", desktop: 199, mobile: 221 },
-    { date: "2024-04-24", desktop: 250, mobile: 194 },
-    { date: "2024-04-25", desktop: 222, mobile: 150 },
-    { date: "2024-04-26", desktop: 199, mobile: 221 },
-    { date: "2024-04-27", desktop: 250, mobile: 194 },
-    { date: "2024-04-28", desktop: 222, mobile: 150 },
-    { date: "2024-04-29", desktop: 199, mobile: 221 },
-    { date: "2024-04-30", desktop: 250, mobile: 194 }
-  ];
+  // Chart data will be populated from real-time API calls
+  const chartData = [];
 
   // Reports system state
   const [activeReportSection, setActiveReportSection] = useState(null);
@@ -171,53 +140,7 @@ const ESCAdminDashboard = () => {
 
   const [recommendationNotes, setRecommendationNotes] = useState('');
   const [submittingRecommendations, setSubmittingRecommendations] = useState(false);
-  const [dataTableData, setDataTableData] = useState([
-    {
-      id: 1,
-      header: "Executive Summary",
-      type: "Executive Summary",
-      status: "Done",
-      target: "2-3",
-      limit: "3",
-      reviewer: "Eddie Lake"
-    },
-    {
-      id: 2,
-      header: "Technical Approach",
-      type: "Technical Approach",
-      status: "In Progress",
-      target: "5-8",
-      limit: "8",
-      reviewer: "Jamik Tashpulatov"
-    },
-    {
-      id: 3,
-      header: "Project Management",
-      type: "Management",
-      status: "Not Started",
-      target: "3-5",
-      limit: "5",
-      reviewer: "Assign reviewer"
-    },
-    {
-      id: 4,
-      header: "Quality Assurance",
-      type: "Quality",
-      status: "Done",
-      target: "2-4",
-      limit: "4",
-      reviewer: "Emily Whalen"
-    },
-    {
-      id: 5,
-      header: "Risk Management",
-      type: "Risk",
-      status: "In Progress",
-      target: "3-6",
-      limit: "6",
-      reviewer: "Eddie Lake"
-    }
-  ]);
+  const [dataTableData, setDataTableData] = useState([]);
   const [showDataModal, setShowDataModal] = useState(false);
   const [selectedDataItem, setSelectedDataItem] = useState(null);
 
@@ -669,6 +592,17 @@ const ESCAdminDashboard = () => {
     setAnalyticsError('');
     
     try {
+      console.log('🚀 Fetching analytics data...');
+      
+      // Debug authentication
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      console.log('🔐 Auth Debug:', { 
+        hasToken: !!token, 
+        tokenLength: token ? token.length : 0,
+        user: user ? JSON.parse(user) : null 
+      });
+      
       // Calculate days based on time range
       const getDaysFromTimeRange = (range) => {
         switch (range) {
@@ -676,109 +610,116 @@ const ESCAdminDashboard = () => {
           case '90d': return 90;
           case '6m': return 180;
           case '1y': return 365;
-          default: return 30;
+          default: return 90; // Default to 90 days to show more data
         }
       };
       
       const days = getDaysFromTimeRange(timeRange);
+      console.log(`📅 Fetching data for last ${days} days`);
       
-      // Fetch registration trends with time range parameter
-      const registrationResponse = await api.get(`/admin/analytics/registration-trends?days=${days}`);
-      const userTypeResponse = await api.get('/admin/analytics/user-type-distribution');
-      const userActivityResponse = await api.get('/admin/analytics/user-activity-status');
-      const cvUploadResponse = await api.get(`/admin/analytics/cv-upload-trends?days=${days}`);
-      const topSkillsResponse = await api.get('/admin/analytics/top-skills');
-      const cvFileTypesResponse = await api.get('/admin/analytics/cv-file-types');
-      const messageTrendsResponse = await api.get(`/admin/analytics/message-trends?days=${days}`);
-      const communicationActivityResponse = await api.get('/admin/analytics/user-communication-activity');
-      const hiredFreelancersTrendsResponse = await api.get(`/admin/analytics/hired-freelancers-trends?days=${days}`);
+      // Fetch all analytics data in parallel
+      const [
+        registrationResponse,
+        userTypeResponse,
+        userActivityResponse,
+        cvUploadResponse,
+        topSkillsResponse,
+        cvFileTypesResponse,
+        messageTrendsResponse,
+        communicationActivityResponse,
+        hiredFreelancersTrendsResponse
+      ] = await Promise.all([
+        api.get(`/admin/analytics/registration-trends?days=${days}`),
+        api.get('/admin/analytics/user-type-distribution'),
+        api.get('/admin/analytics/user-activity-status'),
+        api.get(`/admin/analytics/cv-upload-trends?days=${days}`),
+        api.get('/admin/analytics/top-skills'),
+        api.get('/admin/analytics/cv-file-types'),
+        api.get(`/admin/analytics/message-trends?days=${days}`),
+        api.get('/admin/analytics/user-communication-activity'),
+        api.get(`/admin/analytics/hired-freelancers-trends?days=${days}`)
+      ]);
       
-      // Format the registration trends data to use proper dates
-      const formattedRegistrationTrends = (registrationResponse.data.data || []).map(item => ({
-        ...item,
-        // Format the date for display (e.g., "2024-01-15" -> "Jan 15")
-        formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric' 
-        })
-      }));
-      
-      setAnalyticsData({
-        registrationTrends: formattedRegistrationTrends,
-        userTypeDistribution: userTypeResponse.data.data || [],
-        userActivityStatus: userActivityResponse.data.data || [],
-        cvUploadTrends: cvUploadResponse.data.data || [],
-        topSkills: topSkillsResponse.data.data || [],
-        cvFileTypes: cvFileTypesResponse.data.data || [],
-        messageTrends: messageTrendsResponse.data.data || [],
-        userCommunicationActivity: communicationActivityResponse.data.data || [],
-        hiredFreelancersTrends: hiredFreelancersTrendsResponse.data.data || []
+      console.log('📊 API Responses received:', {
+        registration: registrationResponse.data.success,
+        userType: userTypeResponse.data.success,
+        userActivity: userActivityResponse.data.success,
+        cvUpload: cvUploadResponse.data.success,
+        topSkills: topSkillsResponse.data.success,
+        cvFileTypes: cvFileTypesResponse.data.success,
+        messageTrends: messageTrendsResponse.data.success,
+        communicationActivity: communicationActivityResponse.data.success,
+        hiredFreelancers: hiredFreelancersTrendsResponse.data.success
       });
       
-    } catch (error) {
-      console.error('Analytics fetch error:', error);
-      setAnalyticsError('');
+      // Format all trends data with proper dates
+      const formatTrendsData = (data) => {
+        return (data || []).map(item => ({
+          ...item,
+          formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+          })
+        }));
+      };
       
-      // Fallback to sample data if API fails
+      const analyticsData = {
+        registrationTrends: formatTrendsData(registrationResponse.data.data),
+        userTypeDistribution: userTypeResponse.data.data || [],
+        userActivityStatus: userActivityResponse.data.data || [],
+        cvUploadTrends: formatTrendsData(cvUploadResponse.data.data),
+        topSkills: topSkillsResponse.data.data || [],
+        cvFileTypes: cvFileTypesResponse.data.data || [],
+        messageTrends: formatTrendsData(messageTrendsResponse.data.data),
+        userCommunicationActivity: communicationActivityResponse.data.data || [],
+        hiredFreelancersTrends: formatTrendsData(hiredFreelancersTrendsResponse.data.data)
+      };
+      
+      console.log('📊 Formatted analytics data:', {
+        registrationTrends: analyticsData.registrationTrends.length,
+        cvUploadTrends: analyticsData.cvUploadTrends.length,
+        messageTrends: analyticsData.messageTrends.length,
+        hiredFreelancersTrends: analyticsData.hiredFreelancersTrends.length,
+        userTypeDistribution: analyticsData.userTypeDistribution.length,
+        topSkills: analyticsData.topSkills.length,
+        cvFileTypes: analyticsData.cvFileTypes.length,
+        userCommunicationActivity: analyticsData.userCommunicationActivity.length
+      });
+      
+      setAnalyticsData(analyticsData);
+      setLastAnalyticsUpdate(new Date());
+      console.log('✅ Analytics data updated successfully');
+      
+    } catch (error) {
+      console.error('❌ Analytics fetch error:', error);
+      
+      // Enhanced error logging
+      if (error.response) {
+        console.error('❌ Response Error:', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          headers: error.response.headers
+        });
+      } else if (error.request) {
+        console.error('❌ Request Error:', error.request);
+      } else {
+        console.error('❌ Error:', error.message);
+      }
+      
+      setAnalyticsError('Failed to fetch analytics data. Please try again.');
+      
+      // Set empty data if API fails
       setAnalyticsData({
-        registrationTrends: [
-          { date: '2025-06-19', formattedDate: 'Jun 19', users: 9, associates: 2, freelancers: 6, admins: 1 },
-          { date: '2025-06-20', formattedDate: 'Jun 20', users: 12, associates: 3, freelancers: 8, admins: 1 },
-          { date: '2025-06-21', formattedDate: 'Jun 21', users: 15, associates: 4, freelancers: 10, admins: 1 },
-          { date: '2025-07-01', formattedDate: 'Jul 1', users: 18, associates: 5, freelancers: 12, admins: 1 },
-          { date: '2025-07-15', formattedDate: 'Jul 15', users: 25, associates: 6, freelancers: 16, admins: 3 },
-          { date: '2025-07-31', formattedDate: 'Jul 31', users: 30, associates: 7, freelancers: 20, admins: 3 },
-          { date: '2025-08-01', formattedDate: 'Aug 1', users: 35, associates: 9, freelancers: 22, admins: 4 },
-          { date: '2025-08-11', formattedDate: 'Aug 11', users: 52, associates: 20, freelancers: 28, admins: 4 }
-        ],
-        userTypeDistribution: [
-          { type: 'Freelancers', count: 28, fill: '#fd680e' },
-          { type: 'Associates', count: 20, fill: '#10b981' },
-          { type: 'Admins', count: 4, fill: '#3b82f6' }
-        ],
-        userActivityStatus: [
-          { status: 'Active', count: 52, fill: '#10b981' },
-          { status: 'Inactive', count: 0, fill: '#6b7280' },
-          { status: 'Pending', count: 0, fill: '#f59e0b' }
-        ],
-        cvUploadTrends: [
-          { date: '2025-06-19', uploads: 5, approved: 4, rejected: 1 },
-          { date: '2025-06-25', uploads: 8, approved: 7, rejected: 1 },
-          { date: '2025-07-01', uploads: 12, approved: 11, rejected: 1 },
-          { date: '2025-07-15', uploads: 15, approved: 14, rejected: 1 },
-          { date: '2025-07-31', uploads: 18, approved: 17, rejected: 1 },
-          { date: '2025-08-11', uploads: 22, approved: 21, rejected: 1 }
-        ],
-        topSkills: [
-          { skill: 'JavaScript', count: 18, fill: '#fd680e' },
-          { skill: 'React', count: 15, fill: '#10b981' },
-          { skill: 'Python', count: 12, fill: '#3b82f6' },
-          { skill: 'Node.js', count: 10, fill: '#8b5cf6' },
-          { skill: 'SQL', count: 8, fill: '#f59e0b' },
-          { skill: 'AWS', count: 6, fill: '#ef4444' }
-        ],
-        cvFileTypes: [
-          { type: 'PDF', count: 15, fill: '#ef4444' },
-          { type: 'DOCX', count: 8, fill: '#3b82f6' },
-          { type: 'DOC', count: 3, fill: '#10b981' },
-          { type: 'TXT', count: 1, fill: '#f59e0b' }
-        ],
-        messageTrends: [
-          { date: '2025-06-19', messages: 12, conversations: 3 },
-          { date: '2025-06-25', messages: 18, conversations: 5 },
-          { date: '2025-07-01', messages: 25, conversations: 8 },
-          { date: '2025-07-15', messages: 32, conversations: 12 },
-          { date: '2025-07-31', messages: 40, conversations: 15 },
-          { date: '2025-08-11', messages: 48, conversations: 18 }
-        ],
+        registrationTrends: [],
+        userTypeDistribution: [],
+        userActivityStatus: [],
+        cvUploadTrends: [],
+        topSkills: [],
+        cvFileTypes: [],
+        messageTrends: [],
         hiredFreelancersTrends: [],
-        userCommunicationActivity: [
-          { user: 'josh', messages: 6, conversations: 2, fill: '#10b981' },
-          { user: 'Gunna Wunna', messages: 5, conversations: 2, fill: '#10b981' },
-          { user: 'Jane Smith', messages: 3, conversations: 1, fill: '#10b981' },
-          { user: 'Natasha Joy', messages: 2, conversations: 1, fill: '#10b981' },
-          { user: 'Evidencia Chengeta', messages: 2, conversations: 1, fill: '#fd680e' }
-        ]
+        userCommunicationActivity: []
       });
       
       // Update the last update timestamp
@@ -788,47 +729,7 @@ const ESCAdminDashboard = () => {
     }
   };
 
-  // Generate fallback visitor data based on your actual user data
-  const generateFallbackVisitorData = () => {
-    const today = new Date();
-    const data = [];
-    
-    // Generate data for the last 90 days with realistic patterns
-    for (let i = 89; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      
-      // Simulate realistic visitor patterns based on your actual data
-      let desktop = 0;
-      let mobile = 0;
-      
-      // Add some realistic variation
-      if (i === 89) { // June 19, 2025 (your first registration)
-        desktop = 2; // 2 associates
-        mobile = 6;  // 6 freelancers
-      } else if (i === 70) { // July 8, 2025
-        desktop = 1; // 1 associate
-        mobile = 3;  // 3 freelancers
-      } else if (i === 50) { // July 28, 2025
-        desktop = 2; // 2 associates
-        mobile = 4;  // 4 freelancers
-      } else if (i === 30) { // August 17, 2025
-        desktop = 3; // 3 associates
-        mobile = 2;  // 2 freelancers
-      } else if (i === 10) { // August 27, 2025
-        desktop = 1; // 1 associate
-        mobile = 1;  // 1 freelancer
-      }
-      
-      data.push({
-        date: date.toISOString().split('T')[0],
-        desktop,
-        mobile
-      });
-    }
-    
-    return data;
-  };
+
 
   // Fetch visitor data for dashboard chart
   const fetchVisitorData = async () => {
@@ -862,17 +763,15 @@ const ESCAdminDashboard = () => {
         setFilteredChartData(formattedData); // Update the chart data
       } else {
         console.error('Failed to fetch visitor data:', response.data.message);
-        // Fallback to sample data if API fails
-        const fallbackData = generateFallbackVisitorData();
-        setVisitorData(fallbackData);
-        setFilteredChartData(fallbackData);
+        // Set empty data if API fails
+        setVisitorData([]);
+        setFilteredChartData([]);
       }
     } catch (error) {
       console.error('Error fetching visitor data:', error);
-      // Fallback to sample data if API fails
-      const fallbackData = generateFallbackVisitorData();
-      setVisitorData(fallbackData);
-      setFilteredChartData(fallbackData);
+      // Set empty data if API fails
+      setVisitorData([]);
+      setFilteredChartData([]);
     } finally {
       setVisitorDataLoading(false);
     }
@@ -923,10 +822,10 @@ const ESCAdminDashboard = () => {
       
       // Set fallback data for demonstration
       const fallbackData = {
-        performance: generateFallbackPerformanceData(),
-        business: generateFallbackBusinessData(),
-        security: generateFallbackBasicSecurityData(),
-        operations: generateFallbackOperationsData()
+        performance: null,
+        business: null,
+        security: null,
+        operations: null
       };
       
       setReportsData(fallbackData);
@@ -936,102 +835,7 @@ const ESCAdminDashboard = () => {
     }
   };
 
-  const generateFallbackPerformanceData = () => ({
-    systemHealth: {
-      uptime: '99.8%',
-      responseTime: '245ms',
-      errorRate: '0.2%',
-      activeConnections: 48,
-      totalConnections: 50,
-      connectionUtilization: '96%'
-    },
-    systemResources: {
-      cpuUsage: '23%',
-      memoryUsage: '68%',
-      diskUsage: '45%',
-      networkLatency: '12ms'
-    },
-    performanceMetrics: [
-      { metric: 'Database Query Time', value: '89ms', status: 'excellent' },
-      { metric: 'Connection Pool Usage', value: '48/50', status: 'good' },
-      { metric: 'Slow Query Rate', value: '0.2%', status: 'excellent' },
-      { metric: 'Memory Usage', value: '68%', status: 'good' },
-      { metric: 'CPU Usage', value: '23%', status: 'excellent' },
-      { metric: 'Disk Usage', value: '45%', status: 'excellent' }
-    ],
-    userInsights: {
-      totalUsers: 52,
-      active24h: 12,
-      active7d: 41,
-      newUsers30d: 8,
-      userActivityRate: '78.8%'
-    },
-    recentIssues: [
-      { issue: 'System operating normally', severity: 'low', timestamp: 'Current', details: 'All metrics within normal ranges' }
-    ]
-  });
 
-  const generateFallbackBusinessData = () => ({
-    userGrowth: {
-      totalUsers: 52,
-      monthlyGrowth: '+15.2%',
-      userRetention: '87.3%',
-      activeUsers: 41
-    },
-    matchingEfficiency: {
-      totalRequests: 18,
-      successfulMatches: 15,
-      matchRate: '83.3%',
-      averageResponseTime: '2.4 hours'
-    },
-    businessMetrics: [
-      { metric: 'User Satisfaction', value: '4.6/5.0', trend: 'up' },
-      { metric: 'Project Completion Rate', value: '91.2%', trend: 'up' },
-      { metric: 'Revenue Impact', value: '+23.4%', trend: 'up' }
-    ]
-  });
-
-
-
-  const generateFallbackOperationsData = () => ({
-    workflowEfficiency: {
-      averageProcessingTime: '4.2 hours',
-      completedTasks: 89,
-      pendingTasks: 12,
-      efficiencyScore: '92.1%'
-    },
-    qualityMetrics: {
-      userSatisfaction: '4.6/5.0',
-      errorRate: '1.2%',
-      responseTime: '2.1 hours',
-      qualityScore: '94.3%'
-    },
-    improvementAreas: [
-      'Reduce associate request processing time',
-      'Improve freelancer matching accuracy',
-      'Enhance communication monitoring',
-      'Optimize system performance'
-    ]
-  });
-
-  const generateFallbackBasicSecurityData = () => ({
-    securityOverview: {
-      totalThreats: 3,
-      blockedAttempts: 12,
-      securityScore: 'A+',
-      lastAudit: '2 days ago'
-    },
-    communicationMonitoring: {
-      totalMessages: 156,
-      flaggedMessages: 2,
-      suspiciousUsers: 1,
-      complianceScore: '98.5%'
-    },
-    recentAlerts: [
-      { alert: 'Suspicious login attempt detected', severity: 'medium', timestamp: '3 hours ago' },
-      { alert: 'Unusual message pattern detected', severity: 'low', timestamp: '1 day ago' }
-    ]
-  });
 
   const exportReportData = () => {
     try {
@@ -1101,63 +905,14 @@ const ESCAdminDashboard = () => {
       // Set fallback data for demonstration
       setSecurityData(prev => ({
         ...prev,
-        [section]: generateFallbackSecurityData(section)
+        [section]: null
       }));
     } finally {
       setSecurityLoading(false);
     }
   };
 
-  const generateFallbackSecurityData = (section) => {
-    switch (section) {
-      case 'dashboard':
-        return {
-          realTimeMetrics: {
-            totalUsers: 52,
-            activeUsers24h: 41,
-            activeUsers7d: 48,
-            suspiciousUsers: 1
-          },
-          recentLogins: [
-            { user: 'admin@cvconnect.com', timestamp: '2 minutes ago', ip: '192.168.1.1', status: 'success' },
-            { user: 'john.doe@company.com', timestamp: '5 minutes ago', ip: '192.168.1.100', status: 'success' }
-          ],
-          communicationThreats: {
-            totalMessages: 156,
-            spamMessages: 2,
-            suspiciousMessages: 1,
-            inappropriateMessages: 0
-          },
-          threatLevel: 'LOW',
-          lastUpdated: new Date().toISOString()
-        };
-      case 'communications':
-        return {
-          patterns: [],
-          topCommunicators: [],
-          flaggedMessages: [],
-          analysisPeriod: '7 days',
-          userTypeFilter: 'All Users'
-        };
-      case 'audit':
-        return {
-          logEntries: [],
-          totalEntries: 0,
-          analysisPeriod: '30 days',
-          actionFilter: 'All Actions'
-        };
-      case 'threats':
-        return {
-          messageThreats: { spam: 0, scam: 0, phishing: 0, suspicious: 0 },
-          ipThreats: [],
-          userAnomalies: [],
-          overallThreatLevel: 'LOW',
-          recommendations: []
-        };
-      default:
-        return null;
-    }
-  };
+
 
   const flagMessage = async (messageId, flagReason, adminNotes) => {
     try {
@@ -2638,31 +2393,13 @@ const ESCAdminDashboard = () => {
                         <ResponsiveContainer width="100%" height={300}>
                           <AreaChart data={analyticsData.hiredFreelancersTrends}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis 
-                              dataKey="date" 
-                              stroke="#666"
-                              tickFormatter={(date) => {
-                                const d = new Date(date);
-                                return d.toLocaleDateString('en-US', { 
-                                  month: 'short', 
-                                  day: 'numeric' 
-                                });
-                              }}
-                            />
+                            <XAxis dataKey="date" stroke="#666" />
                             <YAxis stroke="#666" />
                             <Tooltip 
                               contentStyle={{ 
                                 backgroundColor: '#fff', 
                                 border: '1px solid #ddd',
                                 borderRadius: '8px'
-                              }}
-                              labelFormatter={(date) => {
-                                const d = new Date(date);
-                                return d.toLocaleDateString('en-US', { 
-                                  year: 'numeric',
-                                  month: 'long', 
-                                  day: 'numeric' 
-                                });
                               }}
                             />
                             <Area 
