@@ -1554,6 +1554,8 @@ const ESCAdminDashboard = () => {
                   border: 'none',
                   background: activeTab === 'reports' ? accent : 'transparent',
                   color: activeTab === 'reports' ? '#fff' : '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
                   transition: 'all 0.2s ease',
