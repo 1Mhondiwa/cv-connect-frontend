@@ -1524,13 +1524,13 @@ const ESCAdminDashboard = () => {
             </h6>
             <div className="nav-items">
               <button
-                className="nav-item w-100 text-start"
+                className={`nav-item w-100 text-start ${activeTab === 'analytics' ? 'active' : ''}`}
                 onClick={() => setActiveTab('analytics')}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
-                  background: 'transparent',
-                  color: '#374151',
+                  background: activeTab === 'analytics' ? accent : 'transparent',
+                  color: activeTab === 'analytics' ? '#fff' : '#374151',
                   borderRadius: '8px',
                   marginBottom: '4px',
                   fontSize: '14px',
@@ -1547,15 +1547,13 @@ const ESCAdminDashboard = () => {
               </button>
               
               <button
-                className="nav-item w-100 text-start"
+                className={`nav-item w-100 text-start ${activeTab === 'reports' ? 'active' : ''}`}
                 onClick={() => setActiveTab('reports')}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
-                  background: 'transparent',
-                  color: '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
+                  background: activeTab === 'reports' ? accent : 'transparent',
+                  color: activeTab === 'reports' ? '#fff' : '#374151',
                   fontSize: '14px',
                   fontWeight: 500,
                   transition: 'all 0.2s ease',
@@ -1567,7 +1565,7 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-file-earmark-text me-3"></i>
                 Reports
-          </button>
+              </button>
               
 
         </div>
@@ -1587,13 +1585,13 @@ const ESCAdminDashboard = () => {
             </h6>
             <div className="nav-items">
               <button
-                className="nav-item w-100 text-start"
+                className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
                 onClick={() => setActiveTab('settings')}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
-                  background: 'transparent',
-                  color: '#374151',
+                  background: activeTab === 'settings' ? accent : 'transparent',
+                  color: activeTab === 'settings' ? '#fff' : '#374151',
                   borderRadius: '8px',
                   marginBottom: '4px',
                   fontSize: '14px',
