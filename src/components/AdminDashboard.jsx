@@ -92,7 +92,6 @@ const ESCAdminDashboard = () => {
     userActivityStatus: [],
     cvUploadTrends: [],
     topSkills: [],
-    cvFileTypes: [],
     messageTrends: [],
     userCommunicationActivity: [],
     hiredFreelancersTrends: []
@@ -624,7 +623,7 @@ const ESCAdminDashboard = () => {
         userActivityResponse,
         cvUploadResponse,
         topSkillsResponse,
-        cvFileTypesResponse,
+
         messageTrendsResponse,
         communicationActivityResponse,
         hiredFreelancersTrendsResponse
@@ -634,7 +633,7 @@ const ESCAdminDashboard = () => {
         api.get('/admin/analytics/user-activity-status'),
         api.get(`/admin/analytics/cv-upload-trends?days=${days}`),
         api.get('/admin/analytics/top-skills'),
-        api.get('/admin/analytics/cv-file-types'),
+
         api.get(`/admin/analytics/message-trends?days=${days}`),
         api.get('/admin/analytics/user-communication-activity'),
         api.get(`/admin/analytics/hired-freelancers-trends?days=${days}`)
@@ -646,7 +645,7 @@ const ESCAdminDashboard = () => {
         userActivity: userActivityResponse.data.success,
         cvUpload: cvUploadResponse.data.success,
         topSkills: topSkillsResponse.data.success,
-        cvFileTypes: cvFileTypesResponse.data.success,
+
         messageTrends: messageTrendsResponse.data.success,
         communicationActivity: communicationActivityResponse.data.success,
         hiredFreelancers: hiredFreelancersTrendsResponse.data.success
@@ -655,18 +654,18 @@ const ESCAdminDashboard = () => {
       // Format all trends data with proper dates
       const formatTrendsData = (data) => {
         return (data || []).map(item => ({
-          ...item,
+        ...item,
           // Ensure numeric values for chart data
           total_users: parseInt(item.total_users) || 0,
           associates: parseInt(item.associates) || 0,
           freelancers: parseInt(item.freelancers) || 0,
           admins: parseInt(item.admins) || 0,
           ecs_employees: parseInt(item.ecs_employees) || 0,
-          formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
-          })
-        }));
+        formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric' 
+        })
+      }));
       };
       
       const analyticsData = {
@@ -675,7 +674,7 @@ const ESCAdminDashboard = () => {
         userActivityStatus: userActivityResponse.data.data || [],
         cvUploadTrends: formatTrendsData(cvUploadResponse.data.data),
         topSkills: topSkillsResponse.data.data || [],
-        cvFileTypes: cvFileTypesResponse.data.data || [],
+
         messageTrends: formatTrendsData(messageTrendsResponse.data.data),
         userCommunicationActivity: communicationActivityResponse.data.data || [],
         hiredFreelancersTrends: formatTrendsData(hiredFreelancersTrendsResponse.data.data)
@@ -688,7 +687,7 @@ const ESCAdminDashboard = () => {
         hiredFreelancersTrends: analyticsData.hiredFreelancersTrends.length,
         userTypeDistribution: analyticsData.userTypeDistribution.length,
         topSkills: analyticsData.topSkills.length,
-        cvFileTypes: analyticsData.cvFileTypes.length,
+
         userCommunicationActivity: analyticsData.userCommunicationActivity.length
       });
       
@@ -732,7 +731,6 @@ const ESCAdminDashboard = () => {
         userActivityStatus: [],
         cvUploadTrends: [],
         topSkills: [],
-        cvFileTypes: [],
         messageTrends: [],
         hiredFreelancersTrends: [],
         userCommunicationActivity: []
@@ -2123,39 +2121,39 @@ const ESCAdminDashboard = () => {
                             }
                             
                             return (
-                              <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={analyticsData.registrationTrends}>
-                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={analyticsData.registrationTrends}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                   <XAxis dataKey="date" stroke="#666" />
-                                  <YAxis stroke="#666" />
-                                  <Tooltip 
-                                    contentStyle={{ 
-                                      backgroundColor: '#fff', 
-                                      border: '1px solid #ddd',
-                                      borderRadius: '8px'
-                                    }}
-                                  />
-                                  <Area 
-                                    type="monotone" 
+                          <YAxis stroke="#666" />
+                          <Tooltip 
+                            contentStyle={{ 
+                              backgroundColor: '#fff', 
+                              border: '1px solid #ddd',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <Area 
+                            type="monotone" 
                                     dataKey="total_users" 
-                                    stroke="#fd680e" 
-                                    fill="#fd680e" 
-                                    fillOpacity={0.6}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="associates" 
-                                    stroke="#10b981" 
-                                    fill="#10b981" 
-                                    fillOpacity={0.6}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="freelancers" 
-                                    stroke="#3b82f6" 
-                                    fill="#3b82f6" 
-                                    fillOpacity={0.6}
-                                  />
+                            stroke="#fd680e" 
+                            fill="#fd680e" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="associates" 
+                            stroke="#10b981" 
+                            fill="#10b981" 
+                            fillOpacity={0.6}
+                          />
+                          <Area 
+                            type="monotone" 
+                            dataKey="freelancers" 
+                            stroke="#3b82f6" 
+                            fill="#3b82f6" 
+                            fillOpacity={0.6}
+                          />
                                   <Area 
                                     type="monotone" 
                                     dataKey="ecs_employees" 
@@ -2163,8 +2161,8 @@ const ESCAdminDashboard = () => {
                                     fill="#8b5cf6" 
                                     fillOpacity={0.6}
                                   />
-                                </AreaChart>
-                              </ResponsiveContainer>
+                        </AreaChart>
+                      </ResponsiveContainer>
                             );
                           } catch (chartError) {
                             console.error('🚨 Chart rendering error:', chartError);
@@ -2273,25 +2271,8 @@ const ESCAdminDashboard = () => {
                           <Area 
                             type="monotone" 
                             dataKey="uploads" 
-                            stackId="1" 
                             stroke="#fd680e" 
                             fill="#fd680e" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="approved" 
-                            stackId="1" 
-                            stroke="#10b981" 
-                            fill="#10b981" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="rejected" 
-                            stackId="1" 
-                            stroke="#ef4444" 
-                            fill="#ef4444" 
                             fillOpacity={0.6}
                           />
                         </AreaChart>
@@ -2301,9 +2282,9 @@ const ESCAdminDashboard = () => {
                 </div>
               </div>
 
-              {/* Top Skills and CV File Types - Bar and Pie Charts */}
+              {/* Top Skills Distribution - Bar Chart */}
               <div className="row g-4 mb-4">
-                <div className="col-md-8">
+                <div className="col-md-12">
                   <div className="card border-0 shadow-sm">
                     <div className="card-header bg-transparent border-0">
                       <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
@@ -2335,35 +2316,7 @@ const ESCAdminDashboard = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-md-4">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-file-earmark me-2"></i>CV File Types
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                          <Pie
-                            data={analyticsData.cvFileTypes}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="count"
-                            label={({ type, count }) => `${type}: ${count}`}
-                          >
-                            {analyticsData.cvFileTypes.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.fill} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                </div>
+
               </div>
 
               {/* Communication Trends - Line Chart */}
