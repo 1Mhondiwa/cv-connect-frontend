@@ -536,8 +536,8 @@ const FreelancerDashboard = () => {
                         </div>
                         <div className="d-flex justify-content-between mb-2">
                           <span style={{ color: '#666' }}>Account Status:</span>
-                          <span className={`badge ${profile?.is_active ? 'bg-success' : 'bg-danger'}`}>
-                            {profile?.is_active ? 'Active' : 'Inactive'}
+                          <span className="badge bg-success">
+                            Active
                           </span>
                         </div>
                         <div className="d-flex justify-content-between">

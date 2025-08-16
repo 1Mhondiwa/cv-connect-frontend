@@ -1551,7 +1551,7 @@ const ESCAdminDashboard = () => {
                 Analytics
               </button>
               
-                            <button
+              <button
                 className={`nav-item w-100 text-start ${activeTab === 'reports' ? 'active' : ''}`}
                 onClick={() => setActiveTab('reports')}
                 style={{
@@ -1572,7 +1572,7 @@ const ESCAdminDashboard = () => {
               >
                 <i className="bi bi-file-earmark-text me-3"></i>
                 Reports
-              </button>
+          </button>
               
 
         </div>
@@ -2430,8 +2430,8 @@ const ESCAdminDashboard = () => {
                               stackId="1" 
                               stroke="#3b82f6" 
                               fill="#3b82f6" 
-                              fillOpacity={0.6}
-                            />
+                            fillOpacity={0.6}
+                          />
                         </AreaChart>
                       </ResponsiveContainer>
                       )}
