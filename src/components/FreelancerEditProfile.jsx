@@ -246,7 +246,7 @@ const FreelancerEditProfile = () => {
         setSkillsSuccess("Skill deleted successfully!");
         setTimeout(() => setSkillsSuccess(""), 3000);
       } else {
-        setSkillsError(response.data.message || "Failed to delete skill.");
+        setSkillsError(err.response?.data?.message || "Failed to delete skill.");
       }
     } catch (err) {
       console.error("Delete skill error:", err);
@@ -674,7 +674,7 @@ const FreelancerEditProfile = () => {
             <div className="col-lg-8">
               <div className="card shadow-sm" style={{ borderRadius: '16px', border: 'none' }}>
                 <div className="card-body p-4">
-          <form onSubmit={handleSubmit}>
+                  <form onSubmit={handleSubmit}>
                     {/* Personal Information */}
                     <div className="mb-5">
                       <div className="d-flex align-items-center mb-4">
@@ -685,12 +685,12 @@ const FreelancerEditProfile = () => {
                           marginRight: '16px'
                         }}>
                           <i className="bi bi-person" style={{ color: '#fff', fontSize: '20px' }}></i>
-              </div>
+                        </div>
                         <div>
                           <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Personal Information</h4>
                           <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Basic details about yourself</p>
-              </div>
-            </div>
+                        </div>
+                      </div>
                       
                       <div className="row g-3">
                         <div className="col-md-6">
@@ -704,7 +704,7 @@ const FreelancerEditProfile = () => {
                             required 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
-            </div>
+                        </div>
                         <div className="col-md-6">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Last Name *</label>
                           <input 
@@ -716,7 +716,7 @@ const FreelancerEditProfile = () => {
                             required 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
-            </div>
+                        </div>
                         <div className="col-md-6">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Email Address</label>
                           <input 
@@ -734,7 +734,7 @@ const FreelancerEditProfile = () => {
                             }} 
                           />
                           <small className="text-muted">Email cannot be changed</small>
-            </div>
+                        </div>
                         <div className="col-md-6">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Phone Number</label>
                           <input 
@@ -746,7 +746,7 @@ const FreelancerEditProfile = () => {
                             placeholder="+1 (555) 123-4567" 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
-            </div>
+                        </div>
                         <div className="col-12">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Address</label>
                           <input 
@@ -758,9 +758,9 @@ const FreelancerEditProfile = () => {
                             placeholder="Enter your full address" 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
-            </div>
-            </div>
-            </div>
+                        </div>
+                      </div>
+                    </div>
 
                     {/* Professional Information */}
                     <div className="mb-5">
@@ -772,722 +772,87 @@ const FreelancerEditProfile = () => {
                           marginRight: '16px'
                         }}>
                           <i className="bi bi-briefcase" style={{ color: '#fff', fontSize: '20px' }}></i>
-            </div>
+                        </div>
                         <div>
                           <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Professional Information</h4>
                           <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Your work experience and expertise</p>
-            </div>
+                        </div>
                       </div>
                       
                       <div className="row g-3">
-                        <div className="col-md-6">
-                          <label className="form-label fw-semibold" style={{ color: '#333' }}>Job Title</label>
-                          <input 
-                            type="text" 
-                            className="form-control" 
-                            name="headline" 
-                            value={form.headline || ""} 
-                            onChange={handleChange} 
-                            placeholder="e.g., Senior Full Stack Developer" 
-                            style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
-                          />
-                        </div>
                         <div className="col-md-6">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Years of Experience</label>
                           <input 
                             type="number" 
                             min="0" 
+                            max="50" 
                             className="form-control" 
                             name="years_experience" 
                             value={form.years_experience || ""} 
                             onChange={handleChange} 
-                            placeholder="5" 
+                            placeholder="e.g., 5" 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
                         </div>
-                        <div className="col-12">
-                          <label className="form-label fw-semibold" style={{ color: '#333' }}>Professional Summary</label>
+                        <div className="col-md-6">
+                          <label className="form-label fw-semibold" style={{ color: '#333' }}>Summary</label>
                           <textarea 
                             className="form-control" 
                             name="summary" 
                             value={form.summary || ""} 
                             onChange={handleChange} 
-                            rows={4} 
-                            placeholder="Tell us about your professional background, expertise, and what makes you unique..."
-                            style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
-                          />
-                        </div>
-                        <div className="col-12">
-                          <label className="form-label fw-semibold" style={{ color: '#333' }}>Current Status</label>
-                          <input 
-                            type="text" 
-                            className="form-control" 
-                            name="current_status" 
-                            value={form.current_status || ""} 
-                            onChange={handleChange} 
-                            placeholder="e.g., Available for new projects" 
+                            rows={3}
+                            placeholder="Brief professional summary..."
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
                         </div>
                       </div>
                     </div>
 
-                                         {/* Social Links */}
-                     <div className="mb-4">
-                       <div className="d-flex align-items-center mb-4">
-                         <div style={{
-                           background: `linear-gradient(135deg, ${accent}, #ff8533)`,
-                           borderRadius: '12px',
-                           padding: '12px',
-                           marginRight: '16px'
-                         }}>
-                           <i className="bi bi-link-45deg" style={{ color: '#fff', fontSize: '20px' }}></i>
-                         </div>
-                         <div>
-                           <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Social Links</h4>
-                           <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Connect your professional profiles</p>
-                         </div>
-                       </div>
-                       
-                       <div className="row g-3">
-                         <div className="col-md-6">
-                           <label className="form-label fw-semibold" style={{ color: '#333' }}>LinkedIn URL</label>
-                           <input 
-                             type="url" 
-                             className="form-control" 
-                             name="linkedin_url" 
-                             value={form.linkedin_url || ""} 
-                             onChange={handleChange} 
-                             placeholder="https://linkedin.com/in/yourprofile" 
-                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
-                           />
-                         </div>
-                         <div className="col-md-6">
-                           <label className="form-label fw-semibold" style={{ color: '#333' }}>GitHub URL</label>
-                           <input 
-                             type="url" 
-                             className="form-control" 
-                             name="github_url" 
-                             value={form.github_url || ""} 
-                             onChange={handleChange} 
-                             placeholder="https://github.com/yourusername" 
-                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
-                           />
-                         </div>
-                       </div>
-                     </div>
-
-                     {/* Work Experience */}
-                     <div className="mb-4">
-                       <div className="d-flex align-items-center mb-4">
-                         <div style={{
-                           background: `linear-gradient(135deg, ${accent}, #ff8533)`,
-                           borderRadius: '12px',
-                           padding: '12px',
-                           marginRight: '16px'
-                         }}>
-                           <i className="bi bi-briefcase-fill" style={{ color: '#fff', fontSize: '20px' }}></i>
-                         </div>
-                         <div>
-                           <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Work Experience</h4>
-                           <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Your professional work history</p>
-                         </div>
-                       </div>
-
-                       {/* Add Work Experience Form */}
-                       <div className="card mb-3" style={{ borderRadius: '12px', border: `2px solid ${accent}20` }}>
-                         <div className="card-header" style={{ 
-                           background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
-                           color: 'white', 
-                           fontWeight: 600, 
-                           borderRadius: '10px 10px 0 0',
-                           border: 'none'
-                         }}>
-                           <i className="bi bi-plus-circle me-2"></i>
-                           Add Work Experience
-                         </div>
-                         <div className="card-body p-3">
-                           <form onSubmit={handleAddWork}>
-                             <div className="row g-3">
-                               <div className="col-md-6">
-                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Job Title *</label>
-                                 <input 
-                                   type="text" 
-                                   className="form-control form-control-sm" 
-                                   name="title" 
-                                   value={newWork.title} 
-                                   onChange={handleNewWorkChange}
-                                   placeholder="e.g., Senior Developer"
-                                   required
-                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                 />
-                               </div>
-                               <div className="col-md-6">
-                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Company *</label>
-                                 <input 
-                                   type="text" 
-                                   className="form-control form-control-sm" 
-                                   name="company" 
-                                   value={newWork.company} 
-                                   onChange={handleNewWorkChange}
-                                   placeholder="Company name"
-                                   required
-                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                 />
-                               </div>
-                               <div className="col-md-6">
-                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Start Date</label>
-                                 <input 
-                                   type="text" 
-                                   className="form-control form-control-sm" 
-                                   name="start_date" 
-                                   value={newWork.start_date} 
-                                   onChange={handleNewWorkChange}
-                                   placeholder="e.g., January 2020"
-                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                 />
-                               </div>
-                               <div className="col-md-6">
-                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>End Date</label>
-                                 <input 
-                                   type="text" 
-                                   className="form-control form-control-sm" 
-                                   name="end_date" 
-                                   value={newWork.end_date} 
-                                   onChange={handleNewWorkChange}
-                                   placeholder="e.g., December 2023 or Present"
-                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                 />
-                               </div>
-                               <div className="col-12">
-                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Description</label>
-                                 <textarea 
-                                   className="form-control form-control-sm" 
-                                   name="description" 
-                                   value={newWork.description} 
-                                   onChange={handleNewWorkChange}
-                                   rows={3}
-                                   placeholder="Describe your responsibilities and achievements..."
-                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                 />
-                               </div>
-                             </div>
-                             <div className="mt-3 text-center">
-                               <button 
-                                 type="submit" 
-                                 className="btn btn-sm w-100" 
-                                 style={{ 
-                                   background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
-                                   color: 'white', 
-                                   border: 'none', 
-                                   borderRadius: '20px', 
-                                   padding: '8px 16px',
-                                   fontWeight: 600
-                                 }}
-                               >
-                                 <i className="bi bi-plus me-1"></i>
-                                 Add Work Experience
-                               </button>
-                             </div>
-                           </form>
-                         </div>
-                       </div>
-
-                       {/* Work Experience Messages */}
-                       {workError && (
-                         <div className="alert alert-danger alert-dismissible fade show py-2" role="alert" style={{ borderRadius: '10px', fontSize: '14px' }}>
-                           <i className="bi bi-exclamation-triangle me-2"></i>
-                           {workError}
-                           <button type="button" className="btn-close btn-close-sm" onClick={() => setWorkError("")}></button>
-                         </div>
-                       )}
-                       {workSuccess && (
-                         <div className="alert alert-success alert-dismissible fade show py-2" role="alert" style={{ borderRadius: '10px', fontSize: '14px' }}>
-                           <i className="bi bi-check-circle me-2"></i>
-                           {workSuccess}
-                           <button type="button" className="btn-close btn-close-sm" onClick={() => setWorkSuccess("")}></button>
-                         </div>
-                       )}
-
-                                               {/* Work Experience List */}
-                        {cvData.work_experience.length > 0 && (
-                         <div className="card">
-                           <div className="card-header" style={{ background: '#f8f9fa', fontWeight: 600 }}>
-                             <i className="bi bi-list-check me-2"></i>
-                                                           Your Work Experience ({cvData.work_experience.length})
-                           </div>
-                           <div className="card-body">
-                                                           <div className="d-flex flex-column gap-3">
-                                {cvData.work_experience.map((work) => (
-                                 <div key={work.id} style={{
-                                   background: '#f8f9fa',
-                                   borderRadius: '12px',
-                                   padding: '16px',
-                                   border: '1px solid #e9ecef',
-                                   position: 'relative'
-                                 }}>
-                                   {editingWork === work.id ? (
-                                     <div>
-                                       <div className="row g-2 mb-2">
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Job Title *</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingWorkData.title || ""} 
-                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, title: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                             required
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Company *</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingWorkData.company || ""} 
-                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, company: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                             required
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Start Date</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingWorkData.start_date || ""} 
-                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, start_date: e.target.value })}
-                                             placeholder="e.g., January 2020"
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>End Date</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingWorkData.end_date || ""} 
-                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, end_date: e.target.value })}
-                                             placeholder="e.g., December 2023 or Present"
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                       </div>
-
-                                       <div className="mb-2">
-                                         <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Description</label>
-                                         <textarea 
-                                           className="form-control form-control-sm" 
-                                           value={editingWorkData.description || ""} 
-                                           onChange={(e) => setEditingWorkData({ ...editingWorkData, description: e.target.value })}
-                                           rows={2}
-                                           style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                         />
-                                       </div>
-                                       <div className="d-flex gap-2">
-                                         <button 
-                                           type="button"
-                                           className="btn btn-sm btn-success flex-fill"
-                                           onClick={() => handleUpdateWork(work.id)}
-                                           style={{ borderRadius: '8px', fontSize: '12px' }}
-                                         >
-                                           <i className="bi bi-check me-1"></i>
-                                           Save
-                                         </button>
-                                         <button 
-                                           type="button"
-                                           className="btn btn-sm btn-secondary flex-fill"
-                                           onClick={() => {
-                                             setEditingWork(null);
-                                             setEditingWorkData({});
-                                           }}
-                                           style={{ borderRadius: '8px', fontSize: '12px' }}
-                                         >
-                                           <i className="bi bi-x me-1"></i>
-                                           Cancel
-                                         </button>
-                                       </div>
-                                     </div>
-                                   ) : (
-                                     <div>
-                                       <div className="d-flex justify-content-between align-items-start mb-2">
-                                         <div>
-                                                                                       <h6 style={{ 
-                                              fontWeight: 600, 
-                                              color: '#333',
-                                              margin: 0,
-                                              fontSize: '14px'
-                                            }}>
-                                              {work.title}
-                                            </h6>
-                                            <p style={{ 
-                                              color: accent, 
-                                              margin: 0,
-                                              fontSize: '13px',
-                                              fontWeight: 500
-                                            }}>
-                                              {work.company}
-                                            </p>
-                                         </div>
-                                                                                   <span style={{ 
-                                            background: '#6c757d', 
-                                            color: '#fff', 
-                                            padding: '4px 8px', 
-                                            borderRadius: '12px',
-                                            fontSize: '11px',
-                                            fontWeight: 600
-                                          }}>
-                                            Experience
-                                          </span>
-                                       </div>
-                                                                               <div style={{ color: '#666', fontSize: '12px', marginBottom: '12px' }}>
-                                          <i className="bi bi-calendar me-1"></i>
-                                          {work.start_date} - {work.end_date || 'Present'}
-                                        </div>
-                                       {work.description && (
-                                         <div style={{ color: '#666', fontSize: '12px', marginBottom: '12px' }}>
-                                           {work.description}
-                                         </div>
-                                       )}
-                                       <div className="d-flex gap-2">
-                                         <button 
-                                           type="button"
-                                           className="btn btn-sm btn-outline-primary flex-fill"
-                                           onClick={() => startEditingWork(work)}
-                                           style={{ borderRadius: '8px', fontSize: '12px' }}
-                                         >
-                                           <i className="bi bi-pencil me-1"></i>
-                                           Edit
-                                         </button>
-                                         <button 
-                                           type="button"
-                                           className="btn btn-sm btn-outline-danger flex-fill"
-                                           onClick={() => handleDeleteWork(work.id)}
-                                           style={{ borderRadius: '8px', fontSize: '12px' }}
-                                         >
-                                           <i className="bi bi-trash me-1"></i>
-                                           Delete
-                                         </button>
-                                       </div>
-                                     </div>
-                                   )}
-                                 </div>
-                               ))}
-                             </div>
-                           </div>
-                         </div>
-                       )}
-
-                                               {/* No Work Experience Message */}
-                        {cvData.work_experience.length === 0 && (
-                         <div className="text-center" style={{ color: '#888', padding: '40px 20px' }}>
-                           <i className="bi bi-briefcase" style={{ fontSize: '48px', color: '#ddd', marginBottom: '16px' }}></i>
-                           <p className="mb-0" style={{ fontSize: '14px' }}>No work experience listed yet. Add your first work experience above!</p>
-                         </div>
-                       )}
-                     </div>
-
-                     {/* Education */}
-                     <div className="mb-4">
-                       <div className="d-flex align-items-center mb-4">
-                         <div style={{
-                           background: `linear-gradient(135deg, ${accent}, #ff8533)`,
-                           borderRadius: '12px',
-                           padding: '12px',
-                           marginRight: '16px'
-                         }}>
-                           <i className="bi bi-mortarboard-fill" style={{ color: '#fff', fontSize: '20px' }}></i>
-                         </div>
-                         <div>
-                           <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Education</h4>
-                           <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Your academic background and qualifications</p>
-                         </div>
-                       </div>
-
-                       {/* Add Education Form */}
-                       <div className="card mb-3" style={{ borderRadius: '12px', border: `2px solid ${accent}20` }}>
-                         <div className="card-header" style={{ 
-                           background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
-                           color: 'white', 
-                           fontWeight: 600, 
-                           borderRadius: '10px 10px 0 0',
-                           border: 'none'
-                         }}>
-                           <i className="bi bi-plus-circle me-2"></i>
-                           Add Education
-                         </div>
-                         <div className="card-body p-3">
-                           <div>
-                             <div className="row g-3">
-                                                               <div className="col-md-6">
-                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Degree *</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control form-control-sm" 
-                                    name="degree" 
-                                    value={newEducation.degree} 
-                                    onChange={handleNewEducationChange}
-                                    placeholder="e.g., Bachelor's, Master's"
-                                    required
-                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                  />
-                                </div>
-                                <div className="col-md-6">
-                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Institution *</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control form-control-sm" 
-                                    name="institution" 
-                                    value={newEducation.institution} 
-                                    onChange={handleNewEducationChange}
-                                    placeholder="University/College name"
-                                    required
-                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                  />
-                                </div>
-                                                               <div className="col-md-6">
-                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Field of Study</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control form-control-sm" 
-                                    name="field" 
-                                    value={newEducation.field} 
-                                    onChange={handleNewEducationChange}
-                                    placeholder="e.g., Computer Science"
-                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                  />
-                                </div>
-                                <div className="col-md-6">
-                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Year</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control form-control-sm" 
-                                    name="year" 
-                                    value={newEducation.year} 
-                                    onChange={handleNewEducationChange}
-                                    placeholder="e.g., 2020"
-                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                  />
-                                </div>
-                               
-                             </div>
-                             <div className="mt-3 text-center">
-                               <button 
-                                 type="button" 
-                                 className="btn btn-sm me-2" 
-                                 onClick={handleAddEducation}
-                                 style={{ 
-                                   background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
-                                   color: 'white', 
-                                   border: 'none', 
-                                   borderRadius: '20px', 
-                                   padding: '8px 16px',
-                                   fontWeight: 600
-                                 }}
-                               >
-                                 <i className="bi bi-plus me-1"></i>
-                                 Add to Form
-                               </button>
-                               <div className="mt-2">
-                                 <small className="text-muted">
-                                   <i className="bi bi-info-circle me-1"></i>
-                                   Education will be saved when you click "Save Profile Changes"
-                                 </small>
-                               </div>
-                             </div>
-                           </div>
-                         </div>
-                       </div>
-
-                       {/* Education Messages */}
-                       {educationError && (
-                         <div className="alert alert-danger alert-dismissible fade show py-2" role="alert" style={{ borderRadius: '10px', fontSize: '14px' }}>
-                           <i className="bi bi-exclamation-triangle me-2"></i>
-                           {educationError}
-                           <button type="button" className="btn-close btn-close-sm" onClick={() => setEducationError("")}></button>
-                         </div>
-                       )}
-                       {educationSuccess && (
-                         <div className="alert alert-success alert-dismissible fade show py-2" role="alert" style={{ borderRadius: '10px', fontSize: '14px' }}>
-                           <i className="bi bi-check-circle me-2"></i>
-                           {educationSuccess}
-                           <button type="button" className="btn-close btn-close-sm" onClick={() => setEducationSuccess("")}></button>
-                         </div>
-                       )}
-
-                                               {/* Education List */}
-                        {cvData.education.length > 0 && (
-                         <div className="card">
-                           <div className="card-header" style={{ background: '#f8f9fa', fontWeight: 600 }}>
-                             <i className="bi bi-list-check me-2"></i>
-                                                           Your Education ({cvData.education.length})
-                           </div>
-                           <div className="card-body">
-                                                           <div className="d-flex flex-column gap-3">
-                                {cvData.education.map((edu) => (
-                                 <div key={edu.id} style={{
-                                   background: '#f8f9fa',
-                                   borderRadius: '12px',
-                                   padding: '16px',
-                                   border: '1px solid #e9ecef',
-                                   position: 'relative'
-                                 }}>
-                                   {editingEducation === edu.id ? (
-                                     <div>
-                                       <div className="row g-2 mb-2">
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Institution</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingEducationData.institution} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, institution: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Degree</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingEducationData.degree} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, degree: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Field of Study</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingEducationData.field_of_study} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, field_of_study: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>GPA</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingEducationData.gpa} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, gpa: e.target.value })}
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                         <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Year</label>
-                                           <input 
-                                             type="text" 
-                                             className="form-control form-control-sm" 
-                                             value={editingEducationData.year} 
-                                             onChange={(e) => setEditingEducationData({ ...editingEducationData, year: e.target.value })}
-                                             placeholder="e.g., 2020"
-                                             style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
-                                           />
-                                         </div>
-                                       </div>
-
-
-                                       <div className="d-flex gap-2">
-                                         <button 
-                                           type="button"
-                                           className="btn btn-sm btn-success flex-fill"
-                                           onClick={() => handleUpdateEducation(edu.id)}
-                                           style={{ borderRadius: '8px', fontSize: '12px' }}
-                                         >
-                                           <i className="bi bi-check me-1"></i>
-                                           Save
-                                         </button>
-                                         <button 
-                                           type="button"
-                                           className="btn btn-sm btn-secondary flex-fill"
-                                           onClick={() => {
-                                             setEditingEducation(null);
-                                             setEditingEducationData({});
-                                           }}
-                                           style={{ borderRadius: '8px', fontSize: '12px' }}
-                                         >
-                                           <i className="bi bi-x me-1"></i>
-                                           Cancel
-                                         </button>
-                                       </div>
-                                     </div>
-                                   ) : (
-                                     <div>
-                                       <div className="d-flex justify-content-between align-items-start mb-2">
-                                         <div>
-                                                                                       <h6 style={{ 
-                                              fontWeight: 600, 
-                                              color: '#333',
-                                              margin: 0,
-                                              fontSize: '14px'
-                                            }}>
-                                              {edu.degree} {edu.field && `in ${edu.field}`}
-                                            </h6>
-                                            <p style={{ 
-                                              color: accent, 
-                                              margin: 0,
-                                              fontSize: '13px',
-                                              fontWeight: 500
-                                            }}>
-                                              {edu.institution}
-                                            </p>
-                                         </div>
-                                                                                   <span style={{ 
-                                            background: '#6c757d', 
-                                            color: '#fff', 
-                                            padding: '4px 8px', 
-                                            borderRadius: '12px',
-                                            fontSize: '11px',
-                                            fontWeight: 600
-                                          }}>
-                                            Education
-                                          </span>
-                                       </div>
-                                                                               <div style={{ color: '#666', fontSize: '12px', marginBottom: '12px' }}>
-                                          <i className="bi bi-calendar me-1"></i>
-                                          {edu.year || 'Year not specified'}
-                                        </div>
-                                       
-                                       <div className="d-flex gap-2">
-                                         <button 
-                                           type="button"
-                                           className="btn btn-sm btn-outline-primary flex-fill"
-                                           onClick={() => startEditingEducation(edu)}
-                                           style={{ borderRadius: '8px', fontSize: '12px' }}
-                                         >
-                                           <i className="bi bi-pencil me-1"></i>
-                                           Edit
-                                         </button>
-                                         <button 
-                                           type="button"
-                                           className="btn btn-sm btn-outline-danger flex-fill"
-                                           onClick={() => handleDeleteEducation(edu.id)}
-                                           style={{ borderRadius: '8px', fontSize: '12px' }}
-                                         >
-                                           <i className="bi bi-trash me-1"></i>
-                                           Delete
-                                         </button>
-                                       </div>
-                                     </div>
-                                   )}
-                                 </div>
-                               ))}
-                             </div>
-                           </div>
-                         </div>
-                       )}
-
-                                               {/* No Education Message */}
-                        {cvData.education.length === 0 && (
-                         <div className="text-center" style={{ color: '#888', padding: '40px 20px' }}>
-                           <i className="bi bi-mortarboard" style={{ fontSize: '48px', color: '#ddd', marginBottom: '16px' }}></i>
-                           <p className="mb-0" style={{ fontSize: '14px' }}>No education listed yet. Add your first education above!</p>
-                         </div>
-                       )}
-                     </div>
+                    {/* Social Links */}
+                    <div className="mb-5">
+                      <div className="d-flex align-items-center mb-4">
+                        <div style={{
+                          background: `linear-gradient(135deg, ${accent}, #ff8533)`,
+                          borderRadius: '12px',
+                          padding: '12px',
+                          marginRight: '16px'
+                        }}>
+                          <i className="bi bi-link-45deg" style={{ color: '#fff', fontSize: '20px' }}></i>
+                        </div>
+                        <div>
+                          <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Social Links</h4>
+                          <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Your professional online presence</p>
+                        </div>
+                      </div>
+                      
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label fw-semibold" style={{ color: '#333' }}>LinkedIn URL</label>
+                          <input 
+                            type="url" 
+                            className="form-control" 
+                            name="linkedin_url" 
+                            value={form.linkedin_url || ""} 
+                            onChange={handleChange} 
+                            placeholder="https://linkedin.com/in/yourusername" 
+                            style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
+                          />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label fw-semibold" style={{ color: '#333' }}>GitHub URL</label>
+                          <input 
+                            type="url" 
+                            className="form-control" 
+                            name="github_url" 
+                            value={form.github_url || ""} 
+                            onChange={handleChange} 
+                            placeholder="https://github.com/yourusername" 
+                            style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
 
                     {/* Form Messages */}
                     {error && (
@@ -1505,17 +870,21 @@ const FreelancerEditProfile = () => {
                       </div>
                     )}
 
-                    {/* Action Buttons */}
-                    <div className="d-flex justify-content-between align-items-center mt-4 pt-4" style={{ borderTop: '2px solid #f0f0f0' }}>
-                      <button 
-                        type="button" 
-                        className="btn btn-outline-secondary" 
-                        onClick={() => navigate("/freelancer/profile")}
-                        style={{ borderRadius: '25px', padding: '12px 24px', fontWeight: 600 }}
+                    {/* Form Actions */}
+                    <div className="d-flex gap-3 justify-content-end">
+                      <Link 
+                        to="/freelancer/profile" 
+                        className="btn btn-outline-secondary"
+                        style={{ 
+                          borderRadius: '25px', 
+                          padding: '12px 32px',
+                          fontWeight: 600,
+                          fontSize: '16px'
+                        }}
                       >
                         <i className="bi bi-arrow-left me-2"></i>
                         Back to Profile
-                      </button>
+                      </Link>
                       <button 
                         type="submit" 
                         className="btn" 
@@ -1530,20 +899,20 @@ const FreelancerEditProfile = () => {
                           fontSize: '16px'
                         }}
                       >
-                {submitting ? (
-                  <span>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        {submitting ? (
+                          <span>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                             Saving Changes...
-                  </span>
-                ) : (
+                          </span>
+                        ) : (
                           <>
                             <i className="bi bi-check-circle me-2"></i>
                             Save Profile Changes
                           </>
-                )}
-              </button>
-            </div>
-          </form>
+                        )}
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -1814,6 +1183,322 @@ const FreelancerEditProfile = () => {
                       <div className="text-center" style={{ color: '#888', padding: '40px 20px' }}>
                         <i className="bi bi-tools" style={{ fontSize: '48px', color: '#ddd', marginBottom: '16px' }}></i>
                         <p className="mb-0" style={{ fontSize: '14px' }}>No skills listed yet. Add your first skill above!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Work Experience Section - Full Width Below Main Form */}
+          <div className="row mt-4">
+            <div className="col-12">
+              <div className="card shadow-sm" style={{ borderRadius: '16px', border: 'none' }}>
+                <div className="card-body p-4">
+                  <div className="d-flex align-items-center mb-4">
+                    <div style={{
+                      background: `linear-gradient(135deg, ${accent}, #ff8533)`,
+                      borderRadius: '12px',
+                      padding: '12px',
+                      marginRight: '16px'
+                    }}>
+                      <i className="bi bi-briefcase-fill" style={{ color: '#fff', fontSize: '20px' }}></i>
+                    </div>
+                    <div>
+                      <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Work Experience</h4>
+                      <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Your professional work history</p>
+                    </div>
+                  </div>
+
+                  {/* Add Work Experience Form */}
+                  <div className="card mb-4" style={{ borderRadius: '12px', border: `2px solid ${accent}20` }}>
+                    <div className="card-header" style={{ 
+                      background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
+                      color: 'white', 
+                      fontWeight: 600, 
+                      borderRadius: '10px 10px 0 0',
+                      border: 'none'
+                    }}>
+                      <i className="bi bi-plus-circle me-2"></i>
+                      Add Work Experience
+                    </div>
+                    <div className="card-body p-3">
+                      <form onSubmit={handleAddWork}>
+                        <div className="row g-3">
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Job Title *</label>
+                            <input 
+                              type="text" 
+                              className="form-control form-control-sm" 
+                              name="title" 
+                              value={newWork.title} 
+                              onChange={handleNewWorkChange}
+                              placeholder="e.g., Senior Developer"
+                              required
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Company *</label>
+                            <input 
+                              type="text" 
+                              className="form-control form-control-sm" 
+                              name="company" 
+                              value={newWork.company} 
+                              onChange={handleNewWorkChange}
+                              placeholder="Company name"
+                              required
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Start Date</label>
+                            <input 
+                              type="text" 
+                              className="form-control form-control-sm" 
+                              name="start_date" 
+                              value={newWork.start_date} 
+                              onChange={handleNewWorkChange}
+                              placeholder="e.g., January 2020"
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>End Date</label>
+                            <input 
+                              type="text" 
+                              className="form-control form-control-sm" 
+                              name="end_date" 
+                              value={newWork.end_date} 
+                              onChange={handleNewWorkChange}
+                              placeholder="e.g., December 2023 or Present"
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                          <div className="col-12">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Description</label>
+                            <textarea 
+                              className="form-control form-control-sm" 
+                              name="description" 
+                              value={newWork.description} 
+                              onChange={handleNewWorkChange}
+                              rows={3}
+                              placeholder="Describe your responsibilities and achievements..."
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-3 text-center">
+                          <button 
+                            type="submit" 
+                            className="btn btn-sm" 
+                            style={{ 
+                              background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
+                              color: 'white', 
+                              border: 'none', 
+                              borderRadius: '20px', 
+                              padding: '8px 24px',
+                              fontWeight: 600
+                            }}
+                          >
+                            <i className="bi bi-plus me-1"></i>
+                            Add Work Experience
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+
+                  {/* Work Experience Messages */}
+                  {workError && (
+                    <div className="alert alert-danger alert-dismissible fade show py-2" role="alert" style={{ borderRadius: '10px', fontSize: '14px' }}>
+                      <i className="bi bi-exclamation-triangle me-2"></i>
+                      {workError}
+                      <button type="button" className="btn-close btn-close-sm" onClick={() => setWorkError("")}></button>
+                    </div>
+                  )}
+                  {workSuccess && (
+                    <div className="alert alert-success alert-dismissible fade show py-2" role="alert" style={{ borderRadius: '10px', fontSize: '14px' }}>
+                      <i className="bi bi-check-circle me-2"></i>
+                      {workSuccess}
+                      <button type="button" className="btn-close btn-close-sm" onClick={() => setWorkSuccess("")}></button>
+                    </div>
+                  )}
+
+                  {/* Work Experience List */}
+                  <div>
+                    {cvData.work_experience.length > 0 && (
+                      <div className="mb-3">
+                        <h6 style={{ color: '#333', fontWeight: 600, marginBottom: '16px' }}>
+                          <i className="bi bi-list-check me-2"></i>
+                          Your Work Experience ({cvData.work_experience.length})
+                        </h6>
+                        <div className="d-flex flex-column gap-3">
+                          {cvData.work_experience.map((work) => (
+                            <div key={work.id} style={{
+                              background: '#f8f9fa',
+                              borderRadius: '12px',
+                              padding: '16px',
+                              border: '1px solid #e9ecef',
+                              position: 'relative'
+                            }}>
+                              {editingWork === work.id ? (
+                                <div>
+                                  <div className="row g-2 mb-2">
+                                    <div className="col-md-6">
+                                      <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Job Title *</label>
+                                      <input 
+                                        type="text" 
+                                        className="form-control form-control-sm" 
+                                        value={editingWorkData.title || ""} 
+                                        onChange={(e) => setEditingWorkData({ ...editingWorkData, title: e.target.value })}
+                                        style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                        required
+                                      />
+                                    </div>
+                                    <div className="col-md-6">
+                                      <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Company *</label>
+                                      <input 
+                                        type="text" 
+                                        className="form-control form-control-sm" 
+                                        value={editingWorkData.company || ""} 
+                                        onChange={(e) => setEditingWorkData({ ...editingWorkData, company: e.target.value })}
+                                        style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                        required
+                                      />
+                                    </div>
+                                    <div className="col-md-6">
+                                      <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Start Date</label>
+                                      <input 
+                                        type="text" 
+                                        className="form-control form-control-sm" 
+                                        value={editingWorkData.start_date || ""} 
+                                        onChange={(e) => setEditingWorkData({ ...editingWorkData, start_date: e.target.value })}
+                                        placeholder="e.g., January 2020"
+                                        style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                      />
+                                    </div>
+                                    <div className="col-md-6">
+                                      <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>End Date</label>
+                                      <input 
+                                        type="text" 
+                                        className="form-control form-control-sm" 
+                                        value={editingWorkData.end_date || ""} 
+                                        onChange={(e) => setEditingWorkData({ ...editingWorkData, end_date: e.target.value })}
+                                        placeholder="e.g., December 2023 or Present"
+                                        style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="mb-2">
+                                    <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Description</label>
+                                    <textarea 
+                                      className="form-control form-control-sm" 
+                                      value={editingWorkData.description || ""} 
+                                      onChange={(e) => setEditingWorkData({ ...editingWorkData, description: e.target.value })}
+                                      rows={2}
+                                      style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                    />
+                                  </div>
+                                  <div className="d-flex gap-2">
+                                    <button 
+                                      type="button"
+                                      className="btn btn-sm btn-success flex-fill"
+                                      onClick={() => handleUpdateWork(work.id)}
+                                      style={{ borderRadius: '8px', fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-check me-1"></i>
+                                      Save
+                                    </button>
+                                    <button 
+                                      type="button"
+                                      className="btn btn-sm btn-secondary flex-fill"
+                                      onClick={() => {
+                                        setEditingWork(null);
+                                        setEditingWorkData({});
+                                      }}
+                                      style={{ borderRadius: '8px', fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-x me-1"></i>
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <div className="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                      <h6 style={{ 
+                                        fontWeight: 600, 
+                                        color: '#333',
+                                        margin: 0,
+                                        fontSize: '14px'
+                                      }}>
+                                        {work.title}
+                                      </h6>
+                                      <p style={{ 
+                                        color: accent, 
+                                        margin: 0,
+                                        fontSize: '13px',
+                                        fontWeight: 500
+                                      }}>
+                                        {work.company}
+                                      </p>
+                                    </div>
+                                    <span style={{ 
+                                      background: '#6c757d', 
+                                      color: '#fff', 
+                                      padding: '4px 8px', 
+                                      borderRadius: '12px',
+                                      fontSize: '11px',
+                                      fontWeight: 600
+                                    }}>
+                                      Experience
+                                    </span>
+                                  </div>
+                                  <div style={{ color: '#666', fontSize: '12px', marginBottom: '12px' }}>
+                                    <i className="bi bi-calendar me-1"></i>
+                                    {work.start_date} - {work.end_date || 'Present'}
+                                  </div>
+                                  {work.description && (
+                                    <div style={{ color: '#666', fontSize: '12px', marginBottom: '12px' }}>
+                                      {work.description}
+                                    </div>
+                                  )}
+                                  <div className="d-flex gap-2">
+                                    <button 
+                                      type="button"
+                                      className="btn btn-sm btn-outline-primary flex-fill"
+                                      onClick={() => startEditingWork(work)}
+                                      style={{ borderRadius: '8px', fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-pencil me-1"></i>
+                                      Edit
+                                    </button>
+                                    <button 
+                                      type="button"
+                                      className="btn btn-sm btn-outline-danger flex-fill"
+                                      onClick={() => handleDeleteWork(work.id)}
+                                      style={{ borderRadius: '8px', fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-trash me-1"></i>
+                                      Delete
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* No Work Experience Message */}
+                    {cvData.work_experience.length === 0 && (
+                      <div className="text-center" style={{ color: '#888', padding: '40px 20px' }}>
+                        <i className="bi bi-briefcase" style={{ fontSize: '48px', color: '#ddd', marginBottom: '16px' }}></i>
+                        <p className="mb-0" style={{ fontSize: '14px' }}>No work experience listed yet. Add your first work experience above!</p>
                       </div>
                     )}
                   </div>
