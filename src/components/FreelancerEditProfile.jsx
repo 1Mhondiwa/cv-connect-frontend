@@ -436,78 +436,160 @@ const FreelancerEditProfile = () => {
     setEducationSuccess("");
   };
 
-  // Modify handleAddEducation to only update local state
-  const handleAddEducation = () => {
+  // Add education with API integration
+  const handleAddEducation = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!newEducation.degree.trim() || !newEducation.institution.trim()) {
       setEducationError("Degree and institution are required.");
       return;
     }
-    
-    const educationToAdd = {
-      ...newEducation,
-      id: `edu_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    };
-    
-    setCvData(prev => ({
-      ...prev,
-      education: [...prev.education, educationToAdd]
-    }));
-    
-    setNewEducation({
-      degree: "",
-      field: "",
-      institution: "",
-      year: ""
-    });
-    
-    setEducationError("");
-    setEducationSuccess("Education added to form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setEducationSuccess(""), 3000);
+
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Adding education:", newEducation);
+      
+      const response = await axios.post(
+        "/api/freelancer/education",
+        {
+          degree: newEducation.degree.trim(),
+          institution: newEducation.institution.trim(),
+          field: newEducation.field || "",
+          year: newEducation.year || ""
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Add education response:", response.data);
+      
+      if (response.data.success) {
+        await refreshEducation();
+        setNewEducation({
+          degree: "",
+          field: "",
+          institution: "",
+          year: ""
+        });
+        setEducationSuccess("Education added successfully!");
+        setTimeout(() => setEducationSuccess(""), 3000);
+      } else {
+        setEducationError(response.data.message || "Failed to add education.");
+      }
+    } catch (err) {
+      console.error("Add education error:", err);
+      setEducationError(err.response?.data?.message || "Failed to add education.");
+    }
+  };
+
+  const refreshEducation = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("/api/freelancer/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.success) {
+        // Update CV data with fresh education
+        if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
+          const parsedData = response.data.profile.cv.parsed_data;
+          const educationWithIds = (parsedData.education || []).map((edu, index) => ({
+            ...edu,
+            id: edu.id || `edu_${index}_${Date.now()}`
+          }));
+          setCvData(prev => ({
+            ...prev,
+            education: educationWithIds
+          }));
+        }
+      }
+    } catch (err) {
+      console.error("Error refreshing education:", err);
+    }
   };
 
   const startEditingEducation = (edu) => {
     setEditingEducation(edu.id);
     setEditingEducationData({
-      degree: edu.degree,
-      field: edu.field,
-      institution: edu.institution,
-      year: edu.year
+      degree: edu.degree || "",
+      field: edu.field || "",
+      institution: edu.institution || "",
+      year: edu.year || ""
     });
   };
 
-  // Modify handleUpdateEducation to only update local state
-  const handleUpdateEducation = () => {
-    if (!editingEducationData.degree.trim() || !editingEducationData.institution.trim()) {
-      setEducationError("Degree and institution are required.");
-      return;
+  // Update education with API integration
+  const handleUpdateEducation = async () => {
+    try {
+      if (!editingEducationData.degree.trim() || !editingEducationData.institution.trim()) {
+        setEducationError("Degree and institution are required.");
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      console.log("Updating education:", editingEducation, editingEducationData);
+      
+      const response = await axios.put(
+        `/api/freelancer/education/${editingEducation}`,
+        {
+          degree: editingEducationData.degree.trim(),
+          institution: editingEducationData.institution.trim(),
+          field: editingEducationData.field || "",
+          year: editingEducationData.year || ""
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Update education response:", response.data);
+      
+      if (response.data.success) {
+        await refreshEducation();
+        setEditingEducation(null);
+        setEditingEducationData({});
+        setEducationSuccess("Education updated successfully!");
+        setTimeout(() => setEducationSuccess(""), 3000);
+      } else {
+        setEducationError(response.data.message || "Failed to update education.");
+      }
+    } catch (err) {
+      console.error("Update education error:", err);
+      setEducationError(err.response?.data?.message || "Failed to update education.");
     }
-    
-    setCvData(prev => ({
-      ...prev,
-      education: prev.education.map(edu => 
-        edu.id === editingEducation 
-          ? { ...edu, ...editingEducationData }
-          : edu
-      )
-    }));
-    
-    setEditingEducation(null);
-    setEditingEducationData({});
-    setEducationError("");
-    setEducationSuccess("Education updated in form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setEducationSuccess(""), 3000);
   };
 
-  // Modify handleDeleteEducation to only update local state
-  const handleDeleteEducation = (educationId) => {
-    setCvData(prev => ({
-      ...prev,
-      education: prev.education.filter(edu => edu.id !== educationId)
-    }));
-    
-    setEducationError("");
-    setEducationSuccess("Education removed from form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setEducationSuccess(""), 3000);
+  // Delete education with API integration
+  const handleDeleteEducation = async (educationId) => {
+    if (!window.confirm("Are you sure you want to delete this education?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Deleting education:", educationId);
+      
+      const response = await axios.delete(
+        `/api/freelancer/education/${educationId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Delete education response:", response.data);
+      
+      if (response.data.success) {
+        await refreshEducation();
+        setEducationSuccess("Education deleted successfully!");
+        setTimeout(() => setEducationSuccess(""), 3000);
+      } else {
+        setEducationError(response.data.message || "Failed to delete education.");
+      }
+    } catch (err) {
+      console.error("Delete education error:", err);
+      setEducationError(err.response?.data?.message || "Failed to delete education.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -548,14 +630,13 @@ const FreelancerEditProfile = () => {
       
       if (response.data.success) {
         // Update CV parsed data if there are changes
-        if (cvData.work_experience.length > 0 || cvData.education.length > 0) {
+        if (cvData.work_experience.length > 0) {
           try {
             const cvResponse = await axios.put(
               "/api/freelancer/cv/parsed-data",
               {
                 parsed_data: {
-                  work_experience: cvData.work_experience,
-                  education: cvData.education
+                  work_experience: cvData.work_experience
                 }
               },
               {
@@ -1499,6 +1580,295 @@ const FreelancerEditProfile = () => {
                       <div className="text-center" style={{ color: '#888', padding: '40px 20px' }}>
                         <i className="bi bi-briefcase" style={{ fontSize: '48px', color: '#ddd', marginBottom: '16px' }}></i>
                         <p className="mb-0" style={{ fontSize: '14px' }}>No work experience listed yet. Add your first work experience above!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Education Section - Full Width Below Work Experience */}
+          <div className="row mt-4">
+            <div className="col-12">
+              <div className="card shadow-sm" style={{ borderRadius: '16px', border: 'none' }}>
+                <div className="card-body p-4">
+                  <div className="d-flex align-items-center mb-4">
+                    <div style={{
+                      background: `linear-gradient(135deg, ${accent}, #ff8533)`,
+                      borderRadius: '12px',
+                      padding: '12px',
+                      marginRight: '16px'
+                    }}>
+                      <i className="bi bi-mortarboard-fill" style={{ color: '#fff', fontSize: '20px' }}></i>
+                    </div>
+                    <div>
+                      <h4 style={{ color: '#333', fontWeight: 600, margin: 0 }}>Education</h4>
+                      <p style={{ color: '#666', fontSize: '14px', margin: 0 }}>Your academic background and qualifications</p>
+                    </div>
+                  </div>
+
+                  {/* Add Education Form */}
+                  <div className="card mb-4" style={{ borderRadius: '12px', border: `2px solid ${accent}20` }}>
+                    <div className="card-header" style={{ 
+                      background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
+                      color: 'white', 
+                      fontWeight: 600, 
+                      borderRadius: '10px 10px 0 0',
+                      border: 'none'
+                    }}>
+                      <i className="bi bi-plus-circle me-2"></i>
+                      Add Education
+                    </div>
+                    <div className="card-body p-3">
+                      <form onSubmit={handleAddEducation}>
+                        <div className="row g-3">
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Degree *</label>
+                            <input 
+                              type="text" 
+                              className="form-control form-control-sm" 
+                              name="degree" 
+                              value={newEducation.degree} 
+                              onChange={handleNewEducationChange}
+                              placeholder="e.g., Bachelor's, Master's"
+                              required
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Institution *</label>
+                            <input 
+                              type="text" 
+                              className="form-control form-control-sm" 
+                              name="institution" 
+                              value={newEducation.institution} 
+                              onChange={handleNewEducationChange}
+                              placeholder="University/College name"
+                              required
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Field of Study</label>
+                            <input 
+                              type="text" 
+                              className="form-control form-control-sm" 
+                              name="field" 
+                              value={newEducation.field} 
+                              onChange={handleNewEducationChange}
+                              placeholder="e.g., Computer Science"
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Year</label>
+                            <input 
+                              type="text" 
+                              className="form-control form-control-sm" 
+                              name="year" 
+                              value={newEducation.year} 
+                              onChange={handleNewEducationChange}
+                              placeholder="e.g., 2020"
+                              style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                            />
+                          </div>
+                        </div>
+                        <div className="mt-3 text-center">
+                          <button 
+                            type="submit" 
+                            className="btn btn-sm" 
+                            style={{ 
+                              background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
+                              color: 'white', 
+                              border: 'none', 
+                              borderRadius: '20px', 
+                              padding: '8px 24px',
+                              fontWeight: 600
+                            }}
+                          >
+                            <i className="bi bi-plus me-1"></i>
+                            Add Education
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+
+                  {/* Education Messages */}
+                  {educationError && (
+                    <div className="alert alert-danger alert-dismissible fade show py-2" role="alert" style={{ borderRadius: '10px', fontSize: '14px' }}>
+                      <i className="bi bi-exclamation-triangle me-2"></i>
+                      {educationError}
+                      <button type="button" className="btn-close btn-close-sm" onClick={() => setEducationError("")}></button>
+                    </div>
+                  )}
+                  {educationSuccess && (
+                    <div className="alert alert-success alert-dismissible fade show py-2" role="alert" style={{ borderRadius: '10px', fontSize: '14px' }}>
+                      <i className="bi bi-check-circle me-2"></i>
+                      {educationSuccess}
+                      <button type="button" className="btn-close btn-close-sm" onClick={() => setEducationSuccess("")}></button>
+                    </div>
+                  )}
+
+                  {/* Education List */}
+                  <div>
+                    {cvData.education.length > 0 && (
+                      <div className="mb-3">
+                        <h6 style={{ color: '#333', fontWeight: 600, marginBottom: '16px' }}>
+                          <i className="bi bi-mortarboard me-2"></i>
+                          Your Education ({cvData.education.length})
+                        </h6>
+                        <div className="d-flex flex-column gap-3">
+                          {cvData.education.map((edu) => (
+                            <div key={edu.id} style={{
+                              background: '#f8f9fa',
+                              borderRadius: '12px',
+                              padding: '16px',
+                              border: '1px solid #e9ecef',
+                              position: 'relative'
+                            }}>
+                              {editingEducation === edu.id ? (
+                                <div>
+                                  <div className="row g-2 mb-2">
+                                    <div className="col-md-6">
+                                      <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Degree *</label>
+                                      <input 
+                                        type="text" 
+                                        className="form-control form-control-sm" 
+                                        value={editingEducationData.degree || ""} 
+                                        onChange={(e) => setEditingEducationData({ ...editingEducationData, degree: e.target.value })}
+                                        style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                        required
+                                      />
+                                    </div>
+                                    <div className="col-md-6">
+                                      <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Institution *</label>
+                                      <input 
+                                        type="text" 
+                                        className="form-control form-control-sm" 
+                                        value={editingEducationData.institution || ""} 
+                                        onChange={(e) => setEditingEducationData({ ...editingEducationData, institution: e.target.value })}
+                                        style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                        required
+                                      />
+                                    </div>
+                                    <div className="col-md-6">
+                                      <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Field of Study</label>
+                                      <input 
+                                        type="text" 
+                                        className="form-control form-control-sm" 
+                                        value={editingEducationData.field || ""} 
+                                        onChange={(e) => setEditingEducationData({ ...editingEducationData, field: e.target.value })}
+                                        style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                      />
+                                    </div>
+                                    <div className="col-md-6">
+                                      <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Year</label>
+                                      <input 
+                                        type="text" 
+                                        className="form-control form-control-sm" 
+                                        value={editingEducationData.year || ""} 
+                                        onChange={(e) => setEditingEducationData({ ...editingEducationData, year: e.target.value })}
+                                        placeholder="e.g., 2020"
+                                        style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="d-flex gap-2">
+                                    <button 
+                                      type="button"
+                                      className="btn btn-sm btn-success flex-fill"
+                                      onClick={handleUpdateEducation}
+                                      style={{ borderRadius: '8px', fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-check me-1"></i>
+                                      Save
+                                    </button>
+                                    <button 
+                                      type="button"
+                                      className="btn btn-sm btn-secondary flex-fill"
+                                      onClick={() => {
+                                        setEditingEducation(null);
+                                        setEditingEducationData({});
+                                      }}
+                                      style={{ borderRadius: '8px', fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-x me-1"></i>
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div>
+                                  <div className="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                      <h6 style={{ 
+                                        fontWeight: 600, 
+                                        color: '#333',
+                                        margin: 0,
+                                        fontSize: '14px'
+                                      }}>
+                                        {edu.degree} {edu.field && `in ${edu.field}`}
+                                      </h6>
+                                      <p style={{ 
+                                        color: accent, 
+                                        margin: 0,
+                                        fontSize: '13px',
+                                        fontWeight: 500
+                                      }}>
+                                        {edu.institution}
+                                      </p>
+                                    </div>
+                                    <span style={{ 
+                                      background: '#6c757d', 
+                                      color: '#fff', 
+                                      padding: '4px 8px', 
+                                      borderRadius: '12px',
+                                      fontSize: '11px',
+                                      fontWeight: 600
+                                    }}>
+                                      Education
+                                    </span>
+                                  </div>
+                                  <div style={{ color: '#666', fontSize: '12px', marginBottom: '12px' }}>
+                                    <i className="bi bi-calendar me-1"></i>
+                                    {edu.year || 'Year not specified'}
+                                  </div>
+                                  
+                                  <div className="d-flex gap-2">
+                                    <button 
+                                      type="button"
+                                      className="btn btn-sm btn-outline-primary flex-fill"
+                                      onClick={() => startEditingEducation(edu)}
+                                      style={{ borderRadius: '8px', fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-pencil me-1"></i>
+                                      Edit
+                                    </button>
+                                    <button 
+                                      type="button"
+                                      className="btn btn-sm btn-outline-danger flex-fill"
+                                      onClick={() => handleDeleteEducation(edu.id)}
+                                      style={{ borderRadius: '8px', fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-trash me-1"></i>
+                                      Delete
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* No Education Message */}
+                    {cvData.education.length === 0 && (
+                      <div className="text-center" style={{ color: '#888', padding: '40px 20px' }}>
+                        <i className="bi bi-mortarboard" style={{ fontSize: '48px', color: '#ddd', marginBottom: '16px' }}></i>
+                        <p className="mb-0" style={{ fontSize: '14px' }}>No education listed yet. Add your first education above!</p>
                       </div>
                     )}
                   </div>
