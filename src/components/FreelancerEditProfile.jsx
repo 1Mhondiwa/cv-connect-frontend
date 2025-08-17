@@ -265,84 +265,164 @@ const FreelancerEditProfile = () => {
     setWorkSuccess("");
   };
 
-  // Modify handleAddWork to only update local state
-  const handleAddWork = () => {
+  // Add work experience with API integration
+  const handleAddWork = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!newWork.title.trim() || !newWork.company.trim()) {
       setWorkError("Job title and company are required.");
       return;
     }
-    
-    const workToAdd = {
-      ...newWork,
-      id: `work_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    };
-    
-    setCvData(prev => ({
-      ...prev,
-      work_experience: [...prev.work_experience, workToAdd]
-    }));
-    
-    setNewWork({
-      title: "",
-      company: "",
-      start_date: "",
-      end_date: "",
-      description: ""
-    });
-    
-    setWorkError("");
-    setWorkSuccess("Work experience added to form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setWorkSuccess(""), 3000);
+
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Adding work experience:", newWork);
+      
+      const response = await axios.post(
+        "/api/freelancer/work-experience",
+        {
+          title: newWork.title.trim(),
+          company: newWork.company.trim(),
+          start_date: newWork.start_date || "",
+          end_date: newWork.end_date || "",
+          description: newWork.description || ""
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Add work experience response:", response.data);
+      
+      if (response.data.success) {
+        await refreshWorkExperience();
+        setNewWork({
+          title: "",
+          company: "",
+          start_date: "",
+          end_date: "",
+          description: ""
+        });
+        setWorkSuccess("Work experience added successfully!");
+        setTimeout(() => setWorkSuccess(""), 3000);
+      } else {
+        setWorkError(response.data.message || "Failed to add work experience.");
+      }
+    } catch (err) {
+      console.error("Add work experience error:", err);
+      setWorkError(err.response?.data?.message || "Failed to add work experience.");
+    }
+  };
+
+  const refreshWorkExperience = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("/api/freelancer/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.data.success) {
+        // Update CV data with fresh work experience
+        if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
+          const parsedData = response.data.profile.cv.parsed_data;
+          const workExperienceWithIds = (parsedData.work_experience || []).map((work, index) => ({
+            ...work,
+            id: work.id || `work_${index}_${Date.now()}`
+          }));
+          setCvData(prev => ({
+            ...prev,
+            work_experience: workExperienceWithIds
+          }));
+        }
+      }
+    } catch (err) {
+      console.error("Error refreshing work experience:", err);
+    }
   };
 
   const startEditingWork = (work) => {
     setEditingWork(work.id);
     setEditingWorkData({
-      title: work.title,
-      company: work.company,
-      start_date: work.start_date,
-      end_date: work.end_date,
-      description: work.description
+      title: work.title || "",
+      company: work.company || "",
+      start_date: work.start_date || "",
+      end_date: work.end_date || "",
+      description: work.description || ""
     });
   };
 
-  // Modify handleUpdateWork to only update local state
-  const handleUpdateWork = (e) => {
-    e.preventDefault();
-    if (!editingWorkData.company.trim() || !editingWorkData.position.trim()) {
-      setWorkError("Company and position are required.");
-      return;
+  // Update work experience with API integration
+  const handleUpdateWork = async (workId) => {
+    try {
+      if (!editingWorkData.title.trim() || !editingWorkData.company.trim()) {
+        setWorkError("Job title and company are required.");
+        return;
+      }
+
+      const token = localStorage.getItem("token");
+      console.log("Updating work experience:", workId, editingWorkData);
+      
+      const response = await axios.put(
+        `/api/freelancer/work-experience/${workId}`,
+        {
+          title: editingWorkData.title.trim(),
+          company: editingWorkData.company.trim(),
+          start_date: editingWorkData.start_date || "",
+          end_date: editingWorkData.end_date || "",
+          description: editingWorkData.description || ""
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Update work experience response:", response.data);
+      
+      if (response.data.success) {
+        await refreshWorkExperience();
+        setEditingWork(null);
+        setEditingWorkData({});
+        setWorkSuccess("Work experience updated successfully!");
+        setTimeout(() => setWorkSuccess(""), 3000);
+      } else {
+        setWorkError(response.data.message || "Failed to update work experience.");
+      }
+    } catch (err) {
+      console.error("Update work experience error:", err);
+      setWorkError(err.response?.data?.message || "Failed to update work experience.");
     }
-    
-    setCvData(prev => ({
-      ...prev,
-      work_experience: prev.work_experience.map(work => 
-        work.id === editingWork 
-          ? { ...work, ...editingWorkData }
-          : work
-      )
-    }));
-    
-    setEditingWork(null);
-    setEditingWorkData({});
-    setWorkError("");
-    setWorkSuccess("Work experience updated in form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setWorkSuccess(""), 3000);
   };
 
-  // Modify handleDeleteWork to only update local state
-  const handleDeleteWork = (workId, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    setCvData(prev => ({
-      ...prev,
-      work_experience: prev.work_experience.filter(work => work.id !== workId)
-    }));
-    
-    setWorkError("");
-    setWorkSuccess("Work experience removed from form. Click 'Save Profile Changes' to save.");
-    setTimeout(() => setWorkSuccess(""), 3000);
+  // Delete work experience with API integration
+  const handleDeleteWork = async (workId) => {
+    if (!window.confirm("Are you sure you want to delete this work experience?")) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Deleting work experience:", workId);
+      
+      const response = await axios.delete(
+        `/api/freelancer/work-experience/${workId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      
+      console.log("Delete work experience response:", response.data);
+      
+      if (response.data.success) {
+        await refreshWorkExperience();
+        setWorkSuccess("Work experience deleted successfully!");
+        setTimeout(() => setWorkSuccess(""), 3000);
+      } else {
+        setWorkError(err.response?.data?.message || "Failed to delete work experience.");
+      }
+    } catch (err) {
+      console.error("Delete work experience error:", err);
+      setWorkError(err.response?.data?.message || "Failed to delete work experience.");
+    }
   };
 
   // Education Functions
@@ -827,58 +907,58 @@ const FreelancerEditProfile = () => {
                            Add Work Experience
                          </div>
                          <div className="card-body p-3">
-                           <div>
+                           <form onSubmit={handleAddWork}>
                              <div className="row g-3">
-                                                               <div className="col-md-6">
-                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Job Title *</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control form-control-sm" 
-                                    name="title" 
-                                    value={newWork.title} 
-                                    onChange={handleNewWorkChange}
-                                    placeholder="e.g., Senior Developer"
-                                    required
-                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                  />
-                                </div>
-                                <div className="col-md-6">
-                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Company *</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control form-control-sm" 
-                                    name="company" 
-                                    value={newWork.company} 
-                                    onChange={handleNewWorkChange}
-                                    placeholder="Company name"
-                                    required
-                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                  />
-                                </div>
-                                                               <div className="col-md-6">
-                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Start Date</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control form-control-sm" 
-                                    name="start_date" 
-                                    value={newWork.start_date} 
-                                    onChange={handleNewWorkChange}
-                                    placeholder="e.g., January 2020"
-                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                  />
-                                </div>
-                                <div className="col-md-6">
-                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>End Date</label>
-                                  <input 
-                                    type="text" 
-                                    className="form-control form-control-sm" 
-                                    name="end_date" 
-                                    value={newWork.end_date} 
-                                    onChange={handleNewWorkChange}
-                                    placeholder="e.g., December 2023 or Present"
-                                    style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
-                                  />
-                                </div>
+                               <div className="col-md-6">
+                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Job Title *</label>
+                                 <input 
+                                   type="text" 
+                                   className="form-control form-control-sm" 
+                                   name="title" 
+                                   value={newWork.title} 
+                                   onChange={handleNewWorkChange}
+                                   placeholder="e.g., Senior Developer"
+                                   required
+                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                                 />
+                               </div>
+                               <div className="col-md-6">
+                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Company *</label>
+                                 <input 
+                                   type="text" 
+                                   className="form-control form-control-sm" 
+                                   name="company" 
+                                   value={newWork.company} 
+                                   onChange={handleNewWorkChange}
+                                   placeholder="Company name"
+                                   required
+                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                                 />
+                               </div>
+                               <div className="col-md-6">
+                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Start Date</label>
+                                 <input 
+                                   type="text" 
+                                   className="form-control form-control-sm" 
+                                   name="start_date" 
+                                   value={newWork.start_date} 
+                                   onChange={handleNewWorkChange}
+                                   placeholder="e.g., January 2020"
+                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                                 />
+                               </div>
+                               <div className="col-md-6">
+                                 <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>End Date</label>
+                                 <input 
+                                   type="text" 
+                                   className="form-control form-control-sm" 
+                                   name="end_date" 
+                                   value={newWork.end_date} 
+                                   onChange={handleNewWorkChange}
+                                   placeholder="e.g., December 2023 or Present"
+                                   style={{ borderRadius: '8px', border: '2px solid #e9ecef' }}
+                                 />
+                               </div>
                                <div className="col-12">
                                  <label className="form-label fw-semibold" style={{ fontSize: '14px', color: '#333' }}>Description</label>
                                  <textarea 
@@ -894,9 +974,8 @@ const FreelancerEditProfile = () => {
                              </div>
                              <div className="mt-3 text-center">
                                <button 
-                                 type="button" 
-                                 className="btn btn-sm me-2" 
-                                 onClick={handleAddWork}
+                                 type="submit" 
+                                 className="btn btn-sm w-100" 
                                  style={{ 
                                    background: `linear-gradient(135deg, ${accent}, #ff8533)`, 
                                    color: 'white', 
@@ -907,16 +986,10 @@ const FreelancerEditProfile = () => {
                                  }}
                                >
                                  <i className="bi bi-plus me-1"></i>
-                                 Add to Form
+                                 Add Work Experience
                                </button>
-                               <div className="mt-2">
-                                 <small className="text-muted">
-                                   <i className="bi bi-info-circle me-1"></i>
-                                   Work experience will be saved when you click "Save Profile Changes"
-                                 </small>
-                               </div>
                              </div>
-                           </div>
+                           </form>
                          </div>
                        </div>
 
@@ -957,23 +1030,25 @@ const FreelancerEditProfile = () => {
                                      <div>
                                        <div className="row g-2 mb-2">
                                          <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Company</label>
+                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Job Title *</label>
                                            <input 
                                              type="text" 
                                              className="form-control form-control-sm" 
-                                             value={editingWorkData.company} 
-                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, company: e.target.value })}
+                                             value={editingWorkData.title || ""} 
+                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, title: e.target.value })}
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                             required
                                            />
                                          </div>
                                          <div className="col-md-6">
-                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Position</label>
+                                           <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Company *</label>
                                            <input 
                                              type="text" 
                                              className="form-control form-control-sm" 
-                                             value={editingWorkData.position} 
-                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, position: e.target.value })}
+                                             value={editingWorkData.company || ""} 
+                                             onChange={(e) => setEditingWorkData({ ...editingWorkData, company: e.target.value })}
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
+                                             required
                                            />
                                          </div>
                                          <div className="col-md-6">
@@ -981,7 +1056,7 @@ const FreelancerEditProfile = () => {
                                            <input 
                                              type="text" 
                                              className="form-control form-control-sm" 
-                                             value={editingWorkData.start_date} 
+                                             value={editingWorkData.start_date || ""} 
                                              onChange={(e) => setEditingWorkData({ ...editingWorkData, start_date: e.target.value })}
                                              placeholder="e.g., January 2020"
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
@@ -992,7 +1067,7 @@ const FreelancerEditProfile = () => {
                                            <input 
                                              type="text" 
                                              className="form-control form-control-sm" 
-                                             value={editingWorkData.end_date} 
+                                             value={editingWorkData.end_date || ""} 
                                              onChange={(e) => setEditingWorkData({ ...editingWorkData, end_date: e.target.value })}
                                              placeholder="e.g., December 2023 or Present"
                                              style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
@@ -1004,7 +1079,7 @@ const FreelancerEditProfile = () => {
                                          <label className="form-label fw-semibold" style={{ fontSize: '12px', color: '#333' }}>Description</label>
                                          <textarea 
                                            className="form-control form-control-sm" 
-                                           value={editingWorkData.description} 
+                                           value={editingWorkData.description || ""} 
                                            onChange={(e) => setEditingWorkData({ ...editingWorkData, description: e.target.value })}
                                            rows={2}
                                            style={{ borderRadius: '8px', border: '2px solid #e9ecef', fontSize: '12px' }}
@@ -1014,7 +1089,7 @@ const FreelancerEditProfile = () => {
                                          <button 
                                            type="button"
                                            className="btn btn-sm btn-success flex-fill"
-                                           onClick={(e) => handleUpdateWork(e)}
+                                           onClick={() => handleUpdateWork(work.id)}
                                            style={{ borderRadius: '8px', fontSize: '12px' }}
                                          >
                                            <i className="bi bi-check me-1"></i>
@@ -1088,7 +1163,7 @@ const FreelancerEditProfile = () => {
                                          <button 
                                            type="button"
                                            className="btn btn-sm btn-outline-danger flex-fill"
-                                           onClick={(e) => handleDeleteWork(work.id, e)}
+                                           onClick={() => handleDeleteWork(work.id)}
                                            style={{ borderRadius: '8px', fontSize: '12px' }}
                                          >
                                            <i className="bi bi-trash me-1"></i>
