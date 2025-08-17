@@ -606,10 +606,109 @@ const FreelancerProfile = () => {
           )}
         </div>
 
+        {/* Work Experience Section */}
+        <div style={{
+          background: '#fff',
+          borderRadius: 20,
+          padding: '32px',
+          marginBottom: 24,
+          boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+          border: '1px solid #f0f0f0'
+        }}>
+          <h4 style={{ 
+            fontWeight: 700, 
+            color: '#333', 
+            marginBottom: 20,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10
+          }}>
+            <i className="bi bi-briefcase-fill" style={{ color: accent }}></i>
+            Work Experience
+          </h4>
+          
+          {profile.cv && profile.cv.parsed_data && profile.cv.parsed_data.work_experience && profile.cv.parsed_data.work_experience.length > 0 ? (
+            <div className="row g-3">
+              {profile.cv.parsed_data.work_experience.map((work, index) => (
+                <div key={work.id || index} className="col-md-6">
+                  <div style={{
+                    background: '#f8f9fa',
+                    borderRadius: 12,
+                    padding: '16px',
+                    border: '1px solid #e9ecef',
+                    height: '100%'
+                  }}>
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <h6 style={{ 
+                        fontWeight: 600, 
+                        color: '#333',
+                        margin: 0,
+                        fontSize: '14px'
+                      }}>
+                        {work.title || 'Job Title'}
+                      </h6>
+                      <span style={{ 
+                        background: accent, 
+                        color: '#fff', 
+                        padding: '4px 8px', 
+                        borderRadius: 10,
+                        fontSize: 12,
+                        fontWeight: 600
+                      }}>
+                        Experience
+                      </span>
+                    </div>
+                    <p style={{ 
+                      color: accent, 
+                      margin: 0,
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      marginBottom: '8px'
+                    }}>
+                      {work.company || 'Company'}
+                    </p>
+                    {(work.start_date || work.end_date) && (
+                      <div style={{ color: '#666', fontSize: 14, marginBottom: '8px' }}>
+                        <i className="bi bi-calendar me-1"></i>
+                        {work.start_date || 'Start Date'} - {work.end_date || 'Present'}
+                      </div>
+                    )}
+                    {work.description && (
+                      <div style={{ color: '#666', fontSize: 14 }}>
+                        {work.description}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ 
+              textAlign: 'center', 
+              color: '#888',
+              padding: '40px 20px'
+            }}>
+              <i className="bi bi-briefcase" style={{ fontSize: 48, color: '#ddd', marginBottom: 16 }}></i>
+              <p>No work experience listed yet.</p>
+              <Link
+                to="/freelancer/edit"
+                className="btn btn-outline-primary"
+                style={{
+                  borderRadius: 25,
+                  padding: '8px 20px',
+                  fontSize: 14
+                }}
+              >
+                Add Work Experience
+              </Link>
+            </div>
+          )}
+        </div>
+
         {/* Additional CV Data Section */}
         {profile.cv && profile.cv.parsed_data && typeof profile.cv.parsed_data === 'object' && (() => {
           const shownFields = [
-            'first_name', 'last_name', 'email', 'phone', 'headline', 'years_experience', 'summary', 'skills', 'linkedin_url', 'github_url', 'current_status',
+            'first_name', 'last_name', 'email', 'phone', 'headline', 'years_experience', 'summary', 'skills', 'work_experience', 'linkedin_url', 'github_url', 'current_status',
           ];
           const extraEntries = Object.entries(profile.cv.parsed_data).filter(
             ([key]) => !shownFields.includes(key)
