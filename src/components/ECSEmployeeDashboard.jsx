@@ -1696,8 +1696,8 @@ const ECSEmployeeDashboard = () => {
                         <div className="col-md-2 d-flex align-items-end">
                           <div className="d-flex gap-2 w-100">
                 <button 
-                              className="btn w-100" 
-                              style={{ background: accent, color: '#fff' }}
+                              className="btn btn-sm w-100" 
+                              style={{ background: accent, color: '#fff', height: '38px' }}
                               onClick={() => {
                                 console.log('🔍 Search button clicked');
                                 handleSearch();
@@ -1706,7 +1706,8 @@ const ECSEmployeeDashboard = () => {
                               <i className="bi bi-search me-1"></i>Search
                 </button>
                 <button 
-                              className="btn btn-outline-secondary w-100" 
+                              className="btn btn-outline-secondary btn-sm w-100" 
+                              style={{ height: '38px' }}
                               onClick={() => {
                                 setSearchSkills('');
                                 setSearchExperience('');
