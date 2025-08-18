@@ -600,11 +600,11 @@ const ECSEmployeeDashboard = () => {
       if (!isNaN(minExp)) {
         filtered = filtered.filter(f => {
           const experience = f.experience_years || 0;
-          const matches = experience >= minExp;
+          const matches = experience === minExp;
           
           console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
             experience,
-            minRequired: minExp,
+            exactRequired: minExp,
             matches
           });
           
