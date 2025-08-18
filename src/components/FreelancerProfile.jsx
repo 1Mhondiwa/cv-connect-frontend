@@ -705,10 +705,90 @@ const FreelancerProfile = () => {
           )}
         </div>
 
+        {/* Education Section */}
+        {profile.cv && profile.cv.parsed_data && profile.cv.parsed_data.education && profile.cv.parsed_data.education.length > 0 && (
+          <div style={{
+            background: '#fff',
+            borderRadius: 20,
+            padding: '32px',
+            marginBottom: 24,
+            boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+            border: '1px solid #f0f0f0'
+          }}>
+            <h4 style={{ 
+              fontWeight: 700, 
+              color: '#333', 
+              marginBottom: 20,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10
+            }}>
+              <i className="bi bi-mortarboard-fill" style={{ color: accent }}></i>
+              Education
+            </h4>
+            
+            <div className="row g-3">
+              {profile.cv.parsed_data.education.map((edu, index) => (
+                <div key={edu.id || index} className="col-md-6">
+                  <div style={{
+                    background: '#f8f9fa',
+                    borderRadius: 12,
+                    padding: '16px',
+                    border: '1px solid #e9ecef',
+                    height: '100%'
+                  }}>
+                    <div className="d-flex justify-content-between align-items-start mb-2">
+                      <h6 style={{ 
+                        fontWeight: 600, 
+                        color: '#333',
+                        margin: 0,
+                        fontSize: '14px'
+                      }}>
+                        {edu.degree || 'Degree'}
+                      </h6>
+                      <span style={{ 
+                        background: accent, 
+                        color: '#fff', 
+                        padding: '4px 8px', 
+                        borderRadius: 10,
+                        fontSize: 12,
+                        fontWeight: 600
+                      }}>
+                        Education
+                      </span>
+                    </div>
+                    <p style={{ 
+                      color: accent, 
+                      margin: 0,
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      marginBottom: '8px'
+                    }}>
+                      {edu.institution || 'Institution'}
+                    </p>
+                    {edu.field && (
+                      <div style={{ color: '#666', fontSize: 14, marginBottom: '8px' }}>
+                        <i className="bi bi-book me-1"></i>
+                        {edu.field}
+                      </div>
+                    )}
+                    {edu.year && (
+                      <div style={{ color: '#666', fontSize: 14, marginBottom: '8px' }}>
+                        <i className="bi bi-calendar me-1"></i>
+                        {edu.year}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Additional CV Data Section */}
         {profile.cv && profile.cv.parsed_data && typeof profile.cv.parsed_data === 'object' && (() => {
           const shownFields = [
-            'first_name', 'last_name', 'email', 'phone', 'headline', 'years_experience', 'summary', 'skills', 'work_experience', 'linkedin_url', 'github_url', 'current_status',
+            'first_name', 'last_name', 'email', 'phone', 'headline', 'years_experience', 'summary', 'skills', 'work_experience', 'linkedin_url', 'github_url', 'current_status', 'education',
           ];
           const extraEntries = Object.entries(profile.cv.parsed_data).filter(
             ([key]) => !shownFields.includes(key)
@@ -729,11 +809,10 @@ const FreelancerProfile = () => {
           const renderValue = (value, parentKey = '') => {
             if (Array.isArray(value)) {
                   if (value.length === 0) return <span style={{ color: '#888' }}>None</span>;
-              // Array of objects (e.g. education, work experience)
+              // Array of objects (e.g. work experience)
               if (typeof value[0] === 'object' && value[0] !== null) {
-                // Section icon
+                // Section icon for other types
                 let icon = null;
-                    if (/education/i.test(parentKey)) icon = <i className="bi bi-mortarboard-fill me-2" style={{ color: accent }}></i>;
                     if (/work|experience/i.test(parentKey)) icon = <i className="bi bi-briefcase-fill me-2" style={{ color: accent }}></i>;
                 return (
                   <div>
@@ -807,7 +886,7 @@ const FreelancerProfile = () => {
                       <div key={key} className="col-md-6">
                         <div style={{
                           background: '#f8f9fa',
-                          borderRadius: 12,
+                          borderRadius: '12px',
                           padding: '16px',
                           border: '1px solid #e9ecef'
                         }}>

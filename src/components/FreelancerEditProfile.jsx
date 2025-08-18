@@ -82,21 +82,21 @@ const FreelancerEditProfile = () => {
           });
           setSkills(response.data.profile.skills || []);
           
-          // Load CV parsed data
+          // Load CV parsed data - preserve original data exactly as parsed
           if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
             const parsedData = response.data.profile.cv.parsed_data;
-            // Add unique IDs to existing data for editing
-            const workExperienceWithIds = (parsedData.work_experience || []).map((work, index) => ({
-              ...work,
-              id: work.id || `work_${index}_${Date.now()}`
-            }));
-            const educationWithIds = (parsedData.education || []).map((edu, index) => ({
-              ...edu,
-              id: edu.id || `edu_${index}_${Date.now()}`
-            }));
+            
+            // Load work experience exactly as it was parsed from CV
+            const workExperience = parsedData.work_experience || [];
+            console.log('Original CV work experience:', workExperience);
+            
+            // Load education exactly as it was parsed from CV
+            const education = parsedData.education || [];
+            console.log('Original CV education:', education);
+            
             setCvData({
-              work_experience: workExperienceWithIds,
-              education: educationWithIds
+              work_experience: workExperience,
+              education: education
             });
           }
         } else {
@@ -322,17 +322,15 @@ const FreelancerEditProfile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.success) {
-        // Update CV data with fresh work experience - preserve original IDs
+        // Update CV data with fresh work experience - preserve original data exactly
         if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
           const parsedData = response.data.profile.cv.parsed_data;
-          // Only add IDs if they don't exist, don't regenerate them
-          const workExperienceWithIds = (parsedData.work_experience || []).map((work, index) => ({
-            ...work,
-            id: work.id || `work_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-          }));
+          const workExperience = parsedData.work_experience || [];
+          console.log('Refreshed work experience:', workExperience);
+          
           setCvData(prev => ({
             ...prev,
-            work_experience: workExperienceWithIds
+            work_experience: workExperience
           }));
         }
       }
@@ -492,17 +490,15 @@ const FreelancerEditProfile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.success) {
-        // Update CV data with fresh education - preserve original IDs
+        // Update CV data with fresh education - preserve original data exactly
         if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
           const parsedData = response.data.profile.cv.parsed_data;
-          // Only add IDs if they don't exist, don't regenerate them
-          const educationWithIds = (parsedData.education || []).map((edu, index) => ({
-            ...edu,
-            id: edu.id || `edu_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-          }));
+          const education = parsedData.education || [];
+          console.log('Refreshed education:', education);
+          
           setCvData(prev => ({
             ...prev,
-            education: educationWithIds
+            education: education
           }));
         }
       }
