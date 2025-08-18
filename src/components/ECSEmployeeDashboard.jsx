@@ -541,29 +541,41 @@ const ECSEmployeeDashboard = () => {
     }
   };
 
-  // Simple search function
+    // Simple search function
   const handleSearch = () => {
     console.log('🔍 Search function called with:', { searchSkills, searchExperience, searchStatus });
     console.log('🔍 allFreelancers count:', allFreelancers.length);
-    console.log('🔍 Sample freelancer data:', allFreelancers[0]);
+    if (allFreelancers.length > 0) {
+      console.log('🔍 Sample freelancer data:', allFreelancers[0]);
+      console.log('🔍 Sample freelancer skills:', allFreelancers[0].skills);
+      console.log('🔍 Sample freelancer experience_years:', allFreelancers[0].experience_years);
+      console.log('🔍 Sample freelancer is_available:', allFreelancers[0].is_available);
+    }
     
     let filtered = [...allFreelancers];
     console.log('🔍 Starting with all freelancers:', filtered.length);
     
     // Filter by skills
-    if (searchSkills.trim()) {
+    if (searchSkills && searchSkills.trim()) {
       console.log('🔍 Filtering by skills:', searchSkills);
       filtered = filtered.filter(f => {
-        const hasSkills = f.skills?.some(skill => skill.toLowerCase().includes(searchSkills.toLowerCase()));
+        // Check if skills array contains the search term
+        const hasSkills = f.skills?.some(skill => 
+          skill && skill.toLowerCase().includes(searchSkills.toLowerCase())
+        );
+        // Also check headline and current_status
         const hasHeadline = f.headline?.toLowerCase().includes(searchSkills.toLowerCase());
-        const matches = hasSkills || hasHeadline;
+        const hasCurrentStatus = f.current_status?.toLowerCase().includes(searchSkills.toLowerCase());
+        const matches = hasSkills || hasHeadline || hasCurrentStatus;
         
         console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
           skills: f.skills,
           headline: f.headline,
+          current_status: f.current_status,
           searchTerm: searchSkills,
           hasSkills,
           hasHeadline,
+          hasCurrentStatus,
           matches
         });
         
@@ -573,7 +585,7 @@ const ECSEmployeeDashboard = () => {
     }
     
     // Filter by experience
-    if (searchExperience.trim()) {
+    if (searchExperience && searchExperience.trim()) {
       console.log('🔍 Filtering by experience:', searchExperience);
       const minExp = parseInt(searchExperience);
       if (!isNaN(minExp)) {
@@ -613,6 +625,7 @@ const ECSEmployeeDashboard = () => {
     
     setAvailableFreelancers(filtered);
     console.log('🔍 Final filtered results:', filtered.length);
+    console.log('🔍 Filtered freelancers:', filtered.map(f => `${f.first_name} ${f.last_name}`));
   };
 
   const handleLogout = () => {
@@ -1636,7 +1649,10 @@ const ECSEmployeeDashboard = () => {
                             className="form-control"
                             placeholder="e.g., React, Node.js"
                             value={searchSkills}
-                            onChange={(e) => setSearchSkills(e.target.value)}
+                            onChange={(e) => {
+                              console.log('🔍 Skills search input changed:', e.target.value);
+                              setSearchSkills(e.target.value);
+                            }}
                           />
                         </div>
                         <div className="col-md-3">
@@ -1646,7 +1662,10 @@ const ECSEmployeeDashboard = () => {
                             className="form-control"
                             placeholder="e.g., 3"
                             value={searchExperience}
-                            onChange={(e) => setSearchExperience(e.target.value)}
+                            onChange={(e) => {
+                              console.log('🔍 Experience search input changed:', e.target.value);
+                              setSearchExperience(e.target.value);
+                            }}
                             min="0"
                           />
                         </div>
@@ -1655,7 +1674,10 @@ const ECSEmployeeDashboard = () => {
                           <select
                             className="form-select"
                             value={searchStatus}
-                            onChange={(e) => setSearchStatus(e.target.value)}
+                            onChange={(e) => {
+                              console.log('🔍 Status search input changed:', e.target.value);
+                              setSearchStatus(e.target.value);
+                            }}
                           >
                             <option value="all">All Statuses</option>
                             <option value="available">Available</option>
@@ -1667,7 +1689,10 @@ const ECSEmployeeDashboard = () => {
                 <button 
                               className="btn w-100" 
                               style={{ background: accent, color: '#fff' }}
-                              onClick={handleSearch}
+                              onClick={() => {
+                                console.log('🔍 Search button clicked');
+                                handleSearch();
+                              }}
                             >
                               <i className="bi bi-search me-1"></i>Search
                 </button>
@@ -1678,6 +1703,7 @@ const ECSEmployeeDashboard = () => {
                                 setSearchExperience('');
                                 setSearchStatus('all');
                                 setAvailableFreelancers(allFreelancers);
+                                console.log('🔄 Search reset - showing all freelancers:', allFreelancers.length);
                               }}
                             >
                               <i className="bi bi-arrow-clockwise"></i>
@@ -1688,7 +1714,7 @@ const ECSEmployeeDashboard = () => {
 
                                            <div className="mb-3">
                         <p className="text-muted mb-0">
-                          Showing {availableFreelancers.length} of {availableFreelancers.length} freelancers. Use the search above to find specific freelancers.
+                          Showing {availableFreelancers.length} of {allFreelancers.length} freelancers. Use the search above to find specific freelancers.
                         </p>
             </div>
 
