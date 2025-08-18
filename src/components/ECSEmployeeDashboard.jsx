@@ -390,6 +390,11 @@ const ECSEmployeeDashboard = () => {
         if (freelancers.length > 0) {
           console.log('🔍 Sample Freelancer:', freelancers[0]);
           console.log('🔍 Sample Freelancer Skills:', freelancers[0].skills);
+          if (freelancers[0].skills && freelancers[0].skills.length > 0) {
+            console.log('🔍 Sample Skill Structure:', freelancers[0].skills[0]);
+            console.log('🔍 Skills Array Type:', Array.isArray(freelancers[0].skills));
+            console.log('🔍 Skills Array Length:', freelancers[0].skills.length);
+          }
           console.log('🔍 Sample Freelancer Experience:', freelancers[0].experience_years);
           console.log('🔍 Sample Freelancer Rating:', freelancers[0].admin_rating);
         } else {
@@ -548,6 +553,9 @@ const ECSEmployeeDashboard = () => {
     if (allFreelancers.length > 0) {
       console.log('🔍 Sample freelancer data:', allFreelancers[0]);
       console.log('🔍 Sample freelancer skills:', allFreelancers[0].skills);
+      if (allFreelancers[0].skills && allFreelancers[0].skills.length > 0) {
+        console.log('🔍 Sample skill details:', allFreelancers[0].skills[0]);
+      }
       console.log('🔍 Sample freelancer experience_years:', allFreelancers[0].experience_years);
       console.log('🔍 Sample freelancer is_available:', allFreelancers[0].is_available);
     }
@@ -560,9 +568,10 @@ const ECSEmployeeDashboard = () => {
       console.log('🔍 Filtering by skills:', searchSkills);
       filtered = filtered.filter(f => {
         // Check if skills array contains the search term
-        const hasSkills = f.skills?.some(skill => 
-          skill && skill.toLowerCase().includes(searchSkills.toLowerCase())
-        );
+        const hasSkills = f.skills?.some(skill => {
+          const skillName = skill.skill_name || skill;
+          return skillName && skillName.toLowerCase().includes(searchSkills.toLowerCase());
+        });
         // Also check headline and current_status
         const hasHeadline = f.headline?.toLowerCase().includes(searchSkills.toLowerCase());
         const hasCurrentStatus = f.current_status?.toLowerCase().includes(searchSkills.toLowerCase());
@@ -1721,7 +1730,7 @@ const ECSEmployeeDashboard = () => {
                       <div className="row g-3">
                         {availableFreelancers.map((freelancer) => (
                           <div key={freelancer.freelancer_id} className="col-md-6 col-lg-4">
-                            <div className="card shadow-sm h-100" style={{ minHeight: '280px', border: '2px solid #ffd7c2' }}>
+                            <div className="card shadow-sm h-100" style={{ minHeight: '320px', border: '2px solid #ffd7c2' }}>
                               <div className="card-body p-3">
                                 <div className="d-flex align-items-start mb-2">
                                   <div className="form-check me-2">
@@ -1748,13 +1757,27 @@ const ECSEmployeeDashboard = () => {
 
                                 <div className="mb-2">
                                   <strong>Skills:</strong> 
-                                  <div className="mt-1">
+                                  {freelancer.skills && freelancer.skills.length > 0 && (
+                                    <small className="text-muted ms-2">({freelancer.skills.length})</small>
+                                  )}
+                                  <div className="mt-1" style={{ maxHeight: '80px', overflowY: 'auto' }}>
                                     {freelancer.skills && freelancer.skills.length > 0 ? (
-                                      freelancer.skills.slice(0, 3).map((skill, index) => (
-                                        <span key={index} className="badge bg-light text-dark me-1" style={{ fontSize: '10px' }}>
-                                          {skill}
-                                        </span>
-                                      ))
+                                      freelancer.skills.map((skill, index) => {
+                                        // Handle both new skills structure and legacy structure
+                                        const skillName = skill.skill_name || skill;
+                                        const proficiencyLevel = skill.proficiency_level;
+                                        
+                                        return (
+                                          <span key={skill.skill_id || index} className="badge bg-light text-dark me-1 mb-1" style={{ fontSize: '10px' }}>
+                                            {skillName}
+                                            {proficiencyLevel && (
+                                              <span className="ms-1" style={{ color: '#666' }}>
+                                                ({proficiencyLevel})
+                                              </span>
+                                            )}
+                                          </span>
+                                        );
+                                      })
                                     ) : (
                                       <span className="text-muted">No skills listed</span>
                                     )}
