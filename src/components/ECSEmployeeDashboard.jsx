@@ -1785,7 +1785,7 @@ const ECSEmployeeDashboard = () => {
                                 </div>
 
                                 <div className="mb-2">
-                                  <strong>Experience:</strong> Exp: {freelancer.experience_years || 0} years
+                                  <strong>Experience:</strong> {freelancer.experience_years || 0} years
             </div>
 
                                 <div className="mb-2">
