@@ -1519,10 +1519,15 @@ const ECSEmployeeDashboard = () => {
                             </div>
                             <button
                               className="btn btn-sm"
-                              style={{ background: accent, color: '#fff', borderRadius: 20 }}
+                              style={{ 
+                                background: (request.recommendation_count && request.recommendation_count > 0) ? '#28a745' : accent, 
+                                color: '#fff', 
+                                borderRadius: 20 
+                              }}
                               onClick={() => openRecommendationsModal(request)}
                             >
-                              <i className="bi bi-star me-1"></i>Provide Recommendations
+                              <i className="bi bi-star me-1"></i>
+                              {(request.recommendation_count && request.recommendation_count > 0) ? 'Update Recommendations' : 'Provide Recommendations'}
                             </button>
                   </div>
                   </div>
