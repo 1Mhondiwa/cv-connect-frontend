@@ -1028,7 +1028,7 @@ const ECSEmployeeDashboard = () => {
                         Recent Freelancer Hires
                       </h5>
                       <button 
-                        className="btn btn-sm btn-outline-primary"
+                        className="btn btn-sm btn-outline-secondary"
                         onClick={fetchRecentHires}
                         disabled={recentHiresLoading}
                       >
