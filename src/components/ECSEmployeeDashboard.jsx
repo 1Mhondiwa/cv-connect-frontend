@@ -1697,18 +1697,52 @@ const ECSEmployeeDashboard = () => {
                           <div className="d-flex gap-2 w-100">
                 <button 
                               className="btn btn-sm w-100" 
-                              style={{ background: accent, color: '#fff', height: '38px' }}
-                              onClick={() => {
+                              style={{ 
+                                background: accent, 
+                                color: '#fff', 
+                                height: '38px',
+                                transition: 'all 0.2s ease-in-out',
+                                transform: 'scale(1)'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.transform = 'scale(1.05)';
+                                e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.transform = 'scale(1)';
+                                e.target.style.boxShadow = 'none';
+                              }}
+                              onClick={(e) => {
+                                e.target.style.transform = 'scale(0.95)';
+                                setTimeout(() => {
+                                  e.target.style.transform = 'scale(1)';
+                                }, 100);
                                 console.log('🔍 Search button clicked');
                                 handleSearch();
                               }}
                             >
-                              <i className="bi bi-search me-1"></i>Search
+                              <i className="bi bi-search"></i>
                 </button>
                 <button 
                               className="btn btn-outline-secondary btn-sm w-100" 
-                              style={{ height: '38px' }}
-                              onClick={() => {
+                              style={{ 
+                                height: '38px',
+                                transition: 'all 0.2s ease-in-out',
+                                transform: 'scale(1)'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.transform = 'scale(1.05)';
+                                e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.transform = 'scale(1)';
+                                e.target.style.boxShadow = 'none';
+                              }}
+                              onClick={(e) => {
+                                e.target.style.transform = 'scale(0.95)';
+                                setTimeout(() => {
+                                  e.target.style.transform = 'scale(1)';
+                                }, 100);
                                 setSearchSkills('');
                                 setSearchExperience('');
                                 setSearchStatus('all');
