@@ -3587,6 +3587,7 @@ const ESCAdminDashboard = () => {
                   <div className="col-md-6">
                     <h6 style={{ color: accent, fontWeight: 600 }}>Associate Information</h6>
                     <p><strong>Email:</strong> {selectedFreelancerRequest.associate_email}</p>
+                    <p><strong>Company:</strong> {selectedFreelancerRequest.company_name || 'N/A'}</p>
                     <p><strong>Contact Person:</strong> {selectedFreelancerRequest.contact_person}</p>
                     <p><strong>Industry:</strong> {selectedFreelancerRequest.industry}</p>
                     <p><strong>Submitted:</strong> {new Date(selectedFreelancerRequest.created_at).toLocaleDateString()}</p>

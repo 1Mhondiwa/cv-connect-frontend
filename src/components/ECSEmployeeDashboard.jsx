@@ -1444,7 +1444,7 @@ const ECSEmployeeDashboard = () => {
                             <div className="col-md-4">
                               <small className="text-muted">
                                 <i className="bi bi-building me-1"></i>
-                                <strong>Company:</strong> {request.associate_email}
+                                <strong>Company:</strong> {request.company_name || 'N/A'}
                               </small>
                   </div>
                             <div className="col-md-4">
@@ -1552,6 +1552,7 @@ const ECSEmployeeDashboard = () => {
                            </span>
                          </p>
                          <p><strong>Email:</strong> {selectedFreelancerRequest.associate_email}</p>
+                         <p><strong>Company:</strong> {selectedFreelancerRequest.company_name || 'N/A'}</p>
                          <p><strong>Contact Person:</strong> {selectedFreelancerRequest.contact_person}</p>
                          <p><strong>Industry:</strong> {selectedFreelancerRequest.industry}</p>
                          <p><strong>Submitted:</strong> {new Date(selectedFreelancerRequest.created_at).toLocaleDateString()}</p>
