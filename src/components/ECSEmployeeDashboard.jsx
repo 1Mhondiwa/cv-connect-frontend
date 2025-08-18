@@ -1695,7 +1695,7 @@ const ECSEmployeeDashboard = () => {
                       <div className="row g-3">
                         {availableFreelancers.map((freelancer) => (
                           <div key={freelancer.freelancer_id} className="col-md-6 col-lg-4">
-                            <div className="card border-0 shadow-sm h-100" style={{ minHeight: '280px' }}>
+                            <div className="card shadow-sm h-100" style={{ minHeight: '280px', border: '2px solid #ffd7c2' }}>
                               <div className="card-body p-3">
                                 <div className="d-flex align-items-start mb-2">
                                   <div className="form-check me-2">
