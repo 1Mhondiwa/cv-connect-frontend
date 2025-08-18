@@ -1643,7 +1643,7 @@ const ECSEmployeeDashboard = () => {
                        </div>
                        <div className="col-md-4">
                          <div className="mb-3">
-                           <label className="form-label">Admin Notes:</label>
+                           <label className="form-label">ECS Notes:</label>
                            <textarea
                              className="form-control"
                              rows="3"
