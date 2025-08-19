@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Responsive Test - CV-Connect</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="public/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="public/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Main CSS Files -->
+    <link href="public/assets/css/main.css" rel="stylesheet">
+    <link href="public/assets/css/responsive.css" rel="stylesheet">
+    
+    <style>
+        .test-section {
+            padding: 40px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .test-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .responsive-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #fd680e;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div class="responsive-indicator" id="responsiveIndicator">
+        Loading...
+    </div>
+
+    <!-- Navigation Test -->
+    <header class="header">
+        <nav class="container d-flex align-items-center justify-content-between py-2">
+            <div class="logo">
+                <h1 style="color: #fd680e; margin: 0; font-size: 32px;">CV-Connect</h1>
+            </div>
+            <ul class="d-none d-md-flex align-items-center mb-0" style="list-style: none; gap: 18;">
+                <li><a href="#" style="color: #444; text-decoration: none; padding: 8px 16px;">Home</a></li>
+                <li><a href="#" style="color: #444; text-decoration: none; padding: 8px 16px;">About</a></li>
+                <li><a href="#" style="color: #444; text-decoration: none; padding: 8px 16px;">Services</a></li>
+                <li><a href="#" style="color: #444; text-decoration: none; padding: 8px 16px;">Contact</a></li>
+            </ul>
+            <button class="d-md-none" style="background: none; border: none; color: #fd680e; font-size: 24px;">
+                <i class="bi bi-list"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section Test -->
+    <section class="hero d-flex align-items-center justify-content-center" style="min-height: 100vh; background: linear-gradient(135deg, #fd680e 0%, #ff8c42 100%); color: white;">
+        <div class="container text-center">
+            <h1 style="font-size: 3rem; margin-bottom: 20px;">Responsive Test</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">Resize your browser to see the responsive improvements</p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <button class="btn btn-light">Primary Action</button>
+                <button class="btn btn-outline-light">Secondary Action</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Responsive Grid Test -->
+    <section class="test-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Responsive Grid System</h2>
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="test-card">
+                        <i class="bi bi-phone" style="font-size: 48px; color: #fd680e;"></i>
+                        <h3>Mobile First</h3>
+                        <p>Optimized for small screens with progressive enhancement</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="test-card">
+                        <i class="bi bi-tablet" style="font-size: 48px; color: #fd680e;"></i>
+                        <h3>Tablet Ready</h3>
+                        <p>Perfect layout for medium-sized devices</p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="test-card">
+                        <i class="bi bi-laptop" style="font-size: 48px; color: #fd680e;"></i>
+                        <h3>Desktop Optimized</h3>
+                        <p>Full-featured experience on large screens</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Responsive Components Test -->
+    <section class="test-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Responsive Components</h2>
+            
+            <!-- Cards Test -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Responsive Card</h5>
+                            <p class="card-text">This card adapts to different screen sizes with proper spacing and typography.</p>
+                            <button class="btn btn-primary">Action Button</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Another Card</h5>
+                            <p class="card-text">Cards stack vertically on mobile and display side-by-side on larger screens.</p>
+                            <button class="btn btn-outline-primary">Secondary Action</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Test -->
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Responsive Form</h5>
+                            <form>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">First Name</label>
+                                        <input type="text" class="form-control" placeholder="Enter first name">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" placeholder="Enter last name">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" placeholder="Enter email">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Message</label>
+                                    <textarea class="form-control" rows="3" placeholder="Enter your message"></textarea>
+                                </div>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="reset" class="btn btn-secondary">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Responsive Utilities Test -->
+    <section class="test-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Responsive Utilities</h2>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <strong>Responsive Utilities:</strong> Use classes like <code>.d-sm-none</code>, <code>.text-sm-center</code>, <code>.py-sm-3</code> for responsive behavior.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Responsive Display Classes</h4>
+                    <ul>
+                        <li><code>.d-sm-none</code> - Hidden on small screens</li>
+                        <li><code>.d-sm-block</code> - Block on small screens</li>
+                        <li><code>.d-sm-flex</code> - Flex on small screens</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4>Responsive Spacing Classes</h4>
+                    <ul>
+                        <li><code>.py-sm-3</code> - Padding on small screens</li>
+                        <li><code>.my-sm-4</code> - Margin on small screens</li>
+                        <li><code>.px-sm-4</code> - Horizontal padding on small screens</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>CV-Connect</h3>
+                    <p>Perfectly responsive across all devices</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="social-links">
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="public/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Responsive indicator
+        function updateResponsiveIndicator() {
+            const indicator = document.getElementById('responsiveIndicator');
+            const width = window.innerWidth;
+            
+            if (width < 576) {
+                indicator.textContent = 'XS (< 576px)';
+            } else if (width < 768) {
+                indicator.textContent = 'SM (576px - 767px)';
+            } else if (width < 992) {
+                indicator.textContent = 'MD (768px - 991px)';
+            } else if (width < 1200) {
+                indicator.textContent = 'LG (992px - 1199px)';
+            } else {
+                indicator.textContent = 'XL (≥ 1200px)';
+            }
+        }
+
+        // Update on load and resize
+        window.addEventListener('load', updateResponsiveIndicator);
+        window.addEventListener('resize', updateResponsiveIndicator);
+    </script>
+</body>
+</html>

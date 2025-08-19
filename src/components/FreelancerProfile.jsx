@@ -23,7 +23,7 @@ const FreelancerProfile = () => {
     const fields = [
       'first_name', 'last_name', 'email', 'phone', 'headline', 
       'years_experience', 'summary', 'skills', 'linkedin_url', 
-      'github_url', 'current_status', 'profile_picture_url'
+      'github_url', 'current_status', 'availability_status', 'profile_picture_url'
     ];
     const completedFields = fields.filter(field => {
       const value = profile[field];
@@ -108,6 +108,42 @@ const FreelancerProfile = () => {
       }
     };
     fetchProfile();
+
+    // Set up real-time availability updates using SSE
+    const eventSource = new EventSource('/api/freelancer/availability/stream', {
+      withCredentials: true
+    });
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === 'availability_updated') {
+          // Update the profile with new availability status
+          setProfile(prevProfile => {
+            if (prevProfile && prevProfile.user_id === data.user_id) {
+              return {
+                ...prevProfile,
+                availability_status: data.availability_status
+              };
+            }
+            return prevProfile;
+          });
+        }
+      } catch (error) {
+        console.error('Error parsing SSE data:', error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('SSE connection error:', error);
+      eventSource.close();
+    };
+
+    // Cleanup SSE connection on component unmount
+    return () => {
+      eventSource.close();
+    };
   }, []);
 
   if (loading) {
@@ -393,15 +429,18 @@ const FreelancerProfile = () => {
                           {profile.years_experience || 0} years experience
                         </span>
                         <span style={{ 
-                          background: '#fff3cd', 
-                          color: '#856404', 
+                          background: profile.availability_status === 'available' ? '#d4edda' : 
+                                   profile.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
+                          color: profile.availability_status === 'available' ? '#155724' : 
+                                 profile.availability_status === 'busy' ? '#856404' : '#721c24',
                           padding: '4px 12px', 
                           borderRadius: 15,
                           fontSize: 14,
                           fontWeight: 600
                         }}>
                           <i className="bi bi-geo-alt me-1"></i>
-                          {profile.current_status || 'Available'}
+                          {profile.availability_status === 'available' ? 'Available for Work' : 
+                           profile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
                         </span>
                       </div>
                     </div>
