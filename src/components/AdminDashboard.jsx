@@ -2821,14 +2821,30 @@ const ESCAdminDashboard = () => {
                         }
                           
                                                       console.log('🔍 User Communication Activity Chart - About to render with data:', validData);
+                            console.log('🔍 Detailed data inspection:', {
+                              firstItem: validData[0],
+                              lastItem: validData[validData.length - 1],
+                              allItems: validData.map(item => ({
+                                user: item.user,
+                                messages: item.messages,
+                                conversations: item.conversations,
+                                userType: typeof item.user,
+                                messagesType: typeof item.messages,
+                                conversationsType: typeof item.conversations
+                              }))
+                            });
                             return (
                               <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <div className="text-center">
-                                  <i className="bi bi-people display-4 text-muted"></i>
-                                  <p className="text-muted">User Communication Activity Chart (Temporarily disabled for debugging)</p>
+                                  <i className="bi bi-exclamation-triangle display-4 text-warning"></i>
+                                  <p className="text-muted">User Communication Activity Chart</p>
+                                  <small className="text-muted">Temporarily disabled due to Recharts data issue</small>
+                                  <br />
                                   <small className="text-muted">Data length: {validData.length}</small>
-                    </div>
-                  </div>
+                                  <br />
+                                  <small className="text-muted">Check console for detailed data inspection</small>
+                                </div>
+                              </div>
                             );
                       })()}
                 </div>
