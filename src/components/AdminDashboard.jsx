@@ -2899,14 +2899,44 @@ const ESCAdminDashboard = () => {
                         }
                           
                                                       console.log('🔍 User Communication Activity Chart - About to render with data:', validData);
+                            console.log('🔍 Chart data structure check:', validData.map(item => ({
+                              user: item.user,
+                              messages: item.messages,
+                              conversations: item.conversations,
+                              messagesType: typeof item.messages,
+                              conversationsType: typeof item.conversations
+                            })));
+                            
                             return (
-                              <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <div className="text-center">
-                                  <i className="bi bi-people display-4 text-muted"></i>
-                                  <p className="text-muted">User Communication Activity Chart (Temporarily disabled for debugging)</p>
-                                  <small className="text-muted">Data length: {validData.length}</small>
-                    </div>
-                  </div>
+                              <div style={{ width: '100%', height: 300 }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <BarChart data={validData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                    <XAxis 
+                                      dataKey="user" 
+                                      stroke="#666" 
+                                      angle={-45} 
+                                      textAnchor="end" 
+                                      height={80}
+                                      interval={0}
+                                    />
+                                    <YAxis stroke="#666" />
+                                    <Tooltip 
+                                      contentStyle={{ 
+                                        backgroundColor: '#fff', 
+                                        border: '1px solid #ddd',
+                                        borderRadius: '8px'
+                                      }}
+                                      formatter={(value, name) => [
+                                        name === 'messages' ? `${value} messages` : `${value} conversations`,
+                                        name === 'messages' ? 'Messages' : 'Conversations'
+                                      ]}
+                                    />
+                                    <Bar dataKey="messages" fill="#fd680e" name="Messages" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="conversations" fill="#10b981" name="Conversations" radius={[4, 4, 0, 0]} />
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              </div>
                             );
                       })()}
                 </div>
