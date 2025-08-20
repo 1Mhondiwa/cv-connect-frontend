@@ -2155,13 +2155,91 @@ const ESCAdminDashboard = () => {
                                 <span className="visually-hidden">Loading...</span>
                               </div>
                             </div>
-                          ) : analyticsData.registrationTrends && analyticsData.registrationTrends.length > 0 ? (
-                            <div style={{ height: 300 }}>
-                              <div className="text-center text-muted">
-                                <i className="bi bi-graph-up display-4"></i>
-                                <p className="mt-2">Registration trends chart will be implemented here</p>
-                              </div>
-                            </div>
+                                                      ) : analyticsData.registrationTrends && analyticsData.registrationTrends.length > 0 ? (
+                              (() => {
+                                // Validate registration trends data
+                                const validData = analyticsData.registrationTrends.filter(item =>
+                                  item &&
+                                  item.date &&
+                                  typeof item.total_users === 'number' &&
+                                  !isNaN(item.total_users) &&
+                                  item.total_users >= 0
+                                );
+
+                                if (validData.length === 0) {
+                                  return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-exclamation-triangle display-4"></i>
+                                        <p className="mt-2">No valid registration data available</p>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                console.log('🔍 Registration Trends Chart - Rendering with data:', validData);
+                                return (
+                                  <ResponsiveContainer width="100%" height={300}>
+                                    <LineChart data={validData}>
+                                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                      <XAxis dataKey="date" stroke="#666" />
+                                      <YAxis stroke="#666" />
+                                      <Tooltip 
+                                        contentStyle={{ 
+                                          backgroundColor: '#fff', 
+                                          border: '1px solid #ddd',
+                                          borderRadius: '8px'
+                                        }}
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="total_users" 
+                                        stroke="#fd680e" 
+                                        strokeWidth={3}
+                                        dot={{ fill: '#fd680e', strokeWidth: 2, r: 4 }}
+                                        activeDot={{ r: 6, stroke: '#fd680e', strokeWidth: 2, fill: '#fff' }}
+                                        name="Total Users"
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="associates" 
+                                        stroke="#3b82f6" 
+                                        strokeWidth={2}
+                                        dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
+                                        activeDot={{ r: 5, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
+                                        name="Associates"
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="freelancers" 
+                                        stroke="#10b981" 
+                                        strokeWidth={2}
+                                        dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
+                                        activeDot={{ r: 5, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }}
+                                        name="Freelancers"
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="admins" 
+                                        stroke="#8b5cf6" 
+                                        strokeWidth={2}
+                                        dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 3 }}
+                                        activeDot={{ r: 5, stroke: '#8b5cf6', strokeWidth: 2, fill: '#fff' }}
+                                        name="Admins"
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="ecs_employees" 
+                                        stroke="#f59e0b" 
+                                        strokeWidth={2}
+                                        dot={{ fill: '#f59e0b', strokeWidth: 2, r: 3 }}
+                                        activeDot={{ r: 5, stroke: '#f59e0b', strokeWidth: 2, fill: '#fff' }}
+                                        name="ECS Employees"
+                                      />
+                                    </LineChart>
+                                  </ResponsiveContainer>
+                                );
+                              })()
                           ) : (
                             <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
                               <div className="text-center text-muted">
@@ -2499,29 +2577,29 @@ const ESCAdminDashboard = () => {
                         }
                           
                                                       console.log('🔍 Top Skills Chart - About to render with data:', validData);
-                            return (
-                              <ResponsiveContainer width="100%" height={300}>
+                          return (
+                            <ResponsiveContainer width="100%" height={300}>
                                 <AreaChart data={validData}>
-                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                  <XAxis dataKey="skill" stroke="#666" />
-                                  <YAxis stroke="#666" />
-                                  <Tooltip 
-                                    contentStyle={{ 
-                                      backgroundColor: '#fff', 
-                                      border: '1px solid #ddd',
-                                      borderRadius: '8px'
-                                    }}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="count" 
-                                    stroke="#fd680e" 
-                                    fill="#fd680e" 
-                                    fillOpacity={0.6}
-                                  />
-                                </AreaChart>
-                              </ResponsiveContainer>
-                            );
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="skill" stroke="#666" />
+                                <YAxis stroke="#666" />
+                                <Tooltip 
+                                  contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #ddd',
+                                    borderRadius: '8px'
+                                  }}
+                                />
+                                <Area 
+                                  type="monotone" 
+                                  dataKey="count" 
+                                  stroke="#fd680e" 
+                                  fill="#fd680e" 
+                                  fillOpacity={0.6}
+                                />
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          );
                       })()}
                     </div>
                   </div>
@@ -2596,38 +2674,38 @@ const ESCAdminDashboard = () => {
                         }
                           
                                                       console.log('🔍 Communication Trends Chart - About to render with data:', validData);
-                            return (
-                              <ResponsiveContainer width="100%" height={300}>
+                          return (
+                            <ResponsiveContainer width="100%" height={300}>
                                 <AreaChart data={validData}>
-                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                  <XAxis dataKey="date" stroke="#666" />
-                                  <YAxis stroke="#666" />
-                                  <Tooltip 
-                                    contentStyle={{ 
-                                      backgroundColor: '#fff', 
-                                      border: '1px solid #ddd',
-                                      borderRadius: '8px'
-                                    }}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="messages" 
-                                    stackId="1" 
-                                    stroke="#fd680e" 
-                                    fill="#fd680e" 
-                                    fillOpacity={0.6}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="conversations" 
-                                    stackId="1" 
-                                    stroke="#10b981" 
-                                    fill="#10b981" 
-                                    fillOpacity={0.6}
-                                  />
-                                </AreaChart>
-                              </ResponsiveContainer>
-                            );
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="date" stroke="#666" />
+                                <YAxis stroke="#666" />
+                                <Tooltip 
+                                  contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #ddd',
+                                    borderRadius: '8px'
+                                  }}
+                                />
+                                <Area 
+                                  type="monotone" 
+                                  dataKey="messages" 
+                                  stackId="1" 
+                                  stroke="#fd680e" 
+                                  fill="#fd680e" 
+                                  fillOpacity={0.6}
+                                />
+                                <Area 
+                                  type="monotone" 
+                                  dataKey="conversations" 
+                                  stackId="1" 
+                                  stroke="#10b981" 
+                                  fill="#10b981" 
+                                  fillOpacity={0.6}
+                                />
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          );
                       })()}
                     </div>
                   </div>
@@ -2821,30 +2899,14 @@ const ESCAdminDashboard = () => {
                         }
                           
                                                       console.log('🔍 User Communication Activity Chart - About to render with data:', validData);
-                            console.log('🔍 Detailed data inspection:', {
-                              firstItem: validData[0],
-                              lastItem: validData[validData.length - 1],
-                              allItems: validData.map(item => ({
-                                user: item.user,
-                                messages: item.messages,
-                                conversations: item.conversations,
-                                userType: typeof item.user,
-                                messagesType: typeof item.messages,
-                                conversationsType: typeof item.conversations
-                              }))
-                            });
                             return (
                               <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <div className="text-center">
-                                  <i className="bi bi-exclamation-triangle display-4 text-warning"></i>
-                                  <p className="text-muted">User Communication Activity Chart</p>
-                                  <small className="text-muted">Temporarily disabled due to Recharts data issue</small>
-                                  <br />
+                                  <i className="bi bi-people display-4 text-muted"></i>
+                                  <p className="text-muted">User Communication Activity Chart (Temporarily disabled for debugging)</p>
                                   <small className="text-muted">Data length: {validData.length}</small>
-                                  <br />
-                                  <small className="text-muted">Check console for detailed data inspection</small>
-                                </div>
-                              </div>
+                    </div>
+                  </div>
                             );
                       })()}
                 </div>
