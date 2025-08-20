@@ -2927,13 +2927,19 @@ const ESCAdminDashboard = () => {
                                         border: '1px solid #ddd',
                                         borderRadius: '8px'
                                       }}
-                                      formatter={(value, name) => [
-                                        name === 'messages' ? `${value} messages` : `${value} conversations`,
-                                        name === 'messages' ? 'Messages' : 'Conversations'
-                                      ]}
+                                      formatter={(value, name) => {
+                                        console.log('🔍 Tooltip formatter - name:', name, 'value:', value);
+                                        if (name === 'messages') {
+                                          return [`${value} messages`, 'Messages'];
+                                        } else if (name === 'conversations') {
+                                          return [`${value} conversations`, 'Conversations'];
+                                        } else {
+                                          return [value, name];
+                                        }
+                                      }}
                                     />
-                                    <Bar dataKey="messages" fill="#fd680e" name="Messages" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="conversations" fill="#10b981" name="Conversations" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="messages" fill="#fd680e" name="messages" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="conversations" fill="#10b981" name="conversations" radius={[4, 4, 0, 0]} />
                                   </BarChart>
                                 </ResponsiveContainer>
                               </div>
