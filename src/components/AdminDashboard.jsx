@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const accent = '#fd680e';
 
@@ -96,6 +96,7 @@ const ESCAdminDashboard = () => {
     userCommunicationActivity: [],
     hiredFreelancersTrends: []
   });
+  const [analyticsDataReady, setAnalyticsDataReady] = useState(false);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState('');
   const [lastAnalyticsUpdate, setLastAnalyticsUpdate] = useState(null);
@@ -654,18 +655,18 @@ const ESCAdminDashboard = () => {
       // Format all trends data with proper dates
       const formatTrendsData = (data) => {
         return (data || []).map(item => ({
-        ...item,
+          ...item,
           // Ensure numeric values for chart data
           total_users: parseInt(item.total_users) || 0,
           associates: parseInt(item.associates) || 0,
           freelancers: parseInt(item.freelancers) || 0,
           admins: parseInt(item.admins) || 0,
           ecs_employees: parseInt(item.ecs_employees) || 0,
-        formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric' 
-        })
-      }));
+          formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+          })
+        }));
       };
       
       const analyticsData = {
@@ -693,6 +694,7 @@ const ESCAdminDashboard = () => {
       
       setAnalyticsData(analyticsData);
       setLastAnalyticsUpdate(new Date());
+      setAnalyticsDataReady(true);
       console.log('✅ Analytics data updated successfully');
       
       // Debug registration trends data
@@ -763,29 +765,43 @@ const ESCAdminDashboard = () => {
       const response = await api.get(`/admin/analytics/visitor-data?days=${days}`);
       
       if (response.data.success) {
-        // Format the data for the chart
+        // Format the data for the chart with proper validation
         const formattedData = response.data.data.map(item => ({
           ...item,
+          // Ensure required properties exist with fallback values
+          mobile: Number(item.mobile) || 0,
+          desktop: Number(item.desktop) || 0,
+          date: item.date || new Date().toISOString(),
           // Format the date for display
-          formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
+          formattedDate: new Date(item.date || new Date()).toLocaleDateString('en-US', { 
             month: 'short', 
             day: 'numeric' 
           })
         }));
         
+        console.log('📊 Visitor data structure:', response.data.data);
+        console.log('📊 Formatted chart data:', formattedData);
         setVisitorData(formattedData);
         setFilteredChartData(formattedData); // Update the chart data
       } else {
         console.error('Failed to fetch visitor data:', response.data.message);
-        // Set empty data if API fails
-        setVisitorData([]);
-        setFilteredChartData([]);
+        // Set fallback data if API fails
+        const fallbackData = [
+          { date: new Date().toISOString(), mobile: 0, desktop: 0, formattedDate: 'Today' },
+          { date: new Date(Date.now() - 86400000).toISOString(), mobile: 0, desktop: 0, formattedDate: 'Yesterday' }
+        ];
+        setVisitorData(fallbackData);
+        setFilteredChartData(fallbackData);
       }
     } catch (error) {
       console.error('Error fetching visitor data:', error);
-      // Set empty data if API fails
-      setVisitorData([]);
-      setFilteredChartData([]);
+      // Set fallback data if API fails
+      const fallbackData = [
+        { date: new Date().toISOString(), mobile: 0, desktop: 0, formattedDate: 'Today' },
+        { date: new Date(Date.now() - 86400000).toISOString(), mobile: 0, desktop: 0, formattedDate: 'Yesterday' }
+      ];
+      setVisitorData(fallbackData);
+      setFilteredChartData(fallbackData);
     } finally {
       setVisitorDataLoading(false);
     }
@@ -1503,15 +1519,6 @@ const ESCAdminDashboard = () => {
                 Dashboard
                 </button>
               
-
-
-
-
-
-
-
-
-
         </div>
           </div>
 
@@ -1906,9 +1913,24 @@ const ESCAdminDashboard = () => {
                               <p className="mt-2">No visitor data available for the selected time period</p>
                             </div>
                           </div>
+                        ) : !filteredChartData[0] || typeof filteredChartData[0].mobile === 'undefined' || typeof filteredChartData[0].desktop === 'undefined' ? (
+                          <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+                            <div className="text-center text-muted">
+                              <i className="bi bi-exclamation-triangle display-4"></i>
+                              <p className="mt-2">Invalid chart data structure</p>
+                              <small className="text-muted">Please refresh the page or try again later</small>
+                            </div>
+                          </div>
                         ) : (
                         <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={filteredChartData}>
+                          <AreaChart data={filteredChartData.filter(item => 
+                            item && 
+                            typeof item.mobile === 'number' && 
+                            typeof item.desktop === 'number' && 
+                            item.date &&
+                            !isNaN(item.mobile) &&
+                            !isNaN(item.desktop)
+                          )}>
                             <defs>
                               <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor={accent} stopOpacity={1.0} />
@@ -1968,6 +1990,7 @@ const ESCAdminDashboard = () => {
                               strokeWidth={2}
                               stackId="a"
                               name="Mobile"
+                              isAnimationActive={false}
                             />
                             <Area
                               dataKey="desktop"
@@ -1977,6 +2000,7 @@ const ESCAdminDashboard = () => {
                               strokeWidth={2}
                               stackId="a"
                               name="Desktop"
+                              isAnimationActive={false}
                             />
                           </AreaChart>
                         </ResponsiveContainer>
@@ -2088,6 +2112,22 @@ const ESCAdminDashboard = () => {
                 </div>
               )}
               
+              {/* Initial Loading State */}
+              {!analyticsDataReady && !analyticsLoading && (
+                <div className="text-center py-5">
+                  <div className="spinner-border" style={{ color: accent }} role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                  <p className="mt-3 text-muted">Initializing analytics data...</p>
+                  <button 
+                    className="btn btn-sm btn-outline-primary"
+                    onClick={fetchAnalyticsData}
+                  >
+                    <i className="bi bi-arrow-clockwise me-1"></i>Load Data
+                  </button>
+                </div>
+              )}
+              
               {analyticsError && (
                 <div className="alert alert-warning mb-4">
                   <i className="bi bi-exclamation-triangle me-2"></i>
@@ -2095,102 +2135,45 @@ const ESCAdminDashboard = () => {
                 </div>
               )}
 
-              {/* Registration Trends - Line Chart */}
-              <div className="row g-4 mb-4">
-                <div className="col-12">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-graph-up me-2"></i>User Registration Trends
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                      
-                      {analyticsLoading ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                          <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                          </div>
+                            {/* Analytics Content - Only show when data is ready */}
+              {analyticsDataReady && (
+                <>
+                  {console.log('🔍 RENDERING ANALYTICS SECTION - REACHED THIS POINT')}
+                  {/* Registration Trends - Line Chart */}
+                  <div className="row g-4 mb-4">
+                    <div className="col-12">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                            <i className="bi bi-graph-up me-2"></i>User Registration Trends
+                          </h6>
                         </div>
-                      ) : analyticsData.registrationTrends.length === 0 ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                          <div className="text-center text-muted">
-                            <i className="bi bi-graph-up display-4"></i>
-                            <p className="mt-2">No registration data available for the selected time period</p>
-                          </div>
-                        </div>
-                      ) : (
-                      <div>
-                        {/* Chart Container with Error Boundary */}
-                        {(() => {
-                          try {
-                            if (!analyticsData.registrationTrends || analyticsData.registrationTrends.length === 0) {
-                              return <div style={{ color: 'red', textAlign: 'center' }}>No data to render chart</div>;
-                            }
-                            
-                            return (
-                      <ResponsiveContainer width="100%" height={300}>
-                        <AreaChart data={analyticsData.registrationTrends}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                  <XAxis dataKey="date" stroke="#666" />
-                          <YAxis stroke="#666" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#fff', 
-                              border: '1px solid #ddd',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Area 
-                            type="monotone" 
-                                    dataKey="total_users" 
-                            stroke="#fd680e" 
-                            fill="#fd680e" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="associates" 
-                            stroke="#10b981" 
-                            fill="#10b981" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="freelancers" 
-                            stroke="#3b82f6" 
-                            fill="#3b82f6" 
-                            fillOpacity={0.6}
-                          />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="ecs_employees" 
-                                    stroke="#8b5cf6" 
-                                    fill="#8b5cf6" 
-                            fillOpacity={0.6}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                            );
-                          } catch (chartError) {
-                            console.error('🚨 Chart rendering error:', chartError);
-                            return (
-                              <div style={{ color: 'red', textAlign: 'center', padding: '20px' }}>
-                                <strong>Chart Error:</strong><br/>
-                                {chartError.message}<br/>
-                                <small>Check console for details</small>
+                        <div className="card-body">
+                          {analyticsLoading ? (
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                              <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Loading...</span>
                               </div>
-                            );
-                          }
-                        })()}
-                        
-
+                            </div>
+                          ) : analyticsData.registrationTrends && analyticsData.registrationTrends.length > 0 ? (
+                            <div style={{ height: 300 }}>
+                              <div className="text-center text-muted">
+                                <i className="bi bi-graph-up display-4"></i>
+                                <p className="mt-2">Registration trends chart will be implemented here</p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                              <div className="text-center text-muted">
+                                <i className="bi bi-graph-up display-4"></i>
+                                <p className="mt-2">No registration data available for the selected time period</p>
+                                                  </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      )}
                     </div>
                   </div>
-                </div>
-              </div>
 
               {/* User Distribution and Activity - Pie Charts */}
               <div className="row g-4 mb-4">
@@ -2202,24 +2185,80 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      <ResponsiveContainer width="100%" height={250}>
-                        <PieChart>
-                          <Pie
-                            data={analyticsData.userTypeDistribution}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="count"
-                            label={({ type, count }) => `${type}: ${count}`}
-                          >
-                            {analyticsData.userTypeDistribution.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.fill} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
+                          {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 User Type Distribution Data:', {
+                              exists: !!analyticsData.userTypeDistribution,
+                              length: analyticsData.userTypeDistribution?.length,
+                              sample: analyticsData.userTypeDistribution?.[0],
+                              allData: analyticsData.userTypeDistribution
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.userTypeDistribution || analyticsData.userTypeDistribution.length === 0) {
+                              return (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                          <div className="text-center text-muted">
+                            <i className="bi bi-pie-chart display-4"></i>
+                            <p className="mt-2">No user type data available</p>
+                          </div>
+                        </div>
+                              );
+                            }
+
+                            // Validate that each item has required properties
+                            const validData = analyticsData.userTypeDistribution.filter(item => 
+                              item && 
+                              typeof item.type === 'string' && 
+                              typeof item.count === 'number' && 
+                              !isNaN(item.count) &&
+                              item.count >= 0 &&
+                              item.type !== undefined &&
+                              item.count !== undefined &&
+                              item.type !== null &&
+                              item.count !== null
+                            );
+
+                            console.log('🔍 Valid User Type Data:', {
+                              originalLength: analyticsData.userTypeDistribution.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid user type data structure</p>
+                                    <small>Check console for details</small>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            console.log('🔍 FINAL User Type Distribution Data for Chart:', validData);
+                            return (
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie
+                                    data={validData}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="count"
+                              label={({ type, count }) => `${type}: ${count}`}
+                            >
+                                    {validData.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                            );
+                          })()}
                     </div>
                   </div>
                 </div>
@@ -2231,24 +2270,75 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      <ResponsiveContainer width="100%" height={250}>
-                        <PieChart>
-                          <Pie
-                            data={analyticsData.userActivityStatus}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="count"
-                            label={({ status, count }) => `${status}: ${count}`}
-                          >
-                            {analyticsData.userActivityStatus.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.fill} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
+                          {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 User Activity Status Data:', {
+                              exists: !!analyticsData.userActivityStatus,
+                              length: analyticsData.userActivityStatus?.length,
+                              sample: analyticsData.userActivityStatus?.[0],
+                              allData: analyticsData.userActivityStatus
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.userActivityStatus || analyticsData.userActivityStatus.length === 0) {
+                              return (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                          <div className="text-center text-muted">
+                            <i className="bi bi-activity display-4"></i>
+                            <p className="mt-2">No user activity data available</p>
+                          </div>
+                        </div>
+                              );
+                            }
+
+                            // Validate that each item has required properties
+                            const validData = analyticsData.userActivityStatus.filter(item => 
+                              item && 
+                              typeof item.status === 'string' && 
+                              typeof item.count === 'number' && 
+                              !isNaN(item.count) &&
+                              item.count >= 0
+                            );
+
+                            console.log('🔍 Valid User Activity Data:', {
+                              originalLength: analyticsData.userActivityStatus.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid user activity data structure</p>
+                                    <small>Check console for details</small>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            return (
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie
+                                    data={validData}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="count"
+                              label={({ status, count }) => `${status}: ${count}`}
+                            >
+                                    {validData.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                            );
+                          })()}
                     </div>
                   </div>
                 </div>
@@ -2264,27 +2354,83 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <AreaChart data={analyticsData.cvUploadTrends}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis dataKey="date" stroke="#666" />
-                          <YAxis stroke="#666" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#fff', 
-                              border: '1px solid #ddd',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="uploads" 
-                            stroke="#fd680e" 
-                            fill="#fd680e" 
-                            fillOpacity={0.6}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 CV Upload Trends Data:', {
+                              exists: !!analyticsData.cvUploadTrends,
+                              length: analyticsData.cvUploadTrends?.length,
+                              sample: analyticsData.cvUploadTrends?.[0],
+                              allData: analyticsData.cvUploadTrends
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.cvUploadTrends || analyticsData.cvUploadTrends.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-file-earmark-arrow-up display-4"></i>
+                                    <p className="mt-2">No CV upload data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                                                        // Validate that each item has required properties
+                            const validData = analyticsData.cvUploadTrends.filter(item => 
+                            item && 
+                            item.date &&
+                              typeof item.uploads === 'number' && 
+                            !isNaN(item.uploads) &&
+                              item.uploads >= 0 &&
+                              item.date !== undefined &&
+                              item.uploads !== undefined &&
+                              item.date !== null &&
+                              item.uploads !== null
+                            );
+                          
+                            console.log('🔍 Valid CV Upload Data:', {
+                              originalLength: analyticsData.cvUploadTrends.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid CV upload data structure</p>
+                                    <small>Check console for details</small>
+                                  </div>
+                                </div>
+                              );
+                          }
+                          
+                                                      console.log('🔍 CV Upload Chart - About to render with data:', validData);
+                          return (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <AreaChart data={validData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="date" stroke="#666" />
+                                <YAxis stroke="#666" />
+                                <Tooltip 
+                                  contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #ddd',
+                                    borderRadius: '8px'
+                                  }}
+                                />
+                                <Area 
+                                  type="monotone" 
+                                  dataKey="uploads" 
+                                  stroke="#fd680e" 
+                                  fill="#fd680e" 
+                                  fillOpacity={0.6}
+                                />
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -2300,31 +2446,86 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <AreaChart data={analyticsData.topSkills}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis dataKey="skill" stroke="#666" />
-                          <YAxis stroke="#666" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#fff', 
-                              border: '1px solid #ddd',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="count" 
-                            stroke="#fd680e" 
-                            fill="#fd680e" 
-                            fillOpacity={0.6}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 Top Skills Data:', {
+                              exists: !!analyticsData.topSkills,
+                              length: analyticsData.topSkills?.length,
+                              sample: analyticsData.topSkills?.[0],
+                              allData: analyticsData.topSkills
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.topSkills || analyticsData.topSkills.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-bar-chart display-4"></i>
+                                    <p className="mt-2">No skills data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                                                        // Validate that each item has required properties
+                            const validData = analyticsData.topSkills.filter(item => 
+                            item && 
+                              typeof item.skill === 'string' && 
+                            typeof item.count === 'number' && 
+                              !isNaN(item.count) &&
+                              item.count >= 0 &&
+                              item.skill !== undefined &&
+                              item.count !== undefined &&
+                              item.skill !== null &&
+                              item.count !== null
+                            );
+
+                            console.log('🔍 Valid Top Skills Data:', {
+                              originalLength: analyticsData.topSkills.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                          return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid skills data structure</p>
+                              <small>Check console for details</small>
+                                  </div>
+                            </div>
+                          );
+                        }
+                          
+                                                      console.log('🔍 Top Skills Chart - About to render with data:', validData);
+                            return (
+                              <ResponsiveContainer width="100%" height={300}>
+                                <AreaChart data={validData}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                  <XAxis dataKey="skill" stroke="#666" />
+                                  <YAxis stroke="#666" />
+                                  <Tooltip 
+                                    contentStyle={{ 
+                                      backgroundColor: '#fff', 
+                                      border: '1px solid #ddd',
+                                      borderRadius: '8px'
+                                    }}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="count" 
+                                    stroke="#fd680e" 
+                                    fill="#fd680e" 
+                                    fillOpacity={0.6}
+                                  />
+                                </AreaChart>
+                              </ResponsiveContainer>
+                            );
+                      })()}
                     </div>
                   </div>
                 </div>
-
               </div>
 
               {/* Communication Trends - Line Chart */}
@@ -2337,36 +2538,74 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <AreaChart data={analyticsData.messageTrends}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis dataKey="date" stroke="#666" />
-                          <YAxis stroke="#666" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#fff', 
-                              border: '1px solid #ddd',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="messages" 
-                            stackId="1" 
-                            stroke="#fd680e" 
-                            fill="#fd680e" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="conversations" 
-                            stackId="1" 
-                            stroke="#10b981" 
-                            fill="#10b981" 
-                            fillOpacity={0.6}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 Communication Trends Data:', {
+                              exists: !!analyticsData.messageTrends,
+                              length: analyticsData.messageTrends?.length,
+                              sample: analyticsData.messageTrends?.[0],
+                              allData: analyticsData.messageTrends
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.messageTrends || analyticsData.messageTrends.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-chat-dots display-4"></i>
+                                    <p className="mt-2">No message trends data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                                                        // Validate that each item has required properties
+                            const validData = analyticsData.messageTrends.filter(item => 
+                            item && 
+                              item.date && 
+                            typeof item.messages === 'number' && 
+                            typeof item.conversations === 'number' && 
+                              !isNaN(item.messages) &&
+                              !isNaN(item.conversations) &&
+                              item.messages >= 0 &&
+                              item.conversations >= 0 &&
+                              item.date !== undefined &&
+                              item.messages !== undefined &&
+                              item.conversations !== undefined &&
+                              item.date !== null &&
+                              item.messages !== null &&
+                              item.conversations !== null
+                            );
+
+                            console.log('🔍 Valid Communication Trends Data:', {
+                              originalLength: analyticsData.messageTrends.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                          return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid communication trends data structure</p>
+                              <small>Check console for details</small>
+                                  </div>
+                            </div>
+                          );
+                        }
+                          
+                                                      console.log('🔍 Communication Trends Chart - About to render with data:', validData);
+                            return (
+                              <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div className="text-center">
+                                  <i className="bi bi-chat-dots display-4 text-muted"></i>
+                                  <p className="text-muted">Communication Trends Chart (Temporarily disabled for debugging)</p>
+                                  <small className="text-muted">Data length: {validData.length}</small>
+                                </div>
+                              </div>
+                            );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -2382,59 +2621,79 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      {analyticsLoading ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                          <div className="spinner-border text-primary" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                          </div>
-                        </div>
-                      ) : analyticsData.hiredFreelancersTrends.length === 0 ? (
+                          {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 Hired Freelancers Trends Data:', {
+                              exists: !!analyticsData.hiredFreelancersTrends,
+                              length: analyticsData.hiredFreelancersTrends?.length,
+                              sample: analyticsData.hiredFreelancersTrends?.[0],
+                              allData: analyticsData.hiredFreelancersTrends
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.hiredFreelancersTrends || analyticsData.hiredFreelancersTrends.length === 0) {
+                              return (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
                           <div className="text-center text-muted">
                             <i className="bi bi-briefcase display-4"></i>
                             <p className="mt-2">No hiring data available for the selected time period</p>
                           </div>
                         </div>
-                      ) : (
-                      <ResponsiveContainer width="100%" height={300}>
-                          <AreaChart data={analyticsData.hiredFreelancersTrends}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis dataKey="date" stroke="#666" />
-                          <YAxis stroke="#666" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#fff', 
-                              border: '1px solid #ddd',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Area 
-                            type="monotone" 
-                              dataKey="hires" 
-                            stackId="1" 
-                            stroke="#fd680e" 
-                            fill="#fd680e" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                              dataKey="active_hires" 
-                            stackId="1" 
-                            stroke="#10b981" 
-                            fill="#10b981" 
-                            fillOpacity={0.6}
-                          />
-                            <Area 
-                              type="monotone" 
-                              dataKey="completed_hires" 
-                              stackId="1" 
-                              stroke="#3b82f6" 
-                              fill="#3b82f6" 
-                            fillOpacity={0.6}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                      )}
+                              );
+                            }
+
+                                                        // Validate that each item has required properties
+                            const validData = analyticsData.hiredFreelancersTrends.filter(item => 
+                              item && 
+                              item.date && 
+                              typeof item.hires === 'number' && 
+                              typeof item.active_hires === 'number' && 
+                              typeof item.completed_hires === 'number' && 
+                              !isNaN(item.hires) &&
+                              !isNaN(item.active_hires) &&
+                              !isNaN(item.completed_hires) &&
+                              item.hires >= 0 &&
+                              item.active_hires >= 0 &&
+                              item.completed_hires >= 0 &&
+                              item.date !== undefined &&
+                              item.hires !== undefined &&
+                              item.active_hires !== undefined &&
+                              item.completed_hires !== undefined &&
+                              item.date !== null &&
+                              item.hires !== null &&
+                              item.active_hires !== null &&
+                              item.completed_hires !== null
+                            );
+
+                            console.log('🔍 Valid Hired Freelancers Data:', {
+                              originalLength: analyticsData.hiredFreelancersTrends.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                            return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid hiring data structure</p>
+                                <small>Check console for details</small>
+                                  </div>
+                              </div>
+                            );
+                          }
+                            
+                            console.log('🔍 Hired Freelancers Chart - About to render with data:', validData);
+                            return (
+                              <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div className="text-center">
+                                  <i className="bi bi-briefcase display-4 text-muted"></i>
+                                  <p className="text-muted">Hired Freelancers Chart (Temporarily disabled for debugging)</p>
+                                  <small className="text-muted">Data length: {validData.length}</small>
+                                </div>
+                              </div>
+                            );
+                          })()}
                     </div>
                   </div>
                 </div>
@@ -2450,40 +2709,80 @@ const ESCAdminDashboard = () => {
                       </h6>
                     </div>
                     <div className="card-body">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <AreaChart data={analyticsData.userCommunicationActivity}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis dataKey="user" stroke="#666" />
-                          <YAxis stroke="#666" />
-                          <Tooltip 
-                            contentStyle={{ 
-                              backgroundColor: '#fff', 
-                              border: '1px solid #ddd',
-                              borderRadius: '8px'
-                            }}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="messages" 
-                            stackId="1" 
-                            stroke="#fd680e" 
-                            fill="#fd680e" 
-                            fillOpacity={0.6}
-                          />
-                          <Area 
-                            type="monotone" 
-                            dataKey="conversations" 
-                            stackId="1" 
-                            stroke="#10b981" 
-                            fill="#10b981" 
-                            fillOpacity={0.6}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 User Communication Activity Data:', {
+                              exists: !!analyticsData.userCommunicationActivity,
+                              length: analyticsData.userCommunicationActivity?.length,
+                              sample: analyticsData.userCommunicationActivity?.[0],
+                              allData: analyticsData.userCommunicationActivity
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.userCommunicationActivity || analyticsData.userCommunicationActivity.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-people display-4"></i>
+                                    <p className="mt-2">No communication activity data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                                                        // Validate that each item has required properties
+                            const validData = analyticsData.userCommunicationActivity.filter(item => 
+                            item && 
+                              typeof item.user === 'string' && 
+                            typeof item.messages === 'number' && 
+                            typeof item.conversations === 'number' && 
+                              !isNaN(item.messages) &&
+                              !isNaN(item.conversations) &&
+                              item.messages >= 0 &&
+                              item.conversations >= 0 &&
+                              item.user !== undefined &&
+                              item.messages !== undefined &&
+                              item.conversations !== undefined &&
+                              item.user !== null &&
+                              item.messages !== null &&
+                              item.conversations !== null
+                            );
+
+                            console.log('🔍 Valid User Communication Activity Data:', {
+                              originalLength: analyticsData.userCommunicationActivity.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                          return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid communication activity data structure</p>
+                              <small>Check console for details</small>
+                                  </div>
+                            </div>
+                          );
+                        }
+                          
+                                                      console.log('🔍 User Communication Activity Chart - About to render with data:', validData);
+                            return (
+                              <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div className="text-center">
+                                  <i className="bi bi-people display-4 text-muted"></i>
+                                  <p className="text-muted">User Communication Activity Chart (Temporarily disabled for debugging)</p>
+                                  <small className="text-muted">Data length: {validData.length}</small>
                     </div>
                   </div>
+                            );
+                      })()}
                 </div>
               </div>
+            </div>
+              </div>
+                </>
+              )}
             </div>
           )}
 
@@ -3156,8 +3455,7 @@ const ESCAdminDashboard = () => {
                                       <div className="flex-grow-1">
                                         <div className="d-flex align-items-center mb-2">
                                           <strong className="me-2">{alert.alert}</strong>
-                                          <span className={`badge ${
-                                            alert.severity === 'high' ? 'bg-danger' :
+                                          <span className={`badge ${alert.severity === 'high' ? 'bg-danger' :
                                             alert.severity === 'medium' ? 'bg-warning' :
                                             'bg-info'
                                           }`}>
@@ -3234,8 +3532,7 @@ const ESCAdminDashboard = () => {
                                                 <small className="text-muted">ID: {user.user_id}</small>
                                               </td>
                                               <td>
-                                                <span className={`badge ${
-                                                  user.user_type === 'associate' ? 'bg-primary' : 'bg-success'
+                                                <span className={`badge ${user.user_type === 'associate' ? 'bg-primary' : 'bg-success'
                                                 }`}>
                                                   {user.user_type}
                                                 </span>
@@ -3257,8 +3554,7 @@ const ESCAdminDashboard = () => {
                                                 </span>
                                               </td>
                                               <td>
-                                                <span className={`badge ${
-                                                  riskLevel === 'High' ? 'bg-danger' :
+                                                <span className={`badge ${riskLevel === 'High' ? 'bg-danger' :
                                                   riskLevel === 'Medium' ? 'bg-warning' :
                                                   'bg-success'
                                                 }`}>
@@ -3486,11 +3782,12 @@ const ESCAdminDashboard = () => {
           )}
 
           
-        </div>
       </div>
 
+
       {/* Freelancer Notes Modal */}
-      {freelancerNotesModal && (
+        {
+          freelancerNotesModal && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
@@ -3536,10 +3833,12 @@ const ESCAdminDashboard = () => {
             </div>
           </div>
         </div>
-      )}
+          )
+        }
 
       {/* Freelancer Request Details Modal */}
-      {showFreelancerRequestDetailsModal && selectedFreelancerRequest && (
+        {
+          showFreelancerRequestDetailsModal && selectedFreelancerRequest && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg">
             <div className="modal-content">
@@ -3568,8 +3867,7 @@ const ESCAdminDashboard = () => {
                     <p><strong>Urgency Level:</strong> {selectedFreelancerRequest.urgency_level}</p>
                     <p><strong>Preferred Location:</strong> {selectedFreelancerRequest.preferred_location || 'Any'}</p>
                     <p><strong>Status:</strong> 
-                      <span className={`badge ms-2 ${
-                        selectedFreelancerRequest.status === 'pending' ? 'bg-warning' :
+                          <span className={`badge ms-2 ${selectedFreelancerRequest.status === 'pending' ? 'bg-warning' :
                         selectedFreelancerRequest.status === 'reviewed' ? 'bg-info' :
                         selectedFreelancerRequest.status === 'provided' ? 'bg-success' :
                         selectedFreelancerRequest.status === 'completed' ? 'bg-primary' :
@@ -3627,10 +3925,12 @@ const ESCAdminDashboard = () => {
               </div>
           </div>
         </div>
-      )}
+          )
+        }
 
       {/* Recommendations Modal */}
-      {showRecommendationsModal && selectedFreelancerRequest && (
+        {
+          showRecommendationsModal && selectedFreelancerRequest && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-xl">
             <div className="modal-content">
@@ -3656,28 +3956,28 @@ const ESCAdminDashboard = () => {
                         <div className="col-md-3">
                           <small className="text-muted">
                             <i className="bi bi-gear me-1"></i>
-                            <strong>Required Skills:</strong><br/>
+                                <strong>Required Skills:</strong><br />
                             {selectedFreelancerRequest.required_skills.join(', ')}
                           </small>
                         </div>
                         <div className="col-md-3">
                           <small className="text-muted">
                             <i className="bi bi-clock me-1"></i>
-                            <strong>Min Experience:</strong><br/>
+                                <strong>Min Experience:</strong><br />
                             {selectedFreelancerRequest.min_experience}+ years
                           </small>
                         </div>
                         <div className="col-md-3">
                           <small className="text-muted">
                             <i className="bi bi-geo-alt me-1"></i>
-                            <strong>Location:</strong><br/>
+                                <strong>Location:</strong><br />
                             {selectedFreelancerRequest.preferred_location || 'Any'}
                           </small>
                         </div>
                         <div className="col-md-3">
                           <small className="text-muted">
                             <i className="bi bi-currency-dollar me-1"></i>
-                            <strong>Budget:</strong><br/>
+                                <strong>Budget:</strong><br />
                             {selectedFreelancerRequest.budget_range || 'Not specified'}
                           </small>
                         </div>
@@ -3783,8 +4083,7 @@ const ESCAdminDashboard = () => {
                     <div className="row g-3">
                       {availableFreelancers.map((freelancer) => (
                         <div key={freelancer.freelancer_id} className="col-md-6">
-                          <div className={`card border-2 h-100 ${
-                            selectedFreelancers.includes(freelancer.freelancer_id) 
+                              <div className={`card border-2 h-100 ${selectedFreelancers.includes(freelancer.freelancer_id)
                               ? 'border-primary' 
                               : 'border-light'
                           }`}>
@@ -3925,10 +4224,12 @@ const ESCAdminDashboard = () => {
       </div>
           </div>
         </div>
-      )}
+          )
+        }
 
       {/* Animation Styles */}
-      <style>{`
+        <style>
+          {`
         .dashboard-btn:hover, .dashboard-btn:focus {
           transform: scale(1.07);
           box-shadow: 0 4px 24px rgba(253,104,14,0.18);
@@ -4004,21 +4305,15 @@ const ESCAdminDashboard = () => {
         }
         
 
-      `}</style>
-
-
-
-      
-
-
-
-
+      `}
+        </style>
 
 
 
       {/* Security Component Functions */}
       {/* Security Dashboard Component */}
-      {activeSecuritySection === 'dashboard' && (
+        {
+          activeSecuritySection === 'dashboard' && (
         <div className="row g-4">
           {/* Real-time Security Metrics */}
           <div className="col-md-6">
@@ -4134,8 +4429,7 @@ const ESCAdminDashboard = () => {
                             <td>{login.user}</td>
                             <td><code>{login.ip}</code></td>
                             <td>
-                              <span className={`badge ${
-                                login.status === 'success' ? 'bg-success' : 'bg-danger'
+                                  <span className={`badge ${login.status === 'success' ? 'bg-success' : 'bg-danger'
                               }`}>
                                 {login.status}
                               </span>
@@ -4157,10 +4451,12 @@ const ESCAdminDashboard = () => {
             </div>
           </div>
         </div>
-      )}
+          )
+        }
 
       {/* Communication Analysis Component */}
-      {activeSecuritySection === 'communications' && (
+        {
+          activeSecuritySection === 'communications' && (
         <div className="row g-4">
           {/* Communication Patterns */}
           <div className="col-md-8">
@@ -4284,8 +4580,7 @@ const ESCAdminDashboard = () => {
                               </div>
                             </td>
                             <td>
-                              <span className={`badge ${
-                                message.flag_reason === 'spam' ? 'bg-warning' :
+                                  <span className={`badge ${message.flag_reason === 'spam' ? 'bg-warning' :
                                 message.flag_reason === 'suspicious' ? 'bg-danger' :
                                 'bg-secondary'
                               }`}>
@@ -4317,10 +4612,12 @@ const ESCAdminDashboard = () => {
             </div>
           </div>
         </div>
-      )}
+          )
+        }
 
       {/* Audit Log Component */}
-      {activeSecuritySection === 'audit' && (
+        {
+          activeSecuritySection === 'audit' && (
         <div className="card border-0 shadow-sm">
           <div className="card-header bg-dark text-white">
             <h6 className="mb-0"><i className="bi bi-journal-text me-2"></i>System Audit Log</h6>
@@ -4350,8 +4647,7 @@ const ESCAdminDashboard = () => {
                         <td>{entry.details}</td>
                         <td><code>{entry.ip_address}</code></td>
                         <td>
-                          <span className={`badge ${
-                            entry.severity === 'HIGH' ? 'bg-danger' :
+                              <span className={`badge ${entry.severity === 'HIGH' ? 'bg-danger' :
                             entry.severity === 'MEDIUM' ? 'bg-warning' :
                             entry.severity === 'LOW' ? 'bg-info' :
                             'bg-secondary'
@@ -4373,10 +4669,12 @@ const ESCAdminDashboard = () => {
             )}
           </div>
         </div>
-      )}
+          )
+        }
 
       {/* Threat Intelligence Component */}
-      {activeSecuritySection === 'threats' && (
+        {
+          activeSecuritySection === 'threats' && (
         <div className="row g-4">
           {/* Message Threats */}
           <div className="col-md-6">
@@ -4439,8 +4737,7 @@ const ESCAdminDashboard = () => {
                           <small className="text-muted">{threat.threat}</small>
                         </div>
                         <div className="text-end">
-                          <span className={`badge ${
-                            threat.severity === 'HIGH' ? 'bg-danger' :
+                              <span className={`badge ${threat.severity === 'HIGH' ? 'bg-danger' :
                             threat.severity === 'MEDIUM' ? 'bg-warning' :
                             'bg-info'
                           }`}>
@@ -4492,10 +4789,12 @@ const ESCAdminDashboard = () => {
             </div>
           </div>
         </div>
-      )}
+          )
+        }
 
       {/* Auto-fetch security data when section changes */}
-      {activeSecuritySection && !securityData[activeSecuritySection] && (
+        {
+          activeSecuritySection && !securityData[activeSecuritySection] && (
         <div className="text-center py-4">
           <button 
             className="btn btn-primary"
@@ -4505,10 +4804,12 @@ const ESCAdminDashboard = () => {
             Load {activeSecuritySection.charAt(0).toUpperCase() + activeSecuritySection.slice(1)} Data
           </button>
         </div>
-      )}
+          )
+        }
 
       {/* Auto-generate reports when report section changes */}
-      {activeReportSection && !reportsData[activeReportSection] && (
+        {
+          activeReportSection && !reportsData[activeReportSection] && (
         <div className="text-center py-4">
           <button 
             className="btn btn-primary"
@@ -4518,9 +4819,10 @@ const ESCAdminDashboard = () => {
             Load Report Data
           </button>
         </div>
-      )}
+          )
+        }
+      </div>
     </div>
   );
-};
-
+}
 export default ESCAdminDashboard; 
