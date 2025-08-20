@@ -2597,13 +2597,36 @@ const ESCAdminDashboard = () => {
                           
                                                       console.log('🔍 Communication Trends Chart - About to render with data:', validData);
                             return (
-                              <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <div className="text-center">
-                                  <i className="bi bi-chat-dots display-4 text-muted"></i>
-                                  <p className="text-muted">Communication Trends Chart (Temporarily disabled for debugging)</p>
-                                  <small className="text-muted">Data length: {validData.length}</small>
-                                </div>
-                              </div>
+                              <ResponsiveContainer width="100%" height={300}>
+                                <AreaChart data={validData}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                  <XAxis dataKey="date" stroke="#666" />
+                                  <YAxis stroke="#666" />
+                                  <Tooltip 
+                                    contentStyle={{ 
+                                      backgroundColor: '#fff', 
+                                      border: '1px solid #ddd',
+                                      borderRadius: '8px'
+                                    }}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="messages" 
+                                    stackId="1" 
+                                    stroke="#fd680e" 
+                                    fill="#fd680e" 
+                                    fillOpacity={0.6}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="conversations" 
+                                    stackId="1" 
+                                    stroke="#10b981" 
+                                    fill="#10b981" 
+                                    fillOpacity={0.6}
+                                  />
+                                </AreaChart>
+                              </ResponsiveContainer>
                             );
                       })()}
                     </div>
@@ -2685,13 +2708,44 @@ const ESCAdminDashboard = () => {
                             
                             console.log('🔍 Hired Freelancers Chart - About to render with data:', validData);
                             return (
-                              <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <div className="text-center">
-                                  <i className="bi bi-briefcase display-4 text-muted"></i>
-                                  <p className="text-muted">Hired Freelancers Chart (Temporarily disabled for debugging)</p>
-                                  <small className="text-muted">Data length: {validData.length}</small>
-                                </div>
-                              </div>
+                              <ResponsiveContainer width="100%" height={300}>
+                                <AreaChart data={validData}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                  <XAxis dataKey="date" stroke="#666" />
+                                  <YAxis stroke="#666" />
+                                  <Tooltip 
+                                    contentStyle={{ 
+                                      backgroundColor: '#fff', 
+                                      border: '1px solid #ddd',
+                                      borderRadius: '8px'
+                                    }}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="hires" 
+                                    stackId="1" 
+                                    stroke="#3b82f6" 
+                                    fill="#3b82f6" 
+                                    fillOpacity={0.6}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="active_hires" 
+                                    stackId="1" 
+                                    stroke="#10b981" 
+                                    fill="#10b981" 
+                                    fillOpacity={0.6}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="completed_hires" 
+                                    stackId="1" 
+                                    stroke="#f59e0b" 
+                                    fill="#f59e0b" 
+                                    fillOpacity={0.6}
+                                  />
+                                </AreaChart>
+                              </ResponsiveContainer>
                             );
                           })()}
                     </div>
