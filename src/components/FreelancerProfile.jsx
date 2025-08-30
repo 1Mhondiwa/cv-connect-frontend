@@ -827,7 +827,7 @@ const FreelancerProfile = () => {
         {/* Additional CV Data Section */}
         {profile.cv && profile.cv.parsed_data && typeof profile.cv.parsed_data === 'object' && (() => {
           const shownFields = [
-            'first_name', 'last_name', 'email', 'phone', 'headline', 'years_experience', 'summary', 'skills', 'work_experience', 'linkedin_url', 'github_url', 'current_status', 'education',
+            'first_name', 'last_name', 'email', 'phone', 'address', 'headline', 'years_experience', 'summary', 'skills', 'work_experience', 'linkedin_url', 'github_url', 'current_status', 'education',
           ];
           const extraEntries = Object.entries(profile.cv.parsed_data).filter(
             ([key]) => !shownFields.includes(key)
