@@ -21,7 +21,7 @@ const FreelancerProfile = () => {
   const calculateProfileCompletion = (profile) => {
     if (!profile) return 0;
     const fields = [
-      'first_name', 'last_name', 'email', 'phone', 'headline', 
+      'first_name', 'last_name', 'email', 'phone', 'address', 'headline', 
       'years_experience', 'summary', 'skills', 'linkedin_url', 
       'github_url', 'current_status', 'availability_status', 'profile_picture_url'
     ];
