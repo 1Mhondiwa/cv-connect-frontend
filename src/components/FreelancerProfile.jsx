@@ -499,32 +499,32 @@ const FreelancerProfile = () => {
                   </div>
 
                   {/* Contact Info */}
-                  <div className="row">
-          <div className="col-md-6">
-                      <div className="d-flex align-items-center mb-2">
-                        <i className="bi bi-envelope me-2" style={{ color: accent, fontSize: 16 }}></i>
-                        <span style={{ color: '#666' }}>{profile.email}</span>
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-envelope me-3" style={{ color: accent, fontSize: 18 }}></i>
+                        <span style={{ color: '#666', fontSize: '15px' }}>{profile.email}</span>
                       </div>
                       {profile.phone && (
-                        <div className="d-flex align-items-center mb-2">
-                          <i className="bi bi-telephone me-2" style={{ color: accent, fontSize: 16 }}></i>
-                          <span style={{ color: '#666' }}>{profile.phone}</span>
+                        <div className="d-flex align-items-center mb-3">
+                          <i className="bi bi-telephone me-3" style={{ color: accent, fontSize: 18 }}></i>
+                          <span style={{ color: '#666', fontSize: '15px' }}>{profile.phone}</span>
                         </div>
                       )}
-                      {profile.address && (
-                        <div className="d-flex align-items-center mb-2">
-                          <i className="bi bi-geo-alt me-2" style={{ color: accent, fontSize: 16 }}></i>
-                          <span style={{ color: '#666' }}>{profile.address}</span>
-                        </div>
-                      )}
-          </div>
-          <div className="col-md-6">
-                      <div className="d-flex align-items-center mb-2">
-                        <i className="bi bi-calendar me-2" style={{ color: accent, fontSize: 16 }}></i>
-                        <span style={{ color: '#666' }}>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-calendar me-3" style={{ color: accent, fontSize: 18 }}></i>
+                        <span style={{ color: '#666', fontSize: '15px' }}>
                           Member since {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : 'N/A'}
                         </span>
                       </div>
+                      {profile.address && (
+                        <div className="d-flex align-items-center mb-3">
+                          <i className="bi bi-geo-alt me-3" style={{ color: accent, fontSize: 18 }}></i>
+                          <span style={{ color: '#666', fontSize: '15px' }}>{profile.address}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
