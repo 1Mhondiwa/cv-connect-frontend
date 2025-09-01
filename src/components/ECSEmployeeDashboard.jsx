@@ -1836,30 +1836,25 @@ const ECSEmployeeDashboard = () => {
                                   <strong>Phone:</strong> {freelancer.phone || 'Not specified'}
           </div>
 
-                                                                 <div className="mb-2">
-                                   <strong>Rating:</strong> 
-                                   <div className="mt-1">
-                                     {[...Array(5)].map((_, index) => (
-                                       <i 
-                                         key={index} 
-                                         className={`bi bi-star${index < (freelancer.admin_rating || 0) ? '-fill' : ''}`} 
-                                         style={{ 
-                                           color: index < (freelancer.admin_rating || 0) ? '#ffc107' : '#dee2e6',
-                                           fontSize: '14px'
-                                         }}
-                                       ></i>
-                                     ))}
-        </div>
-      </div>
-
-                                <div className="d-flex gap-1 mb-2">
-                                  <span className={`badge ${freelancer.is_available ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
-                                    {freelancer.is_available ? 'Available' : 'Unavailable'}
-                                  </span>
-                                  <span className={`badge ${freelancer.is_approved ? 'bg-primary' : 'bg-warning'}`} style={{ fontSize: '10px' }}>
-                                    {freelancer.is_approved ? 'Approved' : 'Pending'}
-                                  </span>
+                                <div className="mb-2">
+                                  <strong>Availability:</strong>
+                                  <div className="mt-1">
+                                    <span className={`badge ${
+                                      freelancer.availability_status === 'available' ? 'bg-success' :
+                                      freelancer.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
+                                    }`} style={{ fontSize: '11px' }}>
+                                      <i className={`bi ${
+                                        freelancer.availability_status === 'available' ? 'bi-check-circle' :
+                                        freelancer.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                      } me-1`}></i>
+                                      {freelancer.availability_status === 'available' ? 'Available for Work' :
+                                       freelancer.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                                    </span>
+                                  </div>
                                 </div>
+
+
+
 
                                 <div className="mt-auto">
                                   <div className="form-check">
