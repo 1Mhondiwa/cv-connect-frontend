@@ -2266,17 +2266,7 @@ const ECSEmployeeDashboard = () => {
                             boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
                             border: '1px solid #f0f0f0'
                           }}>
-                            <h4 style={{ 
-                              fontWeight: 700, 
-                              color: '#333', 
-                              marginBottom: 20,
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 10
-                            }}>
-                              <i className="bi bi-file-earmark-text" style={{ color: accent }}></i>
-                              CV Information
-                            </h4>
+
                             
                             {/* Work Experience */}
                             {selectedFreelancerProfile.cv.parsed_data.work_experience && (
