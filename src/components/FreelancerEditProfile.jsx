@@ -860,6 +860,18 @@ const FreelancerEditProfile = () => {
                       
                       <div className="row g-3">
                         <div className="col-md-6">
+                          <label className="form-label fw-semibold" style={{ color: '#333' }}>Professional Title/Role</label>
+                          <input 
+                            type="text" 
+                            className="form-control" 
+                            name="headline" 
+                            value={form.headline || ""} 
+                            onChange={handleChange} 
+                            placeholder="e.g., Software Developer, Graphic Designer, Electrician" 
+                            style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
+                          />
+                        </div>
+                        <div className="col-md-6">
                           <label className="form-label fw-semibold" style={{ color: '#333' }}>Years of Experience</label>
                           <input 
                             type="number" 
@@ -873,15 +885,18 @@ const FreelancerEditProfile = () => {
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
                         </div>
-                        <div className="col-md-6">
-                          <label className="form-label fw-semibold" style={{ color: '#333' }}>Summary</label>
+                      </div>
+                      
+                      <div className="row g-3 mt-3">
+                        <div className="col-12">
+                          <label className="form-label fw-semibold" style={{ color: '#333' }}>Professional Summary</label>
                           <textarea 
                             className="form-control" 
                             name="summary" 
                             value={form.summary || ""} 
                             onChange={handleChange} 
-                            rows={3}
-                            placeholder="Brief professional summary..."
+                            rows={4}
+                            placeholder="Write a brief professional summary about yourself, your expertise, and what you can offer to potential clients..."
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
                         </div>
