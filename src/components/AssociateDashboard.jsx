@@ -1422,18 +1422,16 @@ const AssociateDashboard = () => {
                                 </p>
                               </div>
                               <div className="text-end">
-                                <div className="mb-2">
-                                  {[1, 2, 3, 4, 5].map((star) => (
-                                    <i
-                                      key={star}
-                                      className={`bi ${star <= rec.admin_rating ? 'bi-star-fill' : 'bi-star'}`}
-                                      style={{ color: star <= rec.admin_rating ? '#ffc107' : '#dee2e6' }}
-                                    ></i>
-                                  ))}
-                                  <small className="ms-1 text-muted">({rec.admin_rating}/5)</small>
-                                </div>
-                                <span className={`badge ${rec.is_available ? 'bg-success' : 'bg-secondary'}`}>
-                                  {rec.is_available ? 'Available' : 'Unavailable'}
+                                <span className={`badge ${
+                                  rec.availability_status === 'available' ? 'bg-success' : 
+                                  rec.availability_status === 'busy' ? 'bg-warning text-dark' : 'bg-secondary'
+                                }`}>
+                                  <i className={`bi ${
+                                    rec.availability_status === 'available' ? 'bi-check-circle' :
+                                    rec.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                  } me-1`}></i>
+                                  {rec.availability_status === 'available' ? 'Available for Work' : 
+                                   rec.availability_status === 'busy' ? 'Busy' : 'Not Available'}
                                 </span>
                               </div>
                             </div>
