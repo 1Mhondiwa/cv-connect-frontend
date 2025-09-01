@@ -2061,6 +2061,22 @@ const ECSEmployeeDashboard = () => {
                                       Member since {new Date(selectedFreelancerProfile.created_at).toLocaleDateString()}
                                     </span>
                                   </div>
+                                  {selectedFreelancerProfile.current_status && (
+                                    <div className="d-flex align-items-center mb-3">
+                                      <i className="bi bi-person-check me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                      <span className={`badge ${selectedFreelancerProfile.current_status === 'Available' ? 'bg-success' : 'bg-warning'}`}>
+                                        {selectedFreelancerProfile.current_status}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {selectedFreelancerProfile.website && (
+                                    <div className="d-flex align-items-center mb-3">
+                                      <i className="bi bi-globe me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                      <a href={selectedFreelancerProfile.website} target="_blank" rel="noopener noreferrer" style={{ color: accent, textDecoration: 'none', fontSize: '15px' }}>
+                                        Website
+                                      </a>
+                                    </div>
+                                  )}
                                   {selectedFreelancerProfile.linkedin_url && (
                                     <div className="d-flex align-items-center mb-3">
                                       <i className="bi bi-linkedin me-3" style={{ color: accent, fontSize: 18 }}></i>
@@ -2111,6 +2127,70 @@ const ECSEmployeeDashboard = () => {
                               margin: 0
                             }}>
                               {selectedFreelancerProfile.summary}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Education Summary */}
+                        {selectedFreelancerProfile.education_summary && (
+                          <div style={{
+                            background: '#fff',
+                            borderRadius: 20,
+                            padding: '32px',
+                            marginBottom: 24,
+                            boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+                            border: '1px solid #f0f0f0'
+                          }}>
+                            <h4 style={{ 
+                              fontWeight: 700, 
+                              color: '#333', 
+                              marginBottom: 16,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10
+                            }}>
+                              <i className="bi bi-mortarboard" style={{ color: accent }}></i>
+                              Education Summary
+                            </h4>
+                            <p style={{ 
+                              color: '#666', 
+                              fontSize: 16, 
+                              lineHeight: 1.6,
+                              margin: 0
+                            }}>
+                              {selectedFreelancerProfile.education_summary}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Work History */}
+                        {selectedFreelancerProfile.work_history && (
+                          <div style={{
+                            background: '#fff',
+                            borderRadius: 20,
+                            padding: '32px',
+                            marginBottom: 24,
+                            boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+                            border: '1px solid #f0f0f0'
+                          }}>
+                            <h4 style={{ 
+                              fontWeight: 700, 
+                              color: '#333', 
+                              marginBottom: 16,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10
+                            }}>
+                              <i className="bi bi-briefcase" style={{ color: accent }}></i>
+                              Work History
+                            </h4>
+                            <p style={{ 
+                              color: '#666', 
+                              fontSize: 16, 
+                              lineHeight: 1.6,
+                              margin: 0
+                            }}>
+                              {selectedFreelancerProfile.work_history}
                             </p>
                           </div>
                         )}
@@ -2196,7 +2276,46 @@ const ECSEmployeeDashboard = () => {
                             }}>
                               <i className="bi bi-file-earmark-text" style={{ color: accent }}></i>
                               CV Information
+                              {selectedFreelancerProfile.cv.original_filename && (
+                                <small style={{ color: '#666', fontWeight: 400, marginLeft: 10 }}>
+                                  ({selectedFreelancerProfile.cv.original_filename})
+                                </small>
+                              )}
                             </h4>
+                            
+                            {/* CV Metadata */}
+                            <div className="row mb-4">
+                              {selectedFreelancerProfile.cv.file_type && (
+                                <div className="col-md-4">
+                                  <small className="text-muted">
+                                    <i className="bi bi-file-earmark me-1"></i>
+                                    <strong>File Type:</strong> {selectedFreelancerProfile.cv.file_type}
+                                  </small>
+                                </div>
+                              )}
+                              {selectedFreelancerProfile.cv.created_at && (
+                                <div className="col-md-4">
+                                  <small className="text-muted">
+                                    <i className="bi bi-calendar-upload me-1"></i>
+                                    <strong>Uploaded:</strong> {new Date(selectedFreelancerProfile.cv.created_at).toLocaleDateString()}
+                                  </small>
+                                </div>
+                              )}
+                              {selectedFreelancerProfile.cv.parsing_status && (
+                                <div className="col-md-4">
+                                  <small className="text-muted">
+                                    <i className="bi bi-gear me-1"></i>
+                                    <strong>Status:</strong> 
+                                    <span className={`badge ms-1 ${
+                                      selectedFreelancerProfile.cv.parsing_status === 'completed' ? 'bg-success' :
+                                      selectedFreelancerProfile.cv.parsing_status === 'failed' ? 'bg-danger' : 'bg-warning'
+                                    }`} style={{ fontSize: '10px' }}>
+                                      {selectedFreelancerProfile.cv.parsing_status}
+                                    </span>
+                                  </small>
+                                </div>
+                              )}
+                            </div>
                             
                             {/* Work Experience */}
                             {selectedFreelancerProfile.cv.parsed_data.work_experience && (
@@ -2212,7 +2331,7 @@ const ECSEmployeeDashboard = () => {
                                     border: '1px solid #e9ecef'
                                   }}>
                                     <h6 style={{ color: '#333', fontWeight: 600, marginBottom: 4 }}>
-                                      {work.position || work.job_title}
+                                      {work.position || work.job_title || work.title}
                                     </h6>
                                     <p style={{ color: accent, fontWeight: 500, marginBottom: 4 }}>
                                       {work.company}
@@ -2250,7 +2369,7 @@ const ECSEmployeeDashboard = () => {
                                       {edu.institution}
                                     </p>
                                     <small className="text-muted">
-                                      {edu.graduation_year}
+                                      {edu.graduation_year || edu.year}
                                     </small>
                                   </div>
                                 ))}
@@ -2258,6 +2377,119 @@ const ECSEmployeeDashboard = () => {
                             )}
                           </div>
                         )}
+
+                        {/* Additional CV Information */}
+                        {selectedFreelancerProfile.cv && selectedFreelancerProfile.cv.parsed_data && typeof selectedFreelancerProfile.cv.parsed_data === 'object' && (() => {
+                          const shownFields = [
+                            'first_name', 'last_name', 'email', 'phone', 'address', 'headline', 'years_experience', 'summary', 'skills', 'work_experience', 'linkedin_url', 'github_url', 'current_status', 'education',
+                          ];
+                          const extraEntries = Object.entries(selectedFreelancerProfile.cv.parsed_data).filter(
+                            ([key]) => !shownFields.includes(key)
+                          );
+                          if (extraEntries.length === 0) return null;
+
+                          // Helper to format dates
+                          const formatDate = (val) => {
+                            if (!val) return <span style={{ color: '#888' }}>N/A</span>;
+                            const d = new Date(val);
+                            if (!isNaN(d)) return d.toLocaleDateString();
+                            // Try year only
+                            if (/^\d{4}$/.test(val)) return val;
+                            return val;
+                          };
+
+                          // Helper to render objects/arrays nicely
+                          const renderValue = (value, parentKey = '') => {
+                            if (Array.isArray(value)) {
+                              if (value.length === 0) return <span style={{ color: '#888' }}>None</span>;
+                              if (typeof value[0] === 'object' && value[0] !== null) {
+                                // Array of objects
+                                return (
+                                  <div>
+                                    {value.map((item, index) => (
+                                      <div key={index} style={{ marginBottom: 12, padding: 12, background: '#fff', borderRadius: 8, border: '1px solid #ddd' }}>
+                                        {Object.entries(item).map(([k, v]) => (
+                                          <div key={k} style={{ marginBottom: 4 }}>
+                                            <strong style={{ color: '#333' }}>{k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</strong> {/(date|year)/i.test(k) ? formatDate(v) : v}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ))}
+                                  </div>
+                                );
+                              } else {
+                                // Array of primitives
+                                return (
+                                  <ul style={{ margin: 0, paddingLeft: 20 }}>
+                                    {value.map((v, i) => <li key={i} style={{ color: '#666' }}>{v}</li>)}
+                                  </ul>
+                                );
+                              }
+                            } else if (typeof value === 'object' && value !== null) {
+                              // Single object
+                              return (
+                                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                  {Object.entries(value).map(([k, v]) => (
+                                    <li key={k} style={{ marginBottom: 8 }}>
+                                      <strong style={{ color: '#333' }}>{k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</strong> {/(date|year)/i.test(k) ? formatDate(v) : v}
+                                    </li>
+                                  ))}
+                                </ul>
+                              );
+                            } else {
+                              // Primitive value
+                              if (/(date|year)/i.test(parentKey)) return formatDate(value);
+                              return value?.toString() || <span style={{ color: '#888' }}>N/A</span>;
+                            }
+                          };
+
+                          return (
+                            <div style={{
+                              background: '#fff',
+                              borderRadius: 20,
+                              padding: '32px',
+                              marginBottom: 24,
+                              boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+                              border: '1px solid #f0f0f0'
+                            }}>
+                              <h4 style={{ 
+                                fontWeight: 700, 
+                                color: '#333', 
+                                marginBottom: 20,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 10
+                              }}>
+                                <i className="bi bi-file-earmark-text" style={{ color: accent }}></i>
+                                Additional Information
+                              </h4>
+                              <div className="row g-4">
+                                {extraEntries.map(([key, value]) => (
+                                  <div key={key} className="col-md-6">
+                                    <div style={{
+                                      background: '#f8f9fa',
+                                      borderRadius: '12px',
+                                      padding: '16px',
+                                      border: '1px solid #e9ecef'
+                                    }}>
+                                      <h6 style={{ 
+                                        fontWeight: 600, 
+                                        color: '#333',
+                                        marginBottom: 12,
+                                        textTransform: 'capitalize'
+                                      }}>
+                                        {key.replace(/_/g, ' ')}
+                                      </h6>
+                                      <div style={{ color: '#666' }}>
+                                        {renderValue(value, key)}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>
