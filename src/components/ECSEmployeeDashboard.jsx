@@ -99,6 +99,11 @@ const ECSEmployeeDashboard = () => {
   const [searchExperience, setSearchExperience] = useState('');
   const [searchStatus, setSearchStatus] = useState('all');
 
+  // Freelancer profile modal states
+  const [showFreelancerProfileModal, setShowFreelancerProfileModal] = useState(false);
+  const [selectedFreelancerProfile, setSelectedFreelancerProfile] = useState(null);
+  const [freelancerProfileLoading, setFreelancerProfileLoading] = useState(false);
+
 
 
   // Analytics data states
@@ -463,6 +468,30 @@ const ECSEmployeeDashboard = () => {
       setHighlightedFreelancers(prev => [...prev, freelancerId]);
     } else {
       setHighlightedFreelancers(prev => prev.filter(id => id !== freelancerId));
+    }
+  };
+
+  // Freelancer profile modal functions
+  const openFreelancerProfile = async (freelancer) => {
+    setSelectedFreelancerProfile(freelancer);
+    setShowFreelancerProfileModal(true);
+    
+    // Fetch detailed profile data
+    setFreelancerProfileLoading(true);
+    try {
+      console.log('🔍 Fetching detailed profile for freelancer:', freelancer.freelancer_id);
+      const res = await api.get(`/admin/freelancers/${freelancer.freelancer_id}/profile`);
+      if (res.data.success) {
+        setSelectedFreelancerProfile(res.data.freelancer);
+      } else {
+        console.error('❌ Failed to fetch freelancer profile:', res.data.message);
+        // Still show modal with basic data if detailed fetch fails
+      }
+    } catch (err) {
+      console.error('❌ Error fetching freelancer profile:', err);
+      // Still show modal with basic data if detailed fetch fails
+    } finally {
+      setFreelancerProfileLoading(false);
     }
   };
 
@@ -1857,6 +1886,17 @@ const ECSEmployeeDashboard = () => {
 
 
                                 <div className="mt-auto">
+                                  <div className="d-flex gap-2 align-items-center mb-2">
+                                    <button
+                                      type="button"
+                                      className="btn btn-outline-primary btn-sm flex-grow-1"
+                                      onClick={() => openFreelancerProfile(freelancer)}
+                                      style={{ fontSize: '12px' }}
+                                    >
+                                      <i className="bi bi-person-lines-fill me-1"></i>
+                                      View Profile
+                                    </button>
+                                  </div>
                                   <div className="form-check">
                                     <input
                                       type="checkbox"
@@ -1893,6 +1933,347 @@ const ECSEmployeeDashboard = () => {
           </div>
         </div>
            )}
+
+          {/* Freelancer Profile Modal */}
+          {showFreelancerProfileModal && selectedFreelancerProfile && (
+            <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+              <div className="modal-dialog modal-xl">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title" style={{ color: accent, fontWeight: 600 }}>
+                      <i className="bi bi-person-lines-fill me-2"></i>
+                      Freelancer Profile - {selectedFreelancerProfile.first_name} {selectedFreelancerProfile.last_name}
+                    </h5>
+                    <button 
+                      type="button" 
+                      className="btn-close" 
+                      onClick={() => setShowFreelancerProfileModal(false)}
+                    ></button>
+                  </div>
+                  <div className="modal-body">
+                    {freelancerProfileLoading ? (
+                      <div className="text-center py-4">
+                        <div className="spinner-border" style={{ color: accent }} role="status">
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <p className="mt-2 text-muted">Loading detailed profile...</p>
+                      </div>
+                    ) : (
+                      <div className="container-fluid">
+                        {/* Profile Header */}
+                        <div style={{
+                          background: '#fff',
+                          borderRadius: 20,
+                          padding: '32px',
+                          marginBottom: 24,
+                          boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+                          border: '1px solid #f0f0f0'
+                        }}>
+                          <div className="row align-items-center">
+                            <div className="col-md-3 text-center">
+                              {(() => {
+                                const BACKEND_URL = "http://localhost:5000";
+                                let imgUrl = "";
+                                const hasCustomImage = !!selectedFreelancerProfile?.profile_picture_url;
+                                if (hasCustomImage) {
+                                  imgUrl = selectedFreelancerProfile.profile_picture_url.startsWith("http")
+                                    ? selectedFreelancerProfile.profile_picture_url
+                                    : `${BACKEND_URL}${selectedFreelancerProfile.profile_picture_url}?t=${Date.now()}`;
+                                } else {
+                                  const name = `${selectedFreelancerProfile?.first_name || ""} ${selectedFreelancerProfile?.last_name || ""}`.trim() || "User";
+                                  imgUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${accent.replace('#', '')}&color=fff&size=150&bold=true`;
+                                }
+                                return (
+                                  <img
+                                    src={imgUrl}
+                                    alt="Profile"
+                                    style={{
+                                      width: 120,
+                                      height: 120,
+                                      borderRadius: '50%',
+                                      objectFit: 'cover',
+                                      border: `4px solid ${accent}`,
+                                      marginBottom: 16
+                                    }}
+                                  />
+                                );
+                              })()}
+                              <div className="mt-2">
+                                <span className={`badge ${
+                                  selectedFreelancerProfile.availability_status === 'available' ? 'bg-success' :
+                                  selectedFreelancerProfile.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
+                                }`} style={{ fontSize: '12px' }}>
+                                  <i className={`bi ${
+                                    selectedFreelancerProfile.availability_status === 'available' ? 'bi-check-circle' :
+                                    selectedFreelancerProfile.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                  } me-1`}></i>
+                                  {selectedFreelancerProfile.availability_status === 'available' ? 'Available for Work' :
+                                   selectedFreelancerProfile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="col-md-9">
+                              <h2 style={{ 
+                                fontWeight: 700, 
+                                color: '#333', 
+                                marginBottom: 8 
+                              }}>
+                                {selectedFreelancerProfile.first_name} {selectedFreelancerProfile.last_name}
+                              </h2>
+                              {selectedFreelancerProfile.headline && (
+                                <h5 style={{ 
+                                  color: accent, 
+                                  fontWeight: 600, 
+                                  marginBottom: 16 
+                                }}>
+                                  {selectedFreelancerProfile.headline}
+                                </h5>
+                              )}
+                              <div className="row">
+                                <div className="col-md-6">
+                                  <div className="d-flex align-items-center mb-3">
+                                    <i className="bi bi-envelope me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                    <span style={{ color: '#666', fontSize: '15px' }}>{selectedFreelancerProfile.email}</span>
+                                  </div>
+                                  {selectedFreelancerProfile.phone && (
+                                    <div className="d-flex align-items-center mb-3">
+                                      <i className="bi bi-telephone me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                      <span style={{ color: '#666', fontSize: '15px' }}>{selectedFreelancerProfile.phone}</span>
+                                    </div>
+                                  )}
+                                  {selectedFreelancerProfile.address && (
+                                    <div className="d-flex align-items-center mb-3">
+                                      <i className="bi bi-geo-alt me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                      <span style={{ color: '#666', fontSize: '15px' }}>{selectedFreelancerProfile.address}</span>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="col-md-6">
+                                  <div className="d-flex align-items-center mb-3">
+                                    <i className="bi bi-briefcase me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                    <span style={{ color: '#666', fontSize: '15px' }}>
+                                      {selectedFreelancerProfile.experience_years || selectedFreelancerProfile.years_experience || 0} years experience
+                                    </span>
+                                  </div>
+                                  <div className="d-flex align-items-center mb-3">
+                                    <i className="bi bi-calendar me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                    <span style={{ color: '#666', fontSize: '15px' }}>
+                                      Member since {new Date(selectedFreelancerProfile.created_at).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  {selectedFreelancerProfile.linkedin_url && (
+                                    <div className="d-flex align-items-center mb-3">
+                                      <i className="bi bi-linkedin me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                      <a href={selectedFreelancerProfile.linkedin_url} target="_blank" rel="noopener noreferrer" style={{ color: accent, textDecoration: 'none', fontSize: '15px' }}>
+                                        LinkedIn Profile
+                                      </a>
+                                    </div>
+                                  )}
+                                  {selectedFreelancerProfile.github_url && (
+                                    <div className="d-flex align-items-center mb-3">
+                                      <i className="bi bi-github me-3" style={{ color: accent, fontSize: 18 }}></i>
+                                      <a href={selectedFreelancerProfile.github_url} target="_blank" rel="noopener noreferrer" style={{ color: accent, textDecoration: 'none', fontSize: '15px' }}>
+                                        GitHub Profile
+                                      </a>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Professional Summary */}
+                        {selectedFreelancerProfile.summary && (
+                          <div style={{
+                            background: '#fff',
+                            borderRadius: 20,
+                            padding: '32px',
+                            marginBottom: 24,
+                            boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+                            border: '1px solid #f0f0f0'
+                          }}>
+                            <h4 style={{ 
+                              fontWeight: 700, 
+                              color: '#333', 
+                              marginBottom: 16,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10
+                            }}>
+                              <i className="bi bi-person-lines-fill" style={{ color: accent }}></i>
+                              Professional Summary
+                            </h4>
+                            <p style={{ 
+                              color: '#666', 
+                              fontSize: 16, 
+                              lineHeight: 1.6,
+                              margin: 0
+                            }}>
+                              {selectedFreelancerProfile.summary}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Skills Section */}
+                        {selectedFreelancerProfile.skills && selectedFreelancerProfile.skills.length > 0 && (
+                          <div style={{
+                            background: '#fff',
+                            borderRadius: 20,
+                            padding: '32px',
+                            marginBottom: 24,
+                            boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+                            border: '1px solid #f0f0f0'
+                          }}>
+                            <h4 style={{ 
+                              fontWeight: 700, 
+                              color: '#333', 
+                              marginBottom: 20,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10
+                            }}>
+                              <i className="bi bi-star" style={{ color: accent }}></i>
+                              Skills & Expertise
+                            </h4>
+                            <div className="row g-3">
+                              {selectedFreelancerProfile.skills.map((skill, index) => (
+                                <div key={skill.skill_id || index} className="col-md-6 col-lg-4">
+                                  <div style={{
+                                    background: '#f8f9fa',
+                                    borderRadius: '12px',
+                                    padding: '16px',
+                                    border: '1px solid #e9ecef',
+                                    height: '100%'
+                                  }}>
+                                    <h6 style={{ 
+                                      fontWeight: 600, 
+                                      color: '#333',
+                                      marginBottom: 8
+                                    }}>
+                                      {skill.skill_name}
+                                    </h6>
+                                    {skill.proficiency_level && (
+                                      <div className="mb-2">
+                                        <span className={`badge ${
+                                          skill.proficiency_level === 'Expert' ? 'bg-success' :
+                                          skill.proficiency_level === 'Advanced' ? 'bg-primary' :
+                                          skill.proficiency_level === 'Intermediate' ? 'bg-warning' : 'bg-secondary'
+                                        }`} style={{ fontSize: '10px' }}>
+                                          {skill.proficiency_level}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {skill.years_experience && (
+                                      <small className="text-muted">
+                                        {skill.years_experience} years experience
+                                      </small>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* CV Information */}
+                        {selectedFreelancerProfile.cv && selectedFreelancerProfile.cv.parsed_data && (
+                          <div style={{
+                            background: '#fff',
+                            borderRadius: 20,
+                            padding: '32px',
+                            marginBottom: 24,
+                            boxShadow: '0 4px 32px rgba(0,0,0,0.07)',
+                            border: '1px solid #f0f0f0'
+                          }}>
+                            <h4 style={{ 
+                              fontWeight: 700, 
+                              color: '#333', 
+                              marginBottom: 20,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10
+                            }}>
+                              <i className="bi bi-file-earmark-text" style={{ color: accent }}></i>
+                              CV Information
+                            </h4>
+                            
+                            {/* Work Experience */}
+                            {selectedFreelancerProfile.cv.parsed_data.work_experience && (
+                              <div className="mb-4">
+                                <h5 style={{ color: '#333', fontWeight: 600, marginBottom: 16 }}>
+                                  <i className="bi bi-briefcase me-2" style={{ color: accent }}></i>
+                                  Work Experience
+                                </h5>
+                                {selectedFreelancerProfile.cv.parsed_data.work_experience.map((work, index) => (
+                                  <div key={index} className="mb-3 p-3" style={{ 
+                                    background: '#f8f9fa', 
+                                    borderRadius: '8px',
+                                    border: '1px solid #e9ecef'
+                                  }}>
+                                    <h6 style={{ color: '#333', fontWeight: 600, marginBottom: 4 }}>
+                                      {work.position || work.job_title}
+                                    </h6>
+                                    <p style={{ color: accent, fontWeight: 500, marginBottom: 4 }}>
+                                      {work.company}
+                                    </p>
+                                    <small className="text-muted">
+                                      {work.start_date} - {work.end_date || 'Present'}
+                                    </small>
+                                    {work.description && (
+                                      <p style={{ color: '#666', marginTop: 8, marginBottom: 0 }}>
+                                        {work.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Education */}
+                            {selectedFreelancerProfile.cv.parsed_data.education && (
+                              <div className="mb-4">
+                                <h5 style={{ color: '#333', fontWeight: 600, marginBottom: 16 }}>
+                                  <i className="bi bi-mortarboard me-2" style={{ color: accent }}></i>
+                                  Education
+                                </h5>
+                                {selectedFreelancerProfile.cv.parsed_data.education.map((edu, index) => (
+                                  <div key={index} className="mb-3 p-3" style={{ 
+                                    background: '#f8f9fa', 
+                                    borderRadius: '8px',
+                                    border: '1px solid #e9ecef'
+                                  }}>
+                                    <h6 style={{ color: '#333', fontWeight: 600, marginBottom: 4 }}>
+                                      {edu.degree}
+                                    </h6>
+                                    <p style={{ color: accent, fontWeight: 500, marginBottom: 4 }}>
+                                      {edu.institution}
+                                    </p>
+                                    <small className="text-muted">
+                                      {edu.graduation_year}
+                                    </small>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="modal-footer">
+                    <button 
+                      type="button" 
+                      className="btn btn-secondary" 
+                      onClick={() => setShowFreelancerProfileModal(false)}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
       </div>
        </div>
     </div>
