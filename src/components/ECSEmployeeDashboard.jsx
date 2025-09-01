@@ -647,7 +647,7 @@ const ECSEmployeeDashboard = () => {
     if (searchStatus && searchStatus !== 'all') {
       console.log('🔍 Filtering by status:', searchStatus);
       filtered = filtered.filter(f => {
-        const status = f.is_available ? 'available' : 'unavailable';
+        const status = f.availability_status || 'available';
         const matches = status === searchStatus;
         
         console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
