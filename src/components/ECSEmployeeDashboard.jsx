@@ -1868,10 +1868,16 @@ const ECSEmployeeDashboard = () => {
                                 <div className="mb-2">
                                   <strong>Availability:</strong>
                                   <div className="mt-1">
-                                    <span className={`badge ${
-                                      freelancer.availability_status === 'available' ? 'bg-success' :
-                                      freelancer.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
-                                    }`} style={{ fontSize: '11px' }}>
+                                    <span style={{ 
+                                      background: freelancer.availability_status === 'available' ? '#d4edda' : 
+                                                 freelancer.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
+                                      color: freelancer.availability_status === 'available' ? '#155724' : 
+                                             freelancer.availability_status === 'busy' ? '#856404' : '#721c24',
+                                      padding: '4px 8px', 
+                                      borderRadius: 15,
+                                      fontSize: 11,
+                                      fontWeight: 600
+                                    }}>
                                       <i className={`bi ${
                                         freelancer.availability_status === 'available' ? 'bi-check-circle' :
                                         freelancer.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'

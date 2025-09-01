@@ -1422,10 +1422,16 @@ const AssociateDashboard = () => {
                                 </p>
                               </div>
                               <div className="text-end">
-                                <span className={`badge ${
-                                  rec.availability_status === 'available' ? 'bg-success' : 
-                                  rec.availability_status === 'busy' ? 'bg-warning text-dark' : 'bg-secondary'
-                                }`}>
+                                <span style={{ 
+                                  background: rec.availability_status === 'available' ? '#d4edda' : 
+                                             rec.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
+                                  color: rec.availability_status === 'available' ? '#155724' : 
+                                         rec.availability_status === 'busy' ? '#856404' : '#721c24',
+                                  padding: '6px 12px', 
+                                  borderRadius: 15,
+                                  fontSize: 12,
+                                  fontWeight: 600
+                                }}>
                                   <i className={`bi ${
                                     rec.availability_status === 'available' ? 'bi-check-circle' :
                                     rec.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
