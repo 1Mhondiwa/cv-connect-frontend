@@ -1046,6 +1046,20 @@ const AssociateDashboard = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Recent Activity - Only show on Request Freelancer tab */}
+            <div className="mt-5">
+              <h5 className="mb-3" style={{ color: '#444', fontWeight: 700 }}>Recent Activity</h5>
+              {activityLoading ? (
+                <div className="text-center py-4">
+                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                </div>
+              ) : (
+                <div className="bg-light rounded-3 p-3" style={{ maxHeight: '300px', overflowY: 'auto', background: '#f8f9fa' }}>
+                  <ActivityTable activities={activities} />
+                </div>
+              )}
+            </div>
           </div>
         )}
         {activeTab === 'messages' && (
@@ -1176,20 +1190,6 @@ const AssociateDashboard = () => {
                   </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Recent Activity - Only show on Request Freelancer tab */}
-            <div className="mt-5">
-              <h5 className="mb-3" style={{ color: '#444', fontWeight: 700 }}>Recent Activity</h5>
-              {activityLoading ? (
-                <div className="text-center py-4">
-                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
-                </div>
-              ) : (
-                <div className="bg-light rounded-3 p-3" style={{ maxHeight: '300px', overflowY: 'auto', background: '#f8f9fa' }}>
-                  <ActivityTable activities={activities} />
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -1670,6 +1670,9 @@ const AssociateDashboard = () => {
           box-shadow: 0 2px 8px rgba(253,104,14,0.1);
         }
       `}</style>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
