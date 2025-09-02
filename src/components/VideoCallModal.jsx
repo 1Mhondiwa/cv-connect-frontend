@@ -87,15 +87,101 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
         }
       };
 
-      // For demo purposes, we'll simulate a successful connection
-      setTimeout(() => {
+      // Simulate connection and show remote participant
+      setTimeout(async () => {
         setIsConnected(true);
         startTimeRef.current = Date.now();
+        
+        // Simulate remote participant by creating a second stream
+        // In a real app, this would come from the other user
+        await simulateRemoteParticipant();
       }, 2000);
 
     } catch (err) {
       console.error('Error starting call:', err);
       setError('Failed to start video call. Please check your camera and microphone permissions.');
+    }
+  };
+
+  const simulateRemoteParticipant = async () => {
+    try {
+      // Create a canvas element to simulate remote participant
+      const canvas = document.createElement('canvas');
+      canvas.width = 640;
+      canvas.height = 480;
+      const ctx = canvas.getContext('2d');
+      
+      let animationTime = 0;
+      
+      // Draw a more realistic placeholder for remote participant
+      const drawRemoteParticipant = () => {
+        animationTime += 0.1;
+        
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#34495e');
+        gradient.addColorStop(1, '#2c3e50');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw animated avatar circle
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2 - 30;
+        const radius = 60 + Math.sin(animationTime) * 5;
+        
+        // Avatar background
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Avatar icon
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('👤', centerX, centerY + 15);
+        
+        // Participant name
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(userType === 'associate' ? 'Freelancer' : 'Associate', centerX, centerY + 100);
+        
+        // Connection status
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#2ecc71';
+        ctx.fillText('● Connected', centerX, centerY + 125);
+        
+        // Simulated audio visualizer
+        for (let i = 0; i < 10; i++) {
+          const barHeight = Math.random() * 20 + 5;
+          const x = centerX - 50 + (i * 10);
+          const y = centerY + 140;
+          
+          ctx.fillStyle = `rgba(46, 204, 113, ${Math.random() * 0.8 + 0.2})`;
+          ctx.fillRect(x, y, 8, barHeight);
+        }
+      };
+      
+      // Animate the placeholder at 30fps
+      const animationInterval = setInterval(drawRemoteParticipant, 33);
+      
+      // Clean up animation when component unmounts
+      const cleanup = () => clearInterval(animationInterval);
+      
+      // Get stream from canvas
+      const canvasStream = canvas.captureStream(30);
+      
+      // Set as remote video
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = canvasStream;
+      }
+      
+      // Store cleanup function for later use
+      remoteVideoRef.current._cleanup = cleanup;
+      
+    } catch (err) {
+      console.error('Error simulating remote participant:', err);
     }
   };
 
@@ -112,6 +198,11 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
 
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
+    }
+
+    // Clean up remote participant animation
+    if (remoteVideoRef.current && remoteVideoRef.current._cleanup) {
+      remoteVideoRef.current._cleanup();
     }
 
     setIsConnected(false);
@@ -219,50 +310,63 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
               </div>
             )}
 
-            <div className="position-relative h-100">
-              {/* Remote Video (Main) */}
-              <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark d-flex align-items-center justify-content-center">
-                <video
-                  ref={remoteVideoRef}
-                  autoPlay
-                  playsInline
-                  className="w-100 h-100"
-                  style={{ objectFit: 'cover' }}
-                />
-                {!isConnected && (
-                  <div className="text-center text-white">
-                    <div className="spinner-border mb-3" role="status">
-                      <span className="visually-hidden">Connecting...</span>
-                    </div>
-                    <h5>Connecting to interview...</h5>
-                    <p>Please wait while we establish the video connection.</p>
-                  </div>
-                )}
-              </div>
+                         <div className="position-relative h-100">
+               {!isConnected ? (
+                 /* Connection Screen */
+                 <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark d-flex align-items-center justify-content-center">
+                   <div className="text-center text-white">
+                     <div className="spinner-border mb-3" role="status">
+                       <span className="visually-hidden">Connecting...</span>
+                     </div>
+                     <h5>Connecting to interview...</h5>
+                     <p>Please wait while we establish the video connection.</p>
+                   </div>
+                 </div>
+               ) : (
+                 /* Split Screen Layout - Both participants visible */
+                 <div className="d-flex h-100">
+                   {/* Remote Participant (Left Side) */}
+                   <div className="flex-fill bg-dark d-flex flex-column align-items-center justify-content-center position-relative">
+                     <video
+                       ref={remoteVideoRef}
+                       autoPlay
+                       playsInline
+                       className="w-100 h-100"
+                       style={{ objectFit: 'cover' }}
+                     />
+                     <div 
+                       className="position-absolute bottom-0 start-0 w-100 text-center py-2"
+                       style={{ background: 'rgba(0,0,0,0.7)' }}
+                     >
+                       <span className="text-white fw-semibold">
+                         <i className="bi bi-person-circle me-2"></i>
+                         {userType === 'associate' ? 'Freelancer' : 'Associate'}
+                       </span>
+                     </div>
+                   </div>
 
-              {/* Local Video (Picture-in-Picture) */}
-              <div 
-                className="position-absolute"
-                style={{ 
-                  top: '20px', 
-                  right: '20px', 
-                  width: '200px', 
-                  height: '150px',
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                  border: '2px solid #fff',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
-                }}
-              >
-                <video
-                  ref={localVideoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-100 h-100"
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
+                   {/* Local Participant (Right Side) */}
+                   <div className="flex-fill bg-secondary d-flex flex-column align-items-center justify-content-center position-relative">
+                     <video
+                       ref={localVideoRef}
+                       autoPlay
+                       playsInline
+                       muted
+                       className="w-100 h-100"
+                       style={{ objectFit: 'cover' }}
+                     />
+                     <div 
+                       className="position-absolute bottom-0 start-0 w-100 text-center py-2"
+                       style={{ background: 'rgba(0,0,0,0.7)' }}
+                     >
+                       <span className="text-white fw-semibold">
+                         <i className="bi bi-person-circle me-2"></i>
+                         You ({userType === 'associate' ? 'Associate' : 'Freelancer'})
+                       </span>
+                     </div>
+                   </div>
+                 </div>
+               )}
 
                              {/* Controls */}
                <div className="position-absolute bottom-0 start-0 w-100 p-4">
@@ -283,16 +387,14 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
                      <i className={`bi ${isVideoOn ? 'bi-camera-video' : 'bi-camera-video-off'}`}></i>
                    </button>
 
-                   {/* Screen sharing - only for associates */}
-                   {userType === 'associate' && (
-                     <button
-                       className={`btn btn-lg ${isScreenSharing ? 'btn-warning' : 'btn-outline-light'}`}
-                       onClick={toggleScreenShare}
-                       title={isScreenSharing ? 'Stop sharing' : 'Share screen'}
-                     >
-                       <i className="bi bi-laptop"></i>
-                     </button>
-                   )}
+                   {/* Screen sharing - available for both associates and freelancers */}
+                   <button
+                     className={`btn btn-lg ${isScreenSharing ? 'btn-warning' : 'btn-outline-light'}`}
+                     onClick={toggleScreenShare}
+                     title={isScreenSharing ? 'Stop sharing' : 'Share screen'}
+                   >
+                     <i className="bi bi-laptop"></i>
+                   </button>
 
                    {/* Different end call behaviors for associate vs freelancer */}
                    {userType === 'associate' ? (
