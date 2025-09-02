@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
+const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [error, setError] = useState('');
+  const [isHost, setIsHost] = useState(userType === 'associate');
   
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -99,7 +100,7 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
     }
   };
 
-  const endCall = () => {
+  const endCall = async () => {
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(track => track.stop());
       localStreamRef.current = null;
@@ -117,6 +118,32 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
     setIsConnected(false);
     setCallDuration(0);
     startTimeRef.current = null;
+
+    // If this is the host ending the meeting, update the backend
+    if (isHost && interview?.interview_id) {
+      try {
+        const response = await fetch('/api/interview/status', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            interview_id: interview.interview_id,
+            status: 'completed'
+          })
+        });
+
+        if (response.ok) {
+          // Notify parent component that meeting has ended
+          if (onMeetingEnd) {
+            onMeetingEnd();
+          }
+        }
+      } catch (error) {
+        console.error('Error updating meeting status:', error);
+      }
+    }
   };
 
   const toggleMute = () => {
@@ -264,42 +291,56 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
                 />
               </div>
 
-              {/* Controls */}
-              <div className="position-absolute bottom-0 start-0 w-100 p-4">
-                <div className="d-flex justify-content-center gap-3">
-                  <button
-                    className={`btn btn-lg ${isMuted ? 'btn-danger' : 'btn-outline-light'}`}
-                    onClick={toggleMute}
-                    title={isMuted ? 'Unmute' : 'Mute'}
-                  >
-                    <i className={`bi ${isMuted ? 'bi-mic-mute' : 'bi-mic'}`}></i>
-                  </button>
+                             {/* Controls */}
+               <div className="position-absolute bottom-0 start-0 w-100 p-4">
+                 <div className="d-flex justify-content-center gap-3">
+                   <button
+                     className={`btn btn-lg ${isMuted ? 'btn-danger' : 'btn-outline-light'}`}
+                     onClick={toggleMute}
+                     title={isMuted ? 'Unmute' : 'Mute'}
+                   >
+                     <i className={`bi ${isMuted ? 'bi-mic-mute' : 'bi-mic'}`}></i>
+                   </button>
 
-                  <button
-                    className={`btn btn-lg ${!isVideoOn ? 'btn-danger' : 'btn-outline-light'}`}
-                    onClick={toggleVideo}
-                    title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
-                  >
-                    <i className={`bi ${isVideoOn ? 'bi-camera-video' : 'bi-camera-video-off'}`}></i>
-                  </button>
+                   <button
+                     className={`btn btn-lg ${!isVideoOn ? 'btn-danger' : 'btn-outline-light'}`}
+                     onClick={toggleVideo}
+                     title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
+                   >
+                     <i className={`bi ${isVideoOn ? 'bi-camera-video' : 'bi-camera-video-off'}`}></i>
+                   </button>
 
-                  <button
-                    className={`btn btn-lg ${isScreenSharing ? 'btn-warning' : 'btn-outline-light'}`}
-                    onClick={toggleScreenShare}
-                    title={isScreenSharing ? 'Stop sharing' : 'Share screen'}
-                  >
-                    <i className="bi bi-laptop"></i>
-                  </button>
+                   {/* Screen sharing - only for host */}
+                   {isHost && (
+                     <button
+                       className={`btn btn-lg ${isScreenSharing ? 'btn-warning' : 'btn-outline-light'}`}
+                       onClick={toggleScreenShare}
+                       title={isScreenSharing ? 'Stop sharing' : 'Share screen'}
+                     >
+                       <i className="bi bi-laptop"></i>
+                     </button>
+                   )}
 
-                  <button
-                    className="btn btn-lg btn-danger"
-                    onClick={onClose}
-                    title="End call"
-                  >
-                    <i className="bi bi-telephone-x"></i>
-                  </button>
-                </div>
-              </div>
+                   {/* End call button - different behavior for host vs participant */}
+                   {isHost ? (
+                     <button
+                       className="btn btn-lg btn-danger"
+                       onClick={endCall}
+                       title="End meeting for everyone"
+                     >
+                       <i className="bi bi-telephone-x"></i>
+                     </button>
+                   ) : (
+                     <button
+                       className="btn btn-lg btn-outline-light"
+                       onClick={onClose}
+                       title="Leave meeting"
+                     >
+                       <i className="bi bi-box-arrow-right"></i>
+                     </button>
+                   )}
+                 </div>
+               </div>
             </div>
           </div>
         </div>
