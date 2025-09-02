@@ -18,8 +18,6 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
   useEffect(() => {
     if (isOpen) {
       startCall();
-      // Initialize with waiting state for remote participant
-      createPlaceholderFeed();
     } else {
       endCall();
     }
@@ -91,14 +89,8 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
         }
       };
 
-      // For demo: simulate second user joining after some delay only if freelancer joins
-      if (userType === 'freelancer') {
-        // Freelancer is joining an existing meeting
-        setTimeout(async () => {
-          await simulateRemoteVideoFeed();
-        }, 3000);
-      }
-      // If associate, just wait for freelancer to join (don't auto-connect)
+      // In production, the remote participant connection would be handled by
+      // WebRTC signaling server when another user actually joins the call
 
     } catch (err) {
       console.error('Error starting call:', err);
