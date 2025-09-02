@@ -116,16 +116,22 @@ const InterviewDashboard = ({ userType }) => {
     closeFeedbackModal();
   };
 
-  const startVideoCall = (interview) => {
+  const startVideoCall = async (interview) => {
+    console.log('startVideoCall called:', { interview, userType });
+    
     if (interview.interview_type === 'video') {
       // Only associates can start meetings
       if (userType === 'associate') {
-        // Open our custom video call modal
+        console.log('Associate starting video call...');
+        
+        // First update status to in_progress
+        await handleStatusUpdate(interview.interview_id, 'in_progress');
+        
+        // Then open the video call modal
         setSelectedInterviewForCall(interview);
         setShowVideoCallModal(true);
         
-        // Update status to in_progress
-        handleStatusUpdate(interview.interview_id, 'in_progress');
+        console.log('Video call modal should be open now');
       }
     } else {
       // For non-video interviews, just update status
@@ -328,6 +334,7 @@ const InterviewDashboard = ({ userType }) => {
       )}
 
       {/* Video Call Modal */}
+      {console.log('Modal state:', { showVideoCallModal, selectedInterviewForCall })}
       {showVideoCallModal && selectedInterviewForCall && (
         <VideoCallModal
           isOpen={showVideoCallModal}

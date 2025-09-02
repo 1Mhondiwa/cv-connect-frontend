@@ -88,11 +88,9 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
         }
       };
 
-      // For demo purposes, we'll simulate a successful connection
-      setTimeout(() => {
-        setIsConnected(true);
-        startTimeRef.current = Date.now();
-      }, 2000);
+      // Simulate successful connection immediately
+      setIsConnected(true);
+      startTimeRef.current = Date.now();
 
     } catch (err) {
       console.error('Error starting call:', err);
@@ -218,10 +216,12 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
     return null;
   }
 
+  console.log('VideoCallModal rendering:', { isOpen, interview, userType, isHost });
+
   return (
-    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)' }}>
-      <div className="modal-dialog modal-xl">
-        <div className="modal-content" style={{ height: '90vh' }}>
+    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 9999 }}>
+      <div className="modal-dialog modal-xl modal-dialog-centered">
+        <div className="modal-content" style={{ height: '90vh', maxHeight: '90vh' }}>
           <div className="modal-header bg-dark text-white">
             <h5 className="modal-title">
               <i className="bi bi-camera-video me-2"></i>
