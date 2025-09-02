@@ -18,6 +18,8 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
   useEffect(() => {
     if (isOpen) {
       startCall();
+      // Initialize with waiting state for remote participant
+      createPlaceholderFeed();
     } else {
       endCall();
     }
@@ -72,10 +74,12 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
         peerConnectionRef.current.addTrack(track, stream);
       });
 
-      // Handle remote stream
+      // Handle remote stream (will only work when another user actually joins)
       peerConnectionRef.current.ontrack = (event) => {
         if (remoteVideoRef.current) {
           remoteVideoRef.current.srcObject = event.streams[0];
+          setIsConnected(true);
+          startTimeRef.current = Date.now();
         }
       };
 
@@ -87,15 +91,14 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
         }
       };
 
-      // Simulate connection and show remote participant
-      setTimeout(async () => {
-        setIsConnected(true);
-        startTimeRef.current = Date.now();
-        
-        // Simulate remote participant by creating a second stream
-        // In a real app, this would come from the other user
-        await simulateRemoteParticipant();
-      }, 2000);
+      // For demo: simulate second user joining after some delay only if freelancer joins
+      if (userType === 'freelancer') {
+        // Freelancer is joining an existing meeting
+        setTimeout(async () => {
+          await simulateRemoteVideoFeed();
+        }, 3000);
+      }
+      // If associate, just wait for freelancer to join (don't auto-connect)
 
     } catch (err) {
       console.error('Error starting call:', err);
@@ -103,85 +106,57 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
     }
   };
 
-  const simulateRemoteParticipant = async () => {
+  const simulateRemoteVideoFeed = async () => {
     try {
-      // Create a canvas element to simulate remote participant
-      const canvas = document.createElement('canvas');
-      canvas.width = 640;
-      canvas.height = 480;
-      const ctx = canvas.getContext('2d');
+      // Simulate a second camera feed (in real app, this would come from the other user)
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      });
       
-      let animationTime = 0;
-      
-      // Draw a more realistic placeholder for remote participant
-      const drawRemoteParticipant = () => {
-        animationTime += 0.1;
-        
-        // Create gradient background
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#34495e');
-        gradient.addColorStop(1, '#2c3e50');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw animated avatar circle
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2 - 30;
-        const radius = 60 + Math.sin(animationTime) * 5;
-        
-        // Avatar background
-        ctx.fillStyle = '#3498db';
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        // Avatar icon
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '48px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('👤', centerX, centerY + 15);
-        
-        // Participant name
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 20px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(userType === 'associate' ? 'Freelancer' : 'Associate', centerX, centerY + 100);
-        
-        // Connection status
-        ctx.font = '14px Arial';
-        ctx.fillStyle = '#2ecc71';
-        ctx.fillText('● Connected', centerX, centerY + 125);
-        
-        // Simulated audio visualizer
-        for (let i = 0; i < 10; i++) {
-          const barHeight = Math.random() * 20 + 5;
-          const x = centerX - 50 + (i * 10);
-          const y = centerY + 140;
-          
-          ctx.fillStyle = `rgba(46, 204, 113, ${Math.random() * 0.8 + 0.2})`;
-          ctx.fillRect(x, y, 8, barHeight);
-        }
-      };
-      
-      // Animate the placeholder at 30fps
-      const animationInterval = setInterval(drawRemoteParticipant, 33);
-      
-      // Clean up animation when component unmounts
-      const cleanup = () => clearInterval(animationInterval);
-      
-      // Get stream from canvas
-      const canvasStream = canvas.captureStream(30);
-      
-      // Set as remote video
+      // Set as remote video to simulate the other participant
       if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = canvasStream;
+        remoteVideoRef.current.srcObject = stream;
+        setIsConnected(true);
+        startTimeRef.current = Date.now();
       }
       
-      // Store cleanup function for later use
-      remoteVideoRef.current._cleanup = cleanup;
-      
     } catch (err) {
-      console.error('Error simulating remote participant:', err);
+      console.error('Error simulating remote video feed:', err);
+      // Fallback to placeholder if no second camera available
+      await createPlaceholderFeed();
+    }
+  };
+
+  const createPlaceholderFeed = async () => {
+    // Create a simple placeholder that looks more like a real video call
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 480;
+    const ctx = canvas.getContext('2d');
+    
+    // Draw a waiting state
+    const drawWaitingState = () => {
+      // Dark background
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Center text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Waiting for other participant...', canvas.width / 2, canvas.height / 2 - 20);
+      
+      ctx.font = '16px Arial';
+      ctx.fillStyle = '#cccccc';
+      ctx.fillText(userType === 'associate' ? 'Waiting for freelancer to join' : 'Connecting to associate...', canvas.width / 2, canvas.height / 2 + 20);
+    };
+    
+    drawWaitingState();
+    const canvasStream = canvas.captureStream(1);
+    
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = canvasStream;
     }
   };
 
@@ -311,22 +286,20 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
             )}
 
                          <div className="position-relative h-100">
-               {!isConnected ? (
-                 /* Connection Screen */
-                 <div className="position-absolute top-0 start-0 w-100 h-100 bg-dark d-flex align-items-center justify-content-center">
-                   <div className="text-center text-white">
-                     <div className="spinner-border mb-3" role="status">
-                       <span className="visually-hidden">Connecting...</span>
+               {/* Split Screen Layout - Always show both sides */}
+               <div className="d-flex h-100">
+                 {/* Remote Participant (Left Side) */}
+                 <div className="flex-fill bg-dark d-flex flex-column align-items-center justify-content-center position-relative">
+                   {!isConnected ? (
+                     /* Waiting for other participant */
+                     <div className="text-center text-white">
+                       <div className="spinner-border mb-3" role="status">
+                         <span className="visually-hidden">Waiting...</span>
+                       </div>
+                       <h5>Waiting for {userType === 'associate' ? 'freelancer' : 'associate'}</h5>
+                       <p>The interview will start when both participants join</p>
                      </div>
-                     <h5>Connecting to interview...</h5>
-                     <p>Please wait while we establish the video connection.</p>
-                   </div>
-                 </div>
-               ) : (
-                 /* Split Screen Layout - Both participants visible */
-                 <div className="d-flex h-100">
-                   {/* Remote Participant (Left Side) */}
-                   <div className="flex-fill bg-dark d-flex flex-column align-items-center justify-content-center position-relative">
+                   ) : (
                      <video
                        ref={remoteVideoRef}
                        autoPlay
@@ -334,39 +307,42 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
                        className="w-100 h-100"
                        style={{ objectFit: 'cover' }}
                      />
-                     <div 
-                       className="position-absolute bottom-0 start-0 w-100 text-center py-2"
-                       style={{ background: 'rgba(0,0,0,0.7)' }}
-                     >
-                       <span className="text-white fw-semibold">
-                         <i className="bi bi-person-circle me-2"></i>
-                         {userType === 'associate' ? 'Freelancer' : 'Associate'}
-                       </span>
-                     </div>
-                   </div>
-
-                   {/* Local Participant (Right Side) */}
-                   <div className="flex-fill bg-secondary d-flex flex-column align-items-center justify-content-center position-relative">
-                     <video
-                       ref={localVideoRef}
-                       autoPlay
-                       playsInline
-                       muted
-                       className="w-100 h-100"
-                       style={{ objectFit: 'cover' }}
-                     />
-                     <div 
-                       className="position-absolute bottom-0 start-0 w-100 text-center py-2"
-                       style={{ background: 'rgba(0,0,0,0.7)' }}
-                     >
-                       <span className="text-white fw-semibold">
-                         <i className="bi bi-person-circle me-2"></i>
-                         You ({userType === 'associate' ? 'Associate' : 'Freelancer'})
-                       </span>
-                     </div>
+                   )}
+                   <div 
+                     className="position-absolute bottom-0 start-0 w-100 text-center py-2"
+                     style={{ background: 'rgba(0,0,0,0.7)' }}
+                   >
+                     <span className="text-white fw-semibold">
+                       <i className="bi bi-person-circle me-2"></i>
+                       {userType === 'associate' ? 'Freelancer' : 'Associate'}
+                       {isConnected && <span className="text-success ms-2">● Connected</span>}
+                       {!isConnected && <span className="text-warning ms-2">● Waiting</span>}
+                     </span>
                    </div>
                  </div>
-               )}
+
+                 {/* Local Participant (Right Side) */}
+                 <div className="flex-fill bg-secondary d-flex flex-column align-items-center justify-content-center position-relative">
+                   <video
+                     ref={localVideoRef}
+                     autoPlay
+                     playsInline
+                     muted
+                     className="w-100 h-100"
+                     style={{ objectFit: 'cover' }}
+                   />
+                   <div 
+                     className="position-absolute bottom-0 start-0 w-100 text-center py-2"
+                     style={{ background: 'rgba(0,0,0,0.7)' }}
+                   >
+                     <span className="text-white fw-semibold">
+                       <i className="bi bi-person-circle me-2"></i>
+                       You ({userType === 'associate' ? 'Associate' : 'Freelancer'})
+                       <span className="text-success ms-2">● Ready</span>
+                     </span>
+                   </div>
+                 </div>
+               </div>
 
                              {/* Controls */}
                <div className="position-absolute bottom-0 start-0 w-100 p-4">
