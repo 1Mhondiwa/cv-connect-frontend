@@ -4,6 +4,8 @@ import api from '../utils/axios';
 import { useRef } from 'react';
 import ActivityTable from "./ActivityTable";
 import { useAuth } from '../contexts/AuthContext';
+import InterviewDashboard from './InterviewDashboard';
+import InterviewFeedbackModal from './InterviewFeedbackModal';
 
 const BACKEND_URL = "http://localhost:5000";
 const accent = '#fd680e';
@@ -34,6 +36,10 @@ const FreelancerDashboard = () => {
   // Recent Activity state
   const [activities, setActivities] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
+
+  // Interview state
+  const [showInterviewFeedbackModal, setShowInterviewFeedbackModal] = useState(false);
+  const [selectedInterviewForFeedback, setSelectedInterviewForFeedback] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -219,6 +225,22 @@ const FreelancerDashboard = () => {
     }
   };
 
+  // Interview functions
+  const openInterviewFeedbackModal = (interview) => {
+    setSelectedInterviewForFeedback(interview);
+    setShowInterviewFeedbackModal(true);
+  };
+
+  const closeInterviewFeedbackModal = () => {
+    setShowInterviewFeedbackModal(false);
+    setSelectedInterviewForFeedback(null);
+  };
+
+  const handleInterviewFeedbackSuccess = () => {
+    // Show success message or refresh data if needed
+    console.log('Interview feedback submitted successfully');
+  };
+
   if (loading) {
     return (
       <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)' }}>
@@ -325,10 +347,40 @@ const FreelancerDashboard = () => {
                     </span>
                   )}
                 </button>
+                <button 
+                  className={`btn dashboard-tab-btn ${activeTab === 'interviews' ? '' : 'btn-outline-primary'}`}
+                  style={{
+                    background: activeTab === 'interviews' ? accent : 'transparent',
+                    color: activeTab === 'interviews' ? '#fff' : accent,
+                    border: `2px solid ${accent}`,
+                    borderRadius: activeTab === 'interviews' ? '0 30px 30px 0' : '0 30px 30px 0',
+                    padding: '12px 24px',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    transition: 'transform 0.18s, box-shadow 0.18s'
+                  }}
+                  onClick={() => setActiveTab('interviews')}
+                >
+                  <i className="bi bi-calendar-event me-2"></i>Interviews
+                </button>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Interview Tab */}
+        {activeTab === 'interviews' && (
+          <div className="container">
+            <div className="bg-white rounded-4 shadow-lg p-4" style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.07)' }}>
+              <div className="text-center mb-4">
+                <h4 style={{ color: accent, fontWeight: 600 }}>Interview Management</h4>
+                <p style={{ color: '#666', fontSize: 14 }}>View and manage your scheduled interviews with associates</p>
+              </div>
+              
+              <InterviewDashboard userType="freelancer" />
+            </div>
+          </div>
+        )}
 
         {/* Dashboard Tab */}
         {activeTab === 'dashboard' && (
@@ -750,6 +802,15 @@ const FreelancerDashboard = () => {
           box-shadow: 0 2px 8px rgba(253,104,14,0.1);
         }
       `}</style>
+
+      {/* Interview Feedback Modal */}
+      <InterviewFeedbackModal
+        isOpen={showInterviewFeedbackModal}
+        onClose={closeInterviewFeedbackModal}
+        interview={selectedInterviewForFeedback}
+        userType="freelancer"
+        onSubmitSuccess={handleInterviewFeedbackSuccess}
+      />
     </div>
   );
 };

@@ -5,6 +5,9 @@ import { useRef } from 'react';
 import ActivityTable from "./ActivityTable";
 import { useAuth } from '../contexts/AuthContext';
 import HiringModal from './HiringModal';
+import InterviewSchedulingModal from './InterviewSchedulingModal';
+import InterviewDashboard from './InterviewDashboard';
+import InterviewFeedbackModal from './InterviewFeedbackModal';
 // REMOVE: import io from 'socket.io-client';
 
 const accent = '#fd680e';
@@ -77,6 +80,12 @@ const AssociateDashboard = () => {
   const [showHiringModal, setShowHiringModal] = useState(false);
   const [selectedFreelancerForHiring, setSelectedFreelancerForHiring] = useState(null);
   const [hiringLoading, setHiringLoading] = useState(false);
+
+  // Interview state
+  const [showInterviewSchedulingModal, setShowInterviewSchedulingModal] = useState(false);
+  const [selectedFreelancerForInterview, setSelectedFreelancerForInterview] = useState(null);
+  const [showInterviewFeedbackModal, setShowInterviewFeedbackModal] = useState(false);
+  const [selectedInterviewForFeedback, setSelectedInterviewForFeedback] = useState(null);
 
   // REMOVE: const socket = io('http://localhost:5000'); // Adjust if backend URL is different
 
@@ -391,6 +400,61 @@ const AssociateDashboard = () => {
     // Show success toast
     setToast({ 
       message: 'Freelancer hired successfully! ECS Employee has been notified.', 
+      type: 'success' 
+    });
+  };
+
+  // Interview functions
+  const openInterviewSchedulingModal = (freelancer) => {
+    console.log('Opening interview scheduling modal for freelancer:', freelancer);
+    console.log('Current selectedRequest:', selectedRequest);
+    
+    if (!selectedRequest || !selectedRequest.request_id) {
+      console.error('No valid request selected for interview scheduling!');
+      setToast({ 
+        message: 'Error: No valid request selected. Please try again.', 
+        type: 'error' 
+      });
+      return;
+    }
+    
+    setSelectedFreelancerForInterview(freelancer);
+    setShowInterviewSchedulingModal(true);
+  };
+
+  const closeInterviewSchedulingModal = () => {
+    setShowInterviewSchedulingModal(false);
+    setSelectedFreelancerForInterview(null);
+  };
+
+  const handleInterviewScheduleSuccess = () => {
+    // Refresh recommendations and requests
+    if (selectedRequest && selectedRequest.request_id) {
+      fetchRecommendations(selectedRequest.request_id);
+    }
+    fetchRequests();
+    
+    // Show success toast
+    setToast({ 
+      message: 'Interview scheduled successfully! The freelancer has been notified.', 
+      type: 'success' 
+    });
+  };
+
+  const openInterviewFeedbackModal = (interview) => {
+    setSelectedInterviewForFeedback(interview);
+    setShowInterviewFeedbackModal(true);
+  };
+
+  const closeInterviewFeedbackModal = () => {
+    setShowInterviewFeedbackModal(false);
+    setSelectedInterviewForFeedback(null);
+  };
+
+  const handleInterviewFeedbackSuccess = () => {
+    // Show success toast
+    setToast({ 
+      message: 'Interview feedback submitted successfully!', 
       type: 'success' 
     });
   };
@@ -779,6 +843,13 @@ const AssociateDashboard = () => {
                   onClick={() => setActiveTab('my-requests')}
                 >
                   <i className="bi bi-list-check me-2"></i>My Requests
+                </button>
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'interviews' ? '' : 'btn-outline-primary'}`}
+                  style={{ background: activeTab === 'interviews' ? accent : 'transparent', color: activeTab === 'interviews' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => setActiveTab('interviews')}
+                >
+                  <i className="bi bi-calendar-event me-2"></i>Interviews
                 </button>
               </div>
               {assocUploading && (
@@ -1480,6 +1551,13 @@ const AssociateDashboard = () => {
                                 <i className="bi bi-hand-thumbs-down me-1"></i>Not Interested
                               </button>
                               <button
+                                className="btn btn-sm btn-warning"
+                                onClick={() => openInterviewSchedulingModal(rec)}
+                                title="Schedule an interview with this freelancer"
+                              >
+                                <i className="bi bi-calendar-event me-1"></i>Schedule Interview
+                              </button>
+                              <button
                                 className="btn btn-sm btn-primary"
                                 onClick={() => openHiringModal(rec)}
                                 title="Formally hire this freelancer with project details"
@@ -1516,6 +1594,20 @@ const AssociateDashboard = () => {
         </div>
       )}
 
+      {/* Interview Tab */}
+      {activeTab === 'interviews' && (
+        <div className="tab-content">
+          <div className="card p-4 shadow-lg mb-4 rounded-4">
+            <div className="text-center mb-4">
+              <h4 style={{ color: accent, fontWeight: 600 }}>Interview Management</h4>
+              <p style={{ color: '#666', fontSize: 14 }}>Schedule, manage, and track your interviews with freelancers</p>
+            </div>
+            
+            <InterviewDashboard userType="associate" />
+          </div>
+        </div>
+      )}
+
       {/* Toast Notification */}
       {toast.message && (
         <div className={`toast-container position-fixed top-0 end-0 p-3`} style={{ zIndex: 9999 }}>
@@ -1539,6 +1631,24 @@ const AssociateDashboard = () => {
         freelancer={selectedFreelancerForHiring}
         request={selectedRequest}
         onHireSuccess={handleHireSuccess}
+      />
+
+      {/* Interview Scheduling Modal */}
+      <InterviewSchedulingModal
+        isOpen={showInterviewSchedulingModal}
+        onClose={closeInterviewSchedulingModal}
+        freelancer={selectedFreelancerForInterview}
+        request={selectedRequest}
+        onScheduleSuccess={handleInterviewScheduleSuccess}
+      />
+
+      {/* Interview Feedback Modal */}
+      <InterviewFeedbackModal
+        isOpen={showInterviewFeedbackModal}
+        onClose={closeInterviewFeedbackModal}
+        interview={selectedInterviewForFeedback}
+        userType="associate"
+        onSubmitSuccess={handleInterviewFeedbackSuccess}
       />
 
       {/* Animation Styles */}
