@@ -1177,6 +1177,20 @@ const AssociateDashboard = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Recent Activity - Only show on Request Freelancer tab */}
+            <div className="mt-5">
+              <h5 className="mb-3" style={{ color: '#444', fontWeight: 700 }}>Recent Activity</h5>
+              {activityLoading ? (
+                <div className="text-center py-4">
+                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
+                </div>
+              ) : (
+                <div className="bg-light rounded-3 p-3" style={{ maxHeight: '300px', overflowY: 'auto', background: '#f8f9fa' }}>
+                  <ActivityTable activities={activities} />
+                </div>
+              )}
+            </div>
           </div>
         )}
         {activeTab === 'change-password' && (
@@ -1423,22 +1437,6 @@ const AssociateDashboard = () => {
             </div>
           </div>
         )}
-      {/* Recent Activity */}
-            <div className="mt-5">
-              <h5 className="mb-3" style={{ color: '#444', fontWeight: 700 }}>Recent Activity</h5>
-        {activityLoading ? (
-                <div className="text-center py-4">
-                  <div className="spinner-border" style={{ color: accent }} role="status"></div>
-                </div>
-        ) : (
-                <div className="bg-light rounded-3 p-3" style={{ maxHeight: '300px', overflowY: 'auto', background: '#f8f9fa' }}>
-          <ActivityTable activities={activities} />
-                </div>
-        )}
-            </div>
-          </div>
-        </div>
-      </div>
       {/* Recommendations Modal */}
       {showRecommendationsModal && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -1597,7 +1595,7 @@ const AssociateDashboard = () => {
       {/* Interview Tab */}
       {activeTab === 'interviews' && (
         <div className="tab-content">
-          <div className="card p-4 shadow-lg mb-4 rounded-4">
+          <div className="card p-4 shadow-lg rounded-4" style={{ minHeight: '80vh' }}>
             <div className="text-center mb-4">
               <h4 style={{ color: accent, fontWeight: 600 }}>Interview Management</h4>
               <p style={{ color: '#666', fontSize: 14 }}>Schedule, manage, and track your interviews with freelancers</p>
