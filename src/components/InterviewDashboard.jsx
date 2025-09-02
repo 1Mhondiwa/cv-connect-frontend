@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/axios';
+import InterviewFeedbackModal from './InterviewFeedbackModal';
 
 const InterviewDashboard = ({ userType }) => {
   const [interviews, setInterviews] = useState([]);
@@ -8,6 +9,8 @@ const InterviewDashboard = ({ userType }) => {
   const [filter, setFilter] = useState('all');
   const [selectedInterview, setSelectedInterview] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [selectedInterviewForFeedback, setSelectedInterviewForFeedback] = useState(null);
 
   useEffect(() => {
     fetchInterviews();
@@ -93,6 +96,36 @@ const InterviewDashboard = ({ userType }) => {
   const closeInterviewDetails = () => {
     setSelectedInterview(null);
     setShowDetails(false);
+  };
+
+  const openFeedbackModal = (interview) => {
+    setSelectedInterviewForFeedback(interview);
+    setShowFeedbackModal(true);
+  };
+
+  const closeFeedbackModal = () => {
+    setSelectedInterviewForFeedback(null);
+    setShowFeedbackModal(false);
+  };
+
+  const handleFeedbackSuccess = () => {
+    fetchInterviews(); // Refresh interviews to show updated feedback
+    closeFeedbackModal();
+  };
+
+  const startVideoCall = (interview) => {
+    if (interview.interview_type === 'video' && interview.meeting_link) {
+      // For now, we'll use a simple approach - open the meeting link in a new tab
+      // In a real implementation, you would integrate with WebRTC, Jitsi Meet, or similar
+      const meetingUrl = `https://meet.jit.si/${interview.meeting_link}`;
+      window.open(meetingUrl, '_blank', 'width=1200,height=800');
+      
+      // Update status to in_progress
+      handleStatusUpdate(interview.interview_id, 'in_progress');
+    } else {
+      // For non-video interviews, just update status
+      handleStatusUpdate(interview.interview_id, 'in_progress');
+    }
   };
 
   if (loading) {
@@ -213,10 +246,10 @@ const InterviewDashboard = ({ userType }) => {
                     {interview.status === 'scheduled' && (
                       <button
                         className="btn btn-success btn-sm"
-                        onClick={() => handleStatusUpdate(interview.interview_id, 'in_progress')}
+                        onClick={() => startVideoCall(interview)}
                       >
-                        <i className="bi bi-play me-1"></i>
-                        Start
+                        <i className="bi bi-camera-video me-1"></i>
+                        Start Interview
                       </button>
                     )}
                     
@@ -225,8 +258,8 @@ const InterviewDashboard = ({ userType }) => {
                         className="btn btn-primary btn-sm"
                         onClick={() => handleStatusUpdate(interview.interview_id, 'completed')}
                       >
-                        <i className="bi bi-check me-1"></i>
-                        Complete
+                        <i className="bi bi-check-circle me-1"></i>
+                        End Interview
                       </button>
                     )}
                   </div>
@@ -244,6 +277,19 @@ const InterviewDashboard = ({ userType }) => {
           userType={userType}
           onClose={closeInterviewDetails}
           onStatusUpdate={handleStatusUpdate}
+          onOpenFeedback={openFeedbackModal}
+          onStartVideoCall={startVideoCall}
+        />
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedbackModal && selectedInterviewForFeedback && (
+        <InterviewFeedbackModal
+          isOpen={showFeedbackModal}
+          onClose={closeFeedbackModal}
+          interview={selectedInterviewForFeedback}
+          userType={userType}
+          onSubmitSuccess={handleFeedbackSuccess}
         />
       )}
     </div>
@@ -251,8 +297,7 @@ const InterviewDashboard = ({ userType }) => {
 };
 
 // Interview Details Modal Component
-const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate }) => {
-  const [showFeedback, setShowFeedback] = useState(false);
+const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate, onOpenFeedback, onStartVideoCall }) => {
 
   const formatDateTime = (dateTime) => {
     return new Date(dateTime).toLocaleString('en-US', {
@@ -291,11 +336,22 @@ const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate })
                 <p><strong>Date & Time:</strong> {formatDateTime(interview.scheduled_date)}</p>
                 <p><strong>Duration:</strong> {interview.duration_minutes} minutes</p>
                 <p><strong>Status:</strong> {interview.status}</p>
+                {interview.interview_type === 'video' && interview.meeting_link && (
+                  <p><strong>Meeting Link:</strong> 
+                    <a href={`https://meet.jit.si/${interview.meeting_link}`} target="_blank" rel="noopener noreferrer" className="ms-1">
+                      Join Video Call
+                      <i className="bi bi-box-arrow-up-right ms-1"></i>
+                    </a>
+                  </p>
+                )}
               </div>
               <div className="col-md-6">
                 <h6>Project Details</h6>
                 <p><strong>Title:</strong> {interview.request_title}</p>
                 <p><strong>Description:</strong> {interview.request_description}</p>
+                {interview.location && (
+                  <p><strong>Location:</strong> {interview.location}</p>
+                )}
               </div>
             </div>
 
@@ -336,7 +392,7 @@ const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate })
               {canSubmitFeedback() && (
                 <button
                   className="btn btn-outline-primary"
-                  onClick={() => setShowFeedback(true)}
+                  onClick={() => onOpenFeedback(interview)}
                 >
                   <i className="bi bi-star me-1"></i>
                   Submit Feedback
@@ -346,9 +402,9 @@ const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate })
               {interview.status === 'scheduled' && (
                 <button
                   className="btn btn-success"
-                  onClick={() => onStatusUpdate(interview.interview_id, 'in_progress')}
+                  onClick={() => onStartVideoCall(interview)}
                 >
-                  <i className="bi bi-play me-1"></i>
+                  <i className="bi bi-camera-video me-1"></i>
                   Start Interview
                 </button>
               )}
@@ -358,8 +414,8 @@ const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate })
                   className="btn btn-primary"
                   onClick={() => onStatusUpdate(interview.interview_id, 'completed')}
                 >
-                  <i className="bi bi-check me-1"></i>
-                  Complete Interview
+                  <i className="bi bi-check-circle me-1"></i>
+                  End Interview
                 </button>
               )}
               
