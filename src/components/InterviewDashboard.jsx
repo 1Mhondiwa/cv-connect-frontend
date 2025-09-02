@@ -115,10 +115,42 @@ const InterviewDashboard = ({ userType }) => {
 
   const startVideoCall = (interview) => {
     if (interview.interview_type === 'video' && interview.meeting_link) {
-      // For now, we'll use a simple approach - open the meeting link in a new tab
-      // Using Jitsi Meet for video calls (free, no registration required)
-      const meetingUrl = `https://meet.jit.si/${interview.meeting_link}`;
-      window.open(meetingUrl, '_blank', 'width=1200,height=800');
+      // Configure Jitsi Meet with proper host/participant roles
+      const baseUrl = `https://meet.jit.si/${interview.meeting_link}`;
+      
+      // Add URL parameters to configure the meeting
+      const params = new URLSearchParams({
+        'config.prejoinPageEnabled': 'false',
+        'config.startWithAudioMuted': 'false',
+        'config.startWithVideoMuted': 'false',
+        'config.enableWelcomePage': 'false',
+        'config.enableClosePage': 'false',
+        'config.disableModeratorIndicator': 'false',
+        'config.startScreenSharing': 'false',
+        'config.enableEmailInStats': 'false',
+        'interfaceConfig.SHOW_JITSI_WATERMARK': 'false',
+        'interfaceConfig.SHOW_WATERMARK_FOR_GUESTS': 'false',
+        'interfaceConfig.SHOW_BRAND_WATERMARK': 'false',
+        'interfaceConfig.SHOW_POWERED_BY': 'false'
+      });
+      
+      // Add user info based on role
+      if (userType === 'associate') {
+        params.append('userInfo.displayName', 'Interview Host');
+        // Associate gets host privileges - first to join becomes moderator
+        params.append('config.startWithAudioMuted', 'false');
+        params.append('config.startWithVideoMuted', 'false');
+      } else {
+        params.append('userInfo.displayName', 'Interview Participant');
+        // Freelancer joins as participant
+        params.append('config.startWithAudioMuted', 'true');
+        params.append('config.startWithVideoMuted', 'true');
+      }
+      
+      const jitsiUrl = `${baseUrl}?${params.toString()}`;
+      
+      // Open Jitsi Meet in new window
+      window.open(jitsiUrl, '_blank', 'width=1200,height=800');
       
       // Update status to in_progress
       handleStatusUpdate(interview.interview_id, 'in_progress');
@@ -338,8 +370,8 @@ const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate, o
                 <p><strong>Status:</strong> {interview.status}</p>
                 {interview.interview_type === 'video' && interview.meeting_link && (
                   <p><strong>Meeting Link:</strong> 
-                    <a href={`https://meet.jit.si/${interview.meeting_link}`} target="_blank" rel="noopener noreferrer" className="ms-1">
-                      Join Video Call
+                    <a href={`https://meet.jit.si/${interview.meeting_link}?config.prejoinPageEnabled=false&config.startWithAudioMuted=${userType === 'associate' ? 'false' : 'true'}&config.startWithVideoMuted=${userType === 'associate' ? 'false' : 'true'}&userInfo.displayName=${userType === 'associate' ? 'Interview Host' : 'Interview Participant'}`} target="_blank" rel="noopener noreferrer" className="ms-1">
+                      {userType === 'associate' ? 'Host Video Call' : 'Join Video Call'}
                       <i className="bi bi-box-arrow-up-right ms-1"></i>
                     </a>
                   </p>
