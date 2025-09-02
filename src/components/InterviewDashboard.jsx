@@ -28,7 +28,7 @@ const InterviewDashboard = ({ userType }) => {
     if (hasActiveInterviews) {
       const interval = setInterval(() => {
         fetchInterviews(true); // Silent refresh to avoid loading spinners
-      }, 3000); // Poll every 3 seconds for active interviews
+      }, 30000); // Poll every 30 seconds for active interviews (reduced from 3 seconds)
 
       return () => clearInterval(interval);
     }
@@ -45,7 +45,14 @@ const InterviewDashboard = ({ userType }) => {
       }
     } catch (error) {
       console.error('Error fetching interviews:', error);
-      if (!silent) setError('Failed to load interviews');
+      
+      // Handle rate limiting errors silently to avoid spam
+      if (error.response && error.response.status === 429) {
+        console.warn('Rate limited - reducing polling frequency');
+        if (!silent) setError('Server is busy. Please wait a moment and try again.');
+      } else {
+        if (!silent) setError('Failed to load interviews');
+      }
     } finally {
       if (!silent) setLoading(false);
     }
@@ -70,6 +77,13 @@ const InterviewDashboard = ({ userType }) => {
       }
     } catch (error) {
       console.error('Error updating interview status:', error);
+      
+      // Handle rate limiting errors
+      if (error.response && error.response.status === 429) {
+        setError('Server is busy. Please wait a moment and try again.');
+      } else {
+        setError('Failed to update interview status. Please try again.');
+      }
     }
   };
 
