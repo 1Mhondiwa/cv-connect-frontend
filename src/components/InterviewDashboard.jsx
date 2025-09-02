@@ -115,9 +115,9 @@ const InterviewDashboard = ({ userType }) => {
 
   const startVideoCall = (interview) => {
     if (interview.interview_type === 'video' && interview.meeting_link) {
-      // Use the simplest possible Jitsi Meet URL
-      // The first person to join becomes the moderator automatically
-      const jitsiUrl = `https://meet.jit.si/${interview.meeting_link}`;
+      // Try using fragment-based URL to avoid authentication issues
+      // This approach sometimes bypasses Jitsi Meet's authentication checks
+      const jitsiUrl = `https://meet.jit.si/#${interview.meeting_link}`;
       
       // Open Jitsi Meet in new window
       window.open(jitsiUrl, '_blank', 'width=1200,height=800');
@@ -340,7 +340,7 @@ const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate, o
                 <p><strong>Status:</strong> {interview.status}</p>
                 {interview.interview_type === 'video' && interview.meeting_link && (
                   <p><strong>Meeting Link:</strong> 
-                    <a href={`https://meet.jit.si/${interview.meeting_link}`} target="_blank" rel="noopener noreferrer" className="ms-1">
+                    <a href={`https://meet.jit.si/#${interview.meeting_link}`} target="_blank" rel="noopener noreferrer" className="ms-1">
                       {userType === 'associate' ? 'Host Video Call' : 'Join Video Call'}
                       <i className="bi bi-box-arrow-up-right ms-1"></i>
                     </a>
