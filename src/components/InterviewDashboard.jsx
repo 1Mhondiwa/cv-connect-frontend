@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../utils/axios';
 import InterviewFeedbackModal from './InterviewFeedbackModal';
+import VideoCallModal from './VideoCallModal';
 
 const InterviewDashboard = ({ userType }) => {
   const [interviews, setInterviews] = useState([]);
@@ -11,6 +12,8 @@ const InterviewDashboard = ({ userType }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedInterviewForFeedback, setSelectedInterviewForFeedback] = useState(null);
+  const [showVideoCallModal, setShowVideoCallModal] = useState(false);
+  const [selectedInterviewForCall, setSelectedInterviewForCall] = useState(null);
 
   useEffect(() => {
     fetchInterviews();
@@ -114,13 +117,10 @@ const InterviewDashboard = ({ userType }) => {
   };
 
   const startVideoCall = (interview) => {
-    if (interview.interview_type === 'video' && interview.meeting_link) {
-      // Try using fragment-based URL to avoid authentication issues
-      // This approach sometimes bypasses Jitsi Meet's authentication checks
-      const jitsiUrl = `https://meet.jit.si/#${interview.meeting_link}`;
-      
-      // Open Jitsi Meet in new window
-      window.open(jitsiUrl, '_blank', 'width=1200,height=800');
+    if (interview.interview_type === 'video') {
+      // Open our custom video call modal
+      setSelectedInterviewForCall(interview);
+      setShowVideoCallModal(true);
       
       // Update status to in_progress
       handleStatusUpdate(interview.interview_id, 'in_progress');
@@ -128,6 +128,11 @@ const InterviewDashboard = ({ userType }) => {
       // For non-video interviews, just update status
       handleStatusUpdate(interview.interview_id, 'in_progress');
     }
+  };
+
+  const closeVideoCallModal = () => {
+    setShowVideoCallModal(false);
+    setSelectedInterviewForCall(null);
   };
 
   if (loading) {
@@ -294,6 +299,16 @@ const InterviewDashboard = ({ userType }) => {
           onSubmitSuccess={handleFeedbackSuccess}
         />
       )}
+
+      {/* Video Call Modal */}
+      {showVideoCallModal && selectedInterviewForCall && (
+        <VideoCallModal
+          isOpen={showVideoCallModal}
+          onClose={closeVideoCallModal}
+          interview={selectedInterviewForCall}
+          userType={userType}
+        />
+      )}
     </div>
   );
 };
@@ -338,12 +353,12 @@ const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate, o
                 <p><strong>Date & Time:</strong> {formatDateTime(interview.scheduled_date)}</p>
                 <p><strong>Duration:</strong> {interview.duration_minutes} minutes</p>
                 <p><strong>Status:</strong> {interview.status}</p>
-                {interview.interview_type === 'video' && interview.meeting_link && (
-                  <p><strong>Meeting Link:</strong> 
-                    <a href={`https://meet.jit.si/#${interview.meeting_link}`} target="_blank" rel="noopener noreferrer" className="ms-1">
-                      {userType === 'associate' ? 'Host Video Call' : 'Join Video Call'}
-                      <i className="bi bi-box-arrow-up-right ms-1"></i>
-                    </a>
+                {interview.interview_type === 'video' && (
+                  <p><strong>Video Call:</strong> 
+                    <span className="text-success ms-1">
+                      <i className="bi bi-camera-video me-1"></i>
+                      {userType === 'associate' ? 'Start Video Call' : 'Join Video Call'}
+                    </span>
                   </p>
                 )}
               </div>

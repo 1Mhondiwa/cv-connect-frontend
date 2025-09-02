@@ -162,7 +162,7 @@ const InterviewSchedulingModal = ({ isOpen, onClose, freelancer, request, onSche
                     onChange={handleInputChange}
                     required
                   >
-                    <option value="video">Video Call (Jitsi Meet)</option>
+                    <option value="video">Video Call (WebRTC)</option>
                     <option value="phone">Phone Call</option>
                     <option value="in_person">In-Person Meeting</option>
                   </select>
