@@ -116,7 +116,7 @@ const InterviewDashboard = ({ userType }) => {
   const startVideoCall = (interview) => {
     if (interview.interview_type === 'video' && interview.meeting_link) {
       // For now, we'll use a simple approach - open the meeting link in a new tab
-      // In a real implementation, you would integrate with WebRTC, Jitsi Meet, or similar
+      // Using Jitsi Meet for video calls (free, no registration required)
       const meetingUrl = `https://meet.jit.si/${interview.meeting_link}`;
       window.open(meetingUrl, '_blank', 'width=1200,height=800');
       
