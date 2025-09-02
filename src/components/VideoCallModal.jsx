@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) => {
+const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [error, setError] = useState('');
-  const [isHost, setIsHost] = useState(userType === 'associate');
   
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -88,9 +87,11 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
         }
       };
 
-      // Simulate successful connection immediately
-      setIsConnected(true);
-      startTimeRef.current = Date.now();
+      // For demo purposes, we'll simulate a successful connection
+      setTimeout(() => {
+        setIsConnected(true);
+        startTimeRef.current = Date.now();
+      }, 2000);
 
     } catch (err) {
       console.error('Error starting call:', err);
@@ -98,7 +99,7 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
     }
   };
 
-  const endCall = async () => {
+  const endCall = () => {
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(track => track.stop());
       localStreamRef.current = null;
@@ -116,32 +117,6 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
     setIsConnected(false);
     setCallDuration(0);
     startTimeRef.current = null;
-
-    // If this is the host ending the meeting, update the backend
-    if (isHost && interview?.interview_id) {
-      try {
-        const response = await fetch('/api/interview/status', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            interview_id: interview.interview_id,
-            status: 'completed'
-          })
-        });
-
-        if (response.ok) {
-          // Notify parent component that meeting has ended
-          if (onMeetingEnd) {
-            onMeetingEnd();
-          }
-        }
-      } catch (error) {
-        console.error('Error updating meeting status:', error);
-      }
-    }
   };
 
   const toggleMute = () => {
@@ -216,12 +191,10 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
     return null;
   }
 
-  console.log('VideoCallModal rendering:', { isOpen, interview, userType, isHost });
-
   return (
-    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 9999 }}>
-      <div className="modal-dialog modal-xl modal-dialog-centered">
-        <div className="modal-content" style={{ height: '90vh', maxHeight: '90vh' }}>
+    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.8)' }}>
+      <div className="modal-dialog modal-xl">
+        <div className="modal-content" style={{ height: '90vh' }}>
           <div className="modal-header bg-dark text-white">
             <h5 className="modal-title">
               <i className="bi bi-camera-video me-2"></i>
@@ -310,8 +283,8 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
                      <i className={`bi ${isVideoOn ? 'bi-camera-video' : 'bi-camera-video-off'}`}></i>
                    </button>
 
-                   {/* Screen sharing - only for host */}
-                   {isHost && (
+                   {/* Screen sharing - only for associates */}
+                   {userType === 'associate' && (
                      <button
                        className={`btn btn-lg ${isScreenSharing ? 'btn-warning' : 'btn-outline-light'}`}
                        onClick={toggleScreenShare}
@@ -321,12 +294,12 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
                      </button>
                    )}
 
-                   {/* End call button - different behavior for host vs participant */}
-                   {isHost ? (
+                   {/* Different end call behaviors for associate vs freelancer */}
+                   {userType === 'associate' ? (
                      <button
                        className="btn btn-lg btn-danger"
-                       onClick={endCall}
-                       title="End meeting for everyone"
+                       onClick={onClose}
+                       title="End interview for everyone"
                      >
                        <i className="bi bi-telephone-x"></i>
                      </button>
@@ -334,7 +307,7 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType, onMeetingEnd }) 
                      <button
                        className="btn btn-lg btn-outline-light"
                        onClick={onClose}
-                       title="Leave meeting"
+                       title="Leave interview"
                      >
                        <i className="bi bi-box-arrow-right"></i>
                      </button>

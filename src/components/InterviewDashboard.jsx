@@ -19,9 +19,24 @@ const InterviewDashboard = ({ userType }) => {
     fetchInterviews();
   }, [filter]);
 
-  const fetchInterviews = async () => {
+  // Set up polling for real-time updates when there are active interviews
+  useEffect(() => {
+    const hasActiveInterviews = interviews.some(interview => 
+      interview.status === 'in_progress' || interview.status === 'scheduled'
+    );
+
+    if (hasActiveInterviews) {
+      const interval = setInterval(() => {
+        fetchInterviews(true); // Silent refresh to avoid loading spinners
+      }, 3000); // Poll every 3 seconds for active interviews
+
+      return () => clearInterval(interval);
+    }
+  }, [interviews]);
+
+  const fetchInterviews = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const params = filter !== 'all' ? `?status=${filter}` : '';
       const response = await api.get(`/interview/${params}`);
       
@@ -30,9 +45,9 @@ const InterviewDashboard = ({ userType }) => {
       }
     } catch (error) {
       console.error('Error fetching interviews:', error);
-      setError('Failed to load interviews');
+      if (!silent) setError('Failed to load interviews');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -44,8 +59,14 @@ const InterviewDashboard = ({ userType }) => {
       });
 
       if (response.data.success) {
-        // Refresh interviews
+        // Refresh interviews to reflect status change
         await fetchInterviews();
+        
+        // If ending a meeting, close any open video call modals
+        if (newStatus === 'completed' && showVideoCallModal) {
+          setShowVideoCallModal(false);
+          setSelectedInterviewForCall(null);
+        }
       }
     } catch (error) {
       console.error('Error updating interview status:', error);
@@ -116,41 +137,18 @@ const InterviewDashboard = ({ userType }) => {
     closeFeedbackModal();
   };
 
-  const startVideoCall = async (interview) => {
-    console.log('startVideoCall called:', { interview, userType });
-    
+  const startVideoCall = (interview) => {
     if (interview.interview_type === 'video') {
-      // Only associates can start meetings
-      if (userType === 'associate') {
-        console.log('Associate starting video call...');
-        
-        // First update status to in_progress
-        await handleStatusUpdate(interview.interview_id, 'in_progress');
-        
-        // Then open the video call modal
-        setSelectedInterviewForCall(interview);
-        setShowVideoCallModal(true);
-        
-        console.log('Video call modal should be open now');
-      }
+      // Open our custom video call modal
+      setSelectedInterviewForCall(interview);
+      setShowVideoCallModal(true);
+      
+      // Update status to in_progress
+      handleStatusUpdate(interview.interview_id, 'in_progress');
     } else {
       // For non-video interviews, just update status
       handleStatusUpdate(interview.interview_id, 'in_progress');
     }
-  };
-
-  const joinVideoCall = (interview) => {
-    if (interview.interview_type === 'video' && interview.status === 'in_progress') {
-      // Freelancers can only join if meeting is in progress
-      setSelectedInterviewForCall(interview);
-      setShowVideoCallModal(true);
-    }
-  };
-
-  const handleMeetingEnd = () => {
-    // Refresh interviews to show updated status
-    fetchInterviews();
-    closeVideoCallModal();
   };
 
   const closeVideoCallModal = () => {
@@ -263,46 +261,49 @@ const InterviewDashboard = ({ userType }) => {
                     </p>
                   </div>
 
-                  {/* Actions */}
-                  <div className="d-flex gap-2">
-                    <button
-                      className="btn btn-outline-primary btn-sm flex-grow-1"
-                      onClick={() => openInterviewDetails(interview)}
-                    >
-                      <i className="bi bi-eye me-1"></i>
-                      View Details
-                    </button>
-                    
-                    {interview.status === 'scheduled' && userType === 'associate' && (
-                      <button
-                        className="btn btn-success btn-sm"
-                        onClick={() => startVideoCall(interview)}
-                      >
-                        <i className="bi bi-camera-video me-1"></i>
-                        Start Interview
-                      </button>
-                    )}
-                    
-                    {interview.status === 'in_progress' && userType === 'associate' && (
-                      <button
-                        className="btn btn-primary btn-sm"
-                        onClick={() => handleStatusUpdate(interview.interview_id, 'completed')}
-                      >
-                        <i className="bi bi-check-circle me-1"></i>
-                        End Interview
-                      </button>
-                    )}
+                                     {/* Actions */}
+                   <div className="d-flex gap-2">
+                     <button
+                       className="btn btn-outline-primary btn-sm flex-grow-1"
+                       onClick={() => openInterviewDetails(interview)}
+                     >
+                       <i className="bi bi-eye me-1"></i>
+                       View Details
+                     </button>
+                     
+                     {/* Associate can start scheduled interviews */}
+                     {interview.status === 'scheduled' && userType === 'associate' && (
+                       <button
+                         className="btn btn-success btn-sm"
+                         onClick={() => startVideoCall(interview)}
+                       >
+                         <i className="bi bi-camera-video me-1"></i>
+                         Start Interview
+                       </button>
+                     )}
+                     
+                     {/* Associate can end in-progress interviews */}
+                     {interview.status === 'in_progress' && userType === 'associate' && (
+                       <button
+                         className="btn btn-primary btn-sm"
+                         onClick={() => handleStatusUpdate(interview.interview_id, 'completed')}
+                       >
+                         <i className="bi bi-check-circle me-1"></i>
+                         End Interview
+                       </button>
+                     )}
 
-                    {interview.status === 'in_progress' && userType === 'freelancer' && (
-                      <button
-                        className="btn btn-success btn-sm"
-                        onClick={() => joinVideoCall(interview)}
-                      >
-                        <i className="bi bi-camera-video me-1"></i>
-                        Join Interview
-                      </button>
-                    )}
-                  </div>
+                     {/* Freelancer can only join in-progress interviews */}
+                     {interview.status === 'in_progress' && userType === 'freelancer' && (
+                       <button
+                         className="btn btn-success btn-sm"
+                         onClick={() => startVideoCall(interview)}
+                       >
+                         <i className="bi bi-camera-video me-1"></i>
+                         Join Interview
+                       </button>
+                     )}
+                   </div>
                 </div>
               </div>
             </div>
@@ -318,7 +319,7 @@ const InterviewDashboard = ({ userType }) => {
           onClose={closeInterviewDetails}
           onStatusUpdate={handleStatusUpdate}
           onOpenFeedback={openFeedbackModal}
-          onStartVideoCall={userType === 'associate' ? startVideoCall : joinVideoCall}
+          onStartVideoCall={startVideoCall}
         />
       )}
 
@@ -334,14 +335,12 @@ const InterviewDashboard = ({ userType }) => {
       )}
 
       {/* Video Call Modal */}
-      {console.log('Modal state:', { showVideoCallModal, selectedInterviewForCall })}
       {showVideoCallModal && selectedInterviewForCall && (
         <VideoCallModal
           isOpen={showVideoCallModal}
           onClose={closeVideoCallModal}
           interview={selectedInterviewForCall}
           userType={userType}
-          onMeetingEnd={handleMeetingEnd}
         />
       )}
     </div>
@@ -439,55 +438,58 @@ const InterviewDetailsModal = ({ interview, userType, onClose, onStatusUpdate, o
               </div>
             )}
 
-            {/* Actions */}
-            <div className="d-flex gap-2 justify-content-end">
-              {canSubmitFeedback() && (
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={() => onOpenFeedback(interview)}
-                >
-                  <i className="bi bi-star me-1"></i>
-                  Submit Feedback
-                </button>
-              )}
-              
-              {interview.status === 'scheduled' && userType === 'associate' && (
-                <button
-                  className="btn btn-success"
-                  onClick={() => onStartVideoCall(interview)}
-                >
-                  <i className="bi bi-camera-video me-1"></i>
-                  Start Interview
-                </button>
-              )}
-              
-              {interview.status === 'in_progress' && userType === 'associate' && (
-                <button
-                  className="btn btn-primary"
-                  onClick={() => onStatusUpdate(interview.interview_id, 'completed')}
-                >
-                  <i className="bi bi-check-circle me-1"></i>
-                  End Interview
-                </button>
-              )}
+                         {/* Actions */}
+             <div className="d-flex gap-2 justify-content-end">
+               {canSubmitFeedback() && (
+                 <button
+                   className="btn btn-outline-primary"
+                   onClick={() => onOpenFeedback(interview)}
+                 >
+                   <i className="bi bi-star me-1"></i>
+                   Submit Feedback
+                 </button>
+               )}
+               
+               {/* Associate can start scheduled interviews */}
+               {interview.status === 'scheduled' && userType === 'associate' && (
+                 <button
+                   className="btn btn-success"
+                   onClick={() => onStartVideoCall(interview)}
+                 >
+                   <i className="bi bi-camera-video me-1"></i>
+                   Start Interview
+                 </button>
+               )}
+               
+               {/* Associate can end in-progress interviews */}
+               {interview.status === 'in_progress' && userType === 'associate' && (
+                 <button
+                   className="btn btn-primary"
+                   onClick={() => onStatusUpdate(interview.interview_id, 'completed')}
+                 >
+                   <i className="bi bi-check-circle me-1"></i>
+                   End Interview
+                 </button>
+               )}
 
-              {interview.status === 'in_progress' && userType === 'freelancer' && (
-                <button
-                  className="btn btn-success"
-                  onClick={() => onStartVideoCall(interview)}
-                >
-                  <i className="bi bi-camera-video me-1"></i>
-                  Join Interview
-                </button>
-              )}
-              
-              <button
-                className="btn btn-secondary"
-                onClick={onClose}
-              >
-                Close
-              </button>
-            </div>
+               {/* Freelancer can only join in-progress interviews */}
+               {interview.status === 'in_progress' && userType === 'freelancer' && (
+                 <button
+                   className="btn btn-success"
+                   onClick={() => onStartVideoCall(interview)}
+                 >
+                   <i className="bi bi-camera-video me-1"></i>
+                   Join Interview
+                 </button>
+               )}
+               
+               <button
+                 className="btn btn-secondary"
+                 onClick={onClose}
+               >
+                 Close
+               </button>
+             </div>
           </div>
         </div>
       </div>
