@@ -66,21 +66,9 @@ const Home = () => {
           borderRadius: 16
         }}
       >
-        <div className="d-flex align-items-center justify-content-center mb-3">
-          <img 
-            src="/assets/img/cv-connect_logo.png" 
-            alt="CV-Connect Logo" 
-            style={{
-              height: 60,
-              width: 60,
-              marginRight: 16,
-              borderRadius: '50%'
-            }}
-          />
-          <h1 style={{ fontWeight: 700, fontSize: '2.8rem', marginBottom: 0 }}>
-            Welcome to <span style={{ color: '#fd680e' }}>CV‑Connect</span>
-          </h1>
-        </div>
+        <h1 style={{ fontWeight: 700, fontSize: '2.8rem', marginBottom: 12 }}>
+          Welcome to <span style={{ color: '#fd680e' }}>CV‑Connect</span>
+        </h1>
         {/* Sliding Tagline */}
         <div
           style={{

@@ -49,15 +49,15 @@ const Navbar = () => {
         transition: 'background 0.25s, box-shadow 0.25s'
       }}
     >
-      <nav className="container d-flex align-items-center justify-content-between py-2" style={{ maxWidth: 1200 }}>
+      <nav className="container d-flex align-items-center justify-content-between py-2" style={{ maxWidth: 1200, paddingLeft: '15px', paddingRight: '15px' }}>
         <Link to="/" className="logo d-flex align-items-center" style={{ textDecoration: 'none' }}>
           <img 
             src="/assets/img/cv-connect_logo.png" 
             alt="CV-Connect Logo" 
             style={{
-              height: 40,
-              width: 40,
-              marginRight: 12,
+              height: 'clamp(28px, 4vw, 40px)',
+              width: 'clamp(28px, 4vw, 40px)',
+              marginRight: 'clamp(6px, 1.5vw, 12px)',
               borderRadius: '50%'
             }}
           />
@@ -66,7 +66,7 @@ const Navbar = () => {
             style={{
               color: scrolled ? '#fd680e' : '#fff',
               fontWeight: 600,
-              fontSize: 32,
+              fontSize: 'clamp(20px, 4vw, 32px)',
               margin: 0,
               letterSpacing: 1,
               transition: 'color 0.25s'
@@ -156,8 +156,12 @@ const Navbar = () => {
             background: 'none',
             border: 'none',
             color: scrolled ? '#fd680e' : '#fff',
-            fontSize: 32,
-            cursor: 'pointer'
+            fontSize: 'clamp(24px, 5vw, 32px)',
+            cursor: 'pointer',
+            padding: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
           onClick={() => setOpen((o) => !o)}
           aria-label="Toggle navigation"
@@ -185,17 +189,17 @@ const Navbar = () => {
         >
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'center' }}>
             {[...navLinks, ...authLinks].map((link) => (
-              <li key={link.to} style={{ margin: '18px 0' }}>
+              <li key={link.to} style={{ margin: 'clamp(12px, 3vw, 18px) 0' }}>
                 <NavLink
                   to={link.to}
                   end={link.end || false}
                   className="nav-link nav-cta"
                   style={{
                     color: '#fff',
-                    fontSize: 24,
+                    fontSize: 'clamp(18px, 4vw, 24px)',
                     fontWeight: 600,
                     textDecoration: 'none',
-                    padding: '12px 36px',
+                    padding: 'clamp(8px, 2vw, 12px) clamp(24px, 6vw, 36px)',
                     borderRadius: 30,
                     background: 'rgba(253,104,14,0.10)',
                     border: '2px solid #fd680e',
