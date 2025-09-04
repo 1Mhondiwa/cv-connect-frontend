@@ -49,7 +49,7 @@ const Navbar = () => {
         transition: 'background 0.25s, box-shadow 0.25s'
       }}
     >
-      <nav className="container d-flex align-items-center justify-content-between py-2" style={{ maxWidth: 1200, paddingLeft: '15px', paddingRight: '15px' }}>
+      <nav className="container-fluid d-flex align-items-center justify-content-between py-2" style={{ maxWidth: 1400, paddingLeft: '20px', paddingRight: '20px' }}>
         <Link to="/" className="logo d-flex align-items-center" style={{ textDecoration: 'none' }}>
           <img 
             src="/assets/img/cv-connect_logo.png" 
@@ -76,7 +76,7 @@ const Navbar = () => {
           </h1>
         </Link>
         {/* Desktop Nav */}
-        <ul className="d-none d-md-flex align-items-center mb-0" style={{ listStyle: 'none', gap: 18, fontSize: 17 }}>
+        <ul className="d-none d-md-flex align-items-center mb-0" style={{ listStyle: 'none', gap: 12, fontSize: 17 }}>
           {navLinks.map((link) => (
             <li key={link.to}>
               <NavLink
@@ -91,7 +91,7 @@ const Navbar = () => {
                     : isActive ? '#fd680e' : '#fff',
                   fontWeight: isActive ? 700 : 500,
                   textDecoration: 'none',
-                  padding: '8px 22px',
+                  padding: '8px 16px',
                   borderRadius: 30,
                   background: isActive
                     ? 'rgba(253,104,14,0.10)'
@@ -114,7 +114,7 @@ const Navbar = () => {
             </li>
           ))}
           {/* Spacer */}
-          <li style={{ width: 24 }}></li>
+          <li style={{ width: 12 }}></li>
           {authLinks.map((link) => (
             <li key={link.to}>
               <NavLink
@@ -130,7 +130,7 @@ const Navbar = () => {
                       : '#fd680e',
                   fontWeight: 700,
                   textDecoration: 'none',
-                  padding: '8px 28px',
+                  padding: '8px 20px',
                   borderRadius: 30,
                   background: isActive
                     ? '#fd680e'
