@@ -45,35 +45,76 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
   const startCall = async () => {
     try {
       setError('');
+      console.log('Starting video call...');
       
-      // Get user media
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-      });
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Your browser does not support camera access. Please use a modern browser like Chrome, Firefox, or Edge.');
+      }
+
+      // Try different media configurations for better browser compatibility
+      let stream;
+      const mediaConfigs = [
+        // First try: Full HD video with audio
+        { video: { width: 1280, height: 720, facingMode: 'user' }, audio: true },
+        // Fallback 1: Standard HD video with audio
+        { video: { width: 640, height: 480, facingMode: 'user' }, audio: true },
+        // Fallback 2: Basic video with audio
+        { video: true, audio: true },
+        // Fallback 3: Audio only
+        { video: false, audio: true }
+      ];
+
+      let lastError;
+      for (let i = 0; i < mediaConfigs.length; i++) {
+        try {
+          console.log(`Trying media config ${i + 1}:`, mediaConfigs[i]);
+          stream = await navigator.mediaDevices.getUserMedia(mediaConfigs[i]);
+          console.log('Successfully got media stream:', stream);
+          break;
+        } catch (err) {
+          console.warn(`Media config ${i + 1} failed:`, err);
+          lastError = err;
+          
+          // If it's a permission denied error, don't try fallbacks
+          if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            throw err;
+          }
+        }
+      }
+
+      if (!stream) {
+        throw lastError || new Error('Unable to access camera or microphone');
+      }
       
       localStreamRef.current = stream;
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
 
-      // Create peer connection
+      // Create peer connection with more robust configuration
       const configuration = {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' }
-        ]
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' }
+        ],
+        iceCandidatePoolSize: 10
       };
 
       peerConnectionRef.current = new RTCPeerConnection(configuration);
 
       // Add local stream to peer connection
       stream.getTracks().forEach(track => {
+        console.log('Adding track:', track.kind, track.label);
         peerConnectionRef.current.addTrack(track, stream);
       });
 
       // Handle remote stream (will only work when another user actually joins)
       peerConnectionRef.current.ontrack = (event) => {
+        console.log('Received remote track:', event);
         if (remoteVideoRef.current) {
           remoteVideoRef.current.srcObject = event.streams[0];
           setIsConnected(true);
@@ -89,12 +130,47 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
         }
       };
 
+      // Handle connection state changes
+      peerConnectionRef.current.onconnectionstatechange = () => {
+        console.log('Connection state:', peerConnectionRef.current.connectionState);
+      };
+
+      // Handle ICE connection state changes
+      peerConnectionRef.current.oniceconnectionstatechange = () => {
+        console.log('ICE connection state:', peerConnectionRef.current.iceConnectionState);
+      };
+
+      console.log('Video call started successfully');
+
       // In production, the remote participant connection would be handled by
       // WebRTC signaling server when another user actually joins the call
 
     } catch (err) {
       console.error('Error starting call:', err);
-      setError('Failed to start video call. Please check your camera and microphone permissions.');
+      
+      // Provide specific error messages based on error type
+      let errorMessage = 'Failed to start video call. ';
+      
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        errorMessage += 'Camera and microphone access was denied. Please:' +
+          '\n1. Click the camera icon in your browser\'s address bar' +
+          '\n2. Allow access to camera and microphone' +
+          '\n3. Refresh the page and try again';
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        errorMessage += 'No camera or microphone found. Please connect a camera and microphone and try again.';
+      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+        errorMessage += 'Camera or microphone is already in use by another application. Please close other applications and try again.';
+      } else if (err.name === 'OverconstrainedError') {
+        errorMessage += 'Camera requirements not supported. Your camera may not support the required settings.';
+      } else if (err.name === 'SecurityError') {
+        errorMessage += 'Security error. Please ensure you\'re using HTTPS and try again.';
+      } else if (err.message.includes('browser does not support')) {
+        errorMessage = err.message;
+      } else {
+        errorMessage += 'Please check your camera and microphone permissions and try again. Error: ' + err.message;
+      }
+      
+      setError(errorMessage);
     }
   };
 
@@ -273,7 +349,24 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
             {error && (
               <div className="alert alert-danger m-3" role="alert">
                 <i className="bi bi-exclamation-triangle me-2"></i>
-                {error}
+                <div style={{ whiteSpace: 'pre-line' }}>{error}</div>
+                <div className="mt-3 d-flex justify-content-between align-items-center">
+                  <small className="text-muted">
+                    <strong>Browser:</strong> {navigator.userAgent.includes('Edge') ? 'Microsoft Edge' : 
+                      navigator.userAgent.includes('Firefox') ? 'Firefox' : 
+                      navigator.userAgent.includes('Chrome') ? 'Chrome' : 'Unknown'}
+                  </small>
+                  <button 
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => {
+                      setError('');
+                      startCall();
+                    }}
+                  >
+                    <i className="bi bi-arrow-clockwise me-1"></i>
+                    Try Again
+                  </button>
+                </div>
               </div>
             )}
 
