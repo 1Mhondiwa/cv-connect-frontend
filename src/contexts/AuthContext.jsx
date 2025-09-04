@@ -37,9 +37,20 @@ export const AuthProvider = ({ children }) => {
           // Only clear storage for authentication errors, not network errors
           if (error.response?.status === 401) {
             logout();
+          } else if (error.response?.status === 429) {
+            // Rate limited - keep user logged in but don't retry immediately
+            console.warn('Rate limited during auth check - keeping user logged in');
+            if (storedUser) {
+              setUser(JSON.parse(storedUser));
+              setIsAuthenticated(true);
+            }
           } else {
-            // For network errors, keep the user logged in but mark as loading
+            // For other network errors, keep the user logged in but mark as loading
             console.warn('Network error during auth check:', error);
+            if (storedUser) {
+              setUser(JSON.parse(storedUser));
+              setIsAuthenticated(true);
+            }
           }
         }
       }
@@ -68,9 +79,18 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Login error:', error);
+      
+      let errorMessage = 'Login failed. Please check your credentials and try again.';
+      
+      if (error.response?.status === 429) {
+        errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
       return {
         success: false,
-        message: error.response?.data?.message || 'Login failed. Please check your credentials and try again.'
+        message: errorMessage
       };
     }
   };

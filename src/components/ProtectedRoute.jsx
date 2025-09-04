@@ -20,11 +20,15 @@ const ProtectedRoute = ({ children, requiredRole }) => {
           });
           if (profileRes.data.success) {
             if (!profileRes.data.profile.cv) {
-              navigate('/freelancer/welcome', { replace: true });
+              // Use setTimeout to avoid setState during render
+              setTimeout(() => {
+                navigate('/freelancer/welcome', { replace: true });
+              }, 0);
             }
           }
         } catch (err) {
           // If profile fetch fails, let the route render (could be handled elsewhere)
+          console.warn('Error checking freelancer CV:', err);
         } finally {
           setChecking(false);
         }
@@ -39,14 +43,12 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   }
 
   if (!isAuthenticated) {
-    navigate('/login', { replace: true });
-    return null;
+    return <Navigate to="/login" replace />;
   }
 
   if (requiredRole && user?.user_type !== requiredRole) {
     // Optionally redirect to a not-authorized page
-    navigate('/login', { replace: true });
-    return null;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
