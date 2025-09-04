@@ -6,6 +6,7 @@ import ActivityTable from "./ActivityTable";
 import { useAuth } from '../contexts/AuthContext';
 import InterviewDashboard from './InterviewDashboard';
 import InterviewFeedbackModal from './InterviewFeedbackModal';
+import FreelancerInterviewFeedback from './FreelancerInterviewFeedback';
 
 const BACKEND_URL = "http://localhost:5000";
 const accent = '#fd680e';
@@ -332,7 +333,7 @@ const FreelancerDashboard = () => {
                     background: activeTab === 'messages' ? accent : 'transparent',
                     color: activeTab === 'messages' ? '#fff' : accent,
                     border: `2px solid ${accent}`,
-                    borderRadius: activeTab === 'messages' ? '0 30px 30px 0' : '0 30px 30px 0',
+                    borderRadius: '0',
                     padding: '12px 24px',
                     fontWeight: 600,
                     fontSize: 16,
@@ -346,6 +347,22 @@ const FreelancerDashboard = () => {
                       {globalUnread}
                     </span>
                   )}
+                </button>
+                <button 
+                  className={`btn dashboard-tab-btn ${activeTab === 'feedback' ? '' : 'btn-outline-primary'}`}
+                  style={{
+                    background: activeTab === 'feedback' ? accent : 'transparent',
+                    color: activeTab === 'feedback' ? '#fff' : accent,
+                    border: `2px solid ${accent}`,
+                    borderRadius: activeTab === 'feedback' ? '0 30px 30px 0' : '0 30px 30px 0',
+                    padding: '12px 24px',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    transition: 'transform 0.18s, box-shadow 0.18s'
+                  }}
+                  onClick={() => setActiveTab('feedback')}
+                >
+                  <i className="bi bi-star-half me-2"></i>Interview Feedback
                 </button>
                 <button 
                   className={`btn dashboard-tab-btn ${activeTab === 'interviews' ? '' : 'btn-outline-primary'}`}
@@ -378,6 +395,20 @@ const FreelancerDashboard = () => {
               </div>
               
               <InterviewDashboard userType="freelancer" />
+            </div>
+          </div>
+        )}
+
+        {/* Interview Feedback Tab */}
+        {activeTab === 'feedback' && (
+          <div className="container">
+            <div className="bg-white rounded-4 shadow-lg p-4" style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.07)' }}>
+              <div className="text-center mb-4">
+                <h4 style={{ color: accent, fontWeight: 600 }}>Interview Feedback</h4>
+                <p style={{ color: '#666', fontSize: 14 }}>Review feedback from your interviews to improve your performance</p>
+              </div>
+              
+              <FreelancerInterviewFeedback />
             </div>
           </div>
         )}
