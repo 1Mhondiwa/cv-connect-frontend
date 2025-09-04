@@ -3144,10 +3144,17 @@ const ESCAdminDashboard = () => {
                                       { category: 'Cultural Fit', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_cultural_fit) || 0 },
                                       { category: 'Overall', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_overall) || 0 }
                                     ]}
-                                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                    margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
                                   >
                                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                    <XAxis dataKey="category" stroke="#666" />
+                                    <XAxis 
+                                      dataKey="category" 
+                                      stroke="#666" 
+                                      interval={0}
+                                      angle={0}
+                                      textAnchor="middle"
+                                      height={60}
+                                    />
                                     <YAxis domain={[0, 5]} stroke="#666" />
                                     <Tooltip formatter={(value) => [`${value}/5`, 'Rating']} />
                                     <Bar dataKey="rating" fill={accent} radius={[4, 4, 0, 0]} />
