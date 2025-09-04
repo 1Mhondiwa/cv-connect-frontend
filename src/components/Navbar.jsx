@@ -51,6 +51,16 @@ const Navbar = () => {
     >
       <nav className="container d-flex align-items-center justify-content-between py-2" style={{ maxWidth: 1200 }}>
         <Link to="/" className="logo d-flex align-items-center" style={{ textDecoration: 'none' }}>
+          <img 
+            src="/assets/img/cv-connect_logo.png" 
+            alt="CV-Connect Logo" 
+            style={{
+              height: 40,
+              width: 40,
+              marginRight: 12,
+              borderRadius: '50%'
+            }}
+          />
           <h1
             className="sitename"
             style={{

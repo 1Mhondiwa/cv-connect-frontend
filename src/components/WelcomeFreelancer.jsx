@@ -67,7 +67,18 @@ const WelcomeFreelancer = () => {
         <div className="container d-flex justify-content-between align-items-center">
           <span style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1, cursor: 'pointer' }}
             onClick={() => navigate('/')}
+            className="d-flex align-items-center"
           >
+            <img 
+              src="/assets/img/cv-connect_logo.png" 
+              alt="CV-Connect Logo" 
+              style={{
+                height: 32,
+                width: 32,
+                marginRight: 8,
+                borderRadius: '50%'
+              }}
+            />
             CV<span style={{ color: '#333' }}>Connect</span>
           </span>
           <button

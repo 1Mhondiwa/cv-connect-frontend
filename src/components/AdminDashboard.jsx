@@ -1505,23 +1505,21 @@ const ESCAdminDashboard = () => {
           background: '#fafafa'
         }}>
           <div className="d-flex align-items-center">
-            <div style={{ 
-              width: '32px', 
-              height: '32px', 
-              background: accent, 
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: '12px'
-            }}>
-              <i className="bi bi-building" style={{ color: '#fff', fontSize: '18px' }}></i>
-            </div>
+            <img 
+              src="/assets/img/cv-connect_logo.png" 
+              alt="CV-Connect Logo" 
+              style={{
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '8px',
+                marginRight: '12px'
+              }}
+            />
         <div>
               <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }}>
-                ECS Admin
+                CV-Connect
               </h5>
-              <small className="text-muted">Control Center</small>
+              <small className="text-muted">Admin Portal</small>
           </div>
           </div>
         </div>

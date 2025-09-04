@@ -246,6 +246,17 @@ const FreelancerDashboard = () => {
     return (
       <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)' }}>
         <div className="text-center">
+          <img 
+            src="/assets/img/cv-connect_logo.png" 
+            alt="CV-Connect Logo" 
+            style={{
+              height: 60,
+              width: 60,
+              marginBottom: 20,
+              borderRadius: '50%',
+              animation: 'pulse 2s infinite'
+            }}
+          />
           <div className="spinner-border mb-3" style={{ color: accent }} role="status"></div>
           <h4 style={{ color: '#444' }}>Loading Dashboard...</h4>
         </div>
@@ -257,6 +268,16 @@ const FreelancerDashboard = () => {
     return (
       <div className="min-vh-100 d-flex align-items-center justify-content-center" style={{ background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)' }}>
         <div className="text-center">
+          <img 
+            src="/assets/img/cv-connect_logo.png" 
+            alt="CV-Connect Logo" 
+            style={{
+              height: 60,
+              width: 60,
+              marginBottom: 20,
+              borderRadius: '50%'
+            }}
+          />
           <div className="error-message">
             <h4 style={{ color: '#444' }}>Authentication Error</h4>
             <p style={{ color: '#666' }}>{error}</p>
@@ -282,7 +303,17 @@ const FreelancerDashboard = () => {
         zIndex: 100
       }}>
         <div className="container d-flex justify-content-between align-items-center">
-          <Link to="/freelancer-dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }}>
+          <Link to="/freelancer-dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }} className="d-flex align-items-center">
+            <img 
+              src="/assets/img/cv-connect_logo.png" 
+              alt="CV-Connect Logo" 
+              style={{
+                height: 32,
+                width: 32,
+                marginRight: 8,
+                borderRadius: '50%'
+              }}
+            />
             CV<span style={{ color: '#333' }}>‑Connect</span>
           </Link>
           <button

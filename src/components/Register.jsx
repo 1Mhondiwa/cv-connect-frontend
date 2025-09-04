@@ -167,7 +167,19 @@ const Register = () => {
           {/* Left: Form */}
           <div className="col-lg-6 d-flex align-items-center" style={{ padding: '32px 28px', minHeight: 420 }}>
             <div style={{ width: '100%' }}>
-              <h2 style={{ fontWeight: 700, color: accent, marginBottom: 8, textAlign: 'left' }}>Sign Up</h2>
+              <div className="d-flex align-items-center mb-3">
+                <img 
+                  src="/assets/img/cv-connect_logo.png" 
+                  alt="CV-Connect Logo" 
+                  style={{
+                    height: 40,
+                    width: 40,
+                    marginRight: 12,
+                    borderRadius: '50%'
+                  }}
+                />
+                <h2 style={{ fontWeight: 700, color: accent, marginBottom: 0, textAlign: 'left' }}>Sign Up</h2>
+              </div>
               <p style={{ color: '#888', fontSize: 16, marginBottom: 28, textAlign: 'left' }}>
                 Secure your career journey with CV‑Connect.
               </p>
