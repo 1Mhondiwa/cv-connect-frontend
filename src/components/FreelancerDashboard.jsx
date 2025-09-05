@@ -45,10 +45,58 @@ const FreelancerDashboard = () => {
   useEffect(() => {
     let isMounted = true;
     
+    const fetchProfileData = async () => {
+      try {
+        console.log('Fetching freelancer profile...');
+        const response = await api.get('/freelancer/profile');
+
+        if (response.data.success) {
+          console.log('Profile fetched successfully:', response.data.profile);
+          if (isMounted) {
+            setProfile(response.data.profile);
+          }
+        } else {
+          console.error('Profile fetch failed:', response.data.message);
+          if (isMounted) {
+            setError(response.data.message);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        if (isMounted) {
+          if (error.response?.status === 401) {
+            setError('Authentication failed. Please log in again.');
+          } else {
+            setError('Failed to load profile. Please try again.');
+          }
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    const fetchActivityData = async () => {
+      try {
+        const res = await api.get("/freelancer/activity");
+        if (isMounted) {
+          setActivities(res.data.activities || []);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setActivities([]);
+        }
+      } finally {
+        if (isMounted) {
+          setActivityLoading(false);
+        }
+      }
+    };
+    
     const loadData = async () => {
       if (isMounted) {
-        await fetchProfile();
-        await fetchActivity();
+        await Promise.all([fetchProfileData(), fetchActivityData()]);
       }
     };
     
@@ -58,7 +106,7 @@ const FreelancerDashboard = () => {
     return () => {
       isMounted = false;
     };
-  }, []); // Remove profile dependency to prevent infinite loop
+  }, []); // Only run once on mount
 
   useEffect(() => {
     if (activeTab === 'messages') {
@@ -68,29 +116,6 @@ const FreelancerDashboard = () => {
     // eslint-disable-next-line
   }, [activeTab]);
 
-  const fetchProfile = async () => {
-    try {
-      console.log('Fetching freelancer profile...');
-      const response = await api.get('/freelancer/profile');
-
-      if (response.data.success) {
-        console.log('Profile fetched successfully:', response.data.profile);
-        setProfile(response.data.profile);
-      } else {
-        console.error('Profile fetch failed:', response.data.message);
-        setError(response.data.message);
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      if (error.response?.status === 401) {
-        setError('Authentication failed. Please log in again.');
-      } else {
-        setError('Failed to load profile. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchConversations = async () => {
     try {
@@ -215,16 +240,6 @@ const FreelancerDashboard = () => {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=eee&color=555&size=120&bold=true`;
   };
 
-  const fetchActivity = async () => {
-    try {
-      const res = await api.get("/freelancer/activity");
-      setActivities(res.data.activities || []);
-    } catch (err) {
-      setActivities([]);
-    } finally {
-      setActivityLoading(false);
-    }
-  };
 
   // Interview functions
   const openInterviewFeedbackModal = (interview) => {

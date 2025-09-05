@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../utils/axios';
 
 const accent = '#fd680e';
@@ -8,11 +8,7 @@ const FreelancerInterviewFeedback = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchMyFeedback();
-  }, []);
-
-  const fetchMyFeedback = async () => {
+  const fetchMyFeedback = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -31,7 +27,11 @@ const FreelancerInterviewFeedback = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchMyFeedback();
+  }, [fetchMyFeedback]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {

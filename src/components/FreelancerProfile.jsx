@@ -110,7 +110,7 @@ const FreelancerProfile = () => {
     fetchProfile();
 
     // Set up real-time availability updates using SSE
-    const eventSource = new EventSource('/api/freelancer/availability/stream', {
+    const eventSource = new EventSource('http://localhost:5000/api/freelancer/availability/stream', {
       withCredentials: true
     });
 
