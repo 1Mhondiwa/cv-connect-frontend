@@ -337,34 +337,54 @@ const FreelancerDashboard = () => {
         <div className="row">
           <div className="col-12">
             <div className="d-flex justify-content-center mb-4">
-              <div className="btn-group" role="group" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', borderRadius: 30 }}>
+              <div className="btn-group" role="group" style={{ 
+                boxShadow: '0 4px 20px rgba(253,104,14,0.12)', 
+                borderRadius: 30,
+                border: '2px solid #ffb366',
+                background: 'linear-gradient(135deg, #fff5e6 0%, #ffe8cc 100%)',
+                overflow: 'hidden',
+                padding: '3px'
+              }}>
                 <button 
                   className={`btn dashboard-tab-btn ${activeTab === 'dashboard' ? '' : 'btn-outline-primary'}`}
                   style={{
-                    background: activeTab === 'dashboard' ? accent : 'transparent',
+                    background: activeTab === 'dashboard' ? accent : '#fff',
                     color: activeTab === 'dashboard' ? '#fff' : accent,
-                    border: `2px solid ${accent}`,
-                    borderRadius: activeTab === 'dashboard' ? '30px 0 0 30px' : '30px 0 0 30px',
+                    border: 'none',
+                    borderRadius: '27px 0 0 27px',
                     padding: '12px 24px',
                     fontWeight: 600,
                     fontSize: 16,
-                    transition: 'transform 0.18s, box-shadow 0.18s'
+                    transition: 'all 0.3s ease',
+                    minWidth: '140px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: activeTab === 'dashboard' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
                   }}
                   onClick={() => setActiveTab('dashboard')}
                 >
                   <i className="bi bi-house me-2"></i>Dashboard
                 </button>
+                <div style={{ width: '2px', background: '#ffb366', margin: '0 2px' }}></div>
                 <button 
                   className={`btn dashboard-tab-btn ${activeTab === 'messages' ? '' : 'btn-outline-primary'} position-relative`}
                   style={{
-                    background: activeTab === 'messages' ? accent : 'transparent',
+                    background: activeTab === 'messages' ? accent : '#fff',
                     color: activeTab === 'messages' ? '#fff' : accent,
-                    border: `2px solid ${accent}`,
+                    border: 'none',
                     borderRadius: '0',
                     padding: '12px 24px',
                     fontWeight: 600,
                     fontSize: 16,
-                    transition: 'transform 0.18s, box-shadow 0.18s'
+                    transition: 'all 0.3s ease',
+                    minWidth: '140px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: activeTab === 'messages' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
                   }}
                   onClick={() => setActiveTab('messages')}
                 >
@@ -375,33 +395,47 @@ const FreelancerDashboard = () => {
                     </span>
                   )}
                 </button>
+                <div style={{ width: '2px', background: '#ffb366', margin: '0 2px' }}></div>
                 <button 
                   className={`btn dashboard-tab-btn ${activeTab === 'feedback' ? '' : 'btn-outline-primary'}`}
                   style={{
-                    background: activeTab === 'feedback' ? accent : 'transparent',
+                    background: activeTab === 'feedback' ? accent : '#fff',
                     color: activeTab === 'feedback' ? '#fff' : accent,
-                    border: `2px solid ${accent}`,
-                    borderRadius: activeTab === 'feedback' ? '0 30px 30px 0' : '0 30px 30px 0',
+                    border: 'none',
+                    borderRadius: '0',
                     padding: '12px 24px',
                     fontWeight: 600,
                     fontSize: 16,
-                    transition: 'transform 0.18s, box-shadow 0.18s'
+                    transition: 'all 0.3s ease',
+                    minWidth: '180px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: activeTab === 'feedback' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
                   }}
                   onClick={() => setActiveTab('feedback')}
                 >
                   <i className="bi bi-star-half me-2"></i>Interview Feedback
                 </button>
+                <div style={{ width: '2px', background: '#ffb366', margin: '0 2px' }}></div>
                 <button 
                   className={`btn dashboard-tab-btn ${activeTab === 'interviews' ? '' : 'btn-outline-primary'}`}
                   style={{
-                    background: activeTab === 'interviews' ? accent : 'transparent',
+                    background: activeTab === 'interviews' ? accent : '#fff',
                     color: activeTab === 'interviews' ? '#fff' : accent,
-                    border: `2px solid ${accent}`,
-                    borderRadius: activeTab === 'interviews' ? '0 30px 30px 0' : '0 30px 30px 0',
+                    border: 'none',
+                    borderRadius: '0 27px 27px 0',
                     padding: '12px 24px',
                     fontWeight: 600,
                     fontSize: 16,
-                    transition: 'transform 0.18s, box-shadow 0.18s'
+                    transition: 'all 0.3s ease',
+                    minWidth: '140px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: activeTab === 'interviews' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
                   }}
                   onClick={() => setActiveTab('interviews')}
                 >
@@ -833,8 +867,8 @@ const FreelancerDashboard = () => {
       {/* Animation Styles */}
       <style>{`
         .dashboard-tab-btn:hover, .dashboard-tab-btn:focus {
-          transform: scale(1.05);
-          box-shadow: 0 4px 24px rgba(253,104,14,0.18);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 25px rgba(253,104,14,0.2);
           z-index: 2;
         }
         
