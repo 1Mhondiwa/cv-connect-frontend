@@ -85,6 +85,102 @@ button:disabled {
   text-decoration: none;
 }
 
+/* Enhanced Logout Button Styling with Animations */
+.logout-btn {
+  background: #fd680e !important;
+  color: #fff !important;
+  border: 2px solid #ffb366 !important; /* Light orange mint border */
+  border-radius: 25px !important; /* Rounded corners */
+  padding: 8px 24px !important;
+  fontWeight: 600 !important;
+  fontSize: 16px !important;
+  transition: all 0.3s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.logout-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(253, 104, 14, 0.3) !important;
+  border-color: #ff8c42 !important; /* Slightly darker orange on hover */
+  background: #ff6b35 !important; /* Slightly darker background on hover */
+}
+
+.logout-btn:hover::before {
+  left: 100%;
+}
+
+.logout-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 4px 15px rgba(253, 104, 14, 0.2) !important;
+}
+
+.logout-btn i {
+  transition: transform 0.3s ease !important;
+}
+
+.logout-btn:hover i {
+  transform: translateX(2px) !important;
+}
+
+/* Pulse animation for logout button */
+@keyframes logoutPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(253, 104, 14, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(253, 104, 14, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(253, 104, 14, 0);
+  }
+}
+
+.logout-btn:focus {
+  animation: logoutPulse 1.5s infinite;
+  outline: none !important;
+}
+
+/* Enhanced Navbar Styling with Rounded Corners and Light Mint Orange Border */
+.dashboard-navbar {
+  width: 100% !important;
+  background: #fff !important;
+  box-shadow: 0 2px 12px rgba(253,104,14,0.08) !important;
+  padding: 0.7rem 0 !important;
+  margin-bottom: 24px !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
+  border: 2px solid #ffb366 !important; /* Light mint orange border */
+  border-radius: 20px !important; /* Rounded corners */
+  margin: 0 15px 24px 15px !important; /* Add margin for border visibility */
+  transition: all 0.3s ease !important;
+}
+
+.dashboard-navbar:hover {
+  box-shadow: 0 4px 20px rgba(253,104,14,0.15) !important;
+  border-color: #ff8c42 !important; /* Slightly darker orange on hover */
+}
+
+.dashboard-navbar .container {
+  padding: 0 20px !important; /* Add padding inside navbar */
+}
+
 /* Card styling for dashboard */
 .card {
   border: 1px solid rgba(0, 0, 0, 0.125);

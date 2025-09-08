@@ -239,37 +239,19 @@ const FreelancerProfile = () => {
       }}
     >
       {/* Navbar */}
-      <nav style={{
-        width: '100%',
-        background: '#fff',
-        boxShadow: '0 2px 12px rgba(253,104,14,0.08)',
-        padding: '0.7rem 0',
-        marginBottom: 24,
-        position: 'sticky',
-        top: 0,
-        zIndex: 100
-      }}>
+      <nav className="dashboard-navbar">
         <div className="container d-flex justify-content-between align-items-center">
           <Link to="/freelancer-dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }}>
             CV<span style={{ color: '#333' }}>‑Connect</span>
           </Link>
           <button
-            className="btn"
-            style={{
-              background: accent,
-              color: '#fff',
-              borderRadius: 25,
-              padding: '8px 24px',
-              fontWeight: 600,
-              border: 'none',
-              fontSize: 16
-            }}
+            className="btn logout-btn"
             onClick={() => {
               logout();
               navigate('/');
             }}
           >
-            <i className="bi bi-box-arrow-right me-2"></i>Logout
+            <i className="bi bi-box-arrow-right"></i>Logout
           </button>
         </div>
       </nav>
