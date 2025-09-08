@@ -34,11 +34,11 @@ const Navbar = () => {
 
   return (
     <header
+      className="main-website-navbar"
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100%',
         zIndex: 1000,
         background: scrolled
           ? '#fff'
@@ -49,7 +49,7 @@ const Navbar = () => {
         transition: 'background 0.25s, box-shadow 0.25s'
       }}
     >
-      <nav className="container-fluid d-flex align-items-center justify-content-between py-2" style={{ maxWidth: 1400, paddingLeft: '20px', paddingRight: '20px' }}>
+      <nav className="container-fluid d-flex align-items-center justify-content-between py-2">
         <Link to="/" className="logo d-flex align-items-center" style={{ textDecoration: 'none' }}>
           <img 
             src="/assets/img/cv-connect_logo.png" 
@@ -171,41 +171,14 @@ const Navbar = () => {
       </nav>
       {/* Mobile Nav */}
       {open && (
-        <div
-          className="d-md-none"
-          style={{
-            background: 'rgba(0,0,0,0.95)',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            zIndex: 2000,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, textAlign: 'center' }}>
+        <div className="d-md-none mobile-nav-menu">
+          <ul>
             {[...navLinks, ...authLinks].map((link) => (
-              <li key={link.to} style={{ margin: 'clamp(12px, 3vw, 18px) 0' }}>
+              <li key={link.to}>
                 <NavLink
                   to={link.to}
                   end={link.end || false}
                   className="nav-link nav-cta"
-                  style={{
-                    color: '#fff',
-                    fontSize: 'clamp(18px, 4vw, 24px)',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    padding: 'clamp(8px, 2vw, 12px) clamp(24px, 6vw, 36px)',
-                    borderRadius: 30,
-                    background: 'rgba(253,104,14,0.10)',
-                    border: '2px solid #fd680e',
-                    margin: 2,
-                    transition: 'transform 0.18s, box-shadow 0.18s, color 0.18s, background 0.18s, border 0.18s'
-                  }}
                   onClick={() => setOpen(false)}
                 >
                   {link.label}
