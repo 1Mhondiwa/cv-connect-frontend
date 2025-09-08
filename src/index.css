@@ -7,6 +7,22 @@
 body {
   opacity: 1 !important;
   visibility: visible !important;
+  overflow-x: hidden !important; /* Prevent horizontal scroll */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure proper container behavior */
+.container-fluid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Ensure navbar parent containers don't cause overflow */
+.min-vh-100 {
+  overflow-x: hidden !important;
 }
 
 /* Hide the loading spinner that might be stuck */
@@ -158,18 +174,19 @@ button:disabled {
 
 /* Enhanced Navbar Styling with Rounded Corners and Light Mint Orange Border */
 .dashboard-navbar {
-  width: 100% !important;
+  width: calc(100% - 30px) !important; /* Account for margins */
+  max-width: 100% !important;
   background: #fff !important;
   box-shadow: 0 2px 12px rgba(253,104,14,0.08) !important;
   padding: 0.7rem 0 !important;
-  margin-bottom: 24px !important;
+  margin: 15px auto 24px auto !important; /* Center with auto margins */
   position: sticky !important;
   top: 0 !important;
   z-index: 100 !important;
   border: 2px solid #ffb366 !important; /* Light mint orange border */
   border-radius: 20px !important; /* Rounded corners */
-  margin: 0 15px 24px 15px !important; /* Add margin for border visibility */
   transition: all 0.3s ease !important;
+  box-sizing: border-box !important;
 }
 
 .dashboard-navbar:hover {
@@ -179,6 +196,93 @@ button:disabled {
 
 .dashboard-navbar .container {
   padding: 0 20px !important; /* Add padding inside navbar */
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Responsive navbar adjustments */
+@media (max-width: 768px) {
+  .dashboard-navbar {
+    width: calc(100% - 20px) !important;
+    margin: 10px auto 20px auto !important;
+    border-radius: 15px !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .dashboard-navbar .container {
+    padding: 0 15px !important;
+  }
+  
+  .dashboard-navbar .d-flex {
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-navbar {
+    width: calc(100% - 16px) !important;
+    margin: 8px auto 16px auto !important;
+    border-radius: 12px !important;
+    padding: 0.4rem 0 !important;
+  }
+  
+  .dashboard-navbar .container {
+    padding: 0 12px !important;
+  }
+  
+  .dashboard-navbar .d-flex {
+    gap: 8px !important;
+  }
+  
+  /* Adjust logo and text size for mobile */
+  .dashboard-navbar img {
+    height: 24px !important;
+    width: 24px !important;
+  }
+  
+  .dashboard-navbar span,
+  .dashboard-navbar a {
+    font-size: 18px !important;
+  }
+  
+  /* Adjust logout button for mobile */
+  .logout-btn {
+    padding: 6px 16px !important;
+    font-size: 14px !important;
+    border-radius: 20px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .dashboard-navbar {
+    width: calc(100% - 12px) !important;
+    margin: 6px auto 12px auto !important;
+  }
+  
+  .dashboard-navbar .container {
+    padding: 0 8px !important;
+  }
+  
+  .dashboard-navbar .d-flex {
+    gap: 6px !important;
+  }
+  
+  .dashboard-navbar img {
+    height: 20px !important;
+    width: 20px !important;
+  }
+  
+  .dashboard-navbar span,
+  .dashboard-navbar a {
+    font-size: 16px !important;
+  }
+  
+  .logout-btn {
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+    border-radius: 18px !important;
+  }
 }
 
 /* Card styling for dashboard */

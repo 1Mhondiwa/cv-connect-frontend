@@ -701,8 +701,11 @@ const FreelancerEditProfile = () => {
       <nav className="dashboard-navbar" style={{
         position: 'fixed',
         top: 0,
-        left: 0,
-        zIndex: 1000
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1000,
+        width: 'calc(100% - 30px)',
+        maxWidth: '100%'
       }}>
         <div className="container d-flex justify-content-between align-items-center">
           <Link to="/freelancer-dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }} className="d-flex align-items-center">
