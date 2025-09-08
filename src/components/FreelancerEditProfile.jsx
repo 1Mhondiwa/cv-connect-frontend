@@ -698,15 +698,7 @@ const FreelancerEditProfile = () => {
       }}
     >
       {/* Fixed Navbar */}
-      <nav className="dashboard-navbar" style={{
-        position: 'fixed',
-        top: 0,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 1000,
-        width: 'calc(100% - 30px)',
-        maxWidth: '100%'
-      }}>
+      <nav className="freelancer-edit-profile-navbar">
         <div className="container d-flex justify-content-between align-items-center">
           <Link to="/freelancer-dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }} className="d-flex align-items-center">
             <img 
@@ -734,7 +726,7 @@ const FreelancerEditProfile = () => {
       </nav>
 
       {/* Main Content with top margin for fixed navbar */}
-      <div style={{ paddingTop: '80px' }}>
+      <div className="freelancer-edit-profile-content">
         <div className="container-fluid" style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px' }}>
           {/* Page Header */}
           <div className="text-center mb-4">

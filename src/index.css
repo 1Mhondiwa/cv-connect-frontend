@@ -25,6 +25,97 @@ body {
   overflow-x: hidden !important;
 }
 
+/* Specific fixes for FreelancerEditProfile fixed navbar */
+.freelancer-edit-profile-navbar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 1000 !important;
+  width: calc(100% - 30px) !important;
+  max-width: 100% !important;
+  background: #fff !important;
+  box-shadow: 0 2px 12px rgba(253,104,14,0.08) !important;
+  padding: 0.7rem 0 !important;
+  margin: 15px auto !important;
+  border: 2px solid #ffb366 !important;
+  border-radius: 20px !important;
+  transition: all 0.3s ease !important;
+  box-sizing: border-box !important;
+}
+
+.freelancer-edit-profile-navbar:hover {
+  box-shadow: 0 4px 20px rgba(253,104,14,0.15) !important;
+  border-color: #ff8c42 !important;
+}
+
+.freelancer-edit-profile-navbar .container {
+  padding: 0 20px !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Responsive adjustments for fixed navbar */
+@media (max-width: 768px) {
+  .freelancer-edit-profile-navbar {
+    width: calc(100% - 20px) !important;
+    margin: 10px auto !important;
+    border-radius: 15px !important;
+    padding: 0.5rem 0 !important;
+  }
+  
+  .freelancer-edit-profile-navbar .container {
+    padding: 0 15px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .freelancer-edit-profile-navbar {
+    width: calc(100% - 16px) !important;
+    margin: 8px auto !important;
+    border-radius: 12px !important;
+    padding: 0.4rem 0 !important;
+  }
+  
+  .freelancer-edit-profile-navbar .container {
+    padding: 0 12px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .freelancer-edit-profile-navbar {
+    width: calc(100% - 12px) !important;
+    margin: 6px auto !important;
+  }
+  
+  .freelancer-edit-profile-navbar .container {
+    padding: 0 8px !important;
+  }
+}
+
+/* Ensure proper spacing for fixed navbar content */
+.freelancer-edit-profile-content {
+  padding-top: 100px !important; /* Account for fixed navbar height */
+}
+
+@media (max-width: 768px) {
+  .freelancer-edit-profile-content {
+    padding-top: 90px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .freelancer-edit-profile-content {
+    padding-top: 80px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .freelancer-edit-profile-content {
+    padding-top: 70px !important;
+  }
+}
+
 /* Hide the loading spinner that might be stuck */
 .loading-spinner {
   display: none !important;
