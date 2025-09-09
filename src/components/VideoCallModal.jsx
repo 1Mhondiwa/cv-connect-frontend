@@ -92,55 +92,49 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
         localVideoRef.current.srcObject = stream;
       }
 
-      // Create peer connection with more robust configuration
-      const configuration = {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' },
-          { urls: 'stun:stun3.l.google.com:19302' },
-          { urls: 'stun:stun4.l.google.com:19302' }
-        ],
-        iceCandidatePoolSize: 10
-      };
-
-      peerConnectionRef.current = new RTCPeerConnection(configuration);
-
-      // Add local stream to peer connection
-      stream.getTracks().forEach(track => {
-        console.log('Adding track:', track.kind, track.label);
-        peerConnectionRef.current.addTrack(track, stream);
-      });
-
-      // Handle remote stream (will only work when another user actually joins)
-      peerConnectionRef.current.ontrack = (event) => {
-        console.log('Received remote track:', event);
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = event.streams[0];
-          setIsConnected(true);
-          startTimeRef.current = Date.now();
-        }
-      };
-
-      // Handle ICE candidates
-      peerConnectionRef.current.onicecandidate = (event) => {
-        if (event.candidate) {
-          // In a real implementation, you would send this to the other peer
-          console.log('ICE candidate:', event.candidate);
-        }
-      };
-
-      // Handle connection state changes
-      peerConnectionRef.current.onconnectionstatechange = () => {
-        console.log('Connection state:', peerConnectionRef.current.connectionState);
-      };
-
-      // Handle ICE connection state changes
-      peerConnectionRef.current.oniceconnectionstatechange = () => {
-        console.log('ICE connection state:', peerConnectionRef.current.iceConnectionState);
-      };
-
+      // Simulate connection for demo purposes
       console.log('Video call started successfully');
+      
+      // Simulate freelancer joining after a delay
+      setTimeout(() => {
+        console.log('Simulating freelancer joining...');
+        setIsConnected(true);
+        startTimeRef.current = Date.now();
+        
+        // Create a mock remote stream for demonstration
+        if (remoteVideoRef.current) {
+          // Create a canvas element to simulate remote video
+          const canvas = document.createElement('canvas');
+          canvas.width = 640;
+          canvas.height = 480;
+          const ctx = canvas.getContext('2d');
+          
+          // Draw a simple pattern to simulate remote video
+          const drawPattern = () => {
+            ctx.fillStyle = '#2a2a2a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw a simple pattern
+            ctx.fillStyle = '#4a4a4a';
+            ctx.fillRect(50, 50, canvas.width - 100, canvas.height - 100);
+            
+            // Draw text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Freelancer', canvas.width / 2, canvas.height / 2 - 20);
+            ctx.fillText('(Remote Video)', canvas.width / 2, canvas.height / 2 + 20);
+            
+            requestAnimationFrame(drawPattern);
+          };
+          
+          drawPattern();
+          
+          // Convert canvas to stream
+          const remoteStream = canvas.captureStream(30);
+          remoteVideoRef.current.srcObject = remoteStream;
+        }
+      }, 3000);
 
       // In production, the remote participant connection would be handled by
       // WebRTC signaling server when another user actually joins the call
@@ -383,6 +377,7 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
                        </div>
                        <h5>Waiting for {userType === 'associate' ? 'freelancer' : 'associate'}</h5>
                        <p>The interview will start when both participants join</p>
+                       <small className="text-muted">Simulating connection in 3 seconds...</small>
                      </div>
                    ) : (
                      <video
