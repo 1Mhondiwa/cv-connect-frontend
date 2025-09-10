@@ -2685,26 +2685,44 @@ const ESCAdminDashboard = () => {
                           
                                                       console.log('🔍 Top Skills Chart - About to render with data:', validData);
                           return (
-                            <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={validData}>
+                            <ResponsiveContainer width="100%" height={350}>
+                              <BarChart 
+                                data={validData}
+                                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                              >
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis dataKey="skill" stroke="#666" />
-                                <YAxis stroke="#666" />
+                                <XAxis 
+                                  dataKey="skill" 
+                                  stroke="#666"
+                                  tick={{ fontSize: 12, fill: '#666' }}
+                                  angle={-45}
+                                  textAnchor="end"
+                                  height={80}
+                                  interval={0}
+                                />
+                                <YAxis 
+                                  stroke="#666"
+                                  tick={{ fontSize: 12, fill: '#666' }}
+                                  label={{ value: 'Count', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#666' } }}
+                                />
                                 <Tooltip 
                                   contentStyle={{ 
                                     backgroundColor: '#fff', 
                                     border: '1px solid #ddd',
-                                    borderRadius: '8px'
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                                   }}
+                                  formatter={(value, name) => [value, 'Count']}
+                                  labelFormatter={(label) => `Skill: ${label}`}
                                 />
-                                <Area 
-                                  type="monotone" 
+                                <Bar 
                                   dataKey="count" 
-                                  stroke="#fd680e" 
-                                  fill="#fd680e" 
-                                  fillOpacity={0.6}
+                                  fill="#fd680e"
+                                  radius={[4, 4, 0, 0]}
+                                  stroke="#fd680e"
+                                  strokeWidth={1}
                                 />
-                              </AreaChart>
+                              </BarChart>
                             </ResponsiveContainer>
                           );
                       })()}
