@@ -1906,9 +1906,14 @@ const ECSEmployeeDashboard = () => {
                                   <div className="d-flex gap-2 align-items-center mb-2">
                                     <button
                                       type="button"
-                                      className="btn btn-outline-primary btn-sm flex-grow-1"
+                                      className="btn btn-sm flex-grow-1"
                                       onClick={() => openFreelancerProfile(freelancer)}
-                                      style={{ fontSize: '12px' }}
+                                      style={{ 
+                                        fontSize: '12px',
+                                        backgroundColor: '#ffd7c2',
+                                        borderColor: '#ffd7c2',
+                                        color: '#8b4513'
+                                      }}
                                     >
                                       <i className="bi bi-person-lines-fill me-1"></i>
                                       View Profile
