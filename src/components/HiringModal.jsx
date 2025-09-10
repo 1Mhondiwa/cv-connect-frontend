@@ -80,7 +80,7 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title" style={{ color: '#007bff', fontWeight: 600 }}>
+            <h5 className="modal-title" style={{ color: '#8b4513', fontWeight: 600 }}>
               <i className="bi bi-briefcase me-2"></i>
               Hire {freelancer.first_name} {freelancer.last_name}
             </h5>
