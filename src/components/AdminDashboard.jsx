@@ -1840,7 +1840,7 @@ const ESCAdminDashboard = () => {
                         </div>
                     <div style={{ fontWeight: 700, fontSize: '28px', color: '#111827', marginBottom: '8px' }}>
                       {hiredFreelancersLoading ? (
-                        <div className="spinner-border spinner-border-sm text-primary" role="status">
+                        <div className="spinner-border spinner-border-sm" style={{ color: '#ffd7c2' }} role="status">
                           <span className="visually-hidden">Loading...</span>
                         </div>
                       ) : (
@@ -1884,10 +1884,42 @@ const ESCAdminDashboard = () => {
                         <div className="d-flex gap-2 mt-2">
                           {/* Refresh Button */}
                           <button 
-                            className="btn btn-sm btn-outline-primary me-2"
+                            className="btn btn-sm me-2"
                             onClick={fetchVisitorData}
                             disabled={visitorDataLoading}
-                            style={{ fontSize: '12px', padding: '6px 12px' }}
+                            style={{ 
+                              fontSize: '12px', 
+                              padding: '6px 12px',
+                              backgroundColor: '#ffd7c2',
+                              borderColor: '#ffd7c2',
+                              color: '#8b4513',
+                              transition: 'all 0.3s ease-in-out',
+                              transform: 'scale(1)'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!visitorDataLoading) {
+                                e.target.style.transform = 'scale(1.05)';
+                                e.target.style.backgroundColor = '#ffc299';
+                                e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!visitorDataLoading) {
+                                e.target.style.transform = 'scale(1)';
+                                e.target.style.backgroundColor = '#ffd7c2';
+                                e.target.style.boxShadow = 'none';
+                              }
+                            }}
+                            onMouseDown={(e) => {
+                              if (!visitorDataLoading) {
+                                e.target.style.transform = 'scale(0.95)';
+                              }
+                            }}
+                            onMouseUp={(e) => {
+                              if (!visitorDataLoading) {
+                                e.target.style.transform = 'scale(1.05)';
+                              }
+                            }}
                           >
                             {visitorDataLoading ? 'Loading...' : 'Refresh'}
                           </button>
@@ -1895,7 +1927,7 @@ const ESCAdminDashboard = () => {
                           <div className="btn-group" role="group">
                             <button
                               type="button"
-                              className={`btn btn-sm ${timeRange === '90d' ? '' : 'btn-outline-primary'}`}
+                              className={`btn btn-sm ${timeRange === '90d' ? '' : ''}`}
                               onClick={() => setTimeRange('90d')}
                               style={{ 
                                 fontSize: '12px', 
@@ -1910,7 +1942,7 @@ const ESCAdminDashboard = () => {
                             </button>
                             <button
                               type="button"
-                              className={`btn btn-sm ${timeRange === '30d' ? '' : 'btn-outline-primary'}`}
+                              className={`btn btn-sm ${timeRange === '30d' ? '' : ''}`}
                               onClick={() => setTimeRange('30d')}
                               style={{ 
                                 fontSize: '12px', 
@@ -1925,7 +1957,7 @@ const ESCAdminDashboard = () => {
                             </button>
                             <button
                               type="button"
-                              className={`btn btn-sm ${timeRange === '7d' ? '' : 'btn-outline-primary'}`}
+                              className={`btn btn-sm ${timeRange === '7d' ? '' : ''}`}
                               onClick={() => setTimeRange('7d')}
                               style={{ 
                                 fontSize: '12px', 
@@ -1946,7 +1978,7 @@ const ESCAdminDashboard = () => {
                       <div className="chart-wrapper" style={{ height: '300px', width: '100%' }}>
                         {visitorDataLoading ? (
                           <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
-                            <div className="spinner-border text-primary" role="status">
+                            <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
                               <span className="visually-hidden">Loading...</span>
                             </div>
                           </div>
@@ -2133,9 +2165,40 @@ const ESCAdminDashboard = () => {
                     <option value="1y">Last Year</option>
                   </select>
                   <button 
-                    className="btn btn-sm btn-outline-primary"
+                    className="btn btn-sm"
                     onClick={fetchAnalyticsData}
                     disabled={analyticsLoading}
+                    style={{ 
+                      backgroundColor: '#ffd7c2',
+                      borderColor: '#ffd7c2',
+                      color: '#8b4513',
+                      transition: 'all 0.3s ease-in-out',
+                      transform: 'scale(1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!analyticsLoading) {
+                        e.target.style.transform = 'scale(1.05)';
+                        e.target.style.backgroundColor = '#ffc299';
+                        e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!analyticsLoading) {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.backgroundColor = '#ffd7c2';
+                        e.target.style.boxShadow = 'none';
+                      }
+                    }}
+                    onMouseDown={(e) => {
+                      if (!analyticsLoading) {
+                        e.target.style.transform = 'scale(0.95)';
+                      }
+                    }}
+                    onMouseUp={(e) => {
+                      if (!analyticsLoading) {
+                        e.target.style.transform = 'scale(1.05)';
+                      }
+                    }}
                   >
                     {analyticsLoading ? 'Loading...' : 'Refresh'}
                   </button>
@@ -2164,7 +2227,7 @@ const ESCAdminDashboard = () => {
                   </div>
                   <p className="mt-3 text-muted">Initializing analytics data...</p>
                   <button 
-                    className="btn btn-sm btn-outline-primary"
+                    className="btn btn-sm "
                     onClick={fetchAnalyticsData}
                   >
                     <i className="bi bi-arrow-clockwise me-1"></i>Load Data
@@ -2195,7 +2258,7 @@ const ESCAdminDashboard = () => {
                         <div className="card-body">
                           {analyticsLoading ? (
                             <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                              <div className="spinner-border text-primary" role="status">
+                              <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
                                 <span className="visually-hidden">Loading...</span>
                               </div>
                             </div>
@@ -3019,9 +3082,40 @@ const ESCAdminDashboard = () => {
                             <option value="180">Last 6 Months</option>
                           </select>
                           <button 
-                            className="btn btn-sm btn-outline-primary"
+                            className="btn btn-sm"
                             onClick={fetchInterviewAnalytics}
                             disabled={interviewAnalyticsLoading}
+                            style={{ 
+                              backgroundColor: '#ffd7c2',
+                              borderColor: '#ffd7c2',
+                              color: '#8b4513',
+                              transition: 'all 0.3s ease-in-out',
+                              transform: 'scale(1)'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!interviewAnalyticsLoading) {
+                                e.target.style.transform = 'scale(1.05)';
+                                e.target.style.backgroundColor = '#ffc299';
+                                e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!interviewAnalyticsLoading) {
+                                e.target.style.transform = 'scale(1)';
+                                e.target.style.backgroundColor = '#ffd7c2';
+                                e.target.style.boxShadow = 'none';
+                              }
+                            }}
+                            onMouseDown={(e) => {
+                              if (!interviewAnalyticsLoading) {
+                                e.target.style.transform = 'scale(0.95)';
+                              }
+                            }}
+                            onMouseUp={(e) => {
+                              if (!interviewAnalyticsLoading) {
+                                e.target.style.transform = 'scale(1.05)';
+                              }
+                            }}
                           >
                             {interviewAnalyticsLoading ? 'Loading...' : 'Refresh'}
                           </button>
@@ -3038,7 +3132,7 @@ const ESCAdminDashboard = () => {
 
                       {interviewAnalyticsLoading ? (
                         <div className="d-flex justify-content-center align-items-center" style={{ height: 200 }}>
-                          <div className="spinner-border text-primary" role="status">
+                          <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
                             <span className="visually-hidden">Loading...</span>
                           </div>
                         </div>
@@ -3173,7 +3267,7 @@ const ESCAdminDashboard = () => {
                           <h6 className="text-muted mt-3">No Interview Data Available</h6>
                           <p className="text-muted">Interview feedback analytics will appear here once interviews are conducted and feedback is submitted.</p>
                           <button 
-                            className="btn btn-outline-primary"
+                            className="btn "
                             onClick={fetchInterviewAnalytics}
                           >
                             <i className="bi bi-arrow-clockwise me-1"></i>Check for Data
@@ -3200,9 +3294,40 @@ const ESCAdminDashboard = () => {
                 </div>
                 <div className="d-flex gap-2">
                   <button 
-                    className="btn btn-sm btn-outline-primary"
+                    className="btn btn-sm"
                     onClick={() => generateComprehensiveReport()}
                     disabled={reportsLoading}
+                    style={{ 
+                      backgroundColor: '#ffd7c2',
+                      borderColor: '#ffd7c2',
+                      color: '#8b4513',
+                      transition: 'all 0.3s ease-in-out',
+                      transform: 'scale(1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!reportsLoading) {
+                        e.target.style.transform = 'scale(1.05)';
+                        e.target.style.backgroundColor = '#ffc299';
+                        e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!reportsLoading) {
+                        e.target.style.transform = 'scale(1)';
+                        e.target.style.backgroundColor = '#ffd7c2';
+                        e.target.style.boxShadow = 'none';
+                      }
+                    }}
+                    onMouseDown={(e) => {
+                      if (!reportsLoading) {
+                        e.target.style.transform = 'scale(0.95)';
+                      }
+                    }}
+                    onMouseUp={(e) => {
+                      if (!reportsLoading) {
+                        e.target.style.transform = 'scale(1.05)';
+                      }
+                    }}
                   >
                     {reportsLoading ? 'Generating...' : 'Generate Report'}
                   </button>
@@ -4227,9 +4352,40 @@ const ESCAdminDashboard = () => {
                 </button>
                 <button 
                   type="button" 
-                  className="btn btn-primary" 
+                  className="btn" 
                   onClick={saveFreelancerNotes}
                   disabled={notesLoading}
+                  style={{ 
+                    backgroundColor: '#ffd7c2',
+                    borderColor: '#ffd7c2',
+                    color: '#8b4513',
+                    transition: 'all 0.3s ease-in-out',
+                    transform: 'scale(1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!notesLoading) {
+                      e.target.style.transform = 'scale(1.05)';
+                      e.target.style.backgroundColor = '#ffc299';
+                      e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!notesLoading) {
+                      e.target.style.transform = 'scale(1)';
+                      e.target.style.backgroundColor = '#ffd7c2';
+                      e.target.style.boxShadow = 'none';
+                    }
+                  }}
+                  onMouseDown={(e) => {
+                    if (!notesLoading) {
+                      e.target.style.transform = 'scale(0.95)';
+                    }
+                  }}
+                  onMouseUp={(e) => {
+                    if (!notesLoading) {
+                      e.target.style.transform = 'scale(1.05)';
+                    }
+                  }}
                 >
                   {notesLoading ? 'Saving...' : 'Save Notes'}
                 </button>
@@ -4477,8 +4633,31 @@ const ESCAdminDashboard = () => {
                       <i className="bi bi-exclamation-triangle display-4 text-warning"></i>
                       <p className="mt-3 text-muted">No freelancers match the current filters</p>
                       <button 
-                        className="btn btn-sm btn-outline-primary"
+                        className="btn btn-sm"
                         onClick={resetSearch}
+                        style={{ 
+                          backgroundColor: '#ffd7c2',
+                          borderColor: '#ffd7c2',
+                          color: '#8b4513',
+                          transition: 'all 0.3s ease-in-out',
+                          transform: 'scale(1)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.transform = 'scale(1.05)';
+                          e.target.style.backgroundColor = '#ffc299';
+                          e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = 'scale(1)';
+                          e.target.style.backgroundColor = '#ffd7c2';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                        onMouseDown={(e) => {
+                          e.target.style.transform = 'scale(0.95)';
+                        }}
+                        onMouseUp={(e) => {
+                          e.target.style.transform = 'scale(1.05)';
+                        }}
                       >
                         Reset Search
                       </button>
@@ -4908,7 +5087,7 @@ const ESCAdminDashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-3">
-                    <div className="spinner-border text-primary" role="status">
+                    <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
                   </div>
@@ -5201,8 +5380,31 @@ const ESCAdminDashboard = () => {
           activeSecuritySection && !securityData[activeSecuritySection] && (
         <div className="text-center py-4">
           <button 
-            className="btn btn-primary"
+            className="btn"
             onClick={() => fetchSecurityData(activeSecuritySection)}
+            style={{ 
+              backgroundColor: '#ffd7c2',
+              borderColor: '#ffd7c2',
+              color: '#8b4513',
+              transition: 'all 0.3s ease-in-out',
+              transform: 'scale(1)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.05)';
+              e.target.style.backgroundColor = '#ffc299';
+              e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.backgroundColor = '#ffd7c2';
+              e.target.style.boxShadow = 'none';
+            }}
+            onMouseDown={(e) => {
+              e.target.style.transform = 'scale(0.95)';
+            }}
+            onMouseUp={(e) => {
+              e.target.style.transform = 'scale(1.05)';
+            }}
           >
             <i className="bi bi-download me-2"></i>
             Load {activeSecuritySection.charAt(0).toUpperCase() + activeSecuritySection.slice(1)} Data
@@ -5216,8 +5418,31 @@ const ESCAdminDashboard = () => {
           activeReportSection && !reportsData[activeReportSection] && (
         <div className="text-center py-4">
           <button 
-            className="btn btn-primary"
+            className="btn"
             onClick={() => generateComprehensiveReport()}
+            style={{ 
+              backgroundColor: '#ffd7c2',
+              borderColor: '#ffd7c2',
+              color: '#8b4513',
+              transition: 'all 0.3s ease-in-out',
+              transform: 'scale(1)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.05)';
+              e.target.style.backgroundColor = '#ffc299';
+              e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.backgroundColor = '#ffd7c2';
+              e.target.style.boxShadow = 'none';
+            }}
+            onMouseDown={(e) => {
+              e.target.style.transform = 'scale(0.95)';
+            }}
+            onMouseUp={(e) => {
+              e.target.style.transform = 'scale(1.05)';
+            }}
           >
             <i className="bi bi-download me-2"></i>
             Load Report Data
