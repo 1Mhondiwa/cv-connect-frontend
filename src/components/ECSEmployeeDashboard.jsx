@@ -1912,7 +1912,25 @@ const ECSEmployeeDashboard = () => {
                                         fontSize: '12px',
                                         backgroundColor: '#ffd7c2',
                                         borderColor: '#ffd7c2',
-                                        color: '#8b4513'
+                                        color: '#8b4513',
+                                        transition: 'all 0.3s ease-in-out',
+                                        transform: 'scale(1)'
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.target.style.transform = 'scale(1.05)';
+                                        e.target.style.backgroundColor = '#ffc299';
+                                        e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.target.style.transform = 'scale(1)';
+                                        e.target.style.backgroundColor = '#ffd7c2';
+                                        e.target.style.boxShadow = 'none';
+                                      }}
+                                      onMouseDown={(e) => {
+                                        e.target.style.transform = 'scale(0.95)';
+                                      }}
+                                      onMouseUp={(e) => {
+                                        e.target.style.transform = 'scale(1.05)';
                                       }}
                                     >
                                       <i className="bi bi-person-lines-fill me-1"></i>
