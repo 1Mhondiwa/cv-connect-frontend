@@ -804,14 +804,14 @@ const AssociateDashboard = () => {
               <span className="badge bg-success mb-2">Associate</span>
               <div className="d-grid gap-3 w-100 mt-4">
                 <button 
-                  className={`btn dashboard-btn w-100 ${activeTab === 'request' ? '' : 'btn-outline-primary'}`}
+                  className={`btn dashboard-btn w-100 ${activeTab === 'request' ? '' : ''}`}
                   style={{ background: activeTab === 'request' ? accent : 'transparent', color: activeTab === 'request' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('request')}
                 >
                   <i className="bi bi-person-plus me-2"></i>Request Freelancer
                 </button>
                 <button 
-                  className={`btn dashboard-btn w-100 ${activeTab === 'messages' ? '' : 'btn-outline-primary'} position-relative`}
+                  className={`btn dashboard-btn w-100 ${activeTab === 'messages' ? '' : ''} position-relative`}
                   style={{ background: activeTab === 'messages' ? accent : 'transparent', color: activeTab === 'messages' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('messages')}
                 >
@@ -823,21 +823,21 @@ const AssociateDashboard = () => {
                   )}
                 </button>
                 <button 
-                  className={`btn dashboard-btn w-100 ${activeTab === 'change-password' ? '' : 'btn-outline-primary'}`}
+                  className={`btn dashboard-btn w-100 ${activeTab === 'change-password' ? '' : ''}`}
                   style={{ background: activeTab === 'change-password' ? accent : 'transparent', color: activeTab === 'change-password' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('change-password')}
                 >
                   <i className="bi bi-key me-2"></i>Change Password
                 </button>
                 <button 
-                  className={`btn dashboard-btn w-100 ${activeTab === 'my-requests' ? '' : 'btn-outline-primary'}`}
+                  className={`btn dashboard-btn w-100 ${activeTab === 'my-requests' ? '' : ''}`}
                   style={{ background: activeTab === 'my-requests' ? accent : 'transparent', color: activeTab === 'my-requests' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('my-requests')}
                 >
                   <i className="bi bi-list-check me-2"></i>My Requests
                 </button>
                 <button 
-                  className={`btn dashboard-btn w-100 ${activeTab === 'interviews' ? '' : 'btn-outline-primary'}`}
+                  className={`btn dashboard-btn w-100 ${activeTab === 'interviews' ? '' : ''}`}
                   style={{ background: activeTab === 'interviews' ? accent : 'transparent', color: activeTab === 'interviews' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => setActiveTab('interviews')}
                 >
@@ -846,7 +846,7 @@ const AssociateDashboard = () => {
               </div>
               {assocUploading && (
                 <div className="mt-2">
-                  <span className="spinner-border spinner-border-sm text-primary" role="status" />
+                  <span className="spinner-border spinner-border-sm" style={{ color: '#ffd7c2' }} role="status" />
                   <span className="ms-2">Uploading...</span>
                 </div>
               )}
@@ -1371,7 +1371,7 @@ const AssociateDashboard = () => {
                                 request.status === 'pending' ? 'bg-warning' :
                                 request.status === 'reviewed' ? 'bg-info' :
                                 request.status === 'provided' ? 'bg-success' :
-                                request.status === 'completed' ? 'bg-primary' :
+                                request.status === 'completed' ? 'bg-warning' :
                                 'bg-secondary'
                               }`}>
                                 {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
@@ -1548,9 +1548,32 @@ const AssociateDashboard = () => {
                                 <i className="bi bi-calendar-event me-1"></i>Schedule Interview
                               </button>
                               <button
-                                className="btn btn-sm btn-primary"
+                                className="btn btn-sm"
                                 onClick={() => openHiringModal(rec)}
                                 title="Formally hire this freelancer with project details"
+                                style={{ 
+                                  backgroundColor: '#ffd7c2',
+                                  borderColor: '#ffd7c2',
+                                  color: '#8b4513',
+                                  transition: 'all 0.3s ease-in-out',
+                                  transform: 'scale(1)'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.transform = 'scale(1.05)';
+                                  e.target.style.backgroundColor = '#ffc299';
+                                  e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.transform = 'scale(1)';
+                                  e.target.style.backgroundColor = '#ffd7c2';
+                                  e.target.style.boxShadow = 'none';
+                                }}
+                                onMouseDown={(e) => {
+                                  e.target.style.transform = 'scale(0.95)';
+                                }}
+                                onMouseUp={(e) => {
+                                  e.target.style.transform = 'scale(1.05)';
+                                }}
                               >
                                 <i className="bi bi-briefcase me-1"></i>Hire Freelancer
                               </button>
