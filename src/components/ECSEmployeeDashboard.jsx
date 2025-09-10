@@ -1797,9 +1797,10 @@ const ECSEmployeeDashboard = () => {
                       <div className="row g-3">
                         {availableFreelancers.map((freelancer) => (
                           <div key={freelancer.freelancer_id} className="col-md-6 col-lg-4">
-                            <div className="card shadow-sm h-100" style={{ minHeight: '320px', border: '2px solid #ffd7c2' }}>
-                              <div className="card-body p-3">
-                                <div className="d-flex align-items-start mb-2">
+                            <div className="card shadow-sm h-100 d-flex flex-column" style={{ border: '2px solid #ffd7c2' }}>
+                              <div className="card-body p-3 d-flex flex-column">
+                                {/* Header Section */}
+                                <div className="d-flex align-items-start mb-3">
                                   <div className="form-check me-2">
                                     <input
                                       type="checkbox"
@@ -1807,7 +1808,7 @@ const ECSEmployeeDashboard = () => {
                                       checked={selectedFreelancers.includes(freelancer.freelancer_id)}
                                       onChange={(e) => handleFreelancerSelection(freelancer.freelancer_id, e.target.checked)}
                                     />
-          </div>
+                                  </div>
                                   <div className="flex-grow-1">
                                     <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600, fontSize: '14px' }}>
                                       {`${freelancer.first_name} ${freelancer.last_name}`}
@@ -1815,80 +1816,92 @@ const ECSEmployeeDashboard = () => {
                                     <small className="text-muted">
                                       ID: {freelancer.freelancer_id} | Selected: {selectedFreelancers.includes(freelancer.freelancer_id) ? 'Yes' : 'No'} | Checkbox visible: Yes
                                     </small>
-        </div>
-      </div>
-
-                                <div className="mb-2">
-                                  <strong>Role:</strong> {freelancer.headline || 'Not specified'}
-        </div>
-
-                                <div className="mb-2">
-                                  <strong>Skills:</strong> 
-                                  {freelancer.skills && freelancer.skills.length > 0 && (
-                                    <small className="text-muted ms-2">({freelancer.skills.length})</small>
-                                  )}
-                                  <div className="mt-1" style={{ maxHeight: '80px', overflowY: 'auto' }}>
-                                    {freelancer.skills && freelancer.skills.length > 0 ? (
-                                      freelancer.skills.map((skill, index) => {
-                                        // Handle both new skills structure and legacy structure
-                                        const skillName = skill.skill_name || skill;
-                                        const proficiencyLevel = skill.proficiency_level;
-                                        
-                                        return (
-                                          <span key={skill.skill_id || index} className="badge bg-light text-dark me-1 mb-1" style={{ fontSize: '10px' }}>
-                                            {skillName}
-                                            {proficiencyLevel && (
-                                              <span className="ms-1" style={{ color: '#666' }}>
-                                                ({proficiencyLevel})
-                                              </span>
-                                            )}
-                                          </span>
-                                        );
-                                      })
-                                    ) : (
-                                      <span className="text-muted">No skills listed</span>
-                                    )}
-      </div>
-                                </div>
-
-                                <div className="mb-2">
-                                  <strong>Experience:</strong> {freelancer.experience_years || 0} years
-            </div>
-
-                                <div className="mb-2">
-                                  <strong>Email:</strong> {freelancer.email || 'Not specified'}
-            </div>
-
-                                <div className="mb-2">
-                                  <strong>Phone:</strong> {freelancer.phone || 'Not specified'}
-          </div>
-
-                                <div className="mb-2">
-                                  <strong>Availability:</strong>
-                                  <div className="mt-1">
-                                    <span style={{ 
-                                      background: freelancer.availability_status === 'available' ? '#d4edda' : 
-                                                 freelancer.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
-                                      color: freelancer.availability_status === 'available' ? '#155724' : 
-                                             freelancer.availability_status === 'busy' ? '#856404' : '#721c24',
-                                      padding: '4px 8px', 
-                                      borderRadius: 15,
-                                      fontSize: 11,
-                                      fontWeight: 600
-                                    }}>
-                                      <i className={`bi ${
-                                        freelancer.availability_status === 'available' ? 'bi-check-circle' :
-                                        freelancer.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
-                                      } me-1`}></i>
-                                      {freelancer.availability_status === 'available' ? 'Available for Work' :
-                                       freelancer.availability_status === 'busy' ? 'Busy' : 'Not Available'}
-                                    </span>
                                   </div>
                                 </div>
 
+                                {/* Content Section - Fixed Height */}
+                                <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: '200px' }}>
+                                  {/* Role */}
+                                  <div className="mb-2">
+                                    <strong>Role:</strong> 
+                                    <div className="text-muted small">{freelancer.headline || 'Not specified'}</div>
+                                  </div>
 
+                                  {/* Skills */}
+                                  <div className="mb-2">
+                                    <strong>Skills:</strong> 
+                                    {freelancer.skills && freelancer.skills.length > 0 && (
+                                      <small className="text-muted ms-2">({freelancer.skills.length})</small>
+                                    )}
+                                    <div className="mt-1" style={{ maxHeight: '60px', overflowY: 'auto' }}>
+                                      {freelancer.skills && freelancer.skills.length > 0 ? (
+                                        freelancer.skills.map((skill, index) => {
+                                          // Handle both new skills structure and legacy structure
+                                          const skillName = skill.skill_name || skill;
+                                          const proficiencyLevel = skill.proficiency_level;
+                                          
+                                          return (
+                                            <span key={skill.skill_id || index} className="badge bg-light text-dark me-1 mb-1" style={{ fontSize: '10px' }}>
+                                              {skillName}
+                                              {proficiencyLevel && (
+                                                <span className="ms-1" style={{ color: '#666' }}>
+                                                  ({proficiencyLevel})
+                                                </span>
+                                              )}
+                                            </span>
+                                          );
+                                        })
+                                      ) : (
+                                        <span className="text-muted small">No skills listed</span>
+                                      )}
+                                    </div>
+                                  </div>
 
+                                  {/* Experience */}
+                                  <div className="mb-2">
+                                    <strong>Experience:</strong> 
+                                    <span className="text-muted small">{freelancer.experience_years || 0} years</span>
+                                  </div>
 
+                                  {/* Contact Info */}
+                                  <div className="mb-2">
+                                    <strong>Email:</strong> 
+                                    <div className="text-muted small text-truncate" title={freelancer.email || 'Not specified'}>
+                                      {freelancer.email || 'Not specified'}
+                                    </div>
+                                  </div>
+
+                                  <div className="mb-2">
+                                    <strong>Phone:</strong> 
+                                    <div className="text-muted small">{freelancer.phone || 'Not specified'}</div>
+                                  </div>
+
+                                  {/* Availability */}
+                                  <div className="mb-3">
+                                    <strong>Availability:</strong>
+                                    <div className="mt-1">
+                                      <span style={{ 
+                                        background: freelancer.availability_status === 'available' ? '#d4edda' : 
+                                                   freelancer.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
+                                        color: freelancer.availability_status === 'available' ? '#155724' : 
+                                               freelancer.availability_status === 'busy' ? '#856404' : '#721c24',
+                                        padding: '4px 8px', 
+                                        borderRadius: 15,
+                                        fontSize: 11,
+                                        fontWeight: 600
+                                      }}>
+                                        <i className={`bi ${
+                                          freelancer.availability_status === 'available' ? 'bi-check-circle' :
+                                          freelancer.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                        } me-1`}></i>
+                                        {freelancer.availability_status === 'available' ? 'Available for Work' :
+                                         freelancer.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Footer Section - Always at bottom */}
                                 <div className="mt-auto">
                                   <div className="d-flex gap-2 align-items-center mb-2">
                                     <button
