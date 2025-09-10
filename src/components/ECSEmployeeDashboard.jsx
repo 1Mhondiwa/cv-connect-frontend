@@ -1813,9 +1813,6 @@ const ECSEmployeeDashboard = () => {
                                     <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600, fontSize: '14px' }}>
                                       {`${freelancer.first_name} ${freelancer.last_name}`}
                                     </h6>
-                                    <small className="text-muted">
-                                      ID: {freelancer.freelancer_id} | Selected: {selectedFreelancers.includes(freelancer.freelancer_id) ? 'Yes' : 'No'} | Checkbox visible: Yes
-                                    </small>
                                   </div>
                                 </div>
 
