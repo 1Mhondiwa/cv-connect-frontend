@@ -10,7 +10,7 @@
   text-align: center;
   margin-bottom: 30px;
   padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B4513 0%, #fd680e 100%);
   color: white;
   border-radius: 10px;
 }
@@ -57,7 +57,7 @@
   font-size: 1.5rem;
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #fd680e;
   display: inline-block;
 }
 
@@ -95,8 +95,8 @@
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #fd680e;
+  box-shadow: 0 0 0 3px rgba(253, 104, 14, 0.1);
 }
 
 .form-group input.error {
@@ -118,11 +118,11 @@
 .experience-item,
 .education-item,
 .skill-item {
-  background: #f8f9fa;
+  background: #f0f8f0;
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #fd680e;
 }
 
 .skill-item .form-row {
@@ -195,13 +195,13 @@
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B4513 0%, #fd680e 100%);
   color: white;
 }
 
 .save-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 6px 12px rgba(253, 104, 14, 0.3);
 }
 
 /* CV Preview Styles */
@@ -220,7 +220,7 @@
   margin-bottom: 20px;
   text-align: center;
   padding-bottom: 10px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #fd680e;
 }
 
 .cv-document {
@@ -274,10 +274,10 @@
 
 .cv-section h3 {
   font-size: 1.4rem;
-  color: #333;
+  color: #8B4513;
   margin-bottom: 15px;
   padding-bottom: 5px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #fd680e;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -339,9 +339,9 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #f8f9fa;
+  background: #f0f8f0;
   border-radius: 4px;
-  border-left: 3px solid #667eea;
+  border-left: 3px solid #fd680e;
 }
 
 .skill-name {
@@ -492,7 +492,7 @@
 .remove-btn:focus,
 .cancel-btn:focus,
 .save-btn:focus {
-  outline: 2px solid #667eea;
+  outline: 2px solid #fd680e;
   outline-offset: 2px;
 }
 
@@ -512,10 +512,10 @@
 }
 
 .cv-preview::-webkit-scrollbar-thumb {
-  background: #667eea;
+  background: #fd680e;
   border-radius: 4px;
 }
 
 .cv-preview::-webkit-scrollbar-thumb:hover {
-  background: #5a6fd8;
+  background: #e55a0a;
 }
