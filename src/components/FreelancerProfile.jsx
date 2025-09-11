@@ -235,7 +235,7 @@ const FreelancerProfile = () => {
         minHeight: '100vh',
         background: 'linear-gradient(120deg, #fff 60%, #f8f4f2 100%)',
         position: 'relative',
-        padding: '40px 0'
+        padding: '0 0 40px 0'
       }}
     >
       {/* Navbar */}
