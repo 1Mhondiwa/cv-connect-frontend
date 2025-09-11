@@ -185,7 +185,7 @@ const WelcomeFreelancer = () => {
                     <button
                       className="btn dashboard-btn w-100"
                       style={{
-                        background: '#28a745',
+                        background: 'linear-gradient(135deg, #8B4513 0%, #fd680e 100%)',
                         color: '#fff',
                         border: 'none',
                         borderRadius: 30,
@@ -245,8 +245,8 @@ const WelcomeFreelancer = () => {
                   box-shadow: 0 4px 24px rgba(253,104,14,0.18);
                   z-index: 2;
                 }
-                .dashboard-btn[style*="background: #28a745"]:hover {
-                  box-shadow: 0 4px 24px rgba(40,167,69,0.18);
+                .dashboard-btn[style*="background: linear-gradient"]:hover {
+                  box-shadow: 0 4px 24px rgba(253,104,14,0.18);
                 }
               `}</style>
             </div>
