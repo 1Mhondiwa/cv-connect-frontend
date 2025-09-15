@@ -89,6 +89,11 @@ const AssociateDashboard = () => {
 
   // REMOVE: const socket = io('http://localhost:5000'); // Adjust if backend URL is different
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     checkAuth();
   }, []);

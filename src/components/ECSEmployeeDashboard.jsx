@@ -111,6 +111,11 @@ const ECSEmployeeDashboard = () => {
 
 
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Load user data on component mount
   useEffect(() => {
     const loadUserData = async () => {

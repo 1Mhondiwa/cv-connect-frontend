@@ -42,6 +42,11 @@ const FreelancerDashboard = () => {
   const [showInterviewFeedbackModal, setShowInterviewFeedbackModal] = useState(false);
   const [selectedInterviewForFeedback, setSelectedInterviewForFeedback] = useState(null);
 
+  // Scroll to top when component mounts or URL changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     
