@@ -673,6 +673,7 @@ const ECSEmployeeDashboard = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+    window.scrollTo(0, 0);
   };
 
   if (loading) {
@@ -755,7 +756,7 @@ const ECSEmployeeDashboard = () => {
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
-                onClick={() => setActiveTab('dashboard')}
+                onClick={() => handleTabChange('dashboard')}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -776,7 +777,7 @@ const ECSEmployeeDashboard = () => {
 
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'associate-requests' ? 'active' : ''}`}
-                onClick={() => setActiveTab('associate-requests')}
+                onClick={() => handleTabChange('associate-requests')}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -799,7 +800,7 @@ const ECSEmployeeDashboard = () => {
 
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'freelancer-requests' ? 'active' : ''}`}
-                onClick={() => setActiveTab('freelancer-requests')}
+                onClick={() => handleTabChange('freelancer-requests')}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -845,7 +846,7 @@ const ECSEmployeeDashboard = () => {
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
-                onClick={() => setActiveTab('settings')}
+                onClick={() => handleTabChange('settings')}
                 style={{
                   padding: '12px 16px',
                   border: 'none',

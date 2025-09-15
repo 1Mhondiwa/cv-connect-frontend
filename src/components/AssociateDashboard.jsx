@@ -806,14 +806,20 @@ const AssociateDashboard = () => {
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'request' ? '' : ''}`}
                   style={{ background: activeTab === 'request' ? accent : 'transparent', color: activeTab === 'request' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => setActiveTab('request')}
+                  onClick={() => {
+                    setActiveTab('request');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-person-plus me-2"></i>Request Freelancer
                 </button>
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'messages' ? '' : ''} position-relative`}
                   style={{ background: activeTab === 'messages' ? accent : 'transparent', color: activeTab === 'messages' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => setActiveTab('messages')}
+                  onClick={() => {
+                    setActiveTab('messages');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-chat-dots me-2"></i>Messages
                   {globalUnread > 0 && (
@@ -825,21 +831,30 @@ const AssociateDashboard = () => {
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'change-password' ? '' : ''}`}
                   style={{ background: activeTab === 'change-password' ? accent : 'transparent', color: activeTab === 'change-password' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => setActiveTab('change-password')}
+                  onClick={() => {
+                    setActiveTab('change-password');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-key me-2"></i>Change Password
                 </button>
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'my-requests' ? '' : ''}`}
                   style={{ background: activeTab === 'my-requests' ? accent : 'transparent', color: activeTab === 'my-requests' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => setActiveTab('my-requests')}
+                  onClick={() => {
+                    setActiveTab('my-requests');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-list-check me-2"></i>My Requests
                 </button>
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'interviews' ? '' : ''}`}
                   style={{ background: activeTab === 'interviews' ? accent : 'transparent', color: activeTab === 'interviews' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => setActiveTab('interviews')}
+                  onClick={() => {
+                    setActiveTab('interviews');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-calendar-event me-2"></i>Interviews
                 </button>

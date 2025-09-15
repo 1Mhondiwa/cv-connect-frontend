@@ -1546,7 +1546,10 @@ const ESCAdminDashboard = () => {
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
-                onClick={() => setActiveTab('dashboard')}
+                onClick={() => {
+                  setActiveTab('dashboard');
+                  window.scrollTo(0, 0);
+                }}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -1581,7 +1584,10 @@ const ESCAdminDashboard = () => {
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'analytics' ? 'active' : ''}`}
-                onClick={() => setActiveTab('analytics')}
+                onClick={() => {
+                  setActiveTab('analytics');
+                  window.scrollTo(0, 0);
+                }}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -1604,7 +1610,10 @@ const ESCAdminDashboard = () => {
               
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'reports' ? 'active' : ''}`}
-                onClick={() => setActiveTab('reports')}
+                onClick={() => {
+                  setActiveTab('reports');
+                  window.scrollTo(0, 0);
+                }}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -1647,7 +1656,10 @@ const ESCAdminDashboard = () => {
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
-                onClick={() => setActiveTab('settings')}
+                onClick={() => {
+                  setActiveTab('settings');
+                  window.scrollTo(0, 0);
+                }}
                 style={{
                   padding: '12px 16px',
                   border: 'none',

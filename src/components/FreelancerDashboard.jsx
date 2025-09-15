@@ -345,7 +345,10 @@ const FreelancerDashboard = () => {
                     justifyContent: 'center',
                     boxShadow: activeTab === 'dashboard' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
                   }}
-                  onClick={() => setActiveTab('dashboard')}
+                  onClick={() => {
+                    setActiveTab('dashboard');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-house me-2"></i>Dashboard
                 </button>
@@ -368,7 +371,10 @@ const FreelancerDashboard = () => {
                     justifyContent: 'center',
                     boxShadow: activeTab === 'messages' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
                   }}
-                  onClick={() => setActiveTab('messages')}
+                  onClick={() => {
+                    setActiveTab('messages');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-chat-dots me-2"></i>Messages
                   {globalUnread > 0 && (
@@ -396,7 +402,10 @@ const FreelancerDashboard = () => {
                     justifyContent: 'center',
                     boxShadow: activeTab === 'feedback' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
                   }}
-                  onClick={() => setActiveTab('feedback')}
+                  onClick={() => {
+                    setActiveTab('feedback');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-star-half me-2"></i>Interview Feedback
                 </button>
@@ -419,7 +428,10 @@ const FreelancerDashboard = () => {
                     justifyContent: 'center',
                     boxShadow: activeTab === 'interviews' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
                   }}
-                  onClick={() => setActiveTab('interviews')}
+                  onClick={() => {
+                    setActiveTab('interviews');
+                    window.scrollTo(0, 0);
+                  }}
                 >
                   <i className="bi bi-calendar-event me-2"></i>Interviews
                 </button>

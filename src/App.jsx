@@ -20,6 +20,7 @@ import AssociateDashboard from './components/AssociateDashboard';
 import NotFound from './components/NotFound';
 import Footer from './components/Footer';
 import Preloader from './components/Preloader';
+import ScrollToTop from './components/ScrollToTop';
 import FreelancerCVUpload from './components/FreelancerCVUpload';
 import FreelancerProfile from './components/FreelancerProfile';
 import FreelancerEditProfile from './components/FreelancerEditProfile';
@@ -82,6 +83,7 @@ function AppRoutes() {
 
   return (
     <>
+      <ScrollToTop />
       {!hideNavbar && <Navbar />}
       <Routes>
         <Route path="/" element={<MainPage />} />
