@@ -96,6 +96,15 @@ const ESCAdminDashboard = () => {
     userCommunicationActivity: [],
     hiredFreelancersTrends: []
   });
+
+  // CV Upload date filtering states
+  const [cvUploadDateFilter, setCvUploadDateFilter] = useState({
+    type: 'days', // 'days' or 'custom'
+    days: 90,
+    startDate: '',
+    endDate: ''
+  });
+  const [cvUploadFilterLoading, setCvUploadFilterLoading] = useState(false);
   const [analyticsDataReady, setAnalyticsDataReady] = useState(false);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState('');
@@ -164,6 +173,20 @@ const ESCAdminDashboard = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Initialize CV upload date filter with default values
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    const threeMonthsAgoStr = threeMonthsAgo.toISOString().split('T')[0];
+    
+    setCvUploadDateFilter(prev => ({
+      ...prev,
+      startDate: threeMonthsAgoStr,
+      endDate: today
+    }));
+  }, []);
+
   useEffect(() => {
     checkAuth();
     // Fetch initial hired freelancers count
@@ -176,6 +199,31 @@ const ESCAdminDashboard = () => {
       fetchVisitorData();
     }
   }, [timeRange]);
+
+  // Fetch CV upload data when analytics tab is opened or filter changes
+  useEffect(() => {
+    console.log('🔄 CV Upload useEffect triggered:', { 
+      activeTab, 
+      startDate: cvUploadDateFilter.startDate, 
+      endDate: cvUploadDateFilter.endDate 
+    });
+    if (activeTab === 'analytics') {
+      if (cvUploadDateFilter.startDate && cvUploadDateFilter.endDate) {
+        console.log('🚀 Auto-fetching CV upload data...');
+        fetchCVUploadData();
+      } else {
+        console.log('⚠️ CV upload filter not initialized yet');
+      }
+    }
+  }, [cvUploadDateFilter, activeTab]);
+
+  // Debug CV upload trends data changes
+  useEffect(() => {
+    console.log('📊 CV Upload Trends data changed:', {
+      length: analyticsData.cvUploadTrends?.length,
+      data: analyticsData.cvUploadTrends
+    });
+  }, [analyticsData.cvUploadTrends]);
 
   // Fetch associates on mount
   useEffect(() => {
@@ -613,6 +661,90 @@ const ESCAdminDashboard = () => {
 
 
 
+  // Helper function to format trends data
+  const formatTrendsData = (data) => {
+    return (data || []).map(item => ({
+      ...item,
+      // Ensure numeric values for chart data
+      total_users: parseInt(item.total_users) || 0,
+      associates: parseInt(item.associates) || 0,
+      freelancers: parseInt(item.freelancers) || 0,
+      admins: parseInt(item.admins) || 0,
+      ecs_employees: parseInt(item.ecs_employees) || 0,
+      uploads: parseInt(item.uploads) || 0,
+      messages: parseInt(item.messages) || 0,
+      conversations: parseInt(item.conversations) || 0,
+      hired_freelancers: parseInt(item.hired_freelancers) || 0,
+      formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric'
+      })
+    }));
+  };
+
+  // CV Upload date filtering functions
+  const fetchCVUploadData = async () => {
+    setCvUploadFilterLoading(true);
+    try {
+      console.log('🔍 Fetching CV upload data with filter:', cvUploadDateFilter);
+      
+      let queryParams = '';
+      if (cvUploadDateFilter.type === 'custom' && cvUploadDateFilter.startDate && cvUploadDateFilter.endDate) {
+        queryParams = `?start_date=${cvUploadDateFilter.startDate}&end_date=${cvUploadDateFilter.endDate}`;
+        console.log('📅 Using custom date range:', cvUploadDateFilter.startDate, 'to', cvUploadDateFilter.endDate);
+      } else {
+        queryParams = `?days=${cvUploadDateFilter.days}`;
+        console.log('📅 Using days filter:', cvUploadDateFilter.days, 'days');
+      }
+      
+      console.log('🌐 Making API call to:', `/admin/analytics/cv-upload-trends${queryParams}`);
+      const response = await api.get(`/admin/analytics/cv-upload-trends${queryParams}`);
+      
+      console.log('📊 API Response:', response.data);
+      
+      if (response.data.success) {
+        console.log('📊 Raw API data:', response.data.data);
+        const formattedData = formatTrendsData(response.data.data);
+        console.log('📈 Formatted data before setting state:', formattedData);
+        
+        setAnalyticsData(prev => {
+          const newData = {
+            ...prev,
+            cvUploadTrends: formattedData
+          };
+          console.log('🔄 Updated analytics data:', newData.cvUploadTrends);
+          return newData;
+        });
+        
+        console.log('✅ CV upload data fetched successfully:', formattedData.length, 'records');
+      } else {
+        console.error('❌ CV upload data fetch failed:', response.data.message);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching CV upload data:', error);
+      console.error('❌ Error details:', error.response?.data);
+    } finally {
+      setCvUploadFilterLoading(false);
+    }
+  };
+
+  const handleCVUploadDateFilterChange = (field, value) => {
+    setCvUploadDateFilter(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const applyCVUploadDateFilter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('🔍 Apply button clicked!');
+    console.log('📅 Current filter state:', cvUploadDateFilter);
+    alert('Apply button clicked! Check console for details.');
+    console.log('🚀 Starting CV upload data fetch...');
+    fetchCVUploadData();
+  };
+
   // Analytics Functions
   const fetchAnalyticsData = async () => {
     setAnalyticsLoading(true);
@@ -679,22 +811,7 @@ const ESCAdminDashboard = () => {
         hiredFreelancers: hiredFreelancersTrendsResponse.data.success
       });
       
-      // Format all trends data with proper dates
-      const formatTrendsData = (data) => {
-        return (data || []).map(item => ({
-          ...item,
-          // Ensure numeric values for chart data
-          total_users: parseInt(item.total_users) || 0,
-          associates: parseInt(item.associates) || 0,
-          freelancers: parseInt(item.freelancers) || 0,
-          admins: parseInt(item.admins) || 0,
-          ecs_employees: parseInt(item.ecs_employees) || 0,
-          formattedDate: new Date(item.date).toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
-          })
-        }));
-      };
+      // Use the shared formatTrendsData function
       
       const analyticsData = {
         registrationTrends: formatTrendsData(registrationResponse.data.data),
@@ -2549,13 +2666,113 @@ const ESCAdminDashboard = () => {
               {/* CV Upload Trends - Line Chart */}
               <div className="row g-4 mb-4">
                 <div className="col-12">
-                  <div className="card border-0 shadow-sm">
+                  <div className="card border-0 shadow-sm" style={{ border: '2px solid red' }}>
                     <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-file-earmark-arrow-up me-2"></i>CV Upload Trends
-                      </h6>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                          <i className="bi bi-file-earmark-arrow-up me-2"></i>CV Upload Trends
+                        </h6>
+                        
+                        {/* Date Filter Controls */}
+                        <div className="d-flex align-items-center gap-3">
+                          <div className="d-flex align-items-center gap-2">
+                            <label className="form-label mb-0" style={{ fontSize: '14px', fontWeight: 500 }}>
+                              Filter by:
+                            </label>
+                            <select
+                              className="form-select form-select-sm"
+                              style={{ width: '120px', fontSize: '13px' }}
+                              value={cvUploadDateFilter.type}
+                              onChange={(e) => handleCVUploadDateFilterChange('type', e.target.value)}
+                            >
+                              <option value="days">Days</option>
+                              <option value="custom">Custom Range</option>
+                            </select>
+                          </div>
+                          
+                          {cvUploadDateFilter.type === 'days' ? (
+                            <div className="d-flex align-items-center gap-2">
+                              <select
+                                className="form-select form-select-sm"
+                                style={{ width: '100px', fontSize: '13px' }}
+                                value={cvUploadDateFilter.days}
+                                onChange={(e) => handleCVUploadDateFilterChange('days', parseInt(e.target.value))}
+                              >
+                                <option value={7}>7 days</option>
+                                <option value={30}>30 days</option>
+                                <option value={90}>90 days</option>
+                                <option value={180}>6 months</option>
+                                <option value={365}>1 year</option>
+                              </select>
+                            </div>
+                          ) : (
+                            <div className="d-flex align-items-center gap-2">
+                              <input
+                                type="date"
+                                className="form-control form-control-sm"
+                                style={{ width: '140px', fontSize: '13px' }}
+                                value={cvUploadDateFilter.startDate}
+                                onChange={(e) => handleCVUploadDateFilterChange('startDate', e.target.value)}
+                                placeholder="Start Date"
+                              />
+                              <span style={{ fontSize: '13px', color: '#666' }}>to</span>
+                              <input
+                                type="date"
+                                className="form-control form-control-sm"
+                                style={{ width: '140px', fontSize: '13px' }}
+                                value={cvUploadDateFilter.endDate}
+                                onChange={(e) => handleCVUploadDateFilterChange('endDate', e.target.value)}
+                                placeholder="End Date"
+                              />
+                            </div>
+                          )}
+                          
+                          <button
+                            className="btn btn-sm"
+                            style={{ 
+                              background: cvUploadFilterLoading ? '#ccc' : accent, 
+                              color: '#fff', 
+                              border: 'none',
+                              fontSize: '13px',
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              cursor: cvUploadFilterLoading ? 'not-allowed' : 'pointer'
+                            }}
+                            onClick={applyCVUploadDateFilter}
+                            disabled={cvUploadFilterLoading}
+                            type="button"
+                          >
+                            {cvUploadFilterLoading ? (
+                              <>
+                                <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                Loading...
+                              </>
+                            ) : (
+                              <>
+                                <i className="bi bi-funnel me-1"></i>Apply
+                              </>
+                            )}
+                          </button>
+                          
+                          {/* Simple test button */}
+                          <button
+                            className="btn btn-sm btn-outline-danger ms-2"
+                            style={{ fontSize: '13px', padding: '6px 12px' }}
+                            onClick={() => {
+                              console.log('TEST BUTTON CLICKED!');
+                              alert('Test button works!');
+                            }}
+                            type="button"
+                          >
+                            Test
+                          </button>
+                        </div>
+                      </div>
                     </div>
                     <div className="card-body">
+                      <div className="alert alert-info mb-3">
+                        <strong>DEBUG:</strong> CV Upload Trends section is rendering. Current tab: {activeTab}. Check console for data details.
+                      </div>
                       {(() => {
                             // Debug: Log the actual data structure
                             console.log('🔍 CV Upload Trends Data:', {
@@ -2609,9 +2826,11 @@ const ESCAdminDashboard = () => {
                           }
                           
                                                       console.log('🔍 CV Upload Chart - About to render with data:', validData);
+                            console.log('🔍 Chart data keys:', validData.length > 0 ? Object.keys(validData[0]) : 'No data');
+                            console.log('🔍 First data item:', validData[0]);
                           return (
                             <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={validData}>
+                                <AreaChart data={validData} key={validData.length}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                 <XAxis dataKey="date" stroke="#666" />
                                 <YAxis stroke="#666" />

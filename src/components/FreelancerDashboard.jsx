@@ -256,6 +256,7 @@ const FreelancerDashboard = () => {
       fetchConversations();
       fetchGlobalUnread();
     } else if (activeTab === 'contracts') {
+      console.log('🔄 Contracts tab activated, fetching contracts...');
       fetchContracts();
     }
     // eslint-disable-next-line
@@ -265,15 +266,21 @@ const FreelancerDashboard = () => {
   const fetchContracts = async () => {
     try {
       setContractsLoading(true);
-      const response = await api.get('/freelancer/hiring-history');
+      setContractsError('');
+      console.log('🔍 Fetching contracts for freelancer...');
+      const response = await api.get('/freelancer/hiring/history');
+      console.log('📄 Contracts response:', response.data);
       
       if (response.data.success) {
         setContracts(response.data.hiring_history || []);
+        console.log('✅ Contracts loaded:', response.data.hiring_history?.length || 0);
       } else {
+        console.error('❌ Contracts fetch failed:', response.data.message);
         setContractsError(response.data.message || 'Failed to fetch contracts');
       }
     } catch (err) {
-      console.error('Error fetching contracts:', err);
+      console.error('❌ Error fetching contracts:', err);
+      console.error('❌ Error response:', err.response?.data);
       setContractsError('Failed to fetch contracts. Please try again.');
     } finally {
       setContractsLoading(false);
@@ -664,6 +671,14 @@ const FreelancerDashboard = () => {
               <div className="text-center mb-4">
                 <h4 style={{ color: accent, fontWeight: 600 }}>My Contracts</h4>
                 <p style={{ color: '#666', fontSize: 14 }}>View and download your contract agreements with associates</p>
+                <button 
+                  className="btn btn-sm" 
+                  style={{ background: accent, color: '#fff', marginTop: '10px' }}
+                  onClick={fetchContracts}
+                  disabled={contractsLoading}
+                >
+                  {contractsLoading ? 'Loading...' : 'Refresh Contracts'}
+                </button>
               </div>
               
               <ContractsList 
