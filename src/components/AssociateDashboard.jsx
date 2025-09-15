@@ -943,19 +943,19 @@ const AssociateDashboard = () => {
                       />
                     </div>
                     <div className="col-md-4">
-                      <label className="form-label">Budget Range</label>
+                      <label className="form-label">Salary Range (ZAR)</label>
                       <select
                         className="form-control"
                         name="budget_range"
                         value={searchForm.budget_range || ''}
                         onChange={handleSearchChange}
                       >
-                        <option value="">Select budget range</option>
-                        <option value="Under $1,000">Under $1,000</option>
-                        <option value="$1,000 - $5,000">$1,000 - $5,000</option>
-                        <option value="$5,000 - $10,000">$5,000 - $10,000</option>
-                        <option value="$10,000 - $25,000">$10,000 - $25,000</option>
-                        <option value="$25,000+">$25,000+</option>
+                        <option value="">Select salary range</option>
+                        <option value="Under R15,000">Under R15,000</option>
+                        <option value="R15,000 - R75,000">R15,000 - R75,000</option>
+                        <option value="R75,000 - R150,000">R75,000 - R150,000</option>
+                        <option value="R150,000 - R375,000">R150,000 - R375,000</option>
+                        <option value="R375,000+">R375,000+</option>
                       </select>
                     </div>
                     <div className="col-md-4">
