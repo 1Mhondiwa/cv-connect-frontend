@@ -23,7 +23,7 @@ const FreelancerProfile = () => {
     const fields = [
       'first_name', 'last_name', 'email', 'phone', 'address', 'headline', 
       'years_experience', 'summary', 'skills', 'linkedin_url', 
-      'github_url', 'current_status', 'availability_status', 'profile_picture_url'
+      'github_url', 'current_status', 'availability_status', 'profile_picture_url', 'hourly_rate'
     ];
     const completedFields = fields.filter(field => {
       const value = profile[field];
@@ -408,7 +408,7 @@ const FreelancerProfile = () => {
                       }}>
                         {profile.headline || 'Professional Freelancer'}
                       </p>
-                      <div className="d-flex align-items-center gap-3 mb-3">
+                      <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
                         <span style={{ 
                           background: '#e8f5e8', 
                           color: '#2d5a2d', 
@@ -434,6 +434,19 @@ const FreelancerProfile = () => {
                           {profile.availability_status === 'available' ? 'Available for Work' : 
                            profile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
                         </span>
+                        {profile.hourly_rate && (
+                          <span style={{ 
+                            background: '#fff3cd', 
+                            color: '#856404', 
+                            padding: '4px 12px', 
+                            borderRadius: 15,
+                            fontSize: 14,
+                            fontWeight: 600
+                          }}>
+                            <i className="bi bi-currency-exchange me-1"></i>
+                            R{profile.hourly_rate}/hour
+                          </span>
+                        )}
                       </div>
                     </div>
                    {/* <Link

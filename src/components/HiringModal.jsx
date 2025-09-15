@@ -164,17 +164,20 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
 
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Agreed Rate</label>
-                  <input
-                    type="number"
-                    className="form-control"
-                    name="agreed_rate"
-                    value={formData.agreed_rate}
-                    onChange={handleInputChange}
-                    placeholder="Enter agreed rate"
-                    step="0.01"
-                    min="0"
-                  />
+                  <label className="form-label">Agreed Rate (ZAR)</label>
+                  <div className="input-group">
+                    <span className="input-group-text">R</span>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="agreed_rate"
+                      value={formData.agreed_rate}
+                      onChange={handleInputChange}
+                      placeholder="Enter agreed rate"
+                      step="0.01"
+                      min="0"
+                    />
+                  </div>
                 </div>
                 
                 <div className="col-md-6 mb-3">

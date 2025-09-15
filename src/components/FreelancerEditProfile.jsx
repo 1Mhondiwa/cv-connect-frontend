@@ -18,6 +18,7 @@ const FreelancerEditProfile = () => {
     linkedin_url: "",
     github_url: "",
     current_status: "",
+    hourly_rate: "",
   });
   const [skills, setSkills] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -615,6 +616,7 @@ const FreelancerEditProfile = () => {
         linkedin_url: form.linkedin_url,
         github_url: form.github_url,
         current_status: form.current_status,
+        hourly_rate: form.hourly_rate,
       };
       
       // Update profile data
@@ -876,6 +878,27 @@ const FreelancerEditProfile = () => {
                             placeholder="e.g., 5" 
                             style={{ borderRadius: '10px', border: '2px solid #e9ecef', padding: '12px 16px' }}
                           />
+                        </div>
+                      </div>
+                      
+                      <div className="row g-3 mt-3">
+                        <div className="col-md-6">
+                          <label className="form-label fw-semibold" style={{ color: '#333' }}>Hourly Rate (ZAR)</label>
+                          <div className="input-group">
+                            <span className="input-group-text">R</span>
+                            <input 
+                              type="number" 
+                              min="0" 
+                              step="0.01"
+                              className="form-control" 
+                              name="hourly_rate" 
+                              value={form.hourly_rate || ""} 
+                              onChange={handleChange} 
+                              placeholder="e.g., 500" 
+                              style={{ borderRadius: '0 10px 10px 0', border: '2px solid #e9ecef', padding: '12px 16px' }}
+                            />
+                          </div>
+                          <small className="text-muted">Set your hourly rate in South African Rand</small>
                         </div>
                       </div>
                       

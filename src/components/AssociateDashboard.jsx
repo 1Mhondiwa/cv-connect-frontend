@@ -1481,6 +1481,21 @@ const AssociateDashboard = () => {
                                 <p className="card-text text-muted small mb-2">
                                   {rec.headline}
                                 </p>
+                                {rec.hourly_rate && (
+                                  <div className="mb-2">
+                                    <span style={{ 
+                                      background: '#fff3cd', 
+                                      color: '#856404', 
+                                      padding: '4px 8px', 
+                                      borderRadius: 12,
+                                      fontSize: 11,
+                                      fontWeight: 600
+                                    }}>
+                                      <i className="bi bi-currency-exchange me-1"></i>
+                                      R{rec.hourly_rate}/hour
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                               <div className="text-end">
                                 <span style={{ 
