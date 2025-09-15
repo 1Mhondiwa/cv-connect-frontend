@@ -5,12 +5,11 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
   const [formData, setFormData] = useState({
     project_title: '',
     project_description: '',
-    agreed_terms: '',
     agreed_rate: '',
     rate_type: 'hourly',
     start_date: '',
     expected_end_date: '',
-    associate_notes: ''
+    contract_pdf: null
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,12 +20,11 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
       setFormData({
         project_title: request.title || '',
         project_description: request.description || '',
-        agreed_terms: '',
         agreed_rate: '',
         rate_type: 'hourly',
         start_date: '',
         expected_end_date: '',
-        associate_notes: ''
+        contract_pdf: null
       });
     }
   }, [request]);
@@ -43,20 +41,54 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
     }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        setError('Please upload a PDF file only.');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        setError('File size must be less than 10MB.');
+        return;
+      }
+      setFormData(prev => ({
+        ...prev,
+        contract_pdf: file
+      }));
+      setError('');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
 
-    try {
-      const hiringData = {
-        request_id: request.request_id,
-        freelancer_id: freelancer.freelancer_id,
-        ...formData
-      };
+    if (!formData.contract_pdf) {
+      setError('Please upload a contract PDF file.');
+      setLoading(false);
+      return;
+    }
 
-      const response = await api.post('/hiring/hire', hiringData);
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('request_id', request.request_id);
+      formDataToSend.append('freelancer_id', freelancer.freelancer_id);
+      formDataToSend.append('project_title', formData.project_title);
+      formDataToSend.append('project_description', formData.project_description);
+      formDataToSend.append('agreed_rate', formData.agreed_rate);
+      formDataToSend.append('rate_type', formData.rate_type);
+      formDataToSend.append('start_date', formData.start_date);
+      formDataToSend.append('expected_end_date', formData.expected_end_date);
+      formDataToSend.append('contract_pdf', formData.contract_pdf);
+
+      const response = await api.post('/hiring/hire', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
       if (response.data.success) {
         setSuccess('Freelancer hired successfully!');
@@ -114,6 +146,22 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
                 <h6 className="fw-bold">Freelancer Details</h6>
                 <p><strong>Name:</strong> {freelancer.first_name} {freelancer.last_name}</p>
                 <p><strong>Role:</strong> {freelancer.headline}</p>
+                {freelancer.hourly_rate && (
+                  <p><strong>Hourly Rate:</strong> 
+                    <span style={{ 
+                      background: '#fff3cd', 
+                      color: '#856404', 
+                      padding: '2px 6px', 
+                      borderRadius: 8,
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      marginLeft: '8px'
+                    }}>
+                      <i className="bi bi-currency-exchange me-1"></i>
+                      R{freelancer.hourly_rate}/hour
+                    </span>
+                  </p>
+                )}
                 <p><strong>Rating:</strong> 
                   {[...Array(5)].map((_, i) => (
                     <i 
@@ -218,28 +266,26 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Agreed Terms *</label>
-                <textarea
+                <label className="form-label">Contract PDF *</label>
+                <input
+                  type="file"
                   className="form-control"
-                  name="agreed_terms"
-                  value={formData.agreed_terms}
-                  onChange={handleInputChange}
-                  rows="4"
+                  accept=".pdf"
+                  onChange={handleFileChange}
                   required
-                  placeholder="Enter the terms agreed upon with the freelancer (payment schedule, deliverables, etc.)"
-                ></textarea>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Additional Notes</label>
-                <textarea
-                  className="form-control"
-                  name="associate_notes"
-                  value={formData.associate_notes}
-                  onChange={handleInputChange}
-                  rows="3"
-                  placeholder="Any additional notes or special requirements"
-                ></textarea>
+                />
+                <small className="text-muted">
+                  Upload a PDF document containing the agreed terms, payment schedule, deliverables, and any additional requirements. 
+                  Maximum file size: 10MB
+                </small>
+                {formData.contract_pdf && (
+                  <div className="mt-2">
+                    <span className="badge bg-success">
+                      <i className="bi bi-file-pdf me-1"></i>
+                      {formData.contract_pdf.name}
+                    </span>
+                  </div>
+                )}
               </div>
             </form>
           </div>

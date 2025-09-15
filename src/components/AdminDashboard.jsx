@@ -4760,13 +4760,23 @@ const ESCAdminDashboard = () => {
                                 </p>
                                 
                                 {/* Status Badges */}
-                                <div className="d-flex gap-1 mb-2">
+                                <div className="d-flex gap-1 mb-2 flex-wrap">
                                   <span className={`badge ${freelancer.is_available ? 'bg-success' : 'bg-secondary'}`} style={{ fontSize: '10px' }}>
                                     {freelancer.is_available ? 'Available' : 'Unavailable'}
                             </span>
                                   <span className={`badge ${freelancer.is_approved ? 'bg-primary' : 'bg-warning'}`} style={{ fontSize: '10px' }}>
                                     {freelancer.is_approved ? 'Approved' : 'Pending'}
                                   </span>
+                                  {freelancer.hourly_rate && (
+                                    <span className="badge" style={{ 
+                                      backgroundColor: '#fff3cd', 
+                                      color: '#856404', 
+                                      fontSize: '10px' 
+                                    }}>
+                                      <i className="bi bi-currency-exchange me-1"></i>
+                                      R{freelancer.hourly_rate}/hr
+                                    </span>
+                                  )}
                                 </div>
                               </div>
 

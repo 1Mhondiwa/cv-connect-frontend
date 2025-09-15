@@ -1874,7 +1874,7 @@ const ECSEmployeeDashboard = () => {
                                   </div>
 
                                   {/* Availability */}
-                                  <div className="mb-3">
+                                  <div className="mb-2">
                                     <strong>Availability:</strong>
                                     <div className="mt-1">
                                       <span style={{ 
@@ -1896,6 +1896,26 @@ const ECSEmployeeDashboard = () => {
                                       </span>
                                     </div>
                                   </div>
+
+                                  {/* Hourly Rate */}
+                                  {freelancer.hourly_rate && (
+                                    <div className="mb-3">
+                                      <strong>Hourly Rate:</strong>
+                                      <div className="mt-1">
+                                        <span style={{ 
+                                          background: '#fff3cd', 
+                                          color: '#856404', 
+                                          padding: '4px 8px', 
+                                          borderRadius: 15,
+                                          fontSize: 11,
+                                          fontWeight: 600
+                                        }}>
+                                          <i className="bi bi-currency-exchange me-1"></i>
+                                          R{freelancer.hourly_rate}/hour
+                                        </span>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Footer Section - Always at bottom */}
@@ -2035,7 +2055,7 @@ const ECSEmployeeDashboard = () => {
                                   />
                                 );
                               })()}
-                              <div className="mt-2">
+                              <div className="mt-2 d-flex gap-2 flex-wrap">
                                 <span className={`badge ${
                                   selectedFreelancerProfile.availability_status === 'available' ? 'bg-success' :
                                   selectedFreelancerProfile.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
@@ -2047,6 +2067,16 @@ const ECSEmployeeDashboard = () => {
                                   {selectedFreelancerProfile.availability_status === 'available' ? 'Available for Work' :
                                    selectedFreelancerProfile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
                                 </span>
+                                {selectedFreelancerProfile.hourly_rate && (
+                                  <span className="badge" style={{ 
+                                    backgroundColor: '#fff3cd', 
+                                    color: '#856404', 
+                                    fontSize: '12px' 
+                                  }}>
+                                    <i className="bi bi-currency-exchange me-1"></i>
+                                    R{selectedFreelancerProfile.hourly_rate}/hour
+                                  </span>
+                                )}
                               </div>
                             </div>
                             <div className="col-md-9">
