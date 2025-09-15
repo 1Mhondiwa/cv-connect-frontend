@@ -1529,6 +1529,14 @@ const AssociateDashboard = () => {
 
                             <div className="d-flex gap-2">
                               <button
+                                className="btn btn-sm"
+                                style={{ background: accent, color: '#fff' }}
+                                onClick={() => handleStartConversation(rec.freelancer_id, rec.first_name, rec.last_name)}
+                                title="Start a conversation with this freelancer"
+                              >
+                                <i className="bi bi-chat-dots me-1"></i>Start Conversation
+                              </button>
+                              <button
                                 className="btn btn-sm btn-success"
                                 onClick={() => handleRecommendationResponse(rec.freelancer_id, 'interested')}
                               >
@@ -1576,14 +1584,6 @@ const AssociateDashboard = () => {
                                 }}
                               >
                                 <i className="bi bi-briefcase me-1"></i>Hire Freelancer
-                              </button>
-                              <button
-                                className="btn btn-sm"
-                                style={{ background: accent, color: '#fff' }}
-                                onClick={() => handleStartConversation(rec.freelancer_id, rec.first_name, rec.last_name)}
-                                title="Start a conversation with this freelancer"
-                              >
-                                <i className="bi bi-chat-dots me-1"></i>Start Conversation
                               </button>
                             </div>
                           </div>

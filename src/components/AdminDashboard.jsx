@@ -1622,7 +1622,7 @@ const ESCAdminDashboard = () => {
                 }}
               >
                 <i className="bi bi-file-earmark-text me-3"></i>
-                Reports
+                System Monitor
           </button>
               
 
@@ -1713,7 +1713,7 @@ const ESCAdminDashboard = () => {
 
 
               {activeTab === 'analytics' && 'Analytics'}
-              {activeTab === 'reports' && 'Reports'}
+              {activeTab === 'reports' && 'System Monitor'}
               {activeTab === 'settings' && 'Settings'}
               
 
@@ -1723,7 +1723,7 @@ const ESCAdminDashboard = () => {
 
 
               {activeTab === 'analytics' && 'Performance insights and trends'}
-              {activeTab === 'reports' && 'Generate and view system reports'}
+              {activeTab === 'reports' && 'Monitor system performance and health'}
               {activeTab === 'settings' && 'System configuration and preferences'}
               
 
