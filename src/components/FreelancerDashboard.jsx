@@ -8,6 +8,139 @@ import InterviewDashboard from './InterviewDashboard';
 import InterviewFeedbackModal from './InterviewFeedbackModal';
 import FreelancerInterviewFeedback from './FreelancerInterviewFeedback';
 
+// Contracts List Component
+const ContractsList = ({ contracts, loading, error, onRetry }) => {
+
+  const handleDownloadContract = (contractPath) => {
+    if (contractPath) {
+      const fullUrl = contractPath.startsWith('http') ? contractPath : `${BACKEND_URL}${contractPath}`;
+      window.open(fullUrl, '_blank');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border" style={{ color: accent }} role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="mt-3" style={{ color: '#666' }}>Loading your contracts...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-5">
+        <div className="alert alert-danger" role="alert">
+          <i className="bi bi-exclamation-triangle me-2"></i>
+          {error}
+        </div>
+        <button 
+          className="btn" 
+          style={{ background: accent, color: '#fff' }}
+          onClick={onRetry}
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  if (contracts.length === 0) {
+    return (
+      <div className="text-center py-5">
+        <div style={{ fontSize: '4rem', color: '#ddd', marginBottom: '1rem' }}>
+          <i className="bi bi-file-earmark-text"></i>
+        </div>
+        <h5 style={{ color: '#666', marginBottom: '0.5rem' }}>No Contracts Yet</h5>
+        <p style={{ color: '#888' }}>You haven't been hired for any projects yet. Keep building your profile and applying for opportunities!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="row">
+      {contracts.map((contract) => (
+        <div key={contract.hire_id} className="col-md-6 col-lg-4 mb-4">
+          <div className="card h-100" style={{ 
+            border: '1px solid #e9ecef', 
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            transition: 'all 0.3s ease'
+          }}>
+            <div className="card-body d-flex flex-column">
+              <div className="d-flex justify-content-between align-items-start mb-3">
+                <h6 className="card-title mb-0" style={{ color: '#333', fontWeight: 600 }}>
+                  {contract.project_title}
+                </h6>
+                <span className={`badge ${
+                  contract.status === 'active' ? 'bg-success' : 
+                  contract.status === 'completed' ? 'bg-primary' : 
+                  contract.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
+                }`} style={{ fontSize: '10px' }}>
+                  {contract.status?.charAt(0).toUpperCase() + contract.status?.slice(1)}
+                </span>
+              </div>
+              
+              <div className="mb-3">
+                <p className="text-muted mb-1" style={{ fontSize: '12px' }}>
+                  <i className="bi bi-building me-1"></i>
+                  {contract.company_contact}
+                </p>
+                <p className="text-muted mb-1" style={{ fontSize: '12px' }}>
+                  <i className="bi bi-calendar me-1"></i>
+                  Hired: {new Date(contract.hire_date).toLocaleDateString()}
+                </p>
+                {contract.agreed_rate && (
+                  <p className="text-muted mb-1" style={{ fontSize: '12px' }}>
+                    <i className="bi bi-currency-exchange me-1"></i>
+                    R{contract.agreed_rate}/{contract.rate_type}
+                  </p>
+                )}
+              </div>
+
+              {contract.project_description && (
+                <p className="card-text text-muted mb-3" style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                  {contract.project_description.length > 100 
+                    ? `${contract.project_description.substring(0, 100)}...` 
+                    : contract.project_description
+                  }
+                </p>
+              )}
+
+              <div className="mt-auto">
+                {contract.contract_pdf_path ? (
+                  <button
+                    className="btn w-100"
+                    style={{ 
+                      background: accent, 
+                      color: '#fff', 
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 500
+                    }}
+                    onClick={() => handleDownloadContract(contract.contract_pdf_path)}
+                  >
+                    <i className="bi bi-download me-2"></i>
+                    Download Contract
+                  </button>
+                ) : (
+                  <div className="text-center text-muted" style={{ fontSize: '12px' }}>
+                    <i className="bi bi-file-earmark-x me-1"></i>
+                    No contract available
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const BACKEND_URL = "http://localhost:5000";
 const accent = '#fd680e';
 
@@ -30,13 +163,18 @@ const FreelancerDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [messagingLoading, setMessagingLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' or 'messages'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'messages', 'contracts', or 'feedback'
   const [globalUnread, setGlobalUnread] = useState(0);
   const messagesEndRef = useRef(null);
 
   // Recent Activity state
   const [activities, setActivities] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
+
+  // Contracts state
+  const [contracts, setContracts] = useState([]);
+  const [contractsLoading, setContractsLoading] = useState(false);
+  const [contractsError, setContractsError] = useState('');
 
   // Interview state
   const [showInterviewFeedbackModal, setShowInterviewFeedbackModal] = useState(false);
@@ -117,10 +255,30 @@ const FreelancerDashboard = () => {
     if (activeTab === 'messages') {
       fetchConversations();
       fetchGlobalUnread();
+    } else if (activeTab === 'contracts') {
+      fetchContracts();
     }
     // eslint-disable-next-line
   }, [activeTab]);
 
+
+  const fetchContracts = async () => {
+    try {
+      setContractsLoading(true);
+      const response = await api.get('/freelancer/hiring-history');
+      
+      if (response.data.success) {
+        setContracts(response.data.hiring_history || []);
+      } else {
+        setContractsError(response.data.message || 'Failed to fetch contracts');
+      }
+    } catch (err) {
+      console.error('Error fetching contracts:', err);
+      setContractsError('Failed to fetch contracts. Please try again.');
+    } finally {
+      setContractsLoading(false);
+    }
+  };
 
   const fetchConversations = async () => {
     try {
@@ -416,6 +574,32 @@ const FreelancerDashboard = () => {
                 </button>
                 <div style={{ width: '2px', background: '#ffb366', margin: '0 2px' }}></div>
                 <button 
+                  className={`btn dashboard-tab-btn ${activeTab === 'contracts' ? '' : 'btn-outline-primary'}`}
+                  style={{
+                    background: activeTab === 'contracts' ? accent : '#fff',
+                    color: activeTab === 'contracts' ? '#fff' : accent,
+                    border: 'none',
+                    borderRadius: '0',
+                    padding: '12px 24px',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    transition: 'all 0.3s ease',
+                    minWidth: '140px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: activeTab === 'contracts' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                  onClick={() => {
+                    setActiveTab('contracts');
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  <i className="bi bi-file-earmark-text me-2"></i>Contracts
+                </button>
+                <div style={{ width: '2px', background: '#ffb366', margin: '0 2px' }}></div>
+                <button 
                   className={`btn dashboard-tab-btn ${activeTab === 'interviews' ? '' : 'btn-outline-primary'}`}
                   style={{
                     background: activeTab === 'interviews' ? accent : '#fff',
@@ -469,6 +653,25 @@ const FreelancerDashboard = () => {
               </div>
               
               <FreelancerInterviewFeedback />
+            </div>
+          </div>
+        )}
+
+        {/* Contracts Tab */}
+        {activeTab === 'contracts' && (
+          <div className="container">
+            <div className="bg-white rounded-4 shadow-lg p-4" style={{ boxShadow: '0 4px 32px rgba(0,0,0,0.07)' }}>
+              <div className="text-center mb-4">
+                <h4 style={{ color: accent, fontWeight: 600 }}>My Contracts</h4>
+                <p style={{ color: '#666', fontSize: 14 }}>View and download your contract agreements with associates</p>
+              </div>
+              
+              <ContractsList 
+                contracts={contracts}
+                loading={contractsLoading}
+                error={contractsError}
+                onRetry={fetchContracts}
+              />
             </div>
           </div>
         )}
