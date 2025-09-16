@@ -2754,33 +2754,11 @@ const ESCAdminDashboard = () => {
                             )}
                           </button>
                           
-                          {/* Simple test button */}
-                          <button
-                            className="btn btn-sm btn-outline-danger ms-2"
-                            style={{ fontSize: '13px', padding: '6px 12px' }}
-                            onClick={() => {
-                              console.log('TEST BUTTON CLICKED!');
-                              alert('Test button works!');
-                            }}
-                            type="button"
-                          >
-                            Test
-                          </button>
                         </div>
                       </div>
                     </div>
                     <div className="card-body">
-                      <div className="alert alert-info mb-3">
-                        <strong>DEBUG:</strong> CV Upload Trends section is rendering. Current tab: {activeTab}. Check console for data details.
-                      </div>
                       {(() => {
-                            // Debug: Log the actual data structure
-                            console.log('🔍 CV Upload Trends Data:', {
-                              exists: !!analyticsData.cvUploadTrends,
-                              length: analyticsData.cvUploadTrends?.length,
-                              sample: analyticsData.cvUploadTrends?.[0],
-                              allData: analyticsData.cvUploadTrends
-                            });
 
                             // Validate data structure
                             if (!analyticsData.cvUploadTrends || analyticsData.cvUploadTrends.length === 0) {
