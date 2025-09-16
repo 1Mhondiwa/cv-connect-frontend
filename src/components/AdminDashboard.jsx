@@ -2938,9 +2938,24 @@ const ESCAdminDashboard = () => {
                               if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
                                 const skill = item.skill.toLowerCase();
                                 const count = parseInt(item.count);
-                                if (skillMap.has(skill)) {
-                                  skillMap.get(skill).demand = count;
+                                
+                                // Try to find matching skill in supply data
+                                let matchedSkill = null;
+                                for (const [existingSkill, data] of skillMap.entries()) {
+                                  if (skill === existingSkill || 
+                                      skill.includes(existingSkill) || 
+                                      existingSkill.includes(skill) ||
+                                      skill.replace(/[^a-z]/g, '') === existingSkill.replace(/[^a-z]/g, '')) {
+                                    matchedSkill = existingSkill;
+                                    console.log(`🔍 Matched skill: "${skill}" -> "${existingSkill}"`);
+                                    break;
+                                  }
+                                }
+                                
+                                if (matchedSkill) {
+                                  skillMap.get(matchedSkill).demand = count;
                                 } else {
+                                  console.log(`🔍 No match found for skill: "${skill}", adding as new skill`);
                                   skillMap.set(skill, {
                                     skill: item.skill,
                                     supply: 0,
@@ -2976,8 +2991,7 @@ const ESCAdminDashboard = () => {
                               .slice(0, skillsLimit);
 
                             console.log('🔍 Combined Skills Data:', combinedData);
-                            console.log('🔍 Supply Chart Data:', supplyChartData);
-                            console.log('🔍 Demand Chart Data:', demandChartData);
+                            console.log('🔍 Skill Map Entries:', Array.from(skillMap.entries()));
 
                             if (combinedData.length === 0) {
                               return (
@@ -3008,6 +3022,9 @@ const ESCAdminDashboard = () => {
                                 type: 'Demand',
                                 color: '#10b981'
                               }));
+
+                            console.log('🔍 Supply Chart Data:', supplyChartData);
+                            console.log('🔍 Demand Chart Data:', demandChartData);
 
                             return (
                               <div>
