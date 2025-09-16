@@ -2920,10 +2920,12 @@ const ESCAdminDashboard = () => {
                             const skillMap = new Map();
                             
                             // Add supply data
+                            console.log('🔍 Processing Supply Data:', supplyData);
                             supplyData.forEach(item => {
                               if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
                                 const skill = item.skill.toLowerCase();
                                 const count = parseInt(item.count);
+                                console.log(`🔍 Adding supply skill: "${skill}" with count: ${count}`);
                                 skillMap.set(skill, {
                                   skill: item.skill,
                                   supply: count,
@@ -2934,10 +2936,12 @@ const ESCAdminDashboard = () => {
                             });
 
                             // Add demand data
+                            console.log('🔍 Processing Demand Data:', demandData);
                             demandData.forEach(item => {
                               if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
                                 const skill = item.skill.toLowerCase();
                                 const count = parseInt(item.count);
+                                console.log(`🔍 Processing demand skill: "${skill}" with count: ${count}`);
                                 
                                 // Try to find matching skill in supply data
                                 let matchedSkill = null;
@@ -2992,6 +2996,9 @@ const ESCAdminDashboard = () => {
 
                             console.log('🔍 Combined Skills Data:', combinedData);
                             console.log('🔍 Skill Map Entries:', Array.from(skillMap.entries()));
+                            console.log('🔍 Filtered Data Before Limit:', filteredData);
+                            console.log('🔍 Skills Filter:', skillsFilter);
+                            console.log('🔍 Skills Limit:', skillsLimit);
 
                             if (combinedData.length === 0) {
                               return (
@@ -3014,8 +3021,11 @@ const ESCAdminDashboard = () => {
                                 color: '#fd680e'
                               }));
 
-                            const demandChartData = combinedData
+                            // Get all demand skills, not just from combinedData
+                            const allDemandSkills = Array.from(skillMap.values())
                               .filter(item => item.demand > 0)
+                              .sort((a, b) => b.demand - a.demand)
+                              .slice(0, skillsLimit)
                               .map(item => ({
                                 skill: item.skill,
                                 count: item.demand,
@@ -3024,7 +3034,7 @@ const ESCAdminDashboard = () => {
                               }));
 
                             console.log('🔍 Supply Chart Data:', supplyChartData);
-                            console.log('🔍 Demand Chart Data:', demandChartData);
+                            console.log('🔍 Demand Chart Data:', allDemandSkills);
 
                             return (
                               <div>
@@ -3117,7 +3127,7 @@ const ESCAdminDashboard = () => {
                                     </div>
                                     <ResponsiveContainer width="100%" height={300}>
                                       <BarChart 
-                                        data={demandChartData}
+                                        data={allDemandSkills}
                                         margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
                                       >
                                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
