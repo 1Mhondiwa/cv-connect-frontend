@@ -2851,9 +2851,9 @@ const ESCAdminDashboard = () => {
                     <div className="card-header bg-transparent border-0">
                       <div className="d-flex justify-content-between align-items-center">
                         <div>
-                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                             <i className="bi bi-bar-chart me-2"></i>Skills Supply vs Demand
-                          </h6>
+                      </h6>
                           <small className="text-muted">Compare freelancer skills (supply) with job requirements (demand)</small>
                         </div>
                         <div className="d-flex gap-2">
@@ -3001,16 +3001,16 @@ const ESCAdminDashboard = () => {
                             console.log('🔍 Skills Limit:', skillsLimit);
 
                             if (combinedData.length === 0) {
-                              return (
+                          return (
                                 <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
                                   <div className="text-center text-muted">
                                     <i className="bi bi-exclamation-triangle display-4"></i>
                                     <p className="mt-2">No skills match the selected filter</p>
                                   </div>
-                                </div>
-                              );
-                            }
-
+                            </div>
+                          );
+                        }
+                          
                             // Create separate datasets for supply and demand
                             const supplyChartData = combinedData
                               .filter(item => item.supply > 0)
@@ -3035,8 +3035,22 @@ const ESCAdminDashboard = () => {
 
                             console.log('🔍 Supply Chart Data:', supplyChartData);
                             console.log('🔍 Demand Chart Data:', allDemandSkills);
+                            
+                            // Calculate summary statistics
+                            const totalSupply = Array.from(skillMap.values()).reduce((sum, item) => sum + item.supply, 0);
+                            const totalDemand = Array.from(skillMap.values()).reduce((sum, item) => sum + item.demand, 0);
+                            const totalSkills = Array.from(skillMap.values()).length;
+                            const balancedSkills = Array.from(skillMap.values()).filter(item => item.supply > 0 && item.demand > 0).length;
+                            
+                            console.log('📊 Summary Statistics:', {
+                              totalSupply,
+                              totalDemand,
+                              totalSkills,
+                              balancedSkills,
+                              skillsShown: Math.min(totalSkills, skillsLimit)
+                            });
 
-                            return (
+                          return (
                               <div>
                                 {/* Legend */}
                                 <div className="d-flex justify-content-center mb-4">
@@ -3078,44 +3092,44 @@ const ESCAdminDashboard = () => {
                                       </h6>
                                     </div>
                                     <ResponsiveContainer width="100%" height={300}>
-                                      <BarChart 
+                              <BarChart 
                                         data={supplyChartData}
                                         margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
-                                      >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                        <XAxis 
-                                          dataKey="skill" 
-                                          stroke="#666"
+                              >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis 
+                                  dataKey="skill" 
+                                  stroke="#666"
                                           tick={{ fontSize: 11, fill: '#666', fontWeight: '500' }}
-                                          angle={-45}
-                                          textAnchor="end"
+                                  angle={-45}
+                                  textAnchor="end"
                                           height={70}
-                                          interval={0}
-                                        />
-                                        <YAxis 
-                                          stroke="#666"
+                                  interval={0}
+                                />
+                                <YAxis 
+                                  stroke="#666"
                                           tick={{ fontSize: 11, fill: '#666' }}
-                                        />
-                                        <Tooltip 
-                                          contentStyle={{ 
-                                            backgroundColor: '#fff', 
-                                            border: '1px solid #ddd',
-                                            borderRadius: '8px',
+                                />
+                                <Tooltip 
+                                  contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #ddd',
+                                    borderRadius: '8px',
                                             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                                             fontSize: '13px'
-                                          }}
+                                  }}
                                           formatter={(value) => [value, 'Freelancers']}
-                                          labelFormatter={(label) => `Skill: ${label}`}
-                                        />
-                                        <Bar 
-                                          dataKey="count" 
-                                          fill="#fd680e"
-                                          radius={[4, 4, 0, 0]}
-                                          stroke="#fd680e"
-                                          strokeWidth={1}
-                                        />
-                                      </BarChart>
-                                    </ResponsiveContainer>
+                                  labelFormatter={(label) => `Skill: ${label}`}
+                                />
+                                <Bar 
+                                  dataKey="count" 
+                                  fill="#fd680e"
+                                  radius={[4, 4, 0, 0]}
+                                  stroke="#fd680e"
+                                  strokeWidth={1}
+                                />
+                              </BarChart>
+                            </ResponsiveContainer>
                                   </div>
 
                                   {/* Demand Chart */}
@@ -3171,33 +3185,31 @@ const ESCAdminDashboard = () => {
                                 <div className="row mt-4">
                                   <div className="col-md-3">
                                     <div className="text-center p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                      <h6 className="mb-1" style={{ color: '#fd680e' }}>{combinedData.reduce((sum, item) => sum + item.supply, 0)}</h6>
+                                      <h6 className="mb-1" style={{ color: '#fd680e' }}>{totalSupply}</h6>
                                       <small className="text-muted">Total Supply</small>
                                     </div>
                                   </div>
                                   <div className="col-md-3">
                                     <div className="text-center p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                      <h6 className="mb-1" style={{ color: '#10b981' }}>{combinedData.reduce((sum, item) => sum + item.demand, 0)}</h6>
+                                      <h6 className="mb-1" style={{ color: '#10b981' }}>{totalDemand}</h6>
                                       <small className="text-muted">Total Demand</small>
                                     </div>
                                   </div>
                                   <div className="col-md-3">
                                     <div className="text-center p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                      <h6 className="mb-1" style={{ color: '#6b7280' }}>{combinedData.length}</h6>
+                                      <h6 className="mb-1" style={{ color: '#6b7280' }}>{Math.min(totalSkills, skillsLimit)}</h6>
                                       <small className="text-muted">Skills Shown</small>
                                     </div>
                                   </div>
                                   <div className="col-md-3">
                                     <div className="text-center p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                      <h6 className="mb-1" style={{ color: '#8b5cf6' }}>
-                                        {combinedData.filter(item => item.supply > 0 && item.demand > 0).length}
-                                      </h6>
+                                      <h6 className="mb-1" style={{ color: '#8b5cf6' }}>{balancedSkills}</h6>
                                       <small className="text-muted">Balanced Skills</small>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                            );
+                          );
                       })()}
                     </div>
                   </div>
