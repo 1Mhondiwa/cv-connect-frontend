@@ -189,9 +189,9 @@ const ContractsList = ({ contracts, loading, error, onRetry, onUploadSuccess }) 
                     
                     {/* Signed Contract Upload Section */}
                     <div className="border-top pt-2">
-                      {contract.signed_contract_pdf_path ? (
-                        <div className="text-center">
-                          <div className="text-success mb-2" style={{ fontSize: '12px' }}>
+                      {contract.signed_contract_pdf_path && (
+                        <div className="text-center mb-2">
+                          <div className="text-success" style={{ fontSize: '12px' }}>
                             <i className="bi bi-check-circle me-1"></i>
                             Signed contract uploaded
                           </div>
@@ -201,56 +201,56 @@ const ContractsList = ({ contracts, loading, error, onRetry, onUploadSuccess }) 
                             </div>
                           )}
                         </div>
-                      ) : (
-                        <div>
-                          <input
-                            type="file"
-                            accept=".pdf"
-                            onChange={(e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                handleUploadSignedContract(contract.hire_id, file);
-                              }
-                            }}
-                            style={{ display: 'none' }}
-                            id={`signed-contract-${contract.hire_id}`}
-                          />
-                          <label
-                            htmlFor={`signed-contract-${contract.hire_id}`}
-                            className="btn w-100"
-                            style={{ 
-                              background: '#28a745', 
-                              color: '#fff', 
-                              border: 'none',
-                              borderRadius: '8px',
-                              fontSize: '12px',
-                              fontWeight: 500,
-                              cursor: uploadingContracts[contract.hire_id] ? 'not-allowed' : 'pointer',
-                              opacity: uploadingContracts[contract.hire_id] ? 0.6 : 1
-                            }}
-                          >
-                            {uploadingContracts[contract.hire_id] ? (
-                              <>
-                                <div className="spinner-border spinner-border-sm me-2" role="status">
-                                  <span className="visually-hidden">Loading...</span>
-                                </div>
-                                Uploading...
-                              </>
-                            ) : (
-                              <>
-                                <i className="bi bi-upload me-2"></i>
-                                Upload Signed Contract
-                              </>
-                            )}
-                          </label>
-                          
-                          {uploadErrors[contract.hire_id] && (
-                            <div className="text-danger mt-1" style={{ fontSize: '11px' }}>
-                              {uploadErrors[contract.hire_id]}
-                            </div>
-                          )}
-                        </div>
                       )}
+                      
+                      <div>
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              handleUploadSignedContract(contract.hire_id, file);
+                            }
+                          }}
+                          style={{ display: 'none' }}
+                          id={`signed-contract-${contract.hire_id}`}
+                        />
+                        <label
+                          htmlFor={`signed-contract-${contract.hire_id}`}
+                          className="btn w-100"
+                          style={{ 
+                            background: contract.signed_contract_pdf_path ? '#6c757d' : '#28a745', 
+                            color: '#fff', 
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '12px',
+                            fontWeight: 500,
+                            cursor: uploadingContracts[contract.hire_id] ? 'not-allowed' : 'pointer',
+                            opacity: uploadingContracts[contract.hire_id] ? 0.6 : 1
+                          }}
+                        >
+                          {uploadingContracts[contract.hire_id] ? (
+                            <>
+                              <div className="spinner-border spinner-border-sm me-2" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                              </div>
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-upload me-2"></i>
+                              {contract.signed_contract_pdf_path ? 'Re-upload Signed Contract' : 'Upload Signed Contract'}
+                            </>
+                          )}
+                        </label>
+                        
+                        {uploadErrors[contract.hire_id] && (
+                          <div className="text-danger mt-1" style={{ fontSize: '11px' }}>
+                            {uploadErrors[contract.hire_id]}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ) : (
