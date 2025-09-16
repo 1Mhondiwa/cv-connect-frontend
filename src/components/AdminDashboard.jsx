@@ -92,6 +92,7 @@ const ESCAdminDashboard = () => {
     userActivityStatus: [],
     cvUploadTrends: [],
     topSkills: [],
+    skillsDemand: [],
     messageTrends: [],
     userCommunicationActivity: [],
     hiredFreelancersTrends: []
@@ -783,6 +784,7 @@ const ESCAdminDashboard = () => {
         userActivityResponse,
         cvUploadResponse,
         topSkillsResponse,
+        skillsDemandResponse,
 
         messageTrendsResponse,
         communicationActivityResponse,
@@ -793,6 +795,7 @@ const ESCAdminDashboard = () => {
         api.get('/admin/analytics/user-activity-status'),
         api.get(`/admin/analytics/cv-upload-trends?days=${days}`),
         api.get('/admin/analytics/top-skills'),
+        api.get('/admin/analytics/skills-demand'),
 
         api.get(`/admin/analytics/message-trends?days=${days}`),
         api.get('/admin/analytics/user-communication-activity'),
@@ -819,6 +822,7 @@ const ESCAdminDashboard = () => {
         userActivityStatus: userActivityResponse.data.data || [],
         cvUploadTrends: formatTrendsData(cvUploadResponse.data.data),
         topSkills: topSkillsResponse.data.data || [],
+        skillsDemand: skillsDemandResponse.data.data || [],
 
         messageTrends: formatTrendsData(messageTrendsResponse.data.data),
         userCommunicationActivity: communicationActivityResponse.data.data || [],
@@ -877,6 +881,7 @@ const ESCAdminDashboard = () => {
         userActivityStatus: [],
         cvUploadTrends: [],
         topSkills: [],
+        skillsDemand: [],
         messageTrends: [],
         hiredFreelancersTrends: [],
         userCommunicationActivity: []
@@ -2835,27 +2840,31 @@ const ESCAdminDashboard = () => {
                 </div>
               </div>
 
-              {/* Top Skills Distribution - Bar Chart */}
+              {/* Skills Supply vs Demand - Bar Chart */}
               <div className="row g-4 mb-4">
                 <div className="col-md-12">
                   <div className="card border-0 shadow-sm">
                     <div className="card-header bg-transparent border-0">
                       <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-bar-chart me-2"></i>Top Skills Distribution
+                        <i className="bi bi-bar-chart me-2"></i>Skills Supply vs Demand
                       </h6>
+                      <small className="text-muted">Compare freelancer skills (supply) with job requirements (demand)</small>
                     </div>
                     <div className="card-body">
                       {(() => {
-                            // Debug: Log the actual data structure
-                            console.log('🔍 Top Skills Data:', {
-                              exists: !!analyticsData.topSkills,
-                              length: analyticsData.topSkills?.length,
-                              sample: analyticsData.topSkills?.[0],
-                              allData: analyticsData.topSkills
+                            // Get supply data (freelancer skills)
+                            const supplyData = analyticsData.topSkills || [];
+                            const demandData = analyticsData.skillsDemand || [];
+
+                            console.log('🔍 Skills Data:', {
+                              supply: supplyData.length,
+                              demand: demandData.length,
+                              supplySample: supplyData[0],
+                              demandSample: demandData[0]
                             });
 
-                            // Validate data structure
-                            if (!analyticsData.topSkills || analyticsData.topSkills.length === 0) {
+                            // Check if we have any data
+                            if (supplyData.length === 0 && demandData.length === 0) {
                               return (
                                 <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
                                   <div className="text-center text-muted">
@@ -2866,79 +2875,147 @@ const ESCAdminDashboard = () => {
                               );
                             }
 
-                                                        // Validate that each item has required properties
-                            const validData = analyticsData.topSkills.filter(item => 
-                            item && 
-                              typeof item.skill === 'string' && 
-                            typeof item.count === 'number' && 
-                              !isNaN(item.count) &&
-                              item.count >= 0 &&
-                              item.skill !== undefined &&
-                              item.count !== undefined &&
-                              item.skill !== null &&
-                              item.count !== null
-                            );
-
-                            console.log('🔍 Valid Top Skills Data:', {
-                              originalLength: analyticsData.topSkills.length,
-                              validLength: validData.length,
-                              validData: validData
+                            // Create a combined dataset with both supply and demand
+                            const skillMap = new Map();
+                            
+                            // Add supply data
+                            supplyData.forEach(item => {
+                              if (item && item.skill && typeof item.count === 'number') {
+                                const skill = item.skill.toLowerCase();
+                                skillMap.set(skill, {
+                                  skill: item.skill,
+                                  supply: item.count,
+                                  demand: 0,
+                                  fill: item.fill || '#fd680e'
+                                });
+                              }
                             });
 
-                            if (validData.length === 0) {
-                          return (
+                            // Add demand data
+                            demandData.forEach(item => {
+                              if (item && item.skill && typeof item.count === 'number') {
+                                const skill = item.skill.toLowerCase();
+                                if (skillMap.has(skill)) {
+                                  skillMap.get(skill).demand = item.count;
+                                } else {
+                                  skillMap.set(skill, {
+                                    skill: item.skill,
+                                    supply: 0,
+                                    demand: item.count,
+                                    fill: item.fill || '#10b981'
+                                  });
+                                }
+                              }
+                            });
+
+                            // Convert to array and sort by total (supply + demand)
+                            const combinedData = Array.from(skillMap.values())
+                              .map(item => ({
+                                ...item,
+                                total: item.supply + item.demand
+                              }))
+                              .sort((a, b) => b.total - a.total)
+                              .slice(0, 10); // Top 10
+
+                            console.log('🔍 Combined Skills Data:', combinedData);
+
+                            if (combinedData.length === 0) {
+                              return (
                                 <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
                                   <div className="text-center text-muted">
                                     <i className="bi bi-exclamation-triangle display-4"></i>
                                     <p className="mt-2">Invalid skills data structure</p>
-                              <small>Check console for details</small>
                                   </div>
-                            </div>
-                          );
-                        }
-                          
-                                                      console.log('🔍 Top Skills Chart - About to render with data:', validData);
-                          return (
-                            <ResponsiveContainer width="100%" height={350}>
-                              <BarChart 
-                                data={validData}
-                                margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                              >
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis 
-                                  dataKey="skill" 
-                                  stroke="#666"
-                                  tick={{ fontSize: 12, fill: '#666' }}
-                                  angle={-45}
-                                  textAnchor="end"
-                                  height={80}
-                                  interval={0}
-                                />
-                                <YAxis 
-                                  stroke="#666"
-                                  tick={{ fontSize: 12, fill: '#666' }}
-                                  label={{ value: 'Count', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#666' } }}
-                                />
-                                <Tooltip 
-                                  contentStyle={{ 
-                                    backgroundColor: '#fff', 
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                                  }}
-                                  formatter={(value, name) => [value, 'Count']}
-                                  labelFormatter={(label) => `Skill: ${label}`}
-                                />
-                                <Bar 
-                                  dataKey="count" 
-                                  fill="#fd680e"
-                                  radius={[4, 4, 0, 0]}
-                                  stroke="#fd680e"
-                                  strokeWidth={1}
-                                />
-                              </BarChart>
-                            </ResponsiveContainer>
-                          );
+                                </div>
+                              );
+                            }
+
+                            return (
+                              <div>
+                                {/* Legend */}
+                                <div className="d-flex justify-content-center mb-3">
+                                  <div className="d-flex gap-4">
+                                    <div className="d-flex align-items-center">
+                                      <div 
+                                        style={{ 
+                                          width: '16px', 
+                                          height: '16px', 
+                                          backgroundColor: '#fd680e', 
+                                          borderRadius: '4px',
+                                          marginRight: '8px'
+                                        }}
+                                      ></div>
+                                      <span style={{ fontSize: '14px', color: '#666' }}>Supply (Freelancers)</span>
+                                    </div>
+                                    <div className="d-flex align-items-center">
+                                      <div 
+                                        style={{ 
+                                          width: '16px', 
+                                          height: '16px', 
+                                          backgroundColor: '#10b981', 
+                                          borderRadius: '4px',
+                                          marginRight: '8px'
+                                        }}
+                                      ></div>
+                                      <span style={{ fontSize: '14px', color: '#666' }}>Demand (Jobs)</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <ResponsiveContainer width="100%" height={400}>
+                                  <BarChart 
+                                    data={combinedData}
+                                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                                  >
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                    <XAxis 
+                                      dataKey="skill" 
+                                      stroke="#666"
+                                      tick={{ fontSize: 12, fill: '#666' }}
+                                      angle={-45}
+                                      textAnchor="end"
+                                      height={80}
+                                      interval={0}
+                                    />
+                                    <YAxis 
+                                      stroke="#666"
+                                      tick={{ fontSize: 12, fill: '#666' }}
+                                      label={{ value: 'Count', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#666' } }}
+                                    />
+                                    <Tooltip 
+                                      contentStyle={{ 
+                                        backgroundColor: '#fff', 
+                                        border: '1px solid #ddd',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                      }}
+                                      formatter={(value, name) => {
+                                        if (name === 'supply') return [value, 'Supply (Freelancers)'];
+                                        if (name === 'demand') return [value, 'Demand (Jobs)'];
+                                        return [value, name];
+                                      }}
+                                      labelFormatter={(label) => `Skill: ${label}`}
+                                    />
+                                    <Bar 
+                                      dataKey="supply" 
+                                      fill="#fd680e"
+                                      radius={[0, 0, 0, 0]}
+                                      stroke="#fd680e"
+                                      strokeWidth={1}
+                                      name="Supply"
+                                    />
+                                    <Bar 
+                                      dataKey="demand" 
+                                      fill="#10b981"
+                                      radius={[0, 0, 0, 0]}
+                                      stroke="#10b981"
+                                      strokeWidth={1}
+                                      name="Demand"
+                                    />
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              </div>
+                            );
                       })()}
                     </div>
                   </div>
