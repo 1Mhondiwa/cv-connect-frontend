@@ -555,6 +555,32 @@ const FreelancerDashboard = () => {
                 </button>
                 <div style={{ width: '2px', background: '#ffb366', margin: '0 2px' }}></div>
                 <button 
+                  className={`btn dashboard-tab-btn ${activeTab === 'interviews' ? '' : 'btn-outline-primary'}`}
+                  style={{
+                    background: activeTab === 'interviews' ? accent : '#fff',
+                    color: activeTab === 'interviews' ? '#fff' : accent,
+                    border: 'none',
+                    borderRadius: '0',
+                    padding: '12px 24px',
+                    fontWeight: 600,
+                    fontSize: 16,
+                    transition: 'all 0.3s ease',
+                    minWidth: '140px',
+                    height: '48px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: activeTab === 'interviews' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                  onClick={() => {
+                    setActiveTab('interviews');
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  <i className="bi bi-calendar-event me-2"></i>Interviews
+                </button>
+                <div style={{ width: '2px', background: '#ffb366', margin: '0 2px' }}></div>
+                <button 
                   className={`btn dashboard-tab-btn ${activeTab === 'feedback' ? '' : 'btn-outline-primary'}`}
                   style={{
                     background: activeTab === 'feedback' ? accent : '#fff',
@@ -586,7 +612,7 @@ const FreelancerDashboard = () => {
                     background: activeTab === 'contracts' ? accent : '#fff',
                     color: activeTab === 'contracts' ? '#fff' : accent,
                     border: 'none',
-                    borderRadius: '0',
+                    borderRadius: '0 27px 27px 0',
                     padding: '12px 24px',
                     fontWeight: 600,
                     fontSize: 16,
@@ -604,32 +630,6 @@ const FreelancerDashboard = () => {
                   }}
                 >
                   <i className="bi bi-file-earmark-text me-2"></i>Contracts
-                </button>
-                <div style={{ width: '2px', background: '#ffb366', margin: '0 2px' }}></div>
-                <button 
-                  className={`btn dashboard-tab-btn ${activeTab === 'interviews' ? '' : 'btn-outline-primary'}`}
-                  style={{
-                    background: activeTab === 'interviews' ? accent : '#fff',
-                    color: activeTab === 'interviews' ? '#fff' : accent,
-                    border: 'none',
-                    borderRadius: '0 27px 27px 0',
-                    padding: '12px 24px',
-                    fontWeight: 600,
-                    fontSize: 16,
-                    transition: 'all 0.3s ease',
-                    minWidth: '140px',
-                    height: '48px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: activeTab === 'interviews' ? '0 2px 8px rgba(253,104,14,0.3)' : '0 1px 3px rgba(0,0,0,0.1)'
-                  }}
-                  onClick={() => {
-                    setActiveTab('interviews');
-                    window.scrollTo(0, 0);
-                  }}
-                >
-                  <i className="bi bi-calendar-event me-2"></i>Interviews
                 </button>
               </div>
             </div>
