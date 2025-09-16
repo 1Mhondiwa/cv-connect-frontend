@@ -2899,7 +2899,9 @@ const ESCAdminDashboard = () => {
                               supply: supplyData.length,
                               demand: demandData.length,
                               supplySample: supplyData[0],
-                              demandSample: demandData[0]
+                              demandSample: demandData[0],
+                              supplyData: supplyData,
+                              demandData: demandData
                             });
 
                             // Check if we have any data
@@ -2919,11 +2921,12 @@ const ESCAdminDashboard = () => {
                             
                             // Add supply data
                             supplyData.forEach(item => {
-                              if (item && item.skill && typeof item.count === 'number') {
+                              if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
                                 const skill = item.skill.toLowerCase();
+                                const count = parseInt(item.count);
                                 skillMap.set(skill, {
                                   skill: item.skill,
-                                  supply: item.count,
+                                  supply: count,
                                   demand: 0,
                                   fill: item.fill || '#fd680e'
                                 });
@@ -2932,15 +2935,16 @@ const ESCAdminDashboard = () => {
 
                             // Add demand data
                             demandData.forEach(item => {
-                              if (item && item.skill && typeof item.count === 'number') {
+                              if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
                                 const skill = item.skill.toLowerCase();
+                                const count = parseInt(item.count);
                                 if (skillMap.has(skill)) {
-                                  skillMap.get(skill).demand = item.count;
+                                  skillMap.get(skill).demand = count;
                                 } else {
                                   skillMap.set(skill, {
                                     skill: item.skill,
                                     supply: 0,
-                                    demand: item.count,
+                                    demand: count,
                                     fill: item.fill || '#10b981'
                                   });
                                 }
@@ -2972,6 +2976,8 @@ const ESCAdminDashboard = () => {
                               .slice(0, skillsLimit);
 
                             console.log('🔍 Combined Skills Data:', combinedData);
+                            console.log('🔍 Supply Chart Data:', supplyChartData);
+                            console.log('🔍 Demand Chart Data:', demandChartData);
 
                             if (combinedData.length === 0) {
                               return (
