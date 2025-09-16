@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/axios';
-import { useRef } from 'react';
 import ActivityTable from "./ActivityTable";
 import { useAuth } from '../contexts/AuthContext';
 import InterviewDashboard from './InterviewDashboard';
@@ -9,12 +8,72 @@ import InterviewFeedbackModal from './InterviewFeedbackModal';
 import FreelancerInterviewFeedback from './FreelancerInterviewFeedback';
 
 // Contracts List Component
-const ContractsList = ({ contracts, loading, error, onRetry }) => {
+const ContractsList = ({ contracts, loading, error, onRetry, onUploadSuccess }) => {
+  const [uploadingContracts, setUploadingContracts] = useState({});
+  const [uploadErrors, setUploadErrors] = useState({});
 
   const handleDownloadContract = (contractPath) => {
     if (contractPath) {
       const fullUrl = contractPath.startsWith('http') ? contractPath : `${BACKEND_URL}${contractPath}`;
       window.open(fullUrl, '_blank');
+    }
+  };
+
+  const handleUploadSignedContract = async (hireId, file) => {
+    if (!file) return;
+
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+      setUploadErrors(prev => ({
+        ...prev,
+        [hireId]: 'Please select a PDF file'
+      }));
+      return;
+    }
+
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadErrors(prev => ({
+        ...prev,
+        [hireId]: 'File size must be less than 10MB'
+      }));
+      return;
+    }
+
+    setUploadingContracts(prev => ({ ...prev, [hireId]: true }));
+    setUploadErrors(prev => ({ ...prev, [hireId]: '' }));
+
+    try {
+      const formData = new FormData();
+      formData.append('signed_contract', file);
+
+      const token = localStorage.getItem('token');
+      const response = await api.post(
+        `/freelancer/contract/${hireId}/upload-signed`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        // Refresh contracts list
+        onUploadSuccess && onUploadSuccess();
+        console.log('✅ Signed contract uploaded successfully');
+      } else {
+        throw new Error(response.data.message || 'Upload failed');
+      }
+    } catch (error) {
+      console.error('❌ Error uploading signed contract:', error);
+      setUploadErrors(prev => ({
+        ...prev,
+        [hireId]: error.response?.data?.message || 'Failed to upload signed contract'
+      }));
+    } finally {
+      setUploadingContracts(prev => ({ ...prev, [hireId]: false }));
     }
   };
 
@@ -111,21 +170,89 @@ const ContractsList = ({ contracts, loading, error, onRetry }) => {
 
               <div className="mt-auto">
                 {contract.contract_pdf_path ? (
-                  <button
-                    className="btn w-100"
-                    style={{ 
-                      background: accent, 
-                      color: '#fff', 
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '14px',
-                      fontWeight: 500
-                    }}
-                    onClick={() => handleDownloadContract(contract.contract_pdf_path)}
-                  >
-                    <i className="bi bi-download me-2"></i>
-                    Download Contract
-                  </button>
+                  <div>
+                    <button
+                      className="btn w-100 mb-2"
+                      style={{ 
+                        background: accent, 
+                        color: '#fff', 
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        fontWeight: 500
+                      }}
+                      onClick={() => handleDownloadContract(contract.contract_pdf_path)}
+                    >
+                      <i className="bi bi-download me-2"></i>
+                      Download Contract
+                    </button>
+                    
+                    {/* Signed Contract Upload Section */}
+                    <div className="border-top pt-2">
+                      {contract.signed_contract_pdf_path ? (
+                        <div className="text-center">
+                          <div className="text-success mb-2" style={{ fontSize: '12px' }}>
+                            <i className="bi bi-check-circle me-1"></i>
+                            Signed contract uploaded
+                          </div>
+                          {contract.signed_contract_uploaded_at && (
+                            <div className="text-muted" style={{ fontSize: '11px' }}>
+                              Uploaded: {new Date(contract.signed_contract_uploaded_at).toLocaleDateString()}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div>
+                          <input
+                            type="file"
+                            accept=".pdf"
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                handleUploadSignedContract(contract.hire_id, file);
+                              }
+                            }}
+                            style={{ display: 'none' }}
+                            id={`signed-contract-${contract.hire_id}`}
+                          />
+                          <label
+                            htmlFor={`signed-contract-${contract.hire_id}`}
+                            className="btn w-100"
+                            style={{ 
+                              background: '#28a745', 
+                              color: '#fff', 
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              cursor: uploadingContracts[contract.hire_id] ? 'not-allowed' : 'pointer',
+                              opacity: uploadingContracts[contract.hire_id] ? 0.6 : 1
+                            }}
+                          >
+                            {uploadingContracts[contract.hire_id] ? (
+                              <>
+                                <div className="spinner-border spinner-border-sm me-2" role="status">
+                                  <span className="visually-hidden">Loading...</span>
+                                </div>
+                                Uploading...
+                              </>
+                            ) : (
+                              <>
+                                <i className="bi bi-upload me-2"></i>
+                                Upload Signed Contract
+                              </>
+                            )}
+                          </label>
+                          
+                          {uploadErrors[contract.hire_id] && (
+                            <div className="text-danger mt-1" style={{ fontSize: '11px' }}>
+                              {uploadErrors[contract.hire_id]}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-center text-muted" style={{ fontSize: '12px' }}>
                     <i className="bi bi-file-earmark-x me-1"></i>
@@ -686,6 +813,7 @@ const FreelancerDashboard = () => {
                 loading={contractsLoading}
                 error={contractsError}
                 onRetry={fetchContracts}
+                onUploadSuccess={fetchContracts}
               />
             </div>
           </div>
