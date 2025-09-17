@@ -41,7 +41,7 @@ const AssociateDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [messagingLoading, setMessagingLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('request'); // 'request', 'messages', 'change-password', 'my-requests', 'hired-freelancers'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'request', 'messages', 'change-password', 'my-requests', 'hired-freelancers'
   
   // Skills for dropdown
   const [availableSkills, setAvailableSkills] = useState([]);
@@ -52,6 +52,16 @@ const AssociateDashboard = () => {
   const [hiredFreelancers, setHiredFreelancers] = useState([]);
   const [hiredFreelancersLoading, setHiredFreelancersLoading] = useState(false);
   const [hiredFreelancersError, setHiredFreelancersError] = useState('');
+  
+  // Dashboard stats state
+  const [dashboardStats, setDashboardStats] = useState({
+    totalRequests: 0,
+    activeRequests: 0,
+    hiredFreelancers: 0,
+    unreadMessages: 0,
+    upcomingInterviews: 0
+  });
+  const [dashboardLoading, setDashboardLoading] = useState(false);
 
   const [associateProfile, setAssociateProfile] = useState(null);
   const [assocUploading, setAssocUploading] = useState(false);
@@ -132,7 +142,9 @@ const AssociateDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'hired-freelancers') {
+    if (activeTab === 'dashboard') {
+      fetchDashboardStats();
+    } else if (activeTab === 'hired-freelancers') {
       fetchHiredFreelancers();
     }
   }, [activeTab]);
@@ -238,6 +250,36 @@ const AssociateDashboard = () => {
       setHiredFreelancersError('Failed to fetch hired freelancers. Please try again.');
     } finally {
       setHiredFreelancersLoading(false);
+    }
+  };
+
+  // Fetch dashboard stats
+  const fetchDashboardStats = async () => {
+    try {
+      setDashboardLoading(true);
+      
+      // Fetch all stats in parallel
+      const [requestsResponse, hiredResponse, unreadResponse] = await Promise.all([
+        api.get('/associate/freelancer-requests'),
+        api.get('/associate/hired-freelancers'),
+        api.get('/message/unread-count')
+      ]);
+
+      const requests = requestsResponse.data.success ? requestsResponse.data.requests : [];
+      const hired = hiredResponse.data.success ? hiredResponse.data.hired_freelancers : [];
+      const unreadCount = unreadResponse.data.success ? unreadResponse.data.total_unread : 0;
+
+      setDashboardStats({
+        totalRequests: requests.length,
+        activeRequests: requests.filter(r => r.status === 'pending' || r.status === 'reviewed').length,
+        hiredFreelancers: hired.length,
+        unreadMessages: unreadCount,
+        upcomingInterviews: 0 // TODO: Add interview count when interview system is ready
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+    } finally {
+      setDashboardLoading(false);
     }
   };
 
@@ -743,25 +785,19 @@ const AssociateDashboard = () => {
       {/* Navbar */}
       <nav className="dashboard-navbar">
         <div className="container d-flex justify-content-between align-items-center">
-          <div className="d-flex align-items-center">
-            <Link to="/associate/dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }} className="d-flex align-items-center me-4">
-              <img 
-                src="/assets/img/cv-connect_logo.png" 
-                alt="CV-Connect Logo" 
-                style={{
-                  height: 32,
-                  width: 32,
-                  marginRight: 8,
-                  borderRadius: '50%'
-                }}
-              />
-              CV<span style={{ color: '#333' }}>‑Connect</span>
-            </Link>
-            <div className="d-none d-lg-block">
-              <h2 style={{ color: accent, fontWeight: 700, margin: 0, fontSize: '1.5rem' }}>Associate Dashboard</h2>
-              <p style={{ color: '#666', margin: 0, fontSize: '0.9rem' }}>Request freelancers through ECS Admin, review curated profiles, and connect with pre-approved talent that matches your needs.</p>
-            </div>
-          </div>
+          <Link to="/associate/dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }} className="d-flex align-items-center">
+            <img 
+              src="/assets/img/cv-connect_logo.png" 
+              alt="CV-Connect Logo" 
+              style={{
+                height: 32,
+                width: 32,
+                marginRight: 8,
+                borderRadius: '50%'
+              }}
+            />
+            CV<span style={{ color: '#333' }}>‑Connect</span>
+          </Link>
           <button
             className="btn logout-btn"
             onClick={() => {
@@ -845,6 +881,16 @@ const AssociateDashboard = () => {
               <h5 className="mt-3 mb-1" style={{ color: '#444', fontWeight: 700 }}>{associateProfile?.contact_person || user?.email}</h5>
               <span className="badge bg-success mb-2">Associate</span>
               <div className="d-grid gap-3 w-100 mt-4">
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'dashboard' ? '' : ''}`}
+                  style={{ background: activeTab === 'dashboard' ? accent : 'transparent', color: activeTab === 'dashboard' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => {
+                    setActiveTab('dashboard');
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  <i className="bi bi-house me-2"></i>Dashboard
+                </button>
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'request' ? '' : ''}`}
                   style={{ background: activeTab === 'request' ? accent : 'transparent', color: activeTab === 'request' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
@@ -930,6 +976,167 @@ const AssociateDashboard = () => {
         </div>
             )}
             {/* Tab Content */}
+        
+        {/* Dashboard Tab */}
+        {activeTab === 'dashboard' && (
+          <div className="tab-content">
+            <div className="container-fluid px-0">
+              {/* Welcome Section */}
+              <div className="row mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm rounded-4" style={{ background: 'linear-gradient(135deg, #fff 0%, #fff5e6 100%)' }}>
+                    <div className="card-body p-4">
+                      <div className="d-flex align-items-center">
+                        <div className="me-3">
+                          <div className="rounded-circle d-flex align-items-center justify-content-center" style={{ width: 60, height: 60, background: accent }}>
+                            <i className="bi bi-person-fill text-white" style={{ fontSize: '1.5rem' }}></i>
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="mb-1" style={{ color: accent, fontWeight: 700 }}>
+                            Welcome back, {associateProfile?.contact_person || user?.email?.split('@')[0] || 'Associate'}!
+                          </h3>
+                          <p className="text-muted mb-0">Manage your freelancer requests, view recommendations, and track your projects.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats Cards */}
+              <div className="row mb-4">
+                <div className="col-md-6 col-lg-3 mb-3">
+                  <div className="card border-0 shadow-sm rounded-4 h-100">
+                    <div className="card-body text-center p-4">
+                      <div className="mb-3">
+                        <i className="bi bi-list-check" style={{ fontSize: '2.5rem', color: accent }}></i>
+                      </div>
+                      <h4 className="mb-1" style={{ color: accent, fontWeight: 700 }}>
+                        {dashboardLoading ? '...' : dashboardStats.totalRequests}
+                      </h4>
+                      <p className="text-muted mb-0">Total Requests</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6 col-lg-3 mb-3">
+                  <div className="card border-0 shadow-sm rounded-4 h-100">
+                    <div className="card-body text-center p-4">
+                      <div className="mb-3">
+                        <i className="bi bi-clock-history" style={{ fontSize: '2.5rem', color: '#28a745' }}></i>
+                      </div>
+                      <h4 className="mb-1" style={{ color: '#28a745', fontWeight: 700 }}>
+                        {dashboardLoading ? '...' : dashboardStats.activeRequests}
+                      </h4>
+                      <p className="text-muted mb-0">Active Requests</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6 col-lg-3 mb-3">
+                  <div className="card border-0 shadow-sm rounded-4 h-100">
+                    <div className="card-body text-center p-4">
+                      <div className="mb-3">
+                        <i className="bi bi-people" style={{ fontSize: '2.5rem', color: '#17a2b8' }}></i>
+                      </div>
+                      <h4 className="mb-1" style={{ color: '#17a2b8', fontWeight: 700 }}>
+                        {dashboardLoading ? '...' : dashboardStats.hiredFreelancers}
+                      </h4>
+                      <p className="text-muted mb-0">Hired Freelancers</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6 col-lg-3 mb-3">
+                  <div className="card border-0 shadow-sm rounded-4 h-100">
+                    <div className="card-body text-center p-4">
+                      <div className="mb-3">
+                        <i className="bi bi-chat-dots" style={{ fontSize: '2.5rem', color: '#ffc107' }}></i>
+                      </div>
+                      <h4 className="mb-1" style={{ color: '#ffc107', fontWeight: 700 }}>
+                        {dashboardLoading ? '...' : dashboardStats.unreadMessages}
+                      </h4>
+                      <p className="text-muted mb-0">Unread Messages</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="row mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm rounded-4">
+                    <div className="card-body p-4">
+                      <h5 className="mb-3" style={{ color: accent, fontWeight: 600 }}>Quick Actions</h5>
+                      <div className="row">
+                        <div className="col-md-4 mb-3">
+                          <button 
+                            className="btn w-100 p-3 border-0 rounded-3"
+                            style={{ background: 'linear-gradient(135deg, #fff 0%, #fff5e6 100%)', border: '2px solid #fff !important' }}
+                            onClick={() => setActiveTab('request')}
+                          >
+                            <i className="bi bi-person-plus d-block mb-2" style={{ fontSize: '2rem', color: accent }}></i>
+                            <h6 className="mb-1" style={{ color: accent, fontWeight: 600 }}>Request Freelancer</h6>
+                            <small className="text-muted">Create a new request</small>
+                          </button>
+                        </div>
+                        <div className="col-md-4 mb-3">
+                          <button 
+                            className="btn w-100 p-3 border-0 rounded-3"
+                            style={{ background: 'linear-gradient(135deg, #fff 0%, #fff5e6 100%)', border: '2px solid #fff !important' }}
+                            onClick={() => setActiveTab('messages')}
+                          >
+                            <i className="bi bi-chat-dots d-block mb-2" style={{ fontSize: '2rem', color: accent }}></i>
+                            <h6 className="mb-1" style={{ color: accent, fontWeight: 600 }}>View Messages</h6>
+                            <small className="text-muted">Check conversations</small>
+                          </button>
+                        </div>
+                        <div className="col-md-4 mb-3">
+                          <button 
+                            className="btn w-100 p-3 border-0 rounded-3"
+                            style={{ background: 'linear-gradient(135deg, #fff 0%, #fff5e6 100%)', border: '2px solid #fff !important' }}
+                            onClick={() => setActiveTab('my-requests')}
+                          >
+                            <i className="bi bi-list-check d-block mb-2" style={{ fontSize: '2rem', color: accent }}></i>
+                            <h6 className="mb-1" style={{ color: accent, fontWeight: 600 }}>My Requests</h6>
+                            <small className="text-muted">View all requests</small>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="row">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm rounded-4">
+                    <div className="card-body p-4">
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h5 className="mb-0" style={{ color: accent, fontWeight: 600 }}>Recent Activity</h5>
+                        <button 
+                          className="btn btn-sm" 
+                          style={{ background: accent, color: '#fff' }}
+                          onClick={fetchActivity}
+                        >
+                          <i className="bi bi-arrow-clockwise me-1"></i>Refresh
+                        </button>
+                      </div>
+                      {activities.length > 0 ? (
+                        <ActivityTable activities={activities} />
+                      ) : (
+                        <div className="text-center py-4">
+                          <i className="bi bi-clock-history" style={{ fontSize: '3rem', color: '#ddd' }}></i>
+                          <p className="text-muted mt-2">No recent activity to display</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'request' && (
           <div className="tab-content">
             {/* Skill Search */}
