@@ -2846,15 +2846,15 @@ const ESCAdminDashboard = () => {
               </div>
                   
                   {/* 2. Hired Freelancers Trends - SECOND MOST IMPORTANT */}
-              <div className="row g-4 mb-4">
-                <div className="col-12">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                  <div className="row g-4 mb-4">
+                    <div className="col-12">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                         <i className="bi bi-briefcase me-2"></i>Hired Freelancers Trends
-                      </h6>
-                    </div>
-                    <div className="card-body">
+                          </h6>
+                        </div>
+                        <div className="card-body">
                           {(() => {
                             // Debug: Log the actual data structure
                             console.log('🔍 Hired Freelancers Trends Data:', {
@@ -2867,19 +2867,19 @@ const ESCAdminDashboard = () => {
                             // Validate data structure
                             if (!analyticsData.hiredFreelancersTrends || analyticsData.hiredFreelancersTrends.length === 0) {
                               return (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
                           <div className="text-center text-muted">
                             <i className="bi bi-briefcase display-4"></i>
                             <p className="mt-2">No hiring data available for the selected time period</p>
-                          </div>
-                        </div>
+                              </div>
+                            </div>
                               );
                             }
 
                                                         // Validate that each item has required properties
                             const validData = analyticsData.hiredFreelancersTrends.filter(item => 
-                              item && 
-                              item.date && 
+                                  item &&
+                                  item.date &&
                               typeof item.hires === 'number' && 
                               typeof item.active_hires === 'number' && 
                               typeof item.completed_hires === 'number' && 
@@ -2905,64 +2905,64 @@ const ESCAdminDashboard = () => {
                               validData: validData
                             });
 
-                            if (validData.length === 0) {
-                            return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                if (validData.length === 0) {
+                                  return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-exclamation-triangle display-4"></i>
                                     <p className="mt-2">Invalid hiring data structure</p>
                                 <small>Check console for details</small>
-                                  </div>
-                              </div>
-                            );
-                          }
-                            
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
                             console.log('🔍 Hired Freelancers Chart - About to render with data:', validData);
-                            return (
-                              <ResponsiveContainer width="100%" height={300}>
+                                return (
+                                  <ResponsiveContainer width="100%" height={300}>
                                 <AreaChart data={validData}>
-                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                  <XAxis dataKey="date" stroke="#666" />
-                                  <YAxis stroke="#666" />
-                                  <Tooltip 
-                                    contentStyle={{ 
-                                      backgroundColor: '#fff', 
-                                      border: '1px solid #ddd',
-                                      borderRadius: '8px'
-                                    }}
-                                  />
+                                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                      <XAxis dataKey="date" stroke="#666" />
+                                      <YAxis stroke="#666" />
+                                      <Tooltip 
+                                        contentStyle={{ 
+                                          backgroundColor: '#fff', 
+                                          border: '1px solid #ddd',
+                                          borderRadius: '8px'
+                                        }}
+                                      />
                                   <Area 
-                                    type="monotone" 
+                                        type="monotone" 
                                     dataKey="hires" 
                                     stackId="1" 
-                                    stroke="#3b82f6" 
+                                        stroke="#3b82f6" 
                                     fill="#3b82f6" 
                                     fillOpacity={0.6}
                                   />
                                   <Area 
-                                    type="monotone" 
+                                        type="monotone" 
                                     dataKey="active_hires" 
                                     stackId="1" 
-                                    stroke="#10b981" 
+                                        stroke="#10b981" 
                                     fill="#10b981" 
                                     fillOpacity={0.6}
                                   />
                                   <Area 
-                                    type="monotone" 
+                                        type="monotone" 
                                     dataKey="completed_hires" 
                                     stackId="1" 
-                                    stroke="#f59e0b" 
+                                        stroke="#f59e0b" 
                                     fill="#f59e0b" 
                                     fillOpacity={0.6}
                                   />
                                 </AreaChart>
-                              </ResponsiveContainer>
-                            );
+                                  </ResponsiveContainer>
+                                );
                           })()}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
               {/* User Distribution and Activity - Pie Charts */}
               <div className="row g-4 mb-4">
@@ -3321,49 +3321,237 @@ const ESCAdminDashboard = () => {
                     </div>
                     <div className="card-body">
                       {(() => {
-                          <select 
-                            className="form-select form-select-sm" 
-                            style={{ width: '140px', fontSize: '13px' }}
-                            onChange={(e) => {
-                              const filter = e.target.value;
-                              setSkillsFilter(filter);
-                            }}
-                            value={skillsFilter}
-                          >
-                            <option value="all">All Skills</option>
-                            <option value="supply">Freelancer Skills</option>
-                            <option value="demand">Job Requirements</option>
-                            <option value="both">Balanced Skills</option>
-                          </select>
-                          <select 
-                            className="form-select form-select-sm" 
-                            style={{ width: '100px', fontSize: '13px' }}
-                            onChange={(e) => {
-                              const limit = parseInt(e.target.value);
-                              setSkillsLimit(limit);
-                            }}
-                            value={skillsLimit}
-                          >
-                            <option value="5">Top 5</option>
-                            <option value="10">Top 10</option>
-                            <option value="15">Top 15</option>
-                            <option value="20">Top 20</option>
-                          </select>
+                            // Debug: Log the actual data structure
+                            console.log('🔍 Communication Trends Data:', {
+                              exists: !!analyticsData.messageTrends,
+                              length: analyticsData.messageTrends?.length,
+                              sample: analyticsData.messageTrends?.[0],
+                              allData: analyticsData.messageTrends
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.messageTrends || analyticsData.messageTrends.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-chat-dots display-4"></i>
+                                    <p className="mt-2">No message trends data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Validate that each item has required properties
+                            const validData = analyticsData.messageTrends.filter(item => 
+                              item && 
+                              item.date && 
+                              typeof item.messages === 'number' && 
+                              typeof item.conversations === 'number' && 
+                              !isNaN(item.messages) &&
+                              !isNaN(item.conversations) &&
+                              item.messages >= 0 &&
+                              item.conversations >= 0 &&
+                              item.date !== undefined &&
+                              item.messages !== undefined &&
+                              item.conversations !== undefined &&
+                              item.date !== null &&
+                              item.messages !== null &&
+                              item.conversations !== null
+                            );
+
+                            console.log('🔍 Valid Communication Trends Data:', {
+                              originalLength: analyticsData.messageTrends.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid message trends data structure</p>
+                                    <small>Check console for details</small>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            
+                            console.log('🔍 Communication Trends Chart - About to render with data:', validData);
+                            return (
+                              <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={validData}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                  <XAxis dataKey="date" stroke="#666" />
+                                  <YAxis stroke="#666" />
+                                  <Tooltip 
+                                    contentStyle={{ 
+                                      backgroundColor: '#fff', 
+                                      border: '1px solid #ddd',
+                                      borderRadius: '8px'
+                                    }}
+                                  />
+                                  <Line 
+                                    type="monotone" 
+                                    dataKey="messages" 
+                                    stroke="#fd680e" 
+                                    strokeWidth={3}
+                                    dot={{ fill: '#fd680e', strokeWidth: 2, r: 4 }}
+                                    activeDot={{ r: 6, stroke: '#fd680e', strokeWidth: 2, fill: '#fff' }}
+                                    name="Messages"
+                                  />
+                                  <Line 
+                                    type="monotone" 
+                                    dataKey="conversations" 
+                                    stroke="#10b981" 
+                                    strokeWidth={2}
+                                    dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
+                                    activeDot={{ r: 5, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }}
+                                    name="Conversations"
+                                  />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            );
+                          })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ================================== */}
+              {/* TIER 3: GROWTH & TREND ANALYSIS */}
+              {/* ================================== */}
+              
+              {/* User Registration Trends - Line Chart */}
+              <div className="row g-4 mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-graph-up me-2"></i>User Registration Trends
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      {analyticsLoading ? (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                          <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
                         </div>
-                      </div>
+                      ) : analyticsData.registrationTrends && analyticsData.registrationTrends.length > 0 ? (
+                          (() => {
+                            // Validate registration trends data
+                            const validData = analyticsData.registrationTrends.filter(item =>
+                              item &&
+                              item.date &&
+                              typeof item.total_users === 'number' &&
+                              !isNaN(item.total_users) &&
+                              item.total_users >= 0
+                            );
+
+                            if (validData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">No valid registration data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            console.log('🔍 Registration Trends Chart - Rendering with data:', validData);
+                            return (
+                              <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={validData}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                  <XAxis dataKey="date" stroke="#666" />
+                                  <YAxis stroke="#666" />
+                                  <Tooltip 
+                                    contentStyle={{ 
+                                      backgroundColor: '#fff', 
+                                      border: '1px solid #ddd',
+                                      borderRadius: '8px'
+                                    }}
+                                  />
+                                  <Line 
+                                    type="monotone" 
+                                    dataKey="total_users" 
+                                    stroke="#fd680e" 
+                                    strokeWidth={3}
+                                    dot={{ fill: '#fd680e', strokeWidth: 2, r: 4 }}
+                                    activeDot={{ r: 6, stroke: '#fd680e', strokeWidth: 2, fill: '#fff' }}
+                                    name="Total Users"
+                                  />
+                                  <Line 
+                                    type="monotone" 
+                                    dataKey="associates" 
+                                    stroke="#3b82f6" 
+                                    strokeWidth={2}
+                                    dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
+                                    activeDot={{ r: 5, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
+                                    name="Associates"
+                                  />
+                                  <Line 
+                                    type="monotone" 
+                                    dataKey="freelancers" 
+                                    stroke="#10b981" 
+                                    strokeWidth={2}
+                                    dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
+                                    activeDot={{ r: 5, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }}
+                                    name="Freelancers"
+                                  />
+                                  <Line 
+                                    type="monotone" 
+                                    dataKey="admins" 
+                                    stroke="#8b5cf6" 
+                                    strokeWidth={2}
+                                    dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 3 }}
+                                    activeDot={{ r: 5, stroke: '#8b5cf6', strokeWidth: 2, fill: '#fff' }}
+                                    name="Admins"
+                                  />
+                                  <Line 
+                                    type="monotone" 
+                                    dataKey="ecs_employees" 
+                                    stroke="#f59e0b" 
+                                    strokeWidth={2}
+                                    dot={{ fill: '#f59e0b', strokeWidth: 2, r: 3 }}
+                                    activeDot={{ r: 5, stroke: '#f59e0b', strokeWidth: 2, fill: '#fff' }}
+                                    name="ECS Employees"
+                                  />
+                                </LineChart>
+                              </ResponsiveContainer>
+                            );
+                          })()
+                      ) : (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                          <div className="text-center text-muted">
+                            <i className="bi bi-graph-up display-4"></i>
+                            <p className="mt-2">No registration data available for the selected time period</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* User Communication Activity - Bar Chart */}
+              <div className="row g-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-people me-2"></i>User Communication Activity
+                      </h6>
                     </div>
                     <div className="card-body">
                       {(() => {
-                            // Get supply data (freelancer skills)
-                            const supplyData = analyticsData.topSkills || [];
-                            const demandData = analyticsData.skillsDemand || [];
-
-                            console.log('🔍 Skills Data:', {
-                              supply: supplyData.length,
-                              demand: demandData.length,
-                              supplySample: supplyData[0],
-                              demandSample: demandData[0],
-                              supplyData: supplyData,
+                            // Debug: Log the actual data structure
+                            console.log('🔍 User Communication Activity Data:', {
+                              exists: !!analyticsData.userCommunicationActivity,
+                              length: analyticsData.userCommunicationActivity?.length,
+                              sample: analyticsData.userCommunicationActivity?.[0],
                               demandData: demandData
                             });
 
