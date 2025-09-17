@@ -2390,110 +2390,154 @@ const ESCAdminDashboard = () => {
                 <>
                   {console.log('🔍 RENDERING ANALYTICS SECTION - REACHED THIS POINT')}
                   
-                  {/* TIER 1: IMMEDIATE BUSINESS IMPACT - Skills Supply vs Demand (MOST IMPORTANT) */}
-                  {/* Skills Supply vs Demand - Bar Chart */}
-                  <div className="row g-4 mb-4">
-                    <div className="col-md-12">
-                      <div className="card border-0 shadow-sm">
-                        <div className="card-header bg-transparent border-0">
-                          <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                  {/* ================================== */}
+                  {/* TIER 1: IMMEDIATE BUSINESS IMPACT */}
+                  {/* Top Priority for Industry Recruiters */}
+                  {/* ================================== */}
+                  
+                  {/* 1. Skills Supply vs Demand - MOST IMPORTANT FOR RECRUITERS */}
+              <div className="row g-4 mb-4">
+                <div className="col-md-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                             <i className="bi bi-bar-chart me-2"></i>Skills Supply vs Demand
-                          </h6>
+                      </h6>
                           <small className="text-muted">Compare freelancer skills (supply) with job requirements (demand)</small>
                         </div>
-                            <div className="d-flex gap-2 align-items-center">
-                              <select 
-                                className="form-select form-select-sm" 
-                                style={{ width: '150px' }}
-                                value={skillsFilter}
-                                onChange={(e) => setSkillsFilter(e.target.value)}
-                              >
-                                <option value="all">All Skills</option>
-                                <option value="supply">Freelancer Skills</option>
-                                <option value="demand">Job Requirements</option>
-                                <option value="both">Balanced Skills</option>
-                              </select>
-                              <select 
-                                className="form-select form-select-sm" 
-                                style={{ width: '100px' }}
-                                value={skillsLimit}
-                                onChange={(e) => setSkillsLimit(parseInt(e.target.value))}
-                              >
-                                <option value={5}>Top 5</option>
-                                <option value={10}>Top 10</option>
-                                <option value={15}>Top 15</option>
-                                <option value={20}>Top 20</option>
-                              </select>
-                            </div>
-                          </div>
+                        <div className="d-flex gap-2">
+                          <select 
+                            className="form-select form-select-sm" 
+                            style={{ width: '140px', fontSize: '13px' }}
+                            onChange={(e) => {
+                              const filter = e.target.value;
+                              setSkillsFilter(filter);
+                            }}
+                            value={skillsFilter}
+                          >
+                            <option value="all">All Skills</option>
+                            <option value="supply">Freelancer Skills</option>
+                            <option value="demand">Job Requirements</option>
+                            <option value="both">Balanced Skills</option>
+                          </select>
+                          <select 
+                            className="form-select form-select-sm" 
+                            style={{ width: '100px', fontSize: '13px' }}
+                            onChange={(e) => {
+                              const limit = parseInt(e.target.value);
+                              setSkillsLimit(limit);
+                            }}
+                            value={skillsLimit}
+                          >
+                            <option value="5">Top 5</option>
+                            <option value="10">Top 10</option>
+                            <option value="15">Top 15</option>
+                            <option value="20">Top 20</option>
+                          </select>
                         </div>
-                        <div className="card-body">
-                          {analyticsLoading ? (
-                            <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                              <div className="spinner-border" style={{ color: '#ffd7c2' }} role="status">
-                                <span className="visually-hidden">Loading...</span>
-                              </div>
-                            </div>
-                          ) : (() => {
-                            // Process skills data for display
+                      </div>
+                    </div>
+                    <div className="card-body">
+                      {(() => {
+                            // Get supply data (freelancer skills)
+                            const supplyData = analyticsData.topSkills || [];
+                            const demandData = analyticsData.skillsDemand || [];
+
+                            console.log('🔍 Skills Data:', {
+                              supply: supplyData.length,
+                              demand: demandData.length,
+                              supplySample: supplyData[0],
+                              demandSample: demandData[0],
+                              supplyData: supplyData,
+                              demandData: demandData
+                            });
+
+                            // Check if we have any data
+                            if (supplyData.length === 0 && demandData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-bar-chart display-4"></i>
+                                    <p className="mt-2">No skills data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Create a combined dataset with both supply and demand
                             const skillMap = new Map();
                             
-                            // Process supply data (freelancer skills)
-                            if (analyticsData.topSkills && Array.isArray(analyticsData.topSkills)) {
-                              analyticsData.topSkills.forEach(skill => {
-                                if (skill && skill.skill && typeof skill.count === 'number') {
-                                  const skillName = skill.skill.toLowerCase().trim();
-                                  if (!skillMap.has(skillName)) {
-                                    skillMap.set(skillName, { skill: skill.skill, supply: 0, demand: 0 });
-                                  }
-                                  skillMap.get(skillName).supply = parseInt(skill.count);
-                                }
-                              });
-                            }
-
-                            // Process demand data (job requirements)
-                            if (analyticsData.skillsDemand && Array.isArray(analyticsData.skillsDemand)) {
-                              analyticsData.skillsDemand.forEach(skill => {
-                                if (skill && skill.skill && typeof skill.count === 'number') {
-                                  const skillName = skill.skill.toLowerCase().trim();
-                                  if (!skillMap.has(skillName)) {
-                                    skillMap.set(skillName, { skill: skill.skill, supply: 0, demand: 0 });
-                                  }
-                                  skillMap.get(skillName).demand = parseInt(skill.count);
-                                }
-                              });
-                            }
-
-                            // Create fuzzy matching for similar skills
-                            const processedSkillMap = new Map();
-                            skillMap.forEach((value, key) => {
-                              let foundMatch = false;
-                              for (const [existingKey, existingValue] of processedSkillMap) {
-                                // Check for similar skills (case-insensitive, partial match, alphanumeric comparison)
-                                const similarity = (str1, str2) => {
-                                  const s1 = str1.toLowerCase().replace(/[^a-z0-9]/g, '');
-                                  const s2 = str2.toLowerCase().replace(/[^a-z0-9]/g, '');
-                                  return s1 === s2 || s1.includes(s2) || s2.includes(s1);
-                                };
-                                
-                                if (similarity(key, existingKey)) {
-                                  existingValue.supply += value.supply;
-                                  existingValue.demand += value.demand;
-                                  foundMatch = true;
-                                  break;
-                                }
-                              }
-                              
-                              if (!foundMatch) {
-                                processedSkillMap.set(key, { ...value });
+                            // Add supply data
+                            console.log('🔍 Processing Supply Data:', supplyData);
+                            supplyData.forEach(item => {
+                              if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
+                                const skill = item.skill.toLowerCase();
+                                const count = parseInt(item.count);
+                                console.log(`🔍 Adding supply skill: "${skill}" with count: ${count}`);
+                                skillMap.set(skill, {
+                                  skill: item.skill,
+                                  supply: count,
+                                  demand: 0,
+                                  fill: item.fill || '#fd680e'
+                                });
                               }
                             });
 
-                            // Apply filters
-                            let filteredData = Array.from(processedSkillMap.values());
-                            
+                            // Add demand data
+                            console.log('🔍 Processing Demand Data:', demandData);
+                            demandData.forEach(item => {
+                              if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
+                                const skill = item.skill.toLowerCase();
+                                const count = parseInt(item.count);
+                                console.log(`🔍 Processing demand skill: "${skill}" with count: ${count}`);
+                                
+                                // Try to find matching skill in supply data
+                                let matchedSkill = null;
+                                
+                                // First try exact match
+                                if (skillMap.has(skill)) {
+                                  matchedSkill = skill;
+                                } else {
+                                  // Try fuzzy matching
+                                  const normalizedSkill = skill.replace(/[^a-z0-9]/g, '');
+                                  
+                                  for (const [existingSkill] of skillMap) {
+                                    const normalizedExisting = existingSkill.replace(/[^a-z0-9]/g, '');
+                                    
+                                    // Check if skills match (case-insensitive, ignore special chars)
+                                    if (normalizedSkill === normalizedExisting ||
+                                        normalizedSkill.includes(normalizedExisting) ||
+                                        normalizedExisting.includes(normalizedSkill)) {
+                                      matchedSkill = existingSkill;
+                                      break;
+                                    }
+                                  }
+                                }
+                                
+                                if (matchedSkill) {
+                                  // Update existing skill with demand
+                                  const existing = skillMap.get(matchedSkill);
+                                  existing.demand = count;
+                                  console.log(`🔍 Updated existing skill "${matchedSkill}" with demand: ${count}`);
+                                } else {
+                                  // Add new skill with only demand
+                                  skillMap.set(skill, {
+                                    skill: item.skill,
+                                    supply: 0,
+                                    demand: count,
+                                    fill: '#10b981'
+                                  });
+                                  console.log(`🔍 Added new demand-only skill: "${skill}" with count: ${count}`);
+                                }
+                              }
+                            });
+
+                            // Prepare chart data based on filter
+                            let filteredData = Array.from(skillMap.values());
+
+                            // Apply filter
                             if (skillsFilter === 'supply') {
                               filteredData = filteredData.filter(item => item.supply > 0);
                             } else if (skillsFilter === 'demand') {
@@ -2502,13 +2546,21 @@ const ESCAdminDashboard = () => {
                               filteredData = filteredData.filter(item => item.supply > 0 && item.demand > 0);
                             }
 
-                            // Sort and limit
-                            filteredData = filteredData
+                            // Sort and limit data
+                            const sortedData = filteredData
                               .sort((a, b) => (b.supply + b.demand) - (a.supply + a.demand))
                               .slice(0, skillsLimit);
 
-                            // Create chart data
-                            const supplyChartData = filteredData
+                            console.log('🔍 Final Filtered Data:', {
+                              filter: skillsFilter,
+                              limit: skillsLimit,
+                              totalItems: filteredData.length,
+                              displayedItems: sortedData.length,
+                              data: sortedData
+                            });
+
+                            // Prepare chart-specific data
+                            const supplyChartData = Array.from(skillMap.values())
                               .filter(item => item.supply > 0)
                               .sort((a, b) => b.supply - a.supply)
                               .slice(0, skillsLimit)
@@ -2520,7 +2572,7 @@ const ESCAdminDashboard = () => {
                               }));
 
                             // Get all demand skills, not just from combinedData
-                            const allDemandSkills = Array.from(processedSkillMap.values())
+                            const allDemandSkills = Array.from(skillMap.values())
                               .filter(item => item.demand > 0)
                               .sort((a, b) => b.demand - a.demand)
                               .slice(0, skillsLimit)
@@ -2532,7 +2584,7 @@ const ESCAdminDashboard = () => {
                               }));
 
                             // Get balanced skills (skills that have both supply and demand)
-                            const balancedSkillsData = Array.from(processedSkillMap.values())
+                            const balancedSkillsData = Array.from(skillMap.values())
                               .filter(item => item.supply > 0 && item.demand > 0)
                               .sort((a, b) => (b.supply + b.demand) - (a.supply + a.demand))
                               .slice(0, skillsLimit)
@@ -2551,54 +2603,38 @@ const ESCAdminDashboard = () => {
                             console.log('🔍 Balanced Skills Data:', balancedSkillsData);
                             
                             // Calculate summary statistics
-                            const totalSupply = Array.from(processedSkillMap.values()).reduce((sum, item) => sum + item.supply, 0);
-                            const totalDemand = Array.from(processedSkillMap.values()).reduce((sum, item) => sum + item.demand, 0);
-                            const totalSkills = Array.from(processedSkillMap.values()).length;
-                            const balancedSkills = Array.from(processedSkillMap.values()).filter(item => item.supply > 0 && item.demand > 0).length;
+                            const totalSupply = Array.from(skillMap.values()).reduce((sum, item) => sum + item.supply, 0);
+                            const totalDemand = Array.from(skillMap.values()).reduce((sum, item) => sum + item.demand, 0);
+                            const totalSkills = Array.from(skillMap.values()).length;
+                            const balancedSkills = Array.from(skillMap.values()).filter(item => item.supply > 0 && item.demand > 0).length;
 
                             return (
-                              <>
+                              <div>
                                 {/* Summary Statistics */}
-                                <div className="row mb-4">
-                                  <div className="col-md-3">
-                                    <div className="text-center p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                      <h4 className="mb-1" style={{ color: '#fd680e', fontWeight: '700' }}>{totalSupply.toLocaleString()}</h4>
-                                      <small className="text-muted">Total Supply</small>
-                                    </div>
-                                  </div>
-                                  <div className="col-md-3">
-                                    <div className="text-center p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                      <h4 className="mb-1" style={{ color: '#10b981', fontWeight: '700' }}>{totalDemand.toLocaleString()}</h4>
-                                      <small className="text-muted">Total Demand</small>
-                                    </div>
-                                  </div>
-                                  <div className="col-md-3">
-                                    <div className="text-center p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                      <h4 className="mb-1" style={{ color: '#8b5cf6', fontWeight: '700' }}>{totalSkills}</h4>
-                                      <small className="text-muted">Skills Shown</small>
-                                    </div>
-                                  </div>
-                                  <div className="col-md-3">
-                                    <div className="text-center p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
-                                      <h4 className="mb-1" style={{ color: '#f59e0b', fontWeight: '700' }}>{balancedSkills}</h4>
-                                      <small className="text-muted">Balanced Skills</small>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Legend - Only show when both charts are visible */}
                                 {(skillsFilter === 'all' || skillsFilter === 'both') && (
-                                  <div className="row mb-3">
-                                    <div className="col-12">
-                                      <div className="d-flex justify-content-center gap-4">
-                                        <div className="d-flex align-items-center">
-                                          <div style={{ width: '16px', height: '16px', backgroundColor: '#fd680e', borderRadius: '4px', marginRight: '8px' }}></div>
-                                          <span className="text-muted">Supply (Freelancers)</span>
-                                        </div>
-                                        <div className="d-flex align-items-center">
-                                          <div style={{ width: '16px', height: '16px', backgroundColor: '#10b981', borderRadius: '4px', marginRight: '8px' }}></div>
-                                          <span className="text-muted">Demand (Jobs)</span>
-                                        </div>
+                                  <div className="row mb-4">
+                                    <div className="col-md-3">
+                                      <div className="text-center p-3" style={{ backgroundColor: '#fff8f0', borderRadius: '8px', border: '1px solid #fed7aa' }}>
+                                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#fd680e' }}>{totalSupply}</div>
+                                        <div style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase' }}>Total Supply</div>
+                                      </div>
+                                    </div>
+                                    <div className="col-md-3">
+                                      <div className="text-center p-3" style={{ backgroundColor: '#f0fdf4', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>{totalDemand}</div>
+                                        <div style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase' }}>Total Demand</div>
+                                      </div>
+                                    </div>
+                                    <div className="col-md-3">
+                                      <div className="text-center p-3" style={{ backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#64748b' }}>{totalSkills}</div>
+                                        <div style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase' }}>Skills Shown</div>
+                                      </div>
+                                    </div>
+                                    <div className="col-md-3">
+                                      <div className="text-center p-3" style={{ backgroundColor: '#faf5ff', borderRadius: '8px', border: '1px solid #ddd6fe' }}>
+                                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#8b5cf6' }}>{balancedSkills}</div>
+                                        <div style={{ fontSize: '12px', color: '#666', textTransform: 'uppercase' }}>Balanced Skills</div>
                                       </div>
                                     </div>
                                   </div>
@@ -2771,81 +2807,87 @@ const ESCAdminDashboard = () => {
                                     </div>
                                   )}
                                 </div>
-                              </>
+
+                                {/* Legend - Only show when both charts are visible */}
+                                {skillsFilter === 'all' && (
+                                  <div className="row mt-3">
+                                    <div className="col-12">
+                                      <div className="d-flex justify-content-center gap-4">
+                                        <div className="d-flex align-items-center">
+                                          <div style={{ 
+                                            width: '12px', 
+                                            height: '12px', 
+                                            backgroundColor: '#fd680e', 
+                                            marginRight: '8px',
+                                            borderRadius: '2px'
+                                          }}></div>
+                                          <small style={{ color: '#666', fontWeight: '500' }}>Supply (Freelancers)</small>
+                                        </div>
+                                        <div className="d-flex align-items-center">
+                                          <div style={{ 
+                                            width: '12px', 
+                                            height: '12px', 
+                                            backgroundColor: '#10b981', 
+                                            marginRight: '8px',
+                                            borderRadius: '2px'
+                                          }}></div>
+                                          <small style={{ color: '#666', fontWeight: '500' }}>Demand (Jobs)</small>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             );
-                          })()}
-                        </div>
-                      </div>
+                      })()}
                     </div>
                   </div>
-
-                  {/* TIER 1: IMMEDIATE BUSINESS IMPACT - Hired Freelancers Trends (SECOND MOST IMPORTANT) */}
-                  {/* Hired Freelancers Trends - Area Chart */}
+                </div>
+              </div>
+                  
+                  {/* 2. Hired Freelancers Trends - SECOND MOST IMPORTANT */}
+                  {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
                     <div className="col-12">
                       <div className="card border-0 shadow-sm">
                         <div className="card-header bg-transparent border-0">
                           <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                            <i className="bi bi-briefcase me-2"></i>Hired Freelancers Trends
+                            <i className="bi bi-graph-up me-2"></i>User Registration Trends
                           </h6>
                         </div>
                         <div className="card-body">
-                          {(() => {
-                            // Debug: Log the actual data structure
-                            console.log('🔍 Hired Freelancers Trends Data:', {
-                              exists: !!analyticsData.hiredFreelancersTrends,
-                              length: analyticsData.hiredFreelancersTrends?.length,
-                              sample: analyticsData.hiredFreelancersTrends?.[0],
-                              allData: analyticsData.hiredFreelancersTrends
-                            });
-
-                            // Validate data structure
-                            if (!analyticsData.hiredFreelancersTrends || analyticsData.hiredFreelancersTrends.length === 0) {
-                              return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-briefcase display-4"></i>
-                                    <p className="mt-2">No hiring data available</p>
-                                  </div>
-                                </div>
-                              );
-                            }
-
-                            // Validate that each item has required properties
-                            const validData = analyticsData.hiredFreelancersTrends.filter(item => 
+                          {analyticsLoading ? (
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                              <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                              </div>
+                            </div>
+                                                      ) : analyticsData.registrationTrends && analyticsData.registrationTrends.length > 0 ? (
+                              (() => {
+                                // Validate registration trends data
+                                const validData = analyticsData.registrationTrends.filter(item =>
                                   item &&
-                              typeof item.date === 'string' && 
-                              typeof item.hired_count === 'number' && 
-                              !isNaN(item.hired_count) &&
-                              item.hired_count >= 0 &&
-                              item.date !== undefined &&
-                              item.hired_count !== undefined &&
-                              item.date !== null &&
-                              item.hired_count !== null
-                            );
-
-                            console.log('🔍 Valid Hired Freelancers Data:', {
-                              originalLength: analyticsData.hiredFreelancersTrends.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
+                                  item.date &&
+                                  typeof item.total_users === 'number' &&
+                                  !isNaN(item.total_users) &&
+                                  item.total_users >= 0
+                                );
 
                                 if (validData.length === 0) {
                                   return (
                                     <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
                                       <div className="text-center text-muted">
                                         <i className="bi bi-exclamation-triangle display-4"></i>
-                                    <p className="mt-2">Invalid hiring data structure</p>
-                                    <small>Check console for details</small>
+                                        <p className="mt-2">No valid registration data available</p>
                                       </div>
                                     </div>
                                   );
                                 }
 
-                            console.log('🔍 Hired Freelancers Chart - About to render with data:', validData);
+                                console.log('🔍 Registration Trends Chart - Rendering with data:', validData);
                                 return (
                                   <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={validData}>
+                                    <LineChart data={validData}>
                                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                       <XAxis dataKey="date" stroke="#666" />
                                       <YAxis stroke="#666" />
@@ -2855,28 +2897,70 @@ const ESCAdminDashboard = () => {
                                           border: '1px solid #ddd',
                                           borderRadius: '8px'
                                         }}
-                                    formatter={(value) => [`${value} hired`, 'Hired Freelancers']}
-                                    labelFormatter={(label) => `Date: ${label}`}
                                       />
-                                  <Area 
+                                      <Line 
                                         type="monotone" 
-                                    dataKey="hired_count" 
+                                        dataKey="total_users" 
                                         stroke="#fd680e" 
-                                    fill="#fd680e"
-                                    fillOpacity={0.3}
                                         strokeWidth={3}
-                                    name="Hired Freelancers"
-                                  />
-                                </AreaChart>
+                                        dot={{ fill: '#fd680e', strokeWidth: 2, r: 4 }}
+                                        activeDot={{ r: 6, stroke: '#fd680e', strokeWidth: 2, fill: '#fff' }}
+                                        name="Total Users"
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="associates" 
+                                        stroke="#3b82f6" 
+                                        strokeWidth={2}
+                                        dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
+                                        activeDot={{ r: 5, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
+                                        name="Associates"
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="freelancers" 
+                                        stroke="#10b981" 
+                                        strokeWidth={2}
+                                        dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
+                                        activeDot={{ r: 5, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }}
+                                        name="Freelancers"
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="admins" 
+                                        stroke="#8b5cf6" 
+                                        strokeWidth={2}
+                                        dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 3 }}
+                                        activeDot={{ r: 5, stroke: '#8b5cf6', strokeWidth: 2, fill: '#fff' }}
+                                        name="Admins"
+                                      />
+                                      <Line 
+                                        type="monotone" 
+                                        dataKey="ecs_employees" 
+                                        stroke="#f59e0b" 
+                                        strokeWidth={2}
+                                        dot={{ fill: '#f59e0b', strokeWidth: 2, r: 3 }}
+                                        activeDot={{ r: 5, stroke: '#f59e0b', strokeWidth: 2, fill: '#fff' }}
+                                        name="ECS Employees"
+                                      />
+                                    </LineChart>
                                   </ResponsiveContainer>
                                 );
-                          })()}
+                              })()
+                          ) : (
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                              <div className="text-center text-muted">
+                                <i className="bi bi-graph-up display-4"></i>
+                                <p className="mt-2">No registration data available for the selected time period</p>
+                                                  </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
 
-              {/* TIER 2: TALENT ACQUISITION INSIGHTS - User Distribution and Activity - Pie Charts */}
+              {/* User Distribution and Activity - Pie Charts */}
               <div className="row g-4 mb-4">
                 <div className="col-md-6">
                   <div className="card border-0 shadow-sm">
@@ -3045,7 +3129,7 @@ const ESCAdminDashboard = () => {
                 </div>
               </div>
 
-              {/* TIER 2: TALENT ACQUISITION INSIGHTS - CV Upload Trends - Line Chart */}
+              {/* CV Upload Trends - Line Chart */}
               <div className="row g-4 mb-4">
                 <div className="col-12">
                   <div className="card border-0 shadow-sm" style={{ border: '2px solid red' }}>
@@ -3674,121 +3758,7 @@ const ESCAdminDashboard = () => {
                 </div>
               </div>
 
-              {/* TIER 4: GROWTH & TREND ANALYSIS - User Registration Trends - Line Chart */}
-              <div className="row g-4 mb-4">
-                <div className="col-12">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-graph-up me-2"></i>User Registration Trends
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                      {analyticsLoading ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                          <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                          </div>
-                        </div>
-                                                      ) : analyticsData.registrationTrends && analyticsData.registrationTrends.length > 0 ? (
-                              (() => {
-                                // Validate registration trends data
-                                const validData = analyticsData.registrationTrends.filter(item =>
-                                  item &&
-                                  item.date &&
-                                  typeof item.total_users === 'number' &&
-                                  !isNaN(item.total_users) &&
-                                  item.total_users >= 0
-                                );
-
-                                if (validData.length === 0) {
-                                  return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-exclamation-triangle display-4"></i>
-                                        <p className="mt-2">No valid registration data available</p>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-
-                                console.log('🔍 Registration Trends Chart - Rendering with data:', validData);
-                                return (
-                                  <ResponsiveContainer width="100%" height={300}>
-                                    <LineChart data={validData}>
-                                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                      <XAxis dataKey="date" stroke="#666" />
-                                      <YAxis stroke="#666" />
-                                      <Tooltip 
-                                        contentStyle={{ 
-                                          backgroundColor: '#fff', 
-                                          border: '1px solid #ddd',
-                                          borderRadius: '8px'
-                                        }}
-                                      />
-                                      <Line 
-                                        type="monotone" 
-                                        dataKey="total_users" 
-                                        stroke="#fd680e" 
-                                        strokeWidth={3}
-                                        dot={{ fill: '#fd680e', strokeWidth: 2, r: 4 }}
-                                        activeDot={{ r: 6, stroke: '#fd680e', strokeWidth: 2, fill: '#fff' }}
-                                        name="Total Users"
-                                      />
-                                      <Line 
-                                        type="monotone" 
-                                        dataKey="associates" 
-                                        stroke="#3b82f6" 
-                                        strokeWidth={2}
-                                        dot={{ fill: '#3b82f6', strokeWidth: 2, r: 3 }}
-                                        activeDot={{ r: 5, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
-                                        name="Associates"
-                                      />
-                                      <Line 
-                                        type="monotone" 
-                                        dataKey="freelancers" 
-                                        stroke="#10b981" 
-                                        strokeWidth={2}
-                                        dot={{ fill: '#10b981', strokeWidth: 2, r: 3 }}
-                                        activeDot={{ r: 5, stroke: '#10b981', strokeWidth: 2, fill: '#fff' }}
-                                        name="Freelancers"
-                                      />
-                                      <Line 
-                                        type="monotone" 
-                                        dataKey="admins" 
-                                        stroke="#8b5cf6" 
-                                        strokeWidth={2}
-                                        dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 3 }}
-                                        activeDot={{ r: 5, stroke: '#8b5cf6', strokeWidth: 2, fill: '#fff' }}
-                                        name="Admins"
-                                      />
-                                      <Line 
-                                        type="monotone" 
-                                        dataKey="ecs_employees" 
-                                        stroke="#f59e0b" 
-                                        strokeWidth={2}
-                                        dot={{ fill: '#f59e0b', strokeWidth: 2, r: 3 }}
-                                        activeDot={{ r: 5, stroke: '#f59e0b', strokeWidth: 2, fill: '#fff' }}
-                                        name="ECS Employees"
-                                      />
-                                    </LineChart>
-                                  </ResponsiveContainer>
-                                );
-                              })()
-                          ) : (
-                            <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                              <div className="text-center text-muted">
-                                <i className="bi bi-graph-up display-4"></i>
-                                <p className="mt-2">No registration data available for the selected time period</p>
-                                                  </div>
-                            </div>
-                          )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* TIER 3: ENGAGEMENT & QUALITY METRICS - Communication Trends - Line Chart */}
+              {/* Communication Trends - Line Chart */}
               <div className="row g-4 mb-4">
                 <div className="col-12">
                   <div className="card border-0 shadow-sm">
@@ -4013,7 +3983,7 @@ const ESCAdminDashboard = () => {
                 </div>
               </div>
 
-              {/* TIER 3: ENGAGEMENT & QUALITY METRICS - User Communication Activity - Bar Chart */}
+              {/* User Communication Activity - Bar Chart */}
               <div className="row g-4">
                 <div className="col-12">
                   <div className="card border-0 shadow-sm">
@@ -4132,7 +4102,7 @@ const ESCAdminDashboard = () => {
             </div>
               </div>
 
-              {/* TIER 3: ENGAGEMENT & QUALITY METRICS - Interview Feedback Analytics Section */}
+              {/* Interview Feedback Analytics Section */}
               <div className="row g-4 mb-4 mt-5">
                 <div className="col-12">
                   <div className="card border-0 shadow-sm">
