@@ -850,6 +850,16 @@ const AssociateDashboard = () => {
                   <i className="bi bi-person-plus me-2"></i>Request Freelancer
                 </button>
                 <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'my-requests' ? '' : ''}`}
+                  style={{ background: activeTab === 'my-requests' ? accent : 'transparent', color: activeTab === 'my-requests' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => {
+                    setActiveTab('my-requests');
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  <i className="bi bi-list-check me-2"></i>My Requests
+                </button>
+                <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'messages' ? '' : ''} position-relative`}
                   style={{ background: activeTab === 'messages' ? accent : 'transparent', color: activeTab === 'messages' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
                   onClick={() => {
@@ -863,26 +873,6 @@ const AssociateDashboard = () => {
                       {globalUnread}
                     </span>
                   )}
-                </button>
-                <button 
-                  className={`btn dashboard-btn w-100 ${activeTab === 'change-password' ? '' : ''}`}
-                  style={{ background: activeTab === 'change-password' ? accent : 'transparent', color: activeTab === 'change-password' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => {
-                    setActiveTab('change-password');
-                    window.scrollTo(0, 0);
-                  }}
-                >
-                  <i className="bi bi-key me-2"></i>Change Password
-                </button>
-                <button 
-                  className={`btn dashboard-btn w-100 ${activeTab === 'my-requests' ? '' : ''}`}
-                  style={{ background: activeTab === 'my-requests' ? accent : 'transparent', color: activeTab === 'my-requests' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => {
-                    setActiveTab('my-requests');
-                    window.scrollTo(0, 0);
-                  }}
-                >
-                  <i className="bi bi-list-check me-2"></i>My Requests
                 </button>
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'interviews' ? '' : ''}`}
@@ -903,6 +893,16 @@ const AssociateDashboard = () => {
                   }}
                 >
                   <i className="bi bi-people me-2"></i>Hired Freelancers
+                </button>
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'change-password' ? '' : ''}`}
+                  style={{ background: activeTab === 'change-password' ? accent : 'transparent', color: activeTab === 'change-password' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => {
+                    setActiveTab('change-password');
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  <i className="bi bi-key me-2"></i>Change Password
                 </button>
               </div>
               {assocUploading && (
