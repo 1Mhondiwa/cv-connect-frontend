@@ -3048,135 +3048,141 @@ const ESCAdminDashboard = () => {
                               skillsShown: Math.min(totalSkills, skillsLimit)
                             });
 
-                          return (
+                            return (
                               <div>
-                                {/* Legend */}
-                                <div className="d-flex justify-content-center mb-4">
-                                  <div className="d-flex gap-4">
-                                    <div className="d-flex align-items-center">
-                                      <div 
-                                        style={{ 
-                                          width: '20px', 
-                                          height: '20px', 
-                                          backgroundColor: '#fd680e', 
-                                          borderRadius: '4px',
-                                          marginRight: '8px'
-                                        }}
-                                      ></div>
-                                      <span style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>Supply (Freelancers)</span>
-                                    </div>
-                                    <div className="d-flex align-items-center">
-                                      <div 
-                                        style={{ 
-                                          width: '20px', 
-                                          height: '20px', 
-                                          backgroundColor: '#10b981', 
-                                          borderRadius: '4px',
-                                          marginRight: '8px'
-                                        }}
-                                      ></div>
-                                      <span style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>Demand (Jobs)</span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* Two Separate Charts */}
-                                <div className="row">
-                                  {/* Supply Chart */}
-                                  <div className="col-md-6">
-                                    <div className="text-center mb-3">
-                                      <h6 style={{ color: '#fd680e', fontWeight: '600' }}>
-                                        <i className="bi bi-people me-2"></i>Skills Supply (Freelancers)
-                                      </h6>
-                                    </div>
-                                    <ResponsiveContainer width="100%" height={300}>
-                              <BarChart 
-                                        data={supplyChartData}
-                                        margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
-                              >
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis 
-                                  dataKey="skill" 
-                                  stroke="#666"
-                                          tick={{ fontSize: 11, fill: '#666', fontWeight: '500' }}
-                                  angle={-45}
-                                  textAnchor="end"
-                                          height={70}
-                                  interval={0}
-                                />
-                                <YAxis 
-                                  stroke="#666"
-                                          tick={{ fontSize: 11, fill: '#666' }}
-                                />
-                                <Tooltip 
-                                  contentStyle={{ 
-                                    backgroundColor: '#fff', 
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                            fontSize: '13px'
-                                  }}
-                                          formatter={(value) => [value, 'Freelancers']}
-                                  labelFormatter={(label) => `Skill: ${label}`}
-                                />
-                                <Bar 
-                                  dataKey="count" 
-                                  fill="#fd680e"
-                                  radius={[4, 4, 0, 0]}
-                                  stroke="#fd680e"
-                                  strokeWidth={1}
-                                />
-                              </BarChart>
-                            </ResponsiveContainer>
-                                  </div>
-
-                                  {/* Demand Chart */}
-                                  <div className="col-md-6">
-                                    <div className="text-center mb-3">
-                                      <h6 style={{ color: '#10b981', fontWeight: '600' }}>
-                                        <i className="bi bi-briefcase me-2"></i>Skills Demand (Jobs)
-                                      </h6>
-                                    </div>
-                                    <ResponsiveContainer width="100%" height={300}>
-                                      <BarChart 
-                                        data={allDemandSkills}
-                                        margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
-                                      >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                        <XAxis 
-                                          dataKey="skill" 
-                                          stroke="#666"
-                                          tick={{ fontSize: 11, fill: '#666', fontWeight: '500' }}
-                                          angle={-45}
-                                          textAnchor="end"
-                                          height={70}
-                                          interval={0}
-                                        />
-                                        <YAxis 
-                                          stroke="#666"
-                                          tick={{ fontSize: 11, fill: '#666' }}
-                                        />
-                                        <Tooltip 
-                                          contentStyle={{ 
-                                            backgroundColor: '#fff', 
-                                            border: '1px solid #ddd',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                            fontSize: '13px'
+                                {/* Legend - Only show when both charts are visible */}
+                                {(skillsFilter === 'all' || skillsFilter === 'both') && (
+                                  <div className="d-flex justify-content-center mb-4">
+                                    <div className="d-flex gap-4">
+                                      <div className="d-flex align-items-center">
+                                        <div 
+                                          style={{ 
+                                            width: '20px', 
+                                            height: '20px', 
+                                            backgroundColor: '#fd680e', 
+                                            borderRadius: '4px',
+                                            marginRight: '8px'
                                           }}
-                                          formatter={(value) => [value, 'Job Requirements']}
-                                          labelFormatter={(label) => `Skill: ${label}`}
-                                        />
-                                        <Bar 
-                                          dataKey="count" 
-                                          fill="#10b981"
-                                          radius={[4, 4, 0, 0]}
-                                          stroke="#10b981"
-                                          strokeWidth={1}
-                                        />
-                                      </BarChart>
-                                    </ResponsiveContainer>
+                                        ></div>
+                                        <span style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>Supply (Freelancers)</span>
+                                      </div>
+                                      <div className="d-flex align-items-center">
+                                        <div 
+                                          style={{ 
+                                            width: '20px', 
+                                            height: '20px', 
+                                            backgroundColor: '#10b981', 
+                                            borderRadius: '4px',
+                                            marginRight: '8px'
+                                          }}
+                                        ></div>
+                                        <span style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>Demand (Jobs)</span>
+                                      </div>
+                                    </div>
                                   </div>
+                                )}
+
+                                {/* Charts based on filter selection */}
+                                <div className="row">
+                                  {/* Supply Chart - Show for 'all', 'supply', and 'both' filters */}
+                                  {(skillsFilter === 'all' || skillsFilter === 'supply' || skillsFilter === 'both') && (
+                                    <div className={skillsFilter === 'supply' || skillsFilter === 'demand' ? 'col-md-12' : 'col-md-6'}>
+                                      <div className="text-center mb-3">
+                                        <h6 style={{ color: '#fd680e', fontWeight: '600' }}>
+                                          <i className="bi bi-people me-2"></i>Skills Supply (Freelancers)
+                                        </h6>
+                                      </div>
+                                      <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart 
+                                          data={supplyChartData}
+                                          margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
+                                        >
+                                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                          <XAxis 
+                                            dataKey="skill" 
+                                            stroke="#666"
+                                            tick={{ fontSize: 11, fill: '#666', fontWeight: '500' }}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={70}
+                                            interval={0}
+                                          />
+                                          <YAxis 
+                                            stroke="#666"
+                                            tick={{ fontSize: 11, fill: '#666' }}
+                                          />
+                                          <Tooltip 
+                                            contentStyle={{ 
+                                              backgroundColor: '#fff', 
+                                              border: '1px solid #ddd',
+                                              borderRadius: '8px',
+                                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                              fontSize: '13px'
+                                            }}
+                                            formatter={(value) => [value, 'Freelancers']}
+                                            labelFormatter={(label) => `Skill: ${label}`}
+                                          />
+                                          <Bar 
+                                            dataKey="count" 
+                                            fill="#fd680e"
+                                            radius={[4, 4, 0, 0]}
+                                            stroke="#fd680e"
+                                            strokeWidth={1}
+                                          />
+                                        </BarChart>
+                                      </ResponsiveContainer>
+                                    </div>
+                                  )}
+
+                                  {/* Demand Chart - Show for 'all', 'demand', and 'both' filters */}
+                                  {(skillsFilter === 'all' || skillsFilter === 'demand' || skillsFilter === 'both') && (
+                                    <div className={skillsFilter === 'supply' || skillsFilter === 'demand' ? 'col-md-12' : 'col-md-6'}>
+                                      <div className="text-center mb-3">
+                                        <h6 style={{ color: '#10b981', fontWeight: '600' }}>
+                                          <i className="bi bi-briefcase me-2"></i>Skills Demand (Jobs)
+                                        </h6>
+                                      </div>
+                                      <ResponsiveContainer width="100%" height={300}>
+                                        <BarChart 
+                                          data={allDemandSkills}
+                                          margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
+                                        >
+                                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                          <XAxis 
+                                            dataKey="skill" 
+                                            stroke="#666"
+                                            tick={{ fontSize: 11, fill: '#666', fontWeight: '500' }}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={70}
+                                            interval={0}
+                                          />
+                                          <YAxis 
+                                            stroke="#666"
+                                            tick={{ fontSize: 11, fill: '#666' }}
+                                          />
+                                          <Tooltip 
+                                            contentStyle={{ 
+                                              backgroundColor: '#fff', 
+                                              border: '1px solid #ddd',
+                                              borderRadius: '8px',
+                                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                              fontSize: '13px'
+                                            }}
+                                            formatter={(value) => [value, 'Job Requirements']}
+                                            labelFormatter={(label) => `Skill: ${label}`}
+                                          />
+                                          <Bar 
+                                            dataKey="count" 
+                                            fill="#10b981"
+                                            radius={[4, 4, 0, 0]}
+                                            stroke="#10b981"
+                                            strokeWidth={1}
+                                          />
+                                        </BarChart>
+                                      </ResponsiveContainer>
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Summary Stats */}
