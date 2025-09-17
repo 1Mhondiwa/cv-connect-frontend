@@ -3529,6 +3529,112 @@ const ESCAdminDashboard = () => {
                     </div>
                   </div>
 
+                  {/* Communication Trends - Line Chart (SEVENTH PRIORITY) */}
+                  <div className="row g-4 mb-4">
+                    <div className="col-12">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                            <i className="bi bi-chat-dots me-2"></i>Communication Trends
+                          </h6>
+                        </div>
+                        <div className="card-body">
+                          {(() => {
+                                // Debug: Log the actual data structure
+                                console.log('🔍 Communication Trends Data:', {
+                                  exists: !!analyticsData.messageTrends,
+                                  length: analyticsData.messageTrends?.length,
+                                  sample: analyticsData.messageTrends?.[0],
+                                  allData: analyticsData.messageTrends
+                                });
+
+                                // Validate data structure
+                                if (!analyticsData.messageTrends || analyticsData.messageTrends.length === 0) {
+                                  return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-chat-dots display-4"></i>
+                                        <p className="mt-2">No message trends data available</p>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                                        // Validate that each item has required properties
+                                const validData = analyticsData.messageTrends.filter(item => 
+                                item && 
+                                  item.date && 
+                                typeof item.messages === 'number' && 
+                                typeof item.conversations === 'number' && 
+                                  !isNaN(item.messages) &&
+                                  !isNaN(item.conversations) &&
+                                  item.messages >= 0 &&
+                                  item.conversations >= 0 &&
+                                  item.date !== undefined &&
+                                  item.messages !== undefined &&
+                                  item.conversations !== undefined &&
+                                  item.date !== null &&
+                                  item.messages !== null &&
+                                  item.conversations !== null
+                                );
+
+                                console.log('🔍 Valid Communication Trends Data:', {
+                                  originalLength: analyticsData.messageTrends.length,
+                                  validLength: validData.length,
+                                  validData: validData
+                                });
+
+                                if (validData.length === 0) {
+                              return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-exclamation-triangle display-4"></i>
+                                        <p className="mt-2">Invalid communication trends data structure</p>
+                                  <small>Check console for details</small>
+                                    </div>
+                              </div>
+                            );
+                          }
+                            
+                                                      console.log('🔍 Communication Trends Chart - About to render with data:', validData);
+                            return (
+                              <ResponsiveContainer width="100%" height={300}>
+                                  <AreaChart data={validData}>
+                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                  <XAxis dataKey="date" stroke="#666" />
+                                  <YAxis stroke="#666" />
+                                  <Tooltip 
+                                    contentStyle={{ 
+                                      backgroundColor: '#fff', 
+                                      border: '1px solid #ddd',
+                                      borderRadius: '8px'
+                                    }}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="messages" 
+                                    stackId="1" 
+                                    stroke="#fd680e" 
+                                    fill="#fd680e" 
+                                    fillOpacity={0.6}
+                                  />
+                                  <Area 
+                                    type="monotone" 
+                                    dataKey="conversations" 
+                                    stackId="1" 
+                                    stroke="#10b981" 
+                                    fill="#10b981" 
+                                    fillOpacity={0.6}
+                                  />
+                                </AreaChart>
+                              </ResponsiveContainer>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
                     <div className="col-12">
@@ -3646,111 +3752,6 @@ const ESCAdminDashboard = () => {
 
 
 
-              {/* Communication Trends - Line Chart */}
-              <div className="row g-4 mb-4">
-                <div className="col-12">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-chat-dots me-2"></i>Communication Trends
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                      {(() => {
-                            // Debug: Log the actual data structure
-                            console.log('🔍 Communication Trends Data:', {
-                              exists: !!analyticsData.messageTrends,
-                              length: analyticsData.messageTrends?.length,
-                              sample: analyticsData.messageTrends?.[0],
-                              allData: analyticsData.messageTrends
-                            });
-
-                            // Validate data structure
-                            if (!analyticsData.messageTrends || analyticsData.messageTrends.length === 0) {
-                              return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-chat-dots display-4"></i>
-                                    <p className="mt-2">No message trends data available</p>
-                                  </div>
-                                </div>
-                              );
-                            }
-
-                                                        // Validate that each item has required properties
-                            const validData = analyticsData.messageTrends.filter(item => 
-                            item && 
-                              item.date && 
-                            typeof item.messages === 'number' && 
-                            typeof item.conversations === 'number' && 
-                              !isNaN(item.messages) &&
-                              !isNaN(item.conversations) &&
-                              item.messages >= 0 &&
-                              item.conversations >= 0 &&
-                              item.date !== undefined &&
-                              item.messages !== undefined &&
-                              item.conversations !== undefined &&
-                              item.date !== null &&
-                              item.messages !== null &&
-                              item.conversations !== null
-                            );
-
-                            console.log('🔍 Valid Communication Trends Data:', {
-                              originalLength: analyticsData.messageTrends.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
-
-                            if (validData.length === 0) {
-                          return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-exclamation-triangle display-4"></i>
-                                    <p className="mt-2">Invalid communication trends data structure</p>
-                              <small>Check console for details</small>
-                                  </div>
-                            </div>
-                          );
-                        }
-                          
-                                                      console.log('🔍 Communication Trends Chart - About to render with data:', validData);
-                          return (
-                            <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={validData}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis dataKey="date" stroke="#666" />
-                                <YAxis stroke="#666" />
-                                <Tooltip 
-                                  contentStyle={{ 
-                                    backgroundColor: '#fff', 
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px'
-                                  }}
-                                />
-                                <Area 
-                                  type="monotone" 
-                                  dataKey="messages" 
-                                  stackId="1" 
-                                  stroke="#fd680e" 
-                                  fill="#fd680e" 
-                                  fillOpacity={0.6}
-                                />
-                                <Area 
-                                  type="monotone" 
-                                  dataKey="conversations" 
-                                  stackId="1" 
-                                  stroke="#10b981" 
-                                  fill="#10b981" 
-                                  fillOpacity={0.6}
-                                />
-                              </AreaChart>
-                            </ResponsiveContainer>
-                          );
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              </div>
 
 
               {/* User Communication Activity - Bar Chart */}
