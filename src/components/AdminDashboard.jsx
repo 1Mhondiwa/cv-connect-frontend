@@ -2859,7 +2859,7 @@ const ESCAdminDashboard = () => {
                         <div className="d-flex gap-2">
                           <select 
                             className="form-select form-select-sm" 
-                            style={{ width: '120px', fontSize: '13px' }}
+                            style={{ width: '140px', fontSize: '13px' }}
                             onChange={(e) => {
                               const filter = e.target.value;
                               setSkillsFilter(filter);
@@ -2867,10 +2867,9 @@ const ESCAdminDashboard = () => {
                             value={skillsFilter}
                           >
                             <option value="all">All Skills</option>
-                            <option value="supply">Supply Only</option>
-                            <option value="demand">Demand Only</option>
-                            <option value="both">Both Supply & Demand</option>
-                            <option value="imbalance">High Imbalance</option>
+                            <option value="supply">Freelancer Skills</option>
+                            <option value="demand">Job Requirements</option>
+                            <option value="both">Balanced Skills</option>
                           </select>
                           <select 
                             className="form-select form-select-sm" 
@@ -2984,9 +2983,8 @@ const ESCAdminDashboard = () => {
                             } else if (skillsFilter === 'demand') {
                               filteredData = filteredData.filter(item => item.demand > 0);
                             } else if (skillsFilter === 'both') {
+                              // Show skills that have both supply and demand (balanced market)
                               filteredData = filteredData.filter(item => item.supply > 0 && item.demand > 0);
-                            } else if (skillsFilter === 'imbalance') {
-                              filteredData = filteredData.filter(item => item.imbalance > Math.max(item.supply, item.demand) * 0.5);
                             }
 
                             // Sort and limit
