@@ -2880,8 +2880,8 @@ const ESCAdminDashboard = () => {
 
                                                         // Validate that each item has required properties
                                 const validData = analyticsData.hiredFreelancersTrends.filter(item => 
-                                  item && 
-                                  item.date && 
+                                  item &&
+                                  item.date &&
                                   typeof item.hires === 'number' && 
                                   typeof item.active_hires === 'number' && 
                                   typeof item.completed_hires === 'number' && 
@@ -2908,7 +2908,7 @@ const ESCAdminDashboard = () => {
                                 });
 
                                 if (validData.length === 0) {
-                                return (
+                                  return (
                                     <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
                                       <div className="text-center text-muted">
                                         <i className="bi bi-exclamation-triangle display-4"></i>
@@ -2918,7 +2918,7 @@ const ESCAdminDashboard = () => {
                                     </div>
                                   );
                                 }
-                                
+
                                 console.log('🔍 Hired Freelancers Chart - About to render with data:', validData);
                                 return (
                                   <ResponsiveContainer width="100%" height={300}>
@@ -2967,356 +2967,356 @@ const ESCAdminDashboard = () => {
                   </div>
 
                   {/* User Distribution and Activity - Pie Charts (THIRD & FOURTH PRIORITY) */}
-                  <div className="row g-4 mb-4">
-                    <div className="col-md-6">
-                      <div className="card border-0 shadow-sm">
-                        <div className="card-header bg-transparent border-0">
-                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                            <i className="bi bi-pie-chart me-2"></i>User Type Distribution
-                          </h6>
-                        </div>
-                        <div className="card-body">
-                              {(() => {
-                                // Debug: Log the actual data structure
-                                console.log('🔍 User Type Distribution Data:', {
-                                  exists: !!analyticsData.userTypeDistribution,
-                                  length: analyticsData.userTypeDistribution?.length,
-                                  sample: analyticsData.userTypeDistribution?.[0],
-                                  allData: analyticsData.userTypeDistribution
-                                });
-
-                                // Validate data structure
-                                if (!analyticsData.userTypeDistribution || analyticsData.userTypeDistribution.length === 0) {
-                                  return (
-                            <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
-                              <div className="text-center text-muted">
-                                <i className="bi bi-pie-chart display-4"></i>
-                                <p className="mt-2">No user type data available</p>
-                              </div>
-                            </div>
-                                  );
-                                }
-
-                                // Validate that each item has required properties
-                                const validData = analyticsData.userTypeDistribution.filter(item => 
-                                  item && 
-                                  typeof item.type === 'string' && 
-                                  typeof item.count === 'number' && 
-                                  !isNaN(item.count) &&
-                                  item.count >= 0 &&
-                                  item.type !== undefined &&
-                                  item.count !== undefined &&
-                                  item.type !== null &&
-                                  item.count !== null
-                                );
-
-                                console.log('🔍 Valid User Type Data:', {
-                                  originalLength: analyticsData.userTypeDistribution.length,
-                                  validLength: validData.length,
-                                  validData: validData
-                                });
-
-                                if (validData.length === 0) {
-                                  return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-exclamation-triangle display-4"></i>
-                                        <p className="mt-2">Invalid user type data structure</p>
-                                        <small>Check console for details</small>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-
-                                console.log('🔍 FINAL User Type Distribution Data for Chart:', validData);
-                                return (
-                            <ResponsiveContainer width="100%" height={250}>
-                              <PieChart>
-                                <Pie
-                                        data={validData}
-                                  cx="50%"
-                                  cy="50%"
-                                  outerRadius={80}
-                                  fill="#8884d8"
-                                  dataKey="count"
-                                  label={({ type, count }) => `${type}: ${count}`}
-                                >
-                                        {validData.map((entry, index) => (
-                                          <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
-                                  ))}
-                                </Pie>
-                                <Tooltip />
-                              </PieChart>
-                            </ResponsiveContainer>
-                                );
-                              })()}
-                        </div>
-                      </div>
+              <div className="row g-4 mb-4">
+                <div className="col-md-6">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-pie-chart me-2"></i>User Type Distribution
+                      </h6>
                     </div>
-                    <div className="col-md-6">
-                      <div className="card border-0 shadow-sm">
-                        <div className="card-header bg-transparent border-0">
-                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                            <i className="bi bi-activity me-2"></i>User Activity Status
-                          </h6>
-                        </div>
-                        <div className="card-body">
-                              {(() => {
-                                // Debug: Log the actual data structure
-                                console.log('🔍 User Activity Status Data:', {
-                                  exists: !!analyticsData.userActivityStatus,
-                                  length: analyticsData.userActivityStatus?.length,
-                                  sample: analyticsData.userActivityStatus?.[0],
-                                  allData: analyticsData.userActivityStatus
-                                });
+                    <div className="card-body">
+                          {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 User Type Distribution Data:', {
+                              exists: !!analyticsData.userTypeDistribution,
+                              length: analyticsData.userTypeDistribution?.length,
+                              sample: analyticsData.userTypeDistribution?.[0],
+                              allData: analyticsData.userTypeDistribution
+                            });
 
-                                // Validate data structure
-                                if (!analyticsData.userActivityStatus || analyticsData.userActivityStatus.length === 0) {
-                                  return (
-                            <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
-                              <div className="text-center text-muted">
-                                <i className="bi bi-activity display-4"></i>
-                                <p className="mt-2">No user activity data available</p>
-                              </div>
-                            </div>
-                                  );
-                                }
-
-                                // Validate that each item has required properties
-                                const validData = analyticsData.userActivityStatus.filter(item => 
-                                  item && 
-                                  typeof item.status === 'string' && 
-                                  typeof item.count === 'number' && 
-                                  !isNaN(item.count) &&
-                                  item.count >= 0
-                                );
-
-                                console.log('🔍 Valid User Activity Data:', {
-                                  originalLength: analyticsData.userActivityStatus.length,
-                                  validLength: validData.length,
-                                  validData: validData
-                                });
-
-                                if (validData.length === 0) {
-                                  return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-exclamation-triangle display-4"></i>
-                                        <p className="mt-2">Invalid user activity data structure</p>
-                                        <small>Check console for details</small>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-
-                                return (
-                            <ResponsiveContainer width="100%" height={250}>
-                              <PieChart>
-                                <Pie
-                                        data={validData}
-                                  cx="50%"
-                                  cy="50%"
-                                  outerRadius={80}
-                                  fill="#8884d8"
-                                  dataKey="count"
-                                  label={({ status, count }) => `${status}: ${count}`}
-                                >
-                                        {validData.map((entry, index) => (
-                                          <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
-                                  ))}
-                                </Pie>
-                                <Tooltip />
-                              </PieChart>
-                            </ResponsiveContainer>
-                                );
-                              })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* CV Upload Trends - Line Chart (FIFTH PRIORITY) */}
-                  <div className="row g-4 mb-4">
-                    <div className="col-12">
-                      <div className="card border-0 shadow-sm">
-                        <div className="card-header bg-transparent border-0">
-                          <div className="d-flex justify-content-between align-items-center">
-                            <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                              <i className="bi bi-file-earmark-arrow-up me-2"></i>CV Upload Trends
-                            </h6>
-                            
-                            {/* Date Filter Controls */}
-                            <div className="d-flex align-items-center gap-3">
-                              <div className="d-flex align-items-center gap-2">
-                                <label className="form-label mb-0" style={{ fontSize: '14px', fontWeight: 500 }}>
-                                  Filter by:
-                                </label>
-                                <select
-                                  className="form-select form-select-sm"
-                                  style={{ width: '120px', fontSize: '13px' }}
-                                  value={cvUploadDateFilter.type}
-                                  onChange={(e) => handleCVUploadDateFilterChange('type', e.target.value)}
-                                >
-                                  <option value="days">Days</option>
-                                  <option value="custom">Custom Range</option>
-                                </select>
-                              </div>
-                              
-                              {cvUploadDateFilter.type === 'days' ? (
-                                <div className="d-flex align-items-center gap-2">
-                                  <select
-                                    className="form-select form-select-sm"
-                                    style={{ width: '100px', fontSize: '13px' }}
-                                    value={cvUploadDateFilter.days}
-                                    onChange={(e) => handleCVUploadDateFilterChange('days', parseInt(e.target.value))}
-                                  >
-                                    <option value={7}>7 days</option>
-                                    <option value={30}>30 days</option>
-                                    <option value={90}>90 days</option>
-                                    <option value={180}>6 months</option>
-                                    <option value={365}>1 year</option>
-                                  </select>
-                                </div>
-                              ) : (
-                                <div className="d-flex align-items-center gap-2">
-                                  <input
-                                    type="date"
-                                    className="form-control form-control-sm"
-                                    style={{ width: '140px', fontSize: '13px' }}
-                                    value={cvUploadDateFilter.startDate}
-                                    onChange={(e) => handleCVUploadDateFilterChange('startDate', e.target.value)}
-                                    placeholder="Start Date"
-                                  />
-                                  <span style={{ fontSize: '13px', color: '#666' }}>to</span>
-                                  <input
-                                    type="date"
-                                    className="form-control form-control-sm"
-                                    style={{ width: '140px', fontSize: '13px' }}
-                                    value={cvUploadDateFilter.endDate}
-                                    onChange={(e) => handleCVUploadDateFilterChange('endDate', e.target.value)}
-                                    placeholder="End Date"
-                                  />
-                                </div>
-                              )}
-                              
-                              <button
-                                className="btn btn-sm"
-                                style={{ 
-                                  background: cvUploadFilterLoading ? '#ccc' : accent, 
-                                  color: '#fff', 
-                                  border: 'none',
-                                  fontSize: '13px',
-                                  padding: '6px 12px',
-                                  borderRadius: '6px',
-                                  cursor: cvUploadFilterLoading ? 'not-allowed' : 'pointer'
-                                }}
-                                onClick={applyCVUploadDateFilter}
-                                disabled={cvUploadFilterLoading}
-                                type="button"
-                              >
-                                {cvUploadFilterLoading ? (
-                                  <>
-                                    <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                    Loading...
-                                  </>
-                                ) : (
-                                  <>
-                                    <i className="bi bi-funnel me-1"></i>Apply
-                                  </>
-                                )}
-                              </button>
-                              
-                            </div>
+                            // Validate data structure
+                            if (!analyticsData.userTypeDistribution || analyticsData.userTypeDistribution.length === 0) {
+                              return (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                          <div className="text-center text-muted">
+                            <i className="bi bi-pie-chart display-4"></i>
+                            <p className="mt-2">No user type data available</p>
                           </div>
                         </div>
-                        <div className="card-body">
-                          {(() => {
-
-                                // Validate data structure
-                                if (!analyticsData.cvUploadTrends || analyticsData.cvUploadTrends.length === 0) {
-                                  return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-file-earmark-arrow-up display-4"></i>
-                                        <p className="mt-2">No CV upload data available</p>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-
-                                                        // Validate that each item has required properties
-                                const validData = analyticsData.cvUploadTrends.filter(item => 
-                                item && 
-                                item.date &&
-                                  typeof item.uploads === 'number' && 
-                                !isNaN(item.uploads) &&
-                                  item.uploads >= 0 &&
-                                  item.date !== undefined &&
-                                  item.uploads !== undefined &&
-                                  item.date !== null &&
-                                  item.uploads !== null
-                                );
-                              
-                                console.log('🔍 Valid CV Upload Data:', {
-                                  originalLength: analyticsData.cvUploadTrends.length,
-                                  validLength: validData.length,
-                                  validData: validData
-                                });
-
-                                if (validData.length === 0) {
-                                  return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-exclamation-triangle display-4"></i>
-                                        <p className="mt-2">Invalid CV upload data structure</p>
-                                        <small>Check console for details</small>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-                                
-                                                      console.log('🔍 CV Upload Chart - About to render with data:', validData);
-                                console.log('🔍 Chart data keys:', validData.length > 0 ? Object.keys(validData[0]) : 'No data');
-                                console.log('🔍 First data item:', validData[0]);
-                              return (
-                                <ResponsiveContainer width="100%" height={300}>
-                                    <AreaChart data={validData} key={validData.length}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                    <XAxis dataKey="date" stroke="#666" />
-                                    <YAxis stroke="#666" />
-                                    <Tooltip 
-                                      contentStyle={{ 
-                                        backgroundColor: '#fff', 
-                                        border: '1px solid #ddd',
-                                        borderRadius: '8px'
-                                      }}
-                                    />
-                                    <Area 
-                                      type="monotone" 
-                                      dataKey="uploads" 
-                                      stroke="#fd680e" 
-                                      fill="#fd680e" 
-                                      fillOpacity={0.6}
-                                    />
-                                  </AreaChart>
-                                </ResponsiveContainer>
                               );
+                            }
+
+                            // Validate that each item has required properties
+                            const validData = analyticsData.userTypeDistribution.filter(item => 
+                              item && 
+                              typeof item.type === 'string' && 
+                              typeof item.count === 'number' && 
+                              !isNaN(item.count) &&
+                              item.count >= 0 &&
+                              item.type !== undefined &&
+                              item.count !== undefined &&
+                              item.type !== null &&
+                              item.count !== null
+                            );
+
+                            console.log('🔍 Valid User Type Data:', {
+                              originalLength: analyticsData.userTypeDistribution.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid user type data structure</p>
+                                    <small>Check console for details</small>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            console.log('🔍 FINAL User Type Distribution Data for Chart:', validData);
+                            return (
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie
+                                    data={validData}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="count"
+                              label={({ type, count }) => `${type}: ${count}`}
+                            >
+                                    {validData.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                            );
                           })()}
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-activity me-2"></i>User Activity Status
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                          {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 User Activity Status Data:', {
+                              exists: !!analyticsData.userActivityStatus,
+                              length: analyticsData.userActivityStatus?.length,
+                              sample: analyticsData.userActivityStatus?.[0],
+                              allData: analyticsData.userActivityStatus
+                            });
+
+                            // Validate data structure
+                            if (!analyticsData.userActivityStatus || analyticsData.userActivityStatus.length === 0) {
+                              return (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                          <div className="text-center text-muted">
+                            <i className="bi bi-activity display-4"></i>
+                            <p className="mt-2">No user activity data available</p>
+                          </div>
+                        </div>
+                              );
+                            }
+
+                            // Validate that each item has required properties
+                            const validData = analyticsData.userActivityStatus.filter(item => 
+                              item && 
+                              typeof item.status === 'string' && 
+                              typeof item.count === 'number' && 
+                              !isNaN(item.count) &&
+                              item.count >= 0
+                            );
+
+                            console.log('🔍 Valid User Activity Data:', {
+                              originalLength: analyticsData.userActivityStatus.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid user activity data structure</p>
+                                    <small>Check console for details</small>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            return (
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie
+                                    data={validData}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="count"
+                              label={({ status, count }) => `${status}: ${count}`}
+                            >
+                                    {validData.map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                            );
+                          })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+                  {/* CV Upload Trends - Line Chart (FIFTH PRIORITY) */}
+              <div className="row g-4 mb-4">
+                <div className="col-12">
+                      <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                          <i className="bi bi-file-earmark-arrow-up me-2"></i>CV Upload Trends
+                        </h6>
+                        
+                        {/* Date Filter Controls */}
+                        <div className="d-flex align-items-center gap-3">
+                          <div className="d-flex align-items-center gap-2">
+                            <label className="form-label mb-0" style={{ fontSize: '14px', fontWeight: 500 }}>
+                              Filter by:
+                            </label>
+                            <select
+                              className="form-select form-select-sm"
+                              style={{ width: '120px', fontSize: '13px' }}
+                              value={cvUploadDateFilter.type}
+                              onChange={(e) => handleCVUploadDateFilterChange('type', e.target.value)}
+                            >
+                              <option value="days">Days</option>
+                              <option value="custom">Custom Range</option>
+                            </select>
+                          </div>
+                          
+                          {cvUploadDateFilter.type === 'days' ? (
+                            <div className="d-flex align-items-center gap-2">
+                              <select
+                                className="form-select form-select-sm"
+                                style={{ width: '100px', fontSize: '13px' }}
+                                value={cvUploadDateFilter.days}
+                                onChange={(e) => handleCVUploadDateFilterChange('days', parseInt(e.target.value))}
+                              >
+                                <option value={7}>7 days</option>
+                                <option value={30}>30 days</option>
+                                <option value={90}>90 days</option>
+                                <option value={180}>6 months</option>
+                                <option value={365}>1 year</option>
+                              </select>
+                            </div>
+                          ) : (
+                            <div className="d-flex align-items-center gap-2">
+                              <input
+                                type="date"
+                                className="form-control form-control-sm"
+                                style={{ width: '140px', fontSize: '13px' }}
+                                value={cvUploadDateFilter.startDate}
+                                onChange={(e) => handleCVUploadDateFilterChange('startDate', e.target.value)}
+                                placeholder="Start Date"
+                              />
+                              <span style={{ fontSize: '13px', color: '#666' }}>to</span>
+                              <input
+                                type="date"
+                                className="form-control form-control-sm"
+                                style={{ width: '140px', fontSize: '13px' }}
+                                value={cvUploadDateFilter.endDate}
+                                onChange={(e) => handleCVUploadDateFilterChange('endDate', e.target.value)}
+                                placeholder="End Date"
+                              />
+                            </div>
+                          )}
+                          
+                          <button
+                            className="btn btn-sm"
+                            style={{ 
+                              background: cvUploadFilterLoading ? '#ccc' : accent, 
+                              color: '#fff', 
+                              border: 'none',
+                              fontSize: '13px',
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              cursor: cvUploadFilterLoading ? 'not-allowed' : 'pointer'
+                            }}
+                            onClick={applyCVUploadDateFilter}
+                            disabled={cvUploadFilterLoading}
+                            type="button"
+                          >
+                            {cvUploadFilterLoading ? (
+                              <>
+                                <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                Loading...
+                              </>
+                            ) : (
+                              <>
+                                <i className="bi bi-funnel me-1"></i>Apply
+                              </>
+                            )}
+                          </button>
+                          
                         </div>
                       </div>
                     </div>
+                    <div className="card-body">
+                      {(() => {
+
+                            // Validate data structure
+                            if (!analyticsData.cvUploadTrends || analyticsData.cvUploadTrends.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-file-earmark-arrow-up display-4"></i>
+                                    <p className="mt-2">No CV upload data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                                                        // Validate that each item has required properties
+                            const validData = analyticsData.cvUploadTrends.filter(item => 
+                            item && 
+                            item.date &&
+                              typeof item.uploads === 'number' && 
+                            !isNaN(item.uploads) &&
+                              item.uploads >= 0 &&
+                              item.date !== undefined &&
+                              item.uploads !== undefined &&
+                              item.date !== null &&
+                              item.uploads !== null
+                            );
+                          
+                            console.log('🔍 Valid CV Upload Data:', {
+                              originalLength: analyticsData.cvUploadTrends.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid CV upload data structure</p>
+                                    <small>Check console for details</small>
+                                  </div>
+                                </div>
+                              );
+                          }
+                          
+                                                      console.log('🔍 CV Upload Chart - About to render with data:', validData);
+                            console.log('🔍 Chart data keys:', validData.length > 0 ? Object.keys(validData[0]) : 'No data');
+                            console.log('🔍 First data item:', validData[0]);
+                          return (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <AreaChart data={validData} key={validData.length}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="date" stroke="#666" />
+                                <YAxis stroke="#666" />
+                                <Tooltip 
+                                  contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #ddd',
+                                    borderRadius: '8px'
+                                  }}
+                                />
+                                <Area 
+                                  type="monotone" 
+                                  dataKey="uploads" 
+                                  stroke="#fd680e" 
+                                  fill="#fd680e" 
+                                  fillOpacity={0.6}
+                                />
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          );
+                      })()}
+                    </div>
                   </div>
+                </div>
+              </div>
 
                   {/* Interview Feedback Analytics Section (SIXTH PRIORITY) */}
-                  <div className="row g-4 mb-4">
+              <div className="row g-4 mb-4">
                     <div className="col-12">
-                      <div className="card border-0 shadow-sm">
-                        <div className="card-header bg-transparent border-0">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
                           <div className="d-flex justify-content-between align-items-center">
                             <div>
                               <h6 className="mb-1" style={{ color: accent, fontWeight: 600 }}>
                                 <i className="bi bi-chat-square-text me-2"></i>Interview Feedback Analytics
-                              </h6>
+                      </h6>
                               <small className="text-muted">Performance insights from interview feedback</small>
                             </div>
                             <div className="d-flex gap-2 align-items-center">
@@ -3371,8 +3371,8 @@ const ESCAdminDashboard = () => {
                               </button>
                             </div>
                           </div>
-                        </div>
-                        <div className="card-body">
+                    </div>
+                    <div className="card-body">
                           {interviewAnalyticsError && (
                             <div className="alert alert-warning mb-3">
                               <i className="bi bi-exclamation-triangle me-2"></i>
@@ -3384,8 +3384,8 @@ const ESCAdminDashboard = () => {
                             <div className="d-flex justify-content-center align-items-center" style={{ height: 200 }}>
                               <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
                                 <span className="visually-hidden">Loading...</span>
-                              </div>
-                            </div>
+                                  </div>
+                                </div>
                           ) : interviewAnalytics ? (
                             <>
                               {/* Overview Stats */}
@@ -3470,16 +3470,16 @@ const ESCAdminDashboard = () => {
                                     <div className="text-center py-4 text-muted">
                                       <i className="bi bi-pie-chart display-4"></i>
                                       <p className="mt-2">No recommendation data available</p>
-                                    </div>
+                                  </div>
                                   )}
-                                </div>
+                            </div>
 
                                 {/* Rating Breakdown Chart */}
                                 <div className="col-md-6">
                                   <h6 className="mb-3">Average Ratings by Category</h6>
                                   {interviewAnalytics.ratingBreakdown && Object.keys(interviewAnalytics.ratingBreakdown).length > 0 ? (
                                     <ResponsiveContainer width="100%" height={250}>
-                                      <BarChart 
+                              <BarChart 
                                         data={[
                                           { category: 'Technical', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_technical_skills) || 0 },
                                           { category: 'Communication', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_communication) || 0 },
@@ -3487,12 +3487,12 @@ const ESCAdminDashboard = () => {
                                           { category: 'Overall', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_overall) || 0 }
                                         ]}
                                         margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                                      >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                        <XAxis 
+                              >
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis 
                                           dataKey="category" 
-                                          stroke="#666" 
-                                          interval={0}
+                                  stroke="#666"
+                                  interval={0}
                                           angle={0}
                                           textAnchor="middle"
                                           height={60}
@@ -3500,13 +3500,13 @@ const ESCAdminDashboard = () => {
                                         <YAxis domain={[0, 5]} stroke="#666" />
                                         <Tooltip formatter={(value) => [`${value}/5`, 'Rating']} />
                                         <Bar dataKey="rating" fill={accent} radius={[4, 4, 0, 0]} />
-                                      </BarChart>
-                                    </ResponsiveContainer>
+                              </BarChart>
+                            </ResponsiveContainer>
                                   ) : (
                                     <div className="text-center py-4 text-muted">
                                       <i className="bi bi-bar-chart display-4"></i>
                                       <p className="mt-2">No rating data available</p>
-                                    </div>
+                    </div>
                                   )}
                                 </div>
                               </div>
@@ -3525,183 +3525,183 @@ const ESCAdminDashboard = () => {
                             </div>
                           )}
                         </div>
-                      </div>
-                    </div>
                   </div>
+                </div>
+              </div>
 
                   {/* Communication Trends - Line Chart (SEVENTH PRIORITY) */}
-                  <div className="row g-4 mb-4">
-                    <div className="col-12">
-                      <div className="card border-0 shadow-sm">
-                        <div className="card-header bg-transparent border-0">
-                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                            <i className="bi bi-chat-dots me-2"></i>Communication Trends
-                          </h6>
-                        </div>
-                        <div className="card-body">
-                          {(() => {
-                                // Debug: Log the actual data structure
-                                console.log('🔍 Communication Trends Data:', {
-                                  exists: !!analyticsData.messageTrends,
-                                  length: analyticsData.messageTrends?.length,
-                                  sample: analyticsData.messageTrends?.[0],
-                                  allData: analyticsData.messageTrends
-                                });
+              <div className="row g-4 mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-chat-dots me-2"></i>Communication Trends
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 Communication Trends Data:', {
+                              exists: !!analyticsData.messageTrends,
+                              length: analyticsData.messageTrends?.length,
+                              sample: analyticsData.messageTrends?.[0],
+                              allData: analyticsData.messageTrends
+                            });
 
-                                // Validate data structure
-                                if (!analyticsData.messageTrends || analyticsData.messageTrends.length === 0) {
-                                  return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-chat-dots display-4"></i>
-                                        <p className="mt-2">No message trends data available</p>
-                                      </div>
-                                    </div>
-                                  );
-                                }
+                            // Validate data structure
+                            if (!analyticsData.messageTrends || analyticsData.messageTrends.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-chat-dots display-4"></i>
+                                    <p className="mt-2">No message trends data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
 
                                                         // Validate that each item has required properties
-                                const validData = analyticsData.messageTrends.filter(item => 
-                                item && 
-                                  item.date && 
-                                typeof item.messages === 'number' && 
-                                typeof item.conversations === 'number' && 
-                                  !isNaN(item.messages) &&
-                                  !isNaN(item.conversations) &&
-                                  item.messages >= 0 &&
-                                  item.conversations >= 0 &&
-                                  item.date !== undefined &&
-                                  item.messages !== undefined &&
-                                  item.conversations !== undefined &&
-                                  item.date !== null &&
-                                  item.messages !== null &&
-                                  item.conversations !== null
-                                );
-
-                                console.log('🔍 Valid Communication Trends Data:', {
-                                  originalLength: analyticsData.messageTrends.length,
-                                  validLength: validData.length,
-                                  validData: validData
-                                });
-
-                                if (validData.length === 0) {
-                              return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-exclamation-triangle display-4"></i>
-                                        <p className="mt-2">Invalid communication trends data structure</p>
-                                  <small>Check console for details</small>
-                                    </div>
-                              </div>
+                            const validData = analyticsData.messageTrends.filter(item => 
+                            item && 
+                              item.date && 
+                            typeof item.messages === 'number' && 
+                            typeof item.conversations === 'number' && 
+                              !isNaN(item.messages) &&
+                              !isNaN(item.conversations) &&
+                              item.messages >= 0 &&
+                              item.conversations >= 0 &&
+                              item.date !== undefined &&
+                              item.messages !== undefined &&
+                              item.conversations !== undefined &&
+                              item.date !== null &&
+                              item.messages !== null &&
+                              item.conversations !== null
                             );
-                          }
-                            
+
+                            console.log('🔍 Valid Communication Trends Data:', {
+                              originalLength: analyticsData.messageTrends.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                          return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid communication trends data structure</p>
+                              <small>Check console for details</small>
+                                  </div>
+                            </div>
+                          );
+                        }
+                          
                                                       console.log('🔍 Communication Trends Chart - About to render with data:', validData);
-                            return (
-                              <ResponsiveContainer width="100%" height={300}>
-                                  <AreaChart data={validData}>
-                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                  <XAxis dataKey="date" stroke="#666" />
-                                  <YAxis stroke="#666" />
-                                  <Tooltip 
-                                    contentStyle={{ 
-                                      backgroundColor: '#fff', 
-                                      border: '1px solid #ddd',
-                                      borderRadius: '8px'
-                                    }}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="messages" 
-                                    stackId="1" 
-                                    stroke="#fd680e" 
-                                    fill="#fd680e" 
-                                    fillOpacity={0.6}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="conversations" 
-                                    stackId="1" 
-                                    stroke="#10b981" 
-                                    fill="#10b981" 
-                                    fillOpacity={0.6}
-                                  />
-                                </AreaChart>
-                              </ResponsiveContainer>
-                            );
-                          })()}
-                        </div>
-                      </div>
+                          return (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <AreaChart data={validData}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="date" stroke="#666" />
+                                <YAxis stroke="#666" />
+                                <Tooltip 
+                                  contentStyle={{ 
+                                    backgroundColor: '#fff', 
+                                    border: '1px solid #ddd',
+                                    borderRadius: '8px'
+                                  }}
+                                />
+                                <Area 
+                                  type="monotone" 
+                                  dataKey="messages" 
+                                  stackId="1" 
+                                  stroke="#fd680e" 
+                                  fill="#fd680e" 
+                                  fillOpacity={0.6}
+                                />
+                                <Area 
+                                  type="monotone" 
+                                  dataKey="conversations" 
+                                  stackId="1" 
+                                  stroke="#10b981" 
+                                  fill="#10b981" 
+                                  fillOpacity={0.6}
+                                />
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          );
+                      })()}
                     </div>
                   </div>
+                </div>
+              </div>
 
                   {/* User Communication Activity - Bar Chart (EIGHTH PRIORITY) */}
-                  <div className="row g-4 mb-4">
-                    <div className="col-12">
-                      <div className="card border-0 shadow-sm">
-                        <div className="card-header bg-transparent border-0">
-                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                            <i className="bi bi-people me-2"></i>User Communication Activity
-                          </h6>
-                        </div>
-                        <div className="card-body">
-                          {(() => {
-                                // Debug: Log the actual data structure
-                                console.log('🔍 User Communication Activity Data:', {
-                                  exists: !!analyticsData.userCommunicationActivity,
-                                  length: analyticsData.userCommunicationActivity?.length,
-                                  sample: analyticsData.userCommunicationActivity?.[0],
-                                  allData: analyticsData.userCommunicationActivity
-                                });
+              <div className="row g-4 mb-4">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
+                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                        <i className="bi bi-people me-2"></i>User Communication Activity
+                      </h6>
+                    </div>
+                    <div className="card-body">
+                      {(() => {
+                            // Debug: Log the actual data structure
+                            console.log('🔍 User Communication Activity Data:', {
+                              exists: !!analyticsData.userCommunicationActivity,
+                              length: analyticsData.userCommunicationActivity?.length,
+                              sample: analyticsData.userCommunicationActivity?.[0],
+                              allData: analyticsData.userCommunicationActivity
+                            });
 
-                                // Validate data structure
-                                if (!analyticsData.userCommunicationActivity || analyticsData.userCommunicationActivity.length === 0) {
-                                  return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-people display-4"></i>
-                                        <p className="mt-2">No communication activity data available</p>
-                                      </div>
-                                    </div>
-                                  );
-                                }
+                            // Validate data structure
+                            if (!analyticsData.userCommunicationActivity || analyticsData.userCommunicationActivity.length === 0) {
+                              return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-people display-4"></i>
+                                    <p className="mt-2">No communication activity data available</p>
+                                  </div>
+                                </div>
+                              );
+                            }
 
                                                         // Validate that each item has required properties
-                                const validData = analyticsData.userCommunicationActivity.filter(item => 
-                                item && 
-                                  typeof item.user === 'string' && 
-                                typeof item.messages === 'number' && 
-                                typeof item.conversations === 'number' && 
-                                  !isNaN(item.messages) &&
-                                  !isNaN(item.conversations) &&
-                                  item.messages >= 0 &&
-                                  item.conversations >= 0 &&
-                                  item.user !== undefined &&
-                                  item.messages !== undefined &&
-                                  item.conversations !== undefined &&
-                                  item.user !== null &&
-                                  item.messages !== null &&
-                                  item.conversations !== null
-                                );
-
-                                console.log('🔍 Valid User Communication Activity Data:', {
-                                  originalLength: analyticsData.userCommunicationActivity.length,
-                                  validLength: validData.length,
-                                  validData: validData
-                                });
-
-                                if (validData.length === 0) {
-                              return (
-                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                      <div className="text-center text-muted">
-                                        <i className="bi bi-exclamation-triangle display-4"></i>
-                                        <p className="mt-2">Invalid communication activity data structure</p>
-                                  <small>Check console for details</small>
-                                    </div>
-                              </div>
+                            const validData = analyticsData.userCommunicationActivity.filter(item => 
+                            item && 
+                              typeof item.user === 'string' && 
+                            typeof item.messages === 'number' && 
+                            typeof item.conversations === 'number' && 
+                              !isNaN(item.messages) &&
+                              !isNaN(item.conversations) &&
+                              item.messages >= 0 &&
+                              item.conversations >= 0 &&
+                              item.user !== undefined &&
+                              item.messages !== undefined &&
+                              item.conversations !== undefined &&
+                              item.user !== null &&
+                              item.messages !== null &&
+                              item.conversations !== null
                             );
-                          }
-                            
+
+                            console.log('🔍 Valid User Communication Activity Data:', {
+                              originalLength: analyticsData.userCommunicationActivity.length,
+                              validLength: validData.length,
+                              validData: validData
+                            });
+
+                            if (validData.length === 0) {
+                          return (
+                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                  <div className="text-center text-muted">
+                                    <i className="bi bi-exclamation-triangle display-4"></i>
+                                    <p className="mt-2">Invalid communication activity data structure</p>
+                              <small>Check console for details</small>
+                                  </div>
+                            </div>
+                          );
+                        }
+                          
                                                       console.log('🔍 User Communication Activity Chart - About to render with data:', validData);
                             console.log('🔍 Chart data structure check:', validData.map(item => ({
                               user: item.user,
@@ -3748,28 +3748,28 @@ const ESCAdminDashboard = () => {
                                 </ResponsiveContainer>
                               </div>
                             );
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                      })()}
+                </div>
+              </div>
+            </div>
+              </div>
 
                   {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
-                    <div className="col-12">
-                      <div className="card border-0 shadow-sm">
-                        <div className="card-header bg-transparent border-0">
+                <div className="col-12">
+                  <div className="card border-0 shadow-sm">
+                    <div className="card-header bg-transparent border-0">
                           <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                             <i className="bi bi-graph-up me-2"></i>User Registration Trends
                           </h6>
-                        </div>
-                        <div className="card-body">
+                    </div>
+                    <div className="card-body">
                           {analyticsLoading ? (
                             <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                              <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                              </div>
-                            </div>
+                          <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
                                                       ) : analyticsData.registrationTrends && analyticsData.registrationTrends.length > 0 ? (
                               (() => {
                                 // Validate registration trends data
@@ -3787,8 +3787,8 @@ const ESCAdminDashboard = () => {
                                       <div className="text-center text-muted">
                                         <i className="bi bi-exclamation-triangle display-4"></i>
                                         <p className="mt-2">No valid registration data available</p>
-                                      </div>
-                                    </div>
+                                </div>
+                            </div>
                                   );
                                 }
 
@@ -3796,7 +3796,7 @@ const ESCAdminDashboard = () => {
                                 return (
                                   <ResponsiveContainer width="100%" height={300}>
                                     <LineChart data={validData}>
-                                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                       <XAxis dataKey="date" stroke="#666" />
                                       <YAxis stroke="#666" />
                                       <Tooltip 
@@ -3852,7 +3852,7 @@ const ESCAdminDashboard = () => {
                                         name="ECS Employees"
                                       />
                                     </LineChart>
-                                  </ResponsiveContainer>
+                                </ResponsiveContainer>
                                 );
                               })()
                           ) : (
@@ -3860,13 +3860,13 @@ const ESCAdminDashboard = () => {
                               <div className="text-center text-muted">
                                 <i className="bi bi-graph-up display-4"></i>
                                 <p className="mt-2">No registration data available for the selected time period</p>
-                                                  </div>
-                            </div>
-                          )}
+                                </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
+                </div>
+              </div>
 
 
 

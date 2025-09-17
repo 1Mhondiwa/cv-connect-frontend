@@ -37,13 +37,6 @@ export const AuthProvider = ({ children }) => {
           // Only clear storage for authentication errors, not network errors
           if (error.response?.status === 401) {
             logout();
-          } else if (error.response?.status === 429) {
-            // Rate limited - keep user logged in but don't retry immediately
-            console.warn('Rate limited during auth check - keeping user logged in');
-            if (storedUser) {
-              setUser(JSON.parse(storedUser));
-              setIsAuthenticated(true);
-            }
           } else {
             // For other network errors, keep the user logged in but mark as loading
             console.warn('Network error during auth check:', error);
@@ -82,9 +75,7 @@ export const AuthProvider = ({ children }) => {
       
       let errorMessage = 'Login failed. Please check your credentials and try again.';
       
-      if (error.response?.status === 429) {
-        errorMessage = 'Too many login attempts. Please wait a moment and try again.';
-      } else if (error.response?.data?.message) {
+      if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
       
