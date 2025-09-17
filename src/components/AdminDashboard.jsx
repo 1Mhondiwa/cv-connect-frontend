@@ -2847,6 +2847,125 @@ const ESCAdminDashboard = () => {
                     </div>
                   </div>
 
+                  {/* Hired Freelancers Trends - Area Chart (SECOND PRIORITY) */}
+                  <div className="row g-4 mb-4">
+                    <div className="col-12">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                            <i className="bi bi-briefcase me-2"></i>Hired Freelancers Trends
+                          </h6>
+                        </div>
+                        <div className="card-body">
+                              {(() => {
+                                // Debug: Log the actual data structure
+                                console.log('🔍 Hired Freelancers Trends Data:', {
+                                  exists: !!analyticsData.hiredFreelancersTrends,
+                                  length: analyticsData.hiredFreelancersTrends?.length,
+                                  sample: analyticsData.hiredFreelancersTrends?.[0],
+                                  allData: analyticsData.hiredFreelancersTrends
+                                });
+
+                                // Validate data structure
+                                if (!analyticsData.hiredFreelancersTrends || analyticsData.hiredFreelancersTrends.length === 0) {
+                                  return (
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                              <div className="text-center text-muted">
+                                <i className="bi bi-briefcase display-4"></i>
+                                <p className="mt-2">No hiring data available for the selected time period</p>
+                              </div>
+                            </div>
+                                  );
+                                }
+
+                                                        // Validate that each item has required properties
+                                const validData = analyticsData.hiredFreelancersTrends.filter(item => 
+                                  item && 
+                                  item.date && 
+                                  typeof item.hires === 'number' && 
+                                  typeof item.active_hires === 'number' && 
+                                  typeof item.completed_hires === 'number' && 
+                                  !isNaN(item.hires) &&
+                                  !isNaN(item.active_hires) &&
+                                  !isNaN(item.completed_hires) &&
+                                  item.hires >= 0 &&
+                                  item.active_hires >= 0 &&
+                                  item.completed_hires >= 0 &&
+                                  item.date !== undefined &&
+                                  item.hires !== undefined &&
+                                  item.active_hires !== undefined &&
+                                  item.completed_hires !== undefined &&
+                                  item.date !== null &&
+                                  item.hires !== null &&
+                                  item.active_hires !== null &&
+                                  item.completed_hires !== null
+                                );
+
+                                console.log('🔍 Valid Hired Freelancers Data:', {
+                                  originalLength: analyticsData.hiredFreelancersTrends.length,
+                                  validLength: validData.length,
+                                  validData: validData
+                                });
+
+                                if (validData.length === 0) {
+                                return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-exclamation-triangle display-4"></i>
+                                        <p className="mt-2">Invalid hiring data structure</p>
+                                    <small>Check console for details</small>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                                
+                                console.log('🔍 Hired Freelancers Chart - About to render with data:', validData);
+                                return (
+                                  <ResponsiveContainer width="100%" height={300}>
+                                    <AreaChart data={validData}>
+                                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                      <XAxis dataKey="date" stroke="#666" />
+                                      <YAxis stroke="#666" />
+                                      <Tooltip 
+                                        contentStyle={{ 
+                                          backgroundColor: '#fff', 
+                                          border: '1px solid #ddd',
+                                          borderRadius: '8px'
+                                        }}
+                                      />
+                                      <Area 
+                                        type="monotone" 
+                                        dataKey="hires" 
+                                        stackId="1" 
+                                        stroke="#3b82f6" 
+                                        fill="#3b82f6" 
+                                        fillOpacity={0.6}
+                                      />
+                                      <Area 
+                                        type="monotone" 
+                                        dataKey="active_hires" 
+                                        stackId="1" 
+                                        stroke="#10b981" 
+                                        fill="#10b981" 
+                                        fillOpacity={0.6}
+                                      />
+                                      <Area 
+                                        type="monotone" 
+                                        dataKey="completed_hires" 
+                                        stackId="1" 
+                                        stroke="#f59e0b" 
+                                        fill="#f59e0b" 
+                                        fillOpacity={0.6}
+                                      />
+                                    </AreaChart>
+                                  </ResponsiveContainer>
+                                );
+                              })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
                     <div className="col-12">
@@ -3409,124 +3528,6 @@ const ESCAdminDashboard = () => {
                 </div>
               </div>
 
-              {/* Hired Freelancers Trends - Line Chart */}
-              <div className="row g-4 mb-4">
-                <div className="col-12">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-briefcase me-2"></i>Hired Freelancers Trends
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                          {(() => {
-                            // Debug: Log the actual data structure
-                            console.log('🔍 Hired Freelancers Trends Data:', {
-                              exists: !!analyticsData.hiredFreelancersTrends,
-                              length: analyticsData.hiredFreelancersTrends?.length,
-                              sample: analyticsData.hiredFreelancersTrends?.[0],
-                              allData: analyticsData.hiredFreelancersTrends
-                            });
-
-                            // Validate data structure
-                            if (!analyticsData.hiredFreelancersTrends || analyticsData.hiredFreelancersTrends.length === 0) {
-                              return (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                          <div className="text-center text-muted">
-                            <i className="bi bi-briefcase display-4"></i>
-                            <p className="mt-2">No hiring data available for the selected time period</p>
-                          </div>
-                        </div>
-                              );
-                            }
-
-                                                        // Validate that each item has required properties
-                            const validData = analyticsData.hiredFreelancersTrends.filter(item => 
-                              item && 
-                              item.date && 
-                              typeof item.hires === 'number' && 
-                              typeof item.active_hires === 'number' && 
-                              typeof item.completed_hires === 'number' && 
-                              !isNaN(item.hires) &&
-                              !isNaN(item.active_hires) &&
-                              !isNaN(item.completed_hires) &&
-                              item.hires >= 0 &&
-                              item.active_hires >= 0 &&
-                              item.completed_hires >= 0 &&
-                              item.date !== undefined &&
-                              item.hires !== undefined &&
-                              item.active_hires !== undefined &&
-                              item.completed_hires !== undefined &&
-                              item.date !== null &&
-                              item.hires !== null &&
-                              item.active_hires !== null &&
-                              item.completed_hires !== null
-                            );
-
-                            console.log('🔍 Valid Hired Freelancers Data:', {
-                              originalLength: analyticsData.hiredFreelancersTrends.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
-
-                            if (validData.length === 0) {
-                            return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-exclamation-triangle display-4"></i>
-                                    <p className="mt-2">Invalid hiring data structure</p>
-                                <small>Check console for details</small>
-                                  </div>
-                              </div>
-                            );
-                          }
-                            
-                            console.log('🔍 Hired Freelancers Chart - About to render with data:', validData);
-                            return (
-                              <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={validData}>
-                                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                  <XAxis dataKey="date" stroke="#666" />
-                                  <YAxis stroke="#666" />
-                                  <Tooltip 
-                                    contentStyle={{ 
-                                      backgroundColor: '#fff', 
-                                      border: '1px solid #ddd',
-                                      borderRadius: '8px'
-                                    }}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="hires" 
-                                    stackId="1" 
-                                    stroke="#3b82f6" 
-                                    fill="#3b82f6" 
-                                    fillOpacity={0.6}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="active_hires" 
-                                    stackId="1" 
-                                    stroke="#10b981" 
-                                    fill="#10b981" 
-                                    fillOpacity={0.6}
-                                  />
-                                  <Area 
-                                    type="monotone" 
-                                    dataKey="completed_hires" 
-                                    stackId="1" 
-                                    stroke="#f59e0b" 
-                                    fill="#f59e0b" 
-                                    fillOpacity={0.6}
-                                  />
-                                </AreaChart>
-                              </ResponsiveContainer>
-                            );
-                          })()}
-                    </div>
-                  </div>
-                </div>
-              </div>
 
               {/* User Communication Activity - Bar Chart */}
               <div className="row g-4">
