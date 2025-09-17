@@ -2966,6 +2966,175 @@ const ESCAdminDashboard = () => {
                     </div>
                   </div>
 
+                  {/* User Distribution and Activity - Pie Charts (THIRD & FOURTH PRIORITY) */}
+                  <div className="row g-4 mb-4">
+                    <div className="col-md-6">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                            <i className="bi bi-pie-chart me-2"></i>User Type Distribution
+                          </h6>
+                        </div>
+                        <div className="card-body">
+                              {(() => {
+                                // Debug: Log the actual data structure
+                                console.log('🔍 User Type Distribution Data:', {
+                                  exists: !!analyticsData.userTypeDistribution,
+                                  length: analyticsData.userTypeDistribution?.length,
+                                  sample: analyticsData.userTypeDistribution?.[0],
+                                  allData: analyticsData.userTypeDistribution
+                                });
+
+                                // Validate data structure
+                                if (!analyticsData.userTypeDistribution || analyticsData.userTypeDistribution.length === 0) {
+                                  return (
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                              <div className="text-center text-muted">
+                                <i className="bi bi-pie-chart display-4"></i>
+                                <p className="mt-2">No user type data available</p>
+                              </div>
+                            </div>
+                                  );
+                                }
+
+                                // Validate that each item has required properties
+                                const validData = analyticsData.userTypeDistribution.filter(item => 
+                                  item && 
+                                  typeof item.type === 'string' && 
+                                  typeof item.count === 'number' && 
+                                  !isNaN(item.count) &&
+                                  item.count >= 0 &&
+                                  item.type !== undefined &&
+                                  item.count !== undefined &&
+                                  item.type !== null &&
+                                  item.count !== null
+                                );
+
+                                console.log('🔍 Valid User Type Data:', {
+                                  originalLength: analyticsData.userTypeDistribution.length,
+                                  validLength: validData.length,
+                                  validData: validData
+                                });
+
+                                if (validData.length === 0) {
+                                  return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-exclamation-triangle display-4"></i>
+                                        <p className="mt-2">Invalid user type data structure</p>
+                                        <small>Check console for details</small>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                console.log('🔍 FINAL User Type Distribution Data for Chart:', validData);
+                                return (
+                            <ResponsiveContainer width="100%" height={250}>
+                              <PieChart>
+                                <Pie
+                                        data={validData}
+                                  cx="50%"
+                                  cy="50%"
+                                  outerRadius={80}
+                                  fill="#8884d8"
+                                  dataKey="count"
+                                  label={({ type, count }) => `${type}: ${count}`}
+                                >
+                                        {validData.map((entry, index) => (
+                                          <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                              </PieChart>
+                            </ResponsiveContainer>
+                                );
+                              })()}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                            <i className="bi bi-activity me-2"></i>User Activity Status
+                          </h6>
+                        </div>
+                        <div className="card-body">
+                              {(() => {
+                                // Debug: Log the actual data structure
+                                console.log('🔍 User Activity Status Data:', {
+                                  exists: !!analyticsData.userActivityStatus,
+                                  length: analyticsData.userActivityStatus?.length,
+                                  sample: analyticsData.userActivityStatus?.[0],
+                                  allData: analyticsData.userActivityStatus
+                                });
+
+                                // Validate data structure
+                                if (!analyticsData.userActivityStatus || analyticsData.userActivityStatus.length === 0) {
+                                  return (
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                              <div className="text-center text-muted">
+                                <i className="bi bi-activity display-4"></i>
+                                <p className="mt-2">No user activity data available</p>
+                              </div>
+                            </div>
+                                  );
+                                }
+
+                                // Validate that each item has required properties
+                                const validData = analyticsData.userActivityStatus.filter(item => 
+                                  item && 
+                                  typeof item.status === 'string' && 
+                                  typeof item.count === 'number' && 
+                                  !isNaN(item.count) &&
+                                  item.count >= 0
+                                );
+
+                                console.log('🔍 Valid User Activity Data:', {
+                                  originalLength: analyticsData.userActivityStatus.length,
+                                  validLength: validData.length,
+                                  validData: validData
+                                });
+
+                                if (validData.length === 0) {
+                                  return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-exclamation-triangle display-4"></i>
+                                        <p className="mt-2">Invalid user activity data structure</p>
+                                        <small>Check console for details</small>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                return (
+                            <ResponsiveContainer width="100%" height={250}>
+                              <PieChart>
+                                <Pie
+                                        data={validData}
+                                  cx="50%"
+                                  cy="50%"
+                                  outerRadius={80}
+                                  fill="#8884d8"
+                                  dataKey="count"
+                                  label={({ status, count }) => `${status}: ${count}`}
+                                >
+                                        {validData.map((entry, index) => (
+                                          <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                              </PieChart>
+                            </ResponsiveContainer>
+                                );
+                              })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
                     <div className="col-12">
@@ -3080,174 +3249,6 @@ const ESCAdminDashboard = () => {
                     </div>
                   </div>
 
-              {/* User Distribution and Activity - Pie Charts */}
-              <div className="row g-4 mb-4">
-                <div className="col-md-6">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-pie-chart me-2"></i>User Type Distribution
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                          {(() => {
-                            // Debug: Log the actual data structure
-                            console.log('🔍 User Type Distribution Data:', {
-                              exists: !!analyticsData.userTypeDistribution,
-                              length: analyticsData.userTypeDistribution?.length,
-                              sample: analyticsData.userTypeDistribution?.[0],
-                              allData: analyticsData.userTypeDistribution
-                            });
-
-                            // Validate data structure
-                            if (!analyticsData.userTypeDistribution || analyticsData.userTypeDistribution.length === 0) {
-                              return (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
-                          <div className="text-center text-muted">
-                            <i className="bi bi-pie-chart display-4"></i>
-                            <p className="mt-2">No user type data available</p>
-                          </div>
-                        </div>
-                              );
-                            }
-
-                            // Validate that each item has required properties
-                            const validData = analyticsData.userTypeDistribution.filter(item => 
-                              item && 
-                              typeof item.type === 'string' && 
-                              typeof item.count === 'number' && 
-                              !isNaN(item.count) &&
-                              item.count >= 0 &&
-                              item.type !== undefined &&
-                              item.count !== undefined &&
-                              item.type !== null &&
-                              item.count !== null
-                            );
-
-                            console.log('🔍 Valid User Type Data:', {
-                              originalLength: analyticsData.userTypeDistribution.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
-
-                            if (validData.length === 0) {
-                              return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-exclamation-triangle display-4"></i>
-                                    <p className="mt-2">Invalid user type data structure</p>
-                                    <small>Check console for details</small>
-                                  </div>
-                                </div>
-                              );
-                            }
-
-                            console.log('🔍 FINAL User Type Distribution Data for Chart:', validData);
-                            return (
-                        <ResponsiveContainer width="100%" height={250}>
-                          <PieChart>
-                            <Pie
-                                    data={validData}
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={80}
-                              fill="#8884d8"
-                              dataKey="count"
-                              label={({ type, count }) => `${type}: ${count}`}
-                            >
-                                    {validData.map((entry, index) => (
-                                      <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                          </PieChart>
-                        </ResponsiveContainer>
-                            );
-                          })()}
-                    </div>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-activity me-2"></i>User Activity Status
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                          {(() => {
-                            // Debug: Log the actual data structure
-                            console.log('🔍 User Activity Status Data:', {
-                              exists: !!analyticsData.userActivityStatus,
-                              length: analyticsData.userActivityStatus?.length,
-                              sample: analyticsData.userActivityStatus?.[0],
-                              allData: analyticsData.userActivityStatus
-                            });
-
-                            // Validate data structure
-                            if (!analyticsData.userActivityStatus || analyticsData.userActivityStatus.length === 0) {
-                              return (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
-                          <div className="text-center text-muted">
-                            <i className="bi bi-activity display-4"></i>
-                            <p className="mt-2">No user activity data available</p>
-                          </div>
-                        </div>
-                              );
-                            }
-
-                            // Validate that each item has required properties
-                            const validData = analyticsData.userActivityStatus.filter(item => 
-                              item && 
-                              typeof item.status === 'string' && 
-                              typeof item.count === 'number' && 
-                              !isNaN(item.count) &&
-                              item.count >= 0
-                            );
-
-                            console.log('🔍 Valid User Activity Data:', {
-                              originalLength: analyticsData.userActivityStatus.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
-
-                            if (validData.length === 0) {
-                              return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 250 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-exclamation-triangle display-4"></i>
-                                    <p className="mt-2">Invalid user activity data structure</p>
-                                    <small>Check console for details</small>
-                                  </div>
-                                </div>
-                              );
-                            }
-
-                            return (
-                        <ResponsiveContainer width="100%" height={250}>
-                          <PieChart>
-                            <Pie
-                                    data={validData}
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={80}
-                              fill="#8884d8"
-                              dataKey="count"
-                              label={({ status, count }) => `${status}: ${count}`}
-                            >
-                                    {validData.map((entry, index) => (
-                                      <Cell key={`cell-${index}`} fill={entry.fill || `#${Math.floor(Math.random()*16777215).toString(16)}`} />
-                              ))}
-                            </Pie>
-                            <Tooltip />
-                          </PieChart>
-                        </ResponsiveContainer>
-                            );
-                          })()}
-                    </div>
-                  </div>
-                </div>
-              </div>
 
               {/* CV Upload Trends - Line Chart */}
               <div className="row g-4 mb-4">
