@@ -3135,6 +3135,178 @@ const ESCAdminDashboard = () => {
                     </div>
                   </div>
 
+                  {/* CV Upload Trends - Line Chart (FIFTH PRIORITY) */}
+                  <div className="row g-4 mb-4">
+                    <div className="col-12">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <div className="d-flex justify-content-between align-items-center">
+                            <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                              <i className="bi bi-file-earmark-arrow-up me-2"></i>CV Upload Trends
+                            </h6>
+                            
+                            {/* Date Filter Controls */}
+                            <div className="d-flex align-items-center gap-3">
+                              <div className="d-flex align-items-center gap-2">
+                                <label className="form-label mb-0" style={{ fontSize: '14px', fontWeight: 500 }}>
+                                  Filter by:
+                                </label>
+                                <select
+                                  className="form-select form-select-sm"
+                                  style={{ width: '120px', fontSize: '13px' }}
+                                  value={cvUploadDateFilter.type}
+                                  onChange={(e) => handleCVUploadDateFilterChange('type', e.target.value)}
+                                >
+                                  <option value="days">Days</option>
+                                  <option value="custom">Custom Range</option>
+                                </select>
+                              </div>
+                              
+                              {cvUploadDateFilter.type === 'days' ? (
+                                <div className="d-flex align-items-center gap-2">
+                                  <select
+                                    className="form-select form-select-sm"
+                                    style={{ width: '100px', fontSize: '13px' }}
+                                    value={cvUploadDateFilter.days}
+                                    onChange={(e) => handleCVUploadDateFilterChange('days', parseInt(e.target.value))}
+                                  >
+                                    <option value={7}>7 days</option>
+                                    <option value={30}>30 days</option>
+                                    <option value={90}>90 days</option>
+                                    <option value={180}>6 months</option>
+                                    <option value={365}>1 year</option>
+                                  </select>
+                                </div>
+                              ) : (
+                                <div className="d-flex align-items-center gap-2">
+                                  <input
+                                    type="date"
+                                    className="form-control form-control-sm"
+                                    style={{ width: '140px', fontSize: '13px' }}
+                                    value={cvUploadDateFilter.startDate}
+                                    onChange={(e) => handleCVUploadDateFilterChange('startDate', e.target.value)}
+                                    placeholder="Start Date"
+                                  />
+                                  <span style={{ fontSize: '13px', color: '#666' }}>to</span>
+                                  <input
+                                    type="date"
+                                    className="form-control form-control-sm"
+                                    style={{ width: '140px', fontSize: '13px' }}
+                                    value={cvUploadDateFilter.endDate}
+                                    onChange={(e) => handleCVUploadDateFilterChange('endDate', e.target.value)}
+                                    placeholder="End Date"
+                                  />
+                                </div>
+                              )}
+                              
+                              <button
+                                className="btn btn-sm"
+                                style={{ 
+                                  background: cvUploadFilterLoading ? '#ccc' : accent, 
+                                  color: '#fff', 
+                                  border: 'none',
+                                  fontSize: '13px',
+                                  padding: '6px 12px',
+                                  borderRadius: '6px',
+                                  cursor: cvUploadFilterLoading ? 'not-allowed' : 'pointer'
+                                }}
+                                onClick={applyCVUploadDateFilter}
+                                disabled={cvUploadFilterLoading}
+                                type="button"
+                              >
+                                {cvUploadFilterLoading ? (
+                                  <>
+                                    <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                    Loading...
+                                  </>
+                                ) : (
+                                  <>
+                                    <i className="bi bi-funnel me-1"></i>Apply
+                                  </>
+                                )}
+                              </button>
+                              
+                            </div>
+                          </div>
+                        </div>
+                        <div className="card-body">
+                          {(() => {
+
+                                // Validate data structure
+                                if (!analyticsData.cvUploadTrends || analyticsData.cvUploadTrends.length === 0) {
+                                  return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-file-earmark-arrow-up display-4"></i>
+                                        <p className="mt-2">No CV upload data available</p>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                                        // Validate that each item has required properties
+                                const validData = analyticsData.cvUploadTrends.filter(item => 
+                                item && 
+                                item.date &&
+                                  typeof item.uploads === 'number' && 
+                                !isNaN(item.uploads) &&
+                                  item.uploads >= 0 &&
+                                  item.date !== undefined &&
+                                  item.uploads !== undefined &&
+                                  item.date !== null &&
+                                  item.uploads !== null
+                                );
+                              
+                                console.log('🔍 Valid CV Upload Data:', {
+                                  originalLength: analyticsData.cvUploadTrends.length,
+                                  validLength: validData.length,
+                                  validData: validData
+                                });
+
+                                if (validData.length === 0) {
+                                  return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-exclamation-triangle display-4"></i>
+                                        <p className="mt-2">Invalid CV upload data structure</p>
+                                        <small>Check console for details</small>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+                                
+                                                      console.log('🔍 CV Upload Chart - About to render with data:', validData);
+                                console.log('🔍 Chart data keys:', validData.length > 0 ? Object.keys(validData[0]) : 'No data');
+                                console.log('🔍 First data item:', validData[0]);
+                              return (
+                                <ResponsiveContainer width="100%" height={300}>
+                                    <AreaChart data={validData} key={validData.length}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                    <XAxis dataKey="date" stroke="#666" />
+                                    <YAxis stroke="#666" />
+                                    <Tooltip 
+                                      contentStyle={{ 
+                                        backgroundColor: '#fff', 
+                                        border: '1px solid #ddd',
+                                        borderRadius: '8px'
+                                      }}
+                                    />
+                                    <Area 
+                                      type="monotone" 
+                                      dataKey="uploads" 
+                                      stroke="#fd680e" 
+                                      fill="#fd680e" 
+                                      fillOpacity={0.6}
+                                    />
+                                  </AreaChart>
+                                </ResponsiveContainer>
+                              );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
                     <div className="col-12">
@@ -3250,177 +3422,6 @@ const ESCAdminDashboard = () => {
                   </div>
 
 
-              {/* CV Upload Trends - Line Chart */}
-              <div className="row g-4 mb-4">
-                <div className="col-12">
-                  <div className="card border-0 shadow-sm" style={{ border: '2px solid red' }}>
-                    <div className="card-header bg-transparent border-0">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                          <i className="bi bi-file-earmark-arrow-up me-2"></i>CV Upload Trends
-                        </h6>
-                        
-                        {/* Date Filter Controls */}
-                        <div className="d-flex align-items-center gap-3">
-                          <div className="d-flex align-items-center gap-2">
-                            <label className="form-label mb-0" style={{ fontSize: '14px', fontWeight: 500 }}>
-                              Filter by:
-                            </label>
-                            <select
-                              className="form-select form-select-sm"
-                              style={{ width: '120px', fontSize: '13px' }}
-                              value={cvUploadDateFilter.type}
-                              onChange={(e) => handleCVUploadDateFilterChange('type', e.target.value)}
-                            >
-                              <option value="days">Days</option>
-                              <option value="custom">Custom Range</option>
-                            </select>
-                          </div>
-                          
-                          {cvUploadDateFilter.type === 'days' ? (
-                            <div className="d-flex align-items-center gap-2">
-                              <select
-                                className="form-select form-select-sm"
-                                style={{ width: '100px', fontSize: '13px' }}
-                                value={cvUploadDateFilter.days}
-                                onChange={(e) => handleCVUploadDateFilterChange('days', parseInt(e.target.value))}
-                              >
-                                <option value={7}>7 days</option>
-                                <option value={30}>30 days</option>
-                                <option value={90}>90 days</option>
-                                <option value={180}>6 months</option>
-                                <option value={365}>1 year</option>
-                              </select>
-                            </div>
-                          ) : (
-                            <div className="d-flex align-items-center gap-2">
-                              <input
-                                type="date"
-                                className="form-control form-control-sm"
-                                style={{ width: '140px', fontSize: '13px' }}
-                                value={cvUploadDateFilter.startDate}
-                                onChange={(e) => handleCVUploadDateFilterChange('startDate', e.target.value)}
-                                placeholder="Start Date"
-                              />
-                              <span style={{ fontSize: '13px', color: '#666' }}>to</span>
-                              <input
-                                type="date"
-                                className="form-control form-control-sm"
-                                style={{ width: '140px', fontSize: '13px' }}
-                                value={cvUploadDateFilter.endDate}
-                                onChange={(e) => handleCVUploadDateFilterChange('endDate', e.target.value)}
-                                placeholder="End Date"
-                              />
-                            </div>
-                          )}
-                          
-                          <button
-                            className="btn btn-sm"
-                            style={{ 
-                              background: cvUploadFilterLoading ? '#ccc' : accent, 
-                              color: '#fff', 
-                              border: 'none',
-                              fontSize: '13px',
-                              padding: '6px 12px',
-                              borderRadius: '6px',
-                              cursor: cvUploadFilterLoading ? 'not-allowed' : 'pointer'
-                            }}
-                            onClick={applyCVUploadDateFilter}
-                            disabled={cvUploadFilterLoading}
-                            type="button"
-                          >
-                            {cvUploadFilterLoading ? (
-                              <>
-                                <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                Loading...
-                              </>
-                            ) : (
-                              <>
-                                <i className="bi bi-funnel me-1"></i>Apply
-                              </>
-                            )}
-                          </button>
-                          
-                        </div>
-                      </div>
-                    </div>
-                    <div className="card-body">
-                      {(() => {
-
-                            // Validate data structure
-                            if (!analyticsData.cvUploadTrends || analyticsData.cvUploadTrends.length === 0) {
-                              return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-file-earmark-arrow-up display-4"></i>
-                                    <p className="mt-2">No CV upload data available</p>
-                                  </div>
-                                </div>
-                              );
-                            }
-
-                                                        // Validate that each item has required properties
-                            const validData = analyticsData.cvUploadTrends.filter(item => 
-                            item && 
-                            item.date &&
-                              typeof item.uploads === 'number' && 
-                            !isNaN(item.uploads) &&
-                              item.uploads >= 0 &&
-                              item.date !== undefined &&
-                              item.uploads !== undefined &&
-                              item.date !== null &&
-                              item.uploads !== null
-                            );
-                          
-                            console.log('🔍 Valid CV Upload Data:', {
-                              originalLength: analyticsData.cvUploadTrends.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
-
-                            if (validData.length === 0) {
-                              return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-exclamation-triangle display-4"></i>
-                                    <p className="mt-2">Invalid CV upload data structure</p>
-                                    <small>Check console for details</small>
-                                  </div>
-                                </div>
-                              );
-                          }
-                          
-                                                      console.log('🔍 CV Upload Chart - About to render with data:', validData);
-                            console.log('🔍 Chart data keys:', validData.length > 0 ? Object.keys(validData[0]) : 'No data');
-                            console.log('🔍 First data item:', validData[0]);
-                          return (
-                            <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={validData} key={validData.length}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                <XAxis dataKey="date" stroke="#666" />
-                                <YAxis stroke="#666" />
-                                <Tooltip 
-                                  contentStyle={{ 
-                                    backgroundColor: '#fff', 
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px'
-                                  }}
-                                />
-                                <Area 
-                                  type="monotone" 
-                                  dataKey="uploads" 
-                                  stroke="#fd680e" 
-                                  fill="#fd680e" 
-                                  fillOpacity={0.6}
-                                />
-                              </AreaChart>
-                            </ResponsiveContainer>
-                          );
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              </div>
 
 
               {/* Communication Trends - Line Chart */}
