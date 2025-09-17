@@ -41,12 +41,17 @@ const AssociateDashboard = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [messagingLoading, setMessagingLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('request'); // 'request', 'messages', 'change-password', 'my-requests'
+  const [activeTab, setActiveTab] = useState('request'); // 'request', 'messages', 'change-password', 'my-requests', 'hired-freelancers'
   
   // Skills for dropdown
   const [availableSkills, setAvailableSkills] = useState([]);
   const [globalUnread, setGlobalUnread] = useState(0);
   const messagesEndRef = useRef(null);
+  
+  // Hired freelancers state
+  const [hiredFreelancers, setHiredFreelancers] = useState([]);
+  const [hiredFreelancersLoading, setHiredFreelancersLoading] = useState(false);
+  const [hiredFreelancersError, setHiredFreelancersError] = useState('');
 
   const [associateProfile, setAssociateProfile] = useState(null);
   const [assocUploading, setAssocUploading] = useState(false);
@@ -125,6 +130,12 @@ const AssociateDashboard = () => {
   useEffect(() => {
     fetchActivity();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'hired-freelancers') {
+      fetchHiredFreelancers();
+    }
+  }, [activeTab]);
 
   // REMOVE: useEffect for socket.io real-time status updates
 
@@ -207,6 +218,26 @@ const AssociateDashboard = () => {
       }
     } catch (error) {
       setGlobalUnread(0);
+    }
+  };
+
+  // Fetch hired freelancers
+  const fetchHiredFreelancers = async () => {
+    try {
+      setHiredFreelancersLoading(true);
+      setHiredFreelancersError('');
+      
+      const response = await api.get('/associate/hired-freelancers');
+      if (response.data.success) {
+        setHiredFreelancers(response.data.hired_freelancers);
+      } else {
+        setHiredFreelancersError(response.data.message || 'Failed to fetch hired freelancers');
+      }
+    } catch (error) {
+      console.error('Error fetching hired freelancers:', error);
+      setHiredFreelancersError('Failed to fetch hired freelancers. Please try again.');
+    } finally {
+      setHiredFreelancersLoading(false);
     }
   };
 
@@ -862,6 +893,16 @@ const AssociateDashboard = () => {
                   }}
                 >
                   <i className="bi bi-calendar-event me-2"></i>Interviews
+                </button>
+                <button 
+                  className={`btn dashboard-btn w-100 ${activeTab === 'hired-freelancers' ? '' : ''}`}
+                  style={{ background: activeTab === 'hired-freelancers' ? accent : 'transparent', color: activeTab === 'hired-freelancers' ? '#fff' : accent, border: `2px solid ${accent}`, borderRadius: 30, padding: '12px 24px', fontWeight: 600, fontSize: 16, transition: 'transform 0.18s, box-shadow 0.18s' }}
+                  onClick={() => {
+                    setActiveTab('hired-freelancers');
+                    window.scrollTo(0, 0);
+                  }}
+                >
+                  <i className="bi bi-people me-2"></i>Hired Freelancers
                 </button>
               </div>
               {assocUploading && (
@@ -1652,6 +1693,195 @@ const AssociateDashboard = () => {
             </div>
             
             <InterviewDashboard userType="associate" />
+          </div>
+        </div>
+      )}
+
+      {/* Hired Freelancers Tab */}
+      {activeTab === 'hired-freelancers' && (
+        <div className="tab-content">
+          <div className="card p-4 shadow-lg rounded-4" style={{ minHeight: '80vh' }}>
+            <div className="text-center mb-4">
+              <h4 style={{ color: accent, fontWeight: 600 }}>Hired Freelancers</h4>
+              <p style={{ color: '#666', fontSize: 14 }}>View your hired freelancers and their signed contracts</p>
+              <button 
+                className="btn btn-sm" 
+                style={{ background: accent, color: '#fff', marginTop: '10px' }}
+                onClick={fetchHiredFreelancers}
+                disabled={hiredFreelancersLoading}
+              >
+                {hiredFreelancersLoading ? 'Loading...' : 'Refresh'}
+              </button>
+            </div>
+            
+            {hiredFreelancersLoading ? (
+              <div className="text-center py-5">
+                <div className="spinner-border" style={{ color: accent }} role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <p className="mt-3" style={{ color: '#666' }}>Loading hired freelancers...</p>
+              </div>
+            ) : hiredFreelancersError ? (
+              <div className="text-center py-5">
+                <div className="alert alert-danger" role="alert">
+                  <i className="bi bi-exclamation-triangle me-2"></i>
+                  {hiredFreelancersError}
+                </div>
+                <button 
+                  className="btn" 
+                  style={{ background: accent, color: '#fff' }}
+                  onClick={fetchHiredFreelancers}
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : hiredFreelancers.length === 0 ? (
+              <div className="text-center py-5">
+                <div style={{ fontSize: '4rem', color: '#ddd', marginBottom: '1rem' }}>
+                  <i className="bi bi-people"></i>
+                </div>
+                <h5 style={{ color: '#666', marginBottom: '0.5rem' }}>No Hired Freelancers Yet</h5>
+                <p style={{ color: '#888' }}>You haven't hired any freelancers yet. Start by creating a request and hiring freelancers!</p>
+              </div>
+            ) : (
+              <div className="row">
+                {hiredFreelancers.map((freelancer) => (
+                  <div key={freelancer.hire_id} className="col-md-6 col-lg-4 mb-4">
+                    <div className="card h-100" style={{ 
+                      border: '1px solid #e9ecef', 
+                      borderRadius: '12px',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                      transition: 'all 0.3s ease'
+                    }}>
+                      <div className="card-body d-flex flex-column">
+                        <div className="d-flex align-items-center mb-3">
+                          <img
+                            src={freelancer.profile_picture_url ? 
+                              (freelancer.profile_picture_url.startsWith('http') ? 
+                                freelancer.profile_picture_url : 
+                                `http://localhost:5000${freelancer.profile_picture_url}`) : 
+                              `https://ui-avatars.com/api/?name=${encodeURIComponent(freelancer.first_name + ' ' + freelancer.last_name)}&background=eee&color=555&size=40&bold=true`
+                            }
+                            alt="Profile"
+                            className="rounded-circle me-3"
+                            style={{ width: 40, height: 40, objectFit: 'cover' }}
+                          />
+                          <div>
+                            <h6 className="card-title mb-0" style={{ color: '#333', fontWeight: 600 }}>
+                              {freelancer.first_name} {freelancer.last_name}
+                            </h6>
+                            <small className="text-muted">{freelancer.freelancer_email}</small>
+                          </div>
+                        </div>
+                        
+                        <div className="mb-3">
+                          <h6 style={{ color: accent, fontSize: '14px', fontWeight: 600 }}>
+                            {freelancer.project_title}
+                          </h6>
+                          <p className="text-muted mb-1" style={{ fontSize: '12px' }}>
+                            <i className="bi bi-calendar me-1"></i>
+                            Hired: {new Date(freelancer.hire_date).toLocaleDateString()}
+                          </p>
+                          {freelancer.agreed_rate && (
+                            <p className="text-muted mb-1" style={{ fontSize: '12px' }}>
+                              <i className="bi bi-currency-exchange me-1"></i>
+                              R{freelancer.agreed_rate}/{freelancer.rate_type}
+                            </p>
+                          )}
+                          <span className={`badge ${
+                            freelancer.status === 'active' ? 'bg-success' : 
+                            freelancer.status === 'completed' ? 'bg-primary' : 
+                            freelancer.status === 'cancelled' ? 'bg-danger' : 'bg-warning'
+                          }`} style={{ fontSize: '10px' }}>
+                            {freelancer.status?.charAt(0).toUpperCase() + freelancer.status?.slice(1)}
+                          </span>
+                        </div>
+
+                        {freelancer.project_description && (
+                          <p className="card-text text-muted mb-3" style={{ fontSize: '13px', lineHeight: '1.4' }}>
+                            {freelancer.project_description.length > 100 
+                              ? `${freelancer.project_description.substring(0, 100)}...` 
+                              : freelancer.project_description
+                            }
+                          </p>
+                        )}
+
+                        <div className="mt-auto">
+                          {/* Contract Downloads */}
+                          <div className="mb-2">
+                            {freelancer.contract_pdf_path && (
+                              <button
+                                className="btn w-100 mb-2"
+                                style={{ 
+                                  background: accent, 
+                                  color: '#fff', 
+                                  border: 'none',
+                                  borderRadius: '8px',
+                                  fontSize: '12px',
+                                  fontWeight: 500
+                                }}
+                                onClick={() => {
+                                  const fullUrl = freelancer.contract_pdf_path.startsWith('http') ? 
+                                    freelancer.contract_pdf_path : 
+                                    `http://localhost:5000${freelancer.contract_pdf_path}`;
+                                  window.open(fullUrl, '_blank');
+                                }}
+                              >
+                                <i className="bi bi-download me-2"></i>
+                                Download Original Contract
+                              </button>
+                            )}
+                            
+                            {freelancer.signed_contract_pdf_path ? (
+                              <div>
+                                <button
+                                  className="btn w-100 mb-2"
+                                  style={{ 
+                                    background: '#28a745', 
+                                    color: '#fff', 
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontSize: '12px',
+                                    fontWeight: 500
+                                  }}
+                                  onClick={() => {
+                                    const fullUrl = freelancer.signed_contract_pdf_path.startsWith('http') ? 
+                                      freelancer.signed_contract_pdf_path : 
+                                      `http://localhost:5000${freelancer.signed_contract_pdf_path}`;
+                                    window.open(fullUrl, '_blank');
+                                  }}
+                                >
+                                  <i className="bi bi-file-earmark-check me-2"></i>
+                                  Download Signed Contract
+                                </button>
+                                <div className="text-center">
+                                  <small className="text-success">
+                                    <i className="bi bi-check-circle me-1"></i>
+                                    Signed contract uploaded
+                                  </small>
+                                  {freelancer.signed_contract_uploaded_at && (
+                                    <div className="text-muted" style={{ fontSize: '11px' }}>
+                                      {new Date(freelancer.signed_contract_uploaded_at).toLocaleDateString()}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-center">
+                                <small className="text-warning">
+                                  <i className="bi bi-clock me-1"></i>
+                                  Awaiting signed contract
+                                </small>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
