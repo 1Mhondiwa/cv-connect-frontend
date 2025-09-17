@@ -826,60 +826,6 @@ const AssociateDashboard = () => {
         </div>
           </div>
         )}
-              {/* Profile image and overlay buttons */}
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-              <img
-                src={getAssociateAvatarUrl()}
-                alt="Profile"
-                  className="rounded-circle mb-3"
-                  style={{ width: 90, height: 90, objectFit: 'cover', border: '3px solid #fff', boxShadow: '0 4px 16px rgba(253,104,14,0.15)' }}
-                onError={e => {
-                  e.target.onerror = null;
-                    e.target.src = "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=90&bold=true";
-                  }}
-                />
-                {/* Delete button overlays top-right of image */}
-              {associateProfile?.profile_picture_url && (
-                <button
-                  type="button"
-                  className="btn btn-danger btn-sm"
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    borderRadius: "50%",
-                    padding: "6px 8px",
-                    fontSize: 18,
-                    zIndex: 2
-                  }}
-                  title="Delete Profile Picture"
-                  onClick={handleDeleteAssociateProfileImage}
-                >
-                  <i className="bi bi-trash"></i>
-                </button>
-              )}
-                {/* Upload button overlays bottom-right of image */}
-                <button
-                  type="button"
-                  className="btn rounded-circle profile-upload-btn position-absolute"
-                  style={{ bottom: 0, right: 0, width: 30, height: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', padding: 0, background: accent, color: '#fff', transition: 'transform 0.18s, box-shadow 0.18s' }}
-                  onClick={() => assocFileInputRef.current && assocFileInputRef.current.click()}
-                  title="Upload/Change Profile Picture"
-                  disabled={assocUploading}
-                >
-                  <i className="bi bi-plus"></i>
-                </button>
-              <input
-                type="file"
-                accept="image/*"
-                ref={assocFileInputRef}
-                style={{ display: 'none' }}
-                onChange={handleAssociateProfileImageChange}
-                disabled={assocUploading}
-              />
-            </div>
-              <h5 className="mt-3 mb-1" style={{ color: '#444', fontWeight: 700 }}>{associateProfile?.contact_person || user?.email}</h5>
-              <span className="badge bg-success mb-2">Associate</span>
               <div className="d-grid gap-3 w-100 mt-4">
                 <button 
                   className={`btn dashboard-btn w-100 ${activeTab === 'dashboard' ? '' : ''}`}
@@ -987,16 +933,91 @@ const AssociateDashboard = () => {
                   <div className="card border-0 shadow-sm rounded-4" style={{ background: 'linear-gradient(135deg, #fff 0%, #fff5e6 100%)' }}>
                     <div className="card-body p-4">
                       <div className="d-flex align-items-center">
-                        <div className="me-3">
-                          <div className="rounded-circle d-flex align-items-center justify-content-center" style={{ width: 60, height: 60, background: accent }}>
-                            <i className="bi bi-person-fill text-white" style={{ fontSize: '1.5rem' }}></i>
-                          </div>
+                        <div className="me-4" style={{ position: 'relative' }}>
+                          <img
+                            src={getAssociateAvatarUrl()}
+                            alt="Profile"
+                            className="rounded-circle"
+                            style={{ width: 80, height: 80, objectFit: 'cover', border: '3px solid #fff', boxShadow: '0 4px 16px rgba(253,104,14,0.15)' }}
+                            onError={e => {
+                              e.target.onerror = null;
+                              e.target.src = "https://ui-avatars.com/api/?name=User&background=eee&color=555&size=80&bold=true";
+                            }}
+                          />
+                          {/* Delete button overlays top-right of image */}
+                          {associateProfile?.profile_picture_url && (
+                            <button
+                              type="button"
+                              className="btn btn-danger btn-sm position-absolute"
+                              style={{
+                                top: 0,
+                                right: 0,
+                                borderRadius: "50%",
+                                padding: "4px 6px",
+                                fontSize: 14,
+                                zIndex: 2,
+                                width: '24px',
+                                height: '24px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                              title="Delete Profile Picture"
+                              onClick={handleDeleteAssociateProfileImage}
+                            >
+                              <i className="bi bi-x"></i>
+                            </button>
+                          )}
+                          {/* Upload button overlays bottom-right of image */}
+                          <button
+                            type="button"
+                            className="btn rounded-circle position-absolute"
+                            style={{ 
+                              bottom: 0, 
+                              right: 0, 
+                              width: 28, 
+                              height: 28, 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center', 
+                              fontSize: 14, 
+                              border: '2px solid #fff', 
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.1)', 
+                              padding: 0, 
+                              background: accent, 
+                              color: '#fff', 
+                              transition: 'transform 0.18s, box-shadow 0.18s',
+                              zIndex: 2
+                            }}
+                            onClick={() => assocFileInputRef.current && assocFileInputRef.current.click()}
+                            title="Upload/Change Profile Picture"
+                            disabled={assocUploading}
+                          >
+                            <i className="bi bi-camera"></i>
+                          </button>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={assocFileInputRef}
+                            style={{ display: 'none' }}
+                            onChange={handleAssociateProfileImageChange}
+                            disabled={assocUploading}
+                          />
                         </div>
-                        <div>
-                          <h3 className="mb-1" style={{ color: accent, fontWeight: 700 }}>
-                            Welcome back, {associateProfile?.contact_person || user?.email?.split('@')[0] || 'Associate'}!
-                          </h3>
+                        <div className="flex-grow-1">
+                          <div className="d-flex align-items-center mb-2">
+                            <h3 className="mb-0 me-3" style={{ color: accent, fontWeight: 700 }}>
+                              Welcome back, {associateProfile?.contact_person || user?.email?.split('@')[0] || 'Associate'}!
+                            </h3>
+                            <span className="badge bg-success">Associate</span>
+                          </div>
                           <p className="text-muted mb-0">Manage your freelancer requests, view recommendations, and track your projects.</p>
+                          {assocUploading && (
+                            <div className="mt-2">
+                              <span className="spinner-border spinner-border-sm me-2" style={{ color: accent }}></span>
+                              <small className="text-muted">Uploading profile picture...</small>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
