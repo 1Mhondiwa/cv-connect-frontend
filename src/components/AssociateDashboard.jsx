@@ -743,19 +743,25 @@ const AssociateDashboard = () => {
       {/* Navbar */}
       <nav className="dashboard-navbar">
         <div className="container d-flex justify-content-between align-items-center">
-          <Link to="/associate/dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }} className="d-flex align-items-center">
-            <img 
-              src="/assets/img/cv-connect_logo.png" 
-              alt="CV-Connect Logo" 
-              style={{
-                height: 32,
-                width: 32,
-                marginRight: 8,
-                borderRadius: '50%'
-              }}
-            />
-            CV<span style={{ color: '#333' }}>‑Connect</span>
-          </Link>
+          <div className="d-flex align-items-center">
+            <Link to="/associate/dashboard" style={{ textDecoration: 'none', color: accent, fontWeight: 700, fontSize: 22, letterSpacing: 1 }} className="d-flex align-items-center me-4">
+              <img 
+                src="/assets/img/cv-connect_logo.png" 
+                alt="CV-Connect Logo" 
+                style={{
+                  height: 32,
+                  width: 32,
+                  marginRight: 8,
+                  borderRadius: '50%'
+                }}
+              />
+              CV<span style={{ color: '#333' }}>‑Connect</span>
+            </Link>
+            <div className="d-none d-lg-block">
+              <h2 style={{ color: accent, fontWeight: 700, margin: 0, fontSize: '1.5rem' }}>Associate Dashboard</h2>
+              <p style={{ color: '#666', margin: 0, fontSize: '0.9rem' }}>Request freelancers through ECS Admin, review curated profiles, and connect with pre-approved talent that matches your needs.</p>
+            </div>
+          </div>
           <button
             className="btn logout-btn"
             onClick={() => {
@@ -915,10 +921,6 @@ const AssociateDashboard = () => {
           </div>
           {/* Main Content Area */}
           <div className="col-lg-9">
-            <div className="section-title mb-4">
-              <h2 style={{ color: accent, fontWeight: 700 }}>Associate Dashboard</h2>
-              <p style={{ color: '#888' }}>Request freelancers through ECS Admin, review curated profiles, and connect with pre-approved talent that matches your needs.</p>
-            </div>
             {/* Global Unread Badge */}
             {globalUnread > 0 && (
               <div className="text-end mb-3">
