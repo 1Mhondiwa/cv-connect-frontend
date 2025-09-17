@@ -3635,6 +3635,125 @@ const ESCAdminDashboard = () => {
                     </div>
                   </div>
 
+                  {/* User Communication Activity - Bar Chart (EIGHTH PRIORITY) */}
+                  <div className="row g-4 mb-4">
+                    <div className="col-12">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
+                            <i className="bi bi-people me-2"></i>User Communication Activity
+                          </h6>
+                        </div>
+                        <div className="card-body">
+                          {(() => {
+                                // Debug: Log the actual data structure
+                                console.log('🔍 User Communication Activity Data:', {
+                                  exists: !!analyticsData.userCommunicationActivity,
+                                  length: analyticsData.userCommunicationActivity?.length,
+                                  sample: analyticsData.userCommunicationActivity?.[0],
+                                  allData: analyticsData.userCommunicationActivity
+                                });
+
+                                // Validate data structure
+                                if (!analyticsData.userCommunicationActivity || analyticsData.userCommunicationActivity.length === 0) {
+                                  return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-people display-4"></i>
+                                        <p className="mt-2">No communication activity data available</p>
+                                      </div>
+                                    </div>
+                                  );
+                                }
+
+                                                        // Validate that each item has required properties
+                                const validData = analyticsData.userCommunicationActivity.filter(item => 
+                                item && 
+                                  typeof item.user === 'string' && 
+                                typeof item.messages === 'number' && 
+                                typeof item.conversations === 'number' && 
+                                  !isNaN(item.messages) &&
+                                  !isNaN(item.conversations) &&
+                                  item.messages >= 0 &&
+                                  item.conversations >= 0 &&
+                                  item.user !== undefined &&
+                                  item.messages !== undefined &&
+                                  item.conversations !== undefined &&
+                                  item.user !== null &&
+                                  item.messages !== null &&
+                                  item.conversations !== null
+                                );
+
+                                console.log('🔍 Valid User Communication Activity Data:', {
+                                  originalLength: analyticsData.userCommunicationActivity.length,
+                                  validLength: validData.length,
+                                  validData: validData
+                                });
+
+                                if (validData.length === 0) {
+                              return (
+                                    <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
+                                      <div className="text-center text-muted">
+                                        <i className="bi bi-exclamation-triangle display-4"></i>
+                                        <p className="mt-2">Invalid communication activity data structure</p>
+                                  <small>Check console for details</small>
+                                    </div>
+                              </div>
+                            );
+                          }
+                            
+                                                      console.log('🔍 User Communication Activity Chart - About to render with data:', validData);
+                            console.log('🔍 Chart data structure check:', validData.map(item => ({
+                              user: item.user,
+                              messages: item.messages,
+                              conversations: item.conversations,
+                              messagesType: typeof item.messages,
+                              conversationsType: typeof item.conversations
+                            })));
+                            
+                            return (
+                              <div style={{ width: '100%', height: 300 }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <BarChart data={validData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                    <XAxis 
+                                      dataKey="user" 
+                                      stroke="#666" 
+                                      angle={-45} 
+                                      textAnchor="end" 
+                                      height={80}
+                                      interval={0}
+                                    />
+                                    <YAxis stroke="#666" />
+                                    <Tooltip 
+                                      contentStyle={{ 
+                                        backgroundColor: '#fff', 
+                                        border: '1px solid #ddd',
+                                        borderRadius: '8px'
+                                      }}
+                                      formatter={(value, name) => {
+                                        console.log('🔍 Tooltip formatter - name:', name, 'value:', value);
+                                        if (name === 'messages') {
+                                          return [`${value} messages`, 'Messages'];
+                                        } else if (name === 'conversations') {
+                                          return [`${value} conversations`, 'Conversations'];
+                                        } else {
+                                          return [value, name];
+                                        }
+                                      }}
+                                    />
+                                    <Bar dataKey="messages" fill="#fd680e" name="messages" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="conversations" fill="#10b981" name="conversations" radius={[4, 4, 0, 0]} />
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
                     <div className="col-12">
@@ -3754,124 +3873,6 @@ const ESCAdminDashboard = () => {
 
 
 
-              {/* User Communication Activity - Bar Chart */}
-              <div className="row g-4">
-                <div className="col-12">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
-                        <i className="bi bi-people me-2"></i>User Communication Activity
-                      </h6>
-                    </div>
-                    <div className="card-body">
-                      {(() => {
-                            // Debug: Log the actual data structure
-                            console.log('🔍 User Communication Activity Data:', {
-                              exists: !!analyticsData.userCommunicationActivity,
-                              length: analyticsData.userCommunicationActivity?.length,
-                              sample: analyticsData.userCommunicationActivity?.[0],
-                              allData: analyticsData.userCommunicationActivity
-                            });
-
-                            // Validate data structure
-                            if (!analyticsData.userCommunicationActivity || analyticsData.userCommunicationActivity.length === 0) {
-                              return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-people display-4"></i>
-                                    <p className="mt-2">No communication activity data available</p>
-                                  </div>
-                                </div>
-                              );
-                            }
-
-                                                        // Validate that each item has required properties
-                            const validData = analyticsData.userCommunicationActivity.filter(item => 
-                            item && 
-                              typeof item.user === 'string' && 
-                            typeof item.messages === 'number' && 
-                            typeof item.conversations === 'number' && 
-                              !isNaN(item.messages) &&
-                              !isNaN(item.conversations) &&
-                              item.messages >= 0 &&
-                              item.conversations >= 0 &&
-                              item.user !== undefined &&
-                              item.messages !== undefined &&
-                              item.conversations !== undefined &&
-                              item.user !== null &&
-                              item.messages !== null &&
-                              item.conversations !== null
-                            );
-
-                            console.log('🔍 Valid User Communication Activity Data:', {
-                              originalLength: analyticsData.userCommunicationActivity.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
-
-                            if (validData.length === 0) {
-                          return (
-                                <div className="d-flex justify-content-center align-items-center" style={{ height: 300 }}>
-                                  <div className="text-center text-muted">
-                                    <i className="bi bi-exclamation-triangle display-4"></i>
-                                    <p className="mt-2">Invalid communication activity data structure</p>
-                              <small>Check console for details</small>
-                                  </div>
-                            </div>
-                          );
-                        }
-                          
-                                                      console.log('🔍 User Communication Activity Chart - About to render with data:', validData);
-                            console.log('🔍 Chart data structure check:', validData.map(item => ({
-                              user: item.user,
-                              messages: item.messages,
-                              conversations: item.conversations,
-                              messagesType: typeof item.messages,
-                              conversationsType: typeof item.conversations
-                            })));
-                            
-                            return (
-                              <div style={{ width: '100%', height: 300 }}>
-                                <ResponsiveContainer width="100%" height="100%">
-                                  <BarChart data={validData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                    <XAxis 
-                                      dataKey="user" 
-                                      stroke="#666" 
-                                      angle={-45} 
-                                      textAnchor="end" 
-                                      height={80}
-                                      interval={0}
-                                    />
-                                    <YAxis stroke="#666" />
-                                    <Tooltip 
-                                      contentStyle={{ 
-                                        backgroundColor: '#fff', 
-                                        border: '1px solid #ddd',
-                                        borderRadius: '8px'
-                                      }}
-                                      formatter={(value, name) => {
-                                        console.log('🔍 Tooltip formatter - name:', name, 'value:', value);
-                                        if (name === 'messages') {
-                                          return [`${value} messages`, 'Messages'];
-                                        } else if (name === 'conversations') {
-                                          return [`${value} conversations`, 'Conversations'];
-                                        } else {
-                                          return [value, name];
-                                        }
-                                      }}
-                                    />
-                                    <Bar dataKey="messages" fill="#fd680e" name="messages" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="conversations" fill="#10b981" name="conversations" radius={[4, 4, 0, 0]} />
-                                  </BarChart>
-                                </ResponsiveContainer>
-                              </div>
-                            );
-                      })()}
-                </div>
-              </div>
-            </div>
-              </div>
 
 
                 </>
