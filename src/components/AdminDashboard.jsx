@@ -3307,6 +3307,228 @@ const ESCAdminDashboard = () => {
                     </div>
                   </div>
 
+                  {/* Interview Feedback Analytics Section (SIXTH PRIORITY) */}
+                  <div className="row g-4 mb-4">
+                    <div className="col-12">
+                      <div className="card border-0 shadow-sm">
+                        <div className="card-header bg-transparent border-0">
+                          <div className="d-flex justify-content-between align-items-center">
+                            <div>
+                              <h6 className="mb-1" style={{ color: accent, fontWeight: 600 }}>
+                                <i className="bi bi-chat-square-text me-2"></i>Interview Feedback Analytics
+                              </h6>
+                              <small className="text-muted">Performance insights from interview feedback</small>
+                            </div>
+                            <div className="d-flex gap-2 align-items-center">
+                              <select 
+                                className="form-select form-select-sm" 
+                                style={{ width: '120px' }}
+                                value={interviewTimeRange}
+                                onChange={(e) => setInterviewTimeRange(e.target.value)}
+                              >
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                                <option value="180">Last 6 Months</option>
+                              </select>
+                              <button 
+                                className="btn btn-sm"
+                                onClick={fetchInterviewAnalytics}
+                                disabled={interviewAnalyticsLoading}
+                                style={{ 
+                                  backgroundColor: '#ffd7c2',
+                                  borderColor: '#ffd7c2',
+                                  color: '#8b4513',
+                                  transition: 'all 0.3s ease-in-out',
+                                  transform: 'scale(1)'
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!interviewAnalyticsLoading) {
+                                    e.target.style.transform = 'scale(1.05)';
+                                    e.target.style.backgroundColor = '#ffc299';
+                                    e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!interviewAnalyticsLoading) {
+                                    e.target.style.transform = 'scale(1)';
+                                    e.target.style.backgroundColor = '#ffd7c2';
+                                    e.target.style.boxShadow = 'none';
+                                  }
+                                }}
+                                onMouseDown={(e) => {
+                                  if (!interviewAnalyticsLoading) {
+                                    e.target.style.transform = 'scale(0.95)';
+                                  }
+                                }}
+                                onMouseUp={(e) => {
+                                  if (!interviewAnalyticsLoading) {
+                                    e.target.style.transform = 'scale(1.05)';
+                                  }
+                                }}
+                              >
+                                {interviewAnalyticsLoading ? 'Loading...' : 'Refresh'}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="card-body">
+                          {interviewAnalyticsError && (
+                            <div className="alert alert-warning mb-3">
+                              <i className="bi bi-exclamation-triangle me-2"></i>
+                              {interviewAnalyticsError}
+                            </div>
+                          )}
+
+                          {interviewAnalyticsLoading ? (
+                            <div className="d-flex justify-content-center align-items-center" style={{ height: 200 }}>
+                              <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                              </div>
+                            </div>
+                          ) : interviewAnalytics ? (
+                            <>
+                              {/* Overview Stats */}
+                              <div className="row g-3 mb-4">
+                                <div className="col-md-3 col-6">
+                                  <div className="card border-0 bg-light h-100">
+                                    <div className="card-body text-center p-3">
+                                      <div className="h4 mb-1" style={{ color: accent }}>
+                                        {interviewAnalytics.overview?.total_interviews || 0}
+                                      </div>
+                                      <div className="small text-muted">Total Interviews</div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="col-md-3 col-6">
+                                  <div className="card border-0 bg-light h-100">
+                                    <div className="card-body text-center p-3">
+                                      <div className="h4 mb-1 text-success">
+                                        {interviewAnalytics.overview?.completion_rate || 0}%
+                                      </div>
+                                      <div className="small text-muted">Completion Rate</div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="col-md-3 col-6">
+                                  <div className="card border-0 bg-light h-100">
+                                    <div className="card-body text-center p-3">
+                                      <div className="h4 mb-1" style={{ color: '#28a745' }}>
+                                        {interviewAnalytics.overview?.hire_rate || 0}%
+                                      </div>
+                                      <div className="small text-muted">Hire Rate</div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="col-md-3 col-6">
+                                  <div className="card border-0 bg-light h-100">
+                                    <div className="card-body text-center p-3">
+                                      <div className="h4 mb-1" style={{ color: '#ffc107' }}>
+                                        {interviewAnalytics.overview?.avg_overall_rating || 0}/5
+                                      </div>
+                                      <div className="small text-muted">Avg Rating</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Charts Row */}
+                              <div className="row g-4">
+                                {/* Hiring Recommendations Chart */}
+                                <div className="col-md-6">
+                                  <h6 className="mb-3">Hiring Recommendations</h6>
+                                  {interviewAnalytics.recommendationDistribution && interviewAnalytics.recommendationDistribution.length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={250}>
+                                      <PieChart>
+                                        <Pie
+                                          data={interviewAnalytics.recommendationDistribution.map(item => ({
+                                            name: item.recommendation === 'hire' ? 'Hire' : 
+                                                  item.recommendation === 'no_hire' ? 'No Hire' : 'Maybe',
+                                            value: parseInt(item.count),
+                                            percentage: parseFloat(item.percentage)
+                                          }))}
+                                          cx="50%"
+                                          cy="50%"
+                                          labelLine={false}
+                                          label={({ name, percentage }) => `${name}: ${percentage}%`}
+                                          outerRadius={80}
+                                          fill="#8884d8"
+                                          dataKey="value"
+                                        >
+                                          {interviewAnalytics.recommendationDistribution.map((entry, index) => (
+                                            <Cell 
+                                              key={`cell-${index}`} 
+                                              fill={entry.recommendation === 'hire' ? '#28a745' : 
+                                                    entry.recommendation === 'no_hire' ? '#dc3545' : '#ffc107'} 
+                                            />
+                                          ))}
+                                        </Pie>
+                                        <Tooltip />
+                                      </PieChart>
+                                    </ResponsiveContainer>
+                                  ) : (
+                                    <div className="text-center py-4 text-muted">
+                                      <i className="bi bi-pie-chart display-4"></i>
+                                      <p className="mt-2">No recommendation data available</p>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Rating Breakdown Chart */}
+                                <div className="col-md-6">
+                                  <h6 className="mb-3">Average Ratings by Category</h6>
+                                  {interviewAnalytics.ratingBreakdown && Object.keys(interviewAnalytics.ratingBreakdown).length > 0 ? (
+                                    <ResponsiveContainer width="100%" height={250}>
+                                      <BarChart 
+                                        data={[
+                                          { category: 'Technical', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_technical_skills) || 0 },
+                                          { category: 'Communication', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_communication) || 0 },
+                                          { category: 'Cultural Fit', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_cultural_fit) || 0 },
+                                          { category: 'Overall', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_overall) || 0 }
+                                        ]}
+                                        margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
+                                      >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                        <XAxis 
+                                          dataKey="category" 
+                                          stroke="#666" 
+                                          interval={0}
+                                          angle={0}
+                                          textAnchor="middle"
+                                          height={60}
+                                        />
+                                        <YAxis domain={[0, 5]} stroke="#666" />
+                                        <Tooltip formatter={(value) => [`${value}/5`, 'Rating']} />
+                                        <Bar dataKey="rating" fill={accent} radius={[4, 4, 0, 0]} />
+                                      </BarChart>
+                                    </ResponsiveContainer>
+                                  ) : (
+                                    <div className="text-center py-4 text-muted">
+                                      <i className="bi bi-bar-chart display-4"></i>
+                                      <p className="mt-2">No rating data available</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="text-center py-5">
+                              <i className="bi bi-chat-square-text display-4 text-muted"></i>
+                              <h6 className="text-muted mt-3">No Interview Data Available</h6>
+                              <p className="text-muted">Interview feedback analytics will appear here once interviews are conducted and feedback is submitted.</p>
+                              <button 
+                                className="btn "
+                                onClick={fetchInterviewAnalytics}
+                              >
+                                <i className="bi bi-arrow-clockwise me-1"></i>Check for Data
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
                     <div className="col-12">
@@ -3650,227 +3872,6 @@ const ESCAdminDashboard = () => {
             </div>
               </div>
 
-              {/* Interview Feedback Analytics Section */}
-              <div className="row g-4 mb-4 mt-5">
-                <div className="col-12">
-                  <div className="card border-0 shadow-sm">
-                    <div className="card-header bg-transparent border-0">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                          <h6 className="mb-1" style={{ color: accent, fontWeight: 600 }}>
-                            <i className="bi bi-chat-square-text me-2"></i>Interview Feedback Analytics
-                          </h6>
-                          <small className="text-muted">Performance insights from interview feedback</small>
-                        </div>
-                        <div className="d-flex gap-2 align-items-center">
-                          <select 
-                            className="form-select form-select-sm" 
-                            style={{ width: '120px' }}
-                            value={interviewTimeRange}
-                            onChange={(e) => setInterviewTimeRange(e.target.value)}
-                          >
-                            <option value="7">Last 7 Days</option>
-                            <option value="30">Last 30 Days</option>
-                            <option value="90">Last 90 Days</option>
-                            <option value="180">Last 6 Months</option>
-                          </select>
-                          <button 
-                            className="btn btn-sm"
-                            onClick={fetchInterviewAnalytics}
-                            disabled={interviewAnalyticsLoading}
-                            style={{ 
-                              backgroundColor: '#ffd7c2',
-                              borderColor: '#ffd7c2',
-                              color: '#8b4513',
-                              transition: 'all 0.3s ease-in-out',
-                              transform: 'scale(1)'
-                            }}
-                            onMouseEnter={(e) => {
-                              if (!interviewAnalyticsLoading) {
-                                e.target.style.transform = 'scale(1.05)';
-                                e.target.style.backgroundColor = '#ffc299';
-                                e.target.style.boxShadow = '0 4px 12px rgba(255, 215, 194, 0.4)';
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!interviewAnalyticsLoading) {
-                                e.target.style.transform = 'scale(1)';
-                                e.target.style.backgroundColor = '#ffd7c2';
-                                e.target.style.boxShadow = 'none';
-                              }
-                            }}
-                            onMouseDown={(e) => {
-                              if (!interviewAnalyticsLoading) {
-                                e.target.style.transform = 'scale(0.95)';
-                              }
-                            }}
-                            onMouseUp={(e) => {
-                              if (!interviewAnalyticsLoading) {
-                                e.target.style.transform = 'scale(1.05)';
-                              }
-                            }}
-                          >
-                            {interviewAnalyticsLoading ? 'Loading...' : 'Refresh'}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="card-body">
-                      {interviewAnalyticsError && (
-                        <div className="alert alert-warning mb-3">
-                          <i className="bi bi-exclamation-triangle me-2"></i>
-                          {interviewAnalyticsError}
-                        </div>
-                      )}
-
-                      {interviewAnalyticsLoading ? (
-                        <div className="d-flex justify-content-center align-items-center" style={{ height: 200 }}>
-                          <div className="spinner-border style={{ color: '#ffd7c2' }}" role="status">
-                            <span className="visually-hidden">Loading...</span>
-                          </div>
-                        </div>
-                      ) : interviewAnalytics ? (
-                        <>
-                          {/* Overview Stats */}
-                          <div className="row g-3 mb-4">
-                            <div className="col-md-3 col-6">
-                              <div className="card border-0 bg-light h-100">
-                                <div className="card-body text-center p-3">
-                                  <div className="h4 mb-1" style={{ color: accent }}>
-                                    {interviewAnalytics.overview?.total_interviews || 0}
-                                  </div>
-                                  <div className="small text-muted">Total Interviews</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col-md-3 col-6">
-                              <div className="card border-0 bg-light h-100">
-                                <div className="card-body text-center p-3">
-                                  <div className="h4 mb-1 text-success">
-                                    {interviewAnalytics.overview?.completion_rate || 0}%
-                                  </div>
-                                  <div className="small text-muted">Completion Rate</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col-md-3 col-6">
-                              <div className="card border-0 bg-light h-100">
-                                <div className="card-body text-center p-3">
-                                  <div className="h4 mb-1" style={{ color: '#28a745' }}>
-                                    {interviewAnalytics.overview?.hire_rate || 0}%
-                                  </div>
-                                  <div className="small text-muted">Hire Rate</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col-md-3 col-6">
-                              <div className="card border-0 bg-light h-100">
-                                <div className="card-body text-center p-3">
-                                  <div className="h4 mb-1" style={{ color: '#ffc107' }}>
-                                    {interviewAnalytics.overview?.avg_overall_rating || 0}/5
-                                  </div>
-                                  <div className="small text-muted">Avg Rating</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Charts Row */}
-                          <div className="row g-4">
-                            {/* Hiring Recommendations Chart */}
-                            <div className="col-md-6">
-                              <h6 className="mb-3">Hiring Recommendations</h6>
-                              {interviewAnalytics.recommendationDistribution && interviewAnalytics.recommendationDistribution.length > 0 ? (
-                                <ResponsiveContainer width="100%" height={250}>
-                                  <PieChart>
-                                    <Pie
-                                      data={interviewAnalytics.recommendationDistribution.map(item => ({
-                                        name: item.recommendation === 'hire' ? 'Hire' : 
-                                              item.recommendation === 'no_hire' ? 'No Hire' : 'Maybe',
-                                        value: parseInt(item.count),
-                                        percentage: parseFloat(item.percentage)
-                                      }))}
-                                      cx="50%"
-                                      cy="50%"
-                                      labelLine={false}
-                                      label={({ name, percentage }) => `${name}: ${percentage}%`}
-                                      outerRadius={80}
-                                      fill="#8884d8"
-                                      dataKey="value"
-                                    >
-                                      {interviewAnalytics.recommendationDistribution.map((entry, index) => (
-                                        <Cell 
-                                          key={`cell-${index}`} 
-                                          fill={entry.recommendation === 'hire' ? '#28a745' : 
-                                                entry.recommendation === 'no_hire' ? '#dc3545' : '#ffc107'} 
-                                        />
-                                      ))}
-                                    </Pie>
-                                    <Tooltip />
-                                  </PieChart>
-                                </ResponsiveContainer>
-                              ) : (
-                                <div className="text-center py-4 text-muted">
-                                  <i className="bi bi-pie-chart display-4"></i>
-                                  <p className="mt-2">No recommendation data available</p>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Rating Breakdown Chart */}
-                            <div className="col-md-6">
-                              <h6 className="mb-3">Average Ratings by Category</h6>
-                              {interviewAnalytics.ratingBreakdown && Object.keys(interviewAnalytics.ratingBreakdown).length > 0 ? (
-                                <ResponsiveContainer width="100%" height={250}>
-                                  <BarChart 
-                                    data={[
-                                      { category: 'Technical', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_technical_skills) || 0 },
-                                      { category: 'Communication', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_communication) || 0 },
-                                      { category: 'Cultural Fit', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_cultural_fit) || 0 },
-                                      { category: 'Overall', rating: parseFloat(interviewAnalytics.ratingBreakdown.avg_overall) || 0 }
-                                    ]}
-                                    margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-                                  >
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                                    <XAxis 
-                                      dataKey="category" 
-                                      stroke="#666" 
-                                      interval={0}
-                                      angle={0}
-                                      textAnchor="middle"
-                                      height={60}
-                                    />
-                                    <YAxis domain={[0, 5]} stroke="#666" />
-                                    <Tooltip formatter={(value) => [`${value}/5`, 'Rating']} />
-                                    <Bar dataKey="rating" fill={accent} radius={[4, 4, 0, 0]} />
-                                  </BarChart>
-                                </ResponsiveContainer>
-                              ) : (
-                                <div className="text-center py-4 text-muted">
-                                  <i className="bi bi-bar-chart display-4"></i>
-                                  <p className="mt-2">No rating data available</p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="text-center py-5">
-                          <i className="bi bi-chat-square-text display-4 text-muted"></i>
-                          <h6 className="text-muted mt-3">No Interview Data Available</h6>
-                          <p className="text-muted">Interview feedback analytics will appear here once interviews are conducted and feedback is submitted.</p>
-                          <button 
-                            className="btn "
-                            onClick={fetchInterviewAnalytics}
-                          >
-                            <i className="bi bi-arrow-clockwise me-1"></i>Check for Data
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
 
                 </>
               )}
