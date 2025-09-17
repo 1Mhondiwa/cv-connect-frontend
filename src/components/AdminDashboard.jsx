@@ -3031,8 +3031,24 @@ const ESCAdminDashboard = () => {
                                 color: '#10b981'
                               }));
 
+                            // Get balanced skills (skills that have both supply and demand)
+                            const balancedSkillsData = Array.from(skillMap.values())
+                              .filter(item => item.supply > 0 && item.demand > 0)
+                              .sort((a, b) => (b.supply + b.demand) - (a.supply + a.demand))
+                              .slice(0, skillsLimit)
+                              .map(item => ({
+                                skill: item.skill,
+                                supply: item.supply,
+                                demand: item.demand,
+                                total: item.supply + item.demand,
+                                type: 'Balanced',
+                                supplyColor: '#fd680e',
+                                demandColor: '#10b981'
+                              }));
+
                             console.log('🔍 Supply Chart Data:', supplyChartData);
                             console.log('🔍 Demand Chart Data:', allDemandSkills);
+                            console.log('🔍 Balanced Skills Data:', balancedSkillsData);
                             
                             // Calculate summary statistics
                             const totalSupply = Array.from(skillMap.values()).reduce((sum, item) => sum + item.supply, 0);
@@ -3084,9 +3100,74 @@ const ESCAdminDashboard = () => {
 
                                 {/* Charts based on filter selection */}
                                 <div className="row">
-                                  {/* Supply Chart - Show for 'all', 'supply', and 'both' filters */}
-                                  {(skillsFilter === 'all' || skillsFilter === 'supply' || skillsFilter === 'both') && (
-                                    <div className={skillsFilter === 'supply' || skillsFilter === 'demand' ? 'col-md-12' : 'col-md-6'}>
+                                  {/* Balanced Skills Chart - Show only for 'both' filter */}
+                                  {skillsFilter === 'both' && (
+                                    <div className="col-md-12">
+                                      <div className="text-center mb-3">
+                                        <h6 style={{ color: '#8b5cf6', fontWeight: '600' }}>
+                                          <i className="bi bi-balance me-2"></i>Balanced Skills (Supply & Demand)
+                                        </h6>
+                                        <small className="text-muted">Skills that have both freelancer supply and job demand</small>
+                                      </div>
+                                      <ResponsiveContainer width="100%" height={400}>
+                                        <BarChart 
+                                          data={balancedSkillsData}
+                                          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                                        >
+                                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                          <XAxis 
+                                            dataKey="skill" 
+                                            stroke="#666"
+                                            tick={{ fontSize: 12, fill: '#666', fontWeight: '500' }}
+                                            angle={-45}
+                                            textAnchor="end"
+                                            height={100}
+                                            interval={0}
+                                          />
+                                          <YAxis 
+                                            stroke="#666"
+                                            tick={{ fontSize: 12, fill: '#666' }}
+                                            label={{ value: 'Count', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#666', fontSize: '14px', fontWeight: '500' } }}
+                                          />
+                                          <Tooltip 
+                                            contentStyle={{ 
+                                              backgroundColor: '#fff', 
+                                              border: '1px solid #ddd',
+                                              borderRadius: '8px',
+                                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                              fontSize: '14px'
+                                            }}
+                                            formatter={(value, name) => {
+                                              if (name === 'supply') return [value, 'Supply (Freelancers)'];
+                                              if (name === 'demand') return [value, 'Demand (Jobs)'];
+                                              return [value, name];
+                                            }}
+                                            labelFormatter={(label) => `Skill: ${label}`}
+                                          />
+                                          <Bar 
+                                            dataKey="supply" 
+                                            fill="#fd680e"
+                                            radius={[0, 0, 0, 0]}
+                                            stroke="#fd680e"
+                                            strokeWidth={1}
+                                            name="Supply"
+                                          />
+                                          <Bar 
+                                            dataKey="demand" 
+                                            fill="#10b981"
+                                            radius={[0, 0, 0, 0]}
+                                            stroke="#10b981"
+                                            strokeWidth={1}
+                                            name="Demand"
+                                          />
+                                        </BarChart>
+                                      </ResponsiveContainer>
+                                    </div>
+                                  )}
+
+                                  {/* Supply Chart - Show for 'all' and 'supply' filters */}
+                                  {(skillsFilter === 'all' || skillsFilter === 'supply') && (
+                                    <div className={skillsFilter === 'supply' ? 'col-md-12' : 'col-md-6'}>
                                       <div className="text-center mb-3">
                                         <h6 style={{ color: '#fd680e', fontWeight: '600' }}>
                                           <i className="bi bi-people me-2"></i>Skills Supply (Freelancers)
@@ -3134,9 +3215,9 @@ const ESCAdminDashboard = () => {
                                     </div>
                                   )}
 
-                                  {/* Demand Chart - Show for 'all', 'demand', and 'both' filters */}
-                                  {(skillsFilter === 'all' || skillsFilter === 'demand' || skillsFilter === 'both') && (
-                                    <div className={skillsFilter === 'supply' || skillsFilter === 'demand' ? 'col-md-12' : 'col-md-6'}>
+                                  {/* Demand Chart - Show for 'all' and 'demand' filters */}
+                                  {(skillsFilter === 'all' || skillsFilter === 'demand') && (
+                                    <div className={skillsFilter === 'demand' ? 'col-md-12' : 'col-md-6'}>
                                       <div className="text-center mb-3">
                                         <h6 style={{ color: '#10b981', fontWeight: '600' }}>
                                           <i className="bi bi-briefcase me-2"></i>Skills Demand (Jobs)
