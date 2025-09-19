@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -201,14 +201,23 @@ const ESCAdminDashboard = () => {
     fetchHiredFreelancersCount();
   }, []);
 
-  // Fetch visitor data when time range changes
+  // Fetch visitor data when dashboard tab is activated
+  useEffect(() => {
+    console.log('🔄 Dashboard tab useEffect triggered:', { activeTab });
+    if (activeTab === 'dashboard') {
+      console.log('📊 Dashboard tab activated, fetching visitor data');
+      fetchVisitorData();
+    }
+  }, [activeTab, fetchVisitorData]);
+
+  // Refetch visitor data when time range changes
   useEffect(() => {
     console.log('🔄 TimeRange useEffect triggered:', { activeTab, timeRange });
     if (activeTab === 'dashboard') {
-      console.log('📊 Fetching visitor data for timeRange:', timeRange);
+      console.log('📊 Time range changed, fetching visitor data for timeRange:', timeRange);
       fetchVisitorData();
     }
-  }, [timeRange, activeTab]);
+  }, [timeRange, fetchVisitorData]);
 
   // Fetch CV upload data when analytics tab is opened or filter changes
   useEffect(() => {
@@ -333,8 +342,8 @@ const ESCAdminDashboard = () => {
   useEffect(() => {
     if (activeTab === 'dashboard') {
       fetchStats();
-      fetchVisitorData();
       fetchHiredFreelancersCount(); // Add hired freelancers count
+      // Note: fetchVisitorData() is handled by the timeRange useEffect to avoid conflicts
     }
     // eslint-disable-next-line
   }, [activeTab]);
@@ -906,7 +915,7 @@ const ESCAdminDashboard = () => {
 
 
   // Fetch visitor data for dashboard chart
-  const fetchVisitorData = async () => {
+  const fetchVisitorData = useCallback(async () => {
     console.log('🚀 fetchVisitorData called with timeRange:', timeRange);
     setVisitorDataLoading(true);
     try {
@@ -965,7 +974,7 @@ const ESCAdminDashboard = () => {
     } finally {
       setVisitorDataLoading(false);
     }
-  };
+  }, [timeRange]);
 
   // Comprehensive Reports Functions
   const generateComprehensiveReport = async () => {
@@ -2089,7 +2098,7 @@ const ESCAdminDashboard = () => {
                               type="button"
                               className={`btn btn-sm ${timeRange === '90d' ? '' : ''}`}
                               onClick={() => {
-                                console.log('🔄 Last 3 months button clicked');
+                                console.log('🔄 Last 3 months button clicked, setting timeRange to 90d');
                                 setTimeRange('90d');
                               }}
                               style={{ 
@@ -2107,7 +2116,7 @@ const ESCAdminDashboard = () => {
                               type="button"
                               className={`btn btn-sm ${timeRange === '30d' ? '' : ''}`}
                               onClick={() => {
-                                console.log('🔄 Last 30 days button clicked');
+                                console.log('🔄 Last 30 days button clicked, setting timeRange to 30d');
                                 setTimeRange('30d');
                               }}
                               style={{ 
@@ -2125,7 +2134,7 @@ const ESCAdminDashboard = () => {
                               type="button"
                               className={`btn btn-sm ${timeRange === '7d' ? '' : ''}`}
                               onClick={() => {
-                                console.log('🔄 Last 7 days button clicked');
+                                console.log('🔄 Last 7 days button clicked, setting timeRange to 7d');
                                 setTimeRange('7d');
                               }}
                               style={{ 
