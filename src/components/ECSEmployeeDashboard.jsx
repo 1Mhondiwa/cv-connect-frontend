@@ -921,7 +921,7 @@ const ECSEmployeeDashboard = () => {
               </button>
               
                 <button
-                className="nav-item w-100 text-start"
+                className="nav-item w-100 text-start logout-button"
                 onClick={logout}
                 onMouseEnter={() => setHoveredTab('logout')}
                 onMouseLeave={() => setHoveredTab(null)}

@@ -693,8 +693,16 @@ button:disabled {
   transform: translateX(2px) !important;
 }
 
-/* Logout button special styling */
-.ecs-employee-sidebar .nav-item:last-child:hover {
+/* Default orange hover effects for all navigation buttons */
+.ecs-employee-sidebar .nav-item:hover {
+  background: rgba(253, 104, 14, 0.08) !important;
+  border-left: 3px solid #fd680e !important;
+  transform: translateX(4px) !important;
+  box-shadow: 0 4px 12px rgba(253, 104, 14, 0.15) !important;
+}
+
+/* Override with red effects only for logout button */
+.ecs-employee-sidebar .nav-item.logout-button:hover {
   background: rgba(220, 53, 69, 0.1) !important;
   border-left: 3px solid #dc3545 !important;
   color: #dc3545 !important;
