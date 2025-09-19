@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import visitorTracker from '../utils/visitorTracking';
 
 const accent = '#fd680e';
 
@@ -205,18 +206,24 @@ const ESCAdminDashboard = () => {
       
       if (response.data.success) {
         // Format the data for the chart with proper validation
-        const formattedData = response.data.data.map(item => ({
-          ...item,
-          // Ensure required properties exist with fallback values
-          mobile: Number(item.mobile) || 0,
-          desktop: Number(item.desktop) || 0,
-          date: item.date || new Date().toISOString(),
-          // Format the date for display
-          formattedDate: new Date(item.date || new Date()).toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
-          })
-        }));
+        const formattedData = response.data.data.map(item => {
+          // Ensure date is properly formatted for the chart
+          const dateValue = item.date ? new Date(item.date) : new Date();
+          
+          return {
+            ...item,
+            // Ensure required properties exist with fallback values
+            mobile: Number(item.mobile) || 0,
+            desktop: Number(item.desktop) || 0,
+            // Use ISO string format for chart compatibility
+            date: dateValue.toISOString(),
+            // Format the date for display
+            formattedDate: dateValue.toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric' 
+            })
+          };
+        });
         
         console.log('📊 Visitor data structure:', response.data.data);
         console.log('📊 Formatted chart data:', formattedData);
@@ -274,6 +281,10 @@ const ESCAdminDashboard = () => {
     checkAuth();
     // Fetch initial hired freelancers count
     fetchHiredFreelancersCount();
+    
+    // Track visitor when dashboard loads
+    const userId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).user_id : null;
+    visitorTracker.trackVisit('/admin/dashboard', userId);
   }, []);
 
   // Fetch visitor data when dashboard tab is activated
@@ -2189,18 +2200,25 @@ const ESCAdminDashboard = () => {
                               <i className="bi bi-exclamation-triangle display-4"></i>
                               <p className="mt-2">Invalid chart data structure</p>
                               <small className="text-muted">Please refresh the page or try again later</small>
+                              <br />
+                              <small className="text-muted">Debug: {JSON.stringify(filteredChartData[0])}</small>
                             </div>
                           </div>
                         ) : (
                         <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart data={filteredChartData.filter(item => 
-                            item && 
-                            typeof item.mobile === 'number' && 
-                            typeof item.desktop === 'number' && 
-                            item.date &&
-                            !isNaN(item.mobile) &&
-                            !isNaN(item.desktop)
-                          )}>
+                          <AreaChart data={filteredChartData.filter(item => {
+                            const isValid = item && 
+                              typeof item.mobile === 'number' && 
+                              typeof item.desktop === 'number' && 
+                              item.date &&
+                              !isNaN(item.mobile) &&
+                              !isNaN(item.desktop);
+                            
+                            if (!isValid) {
+                              console.log('❌ Invalid chart item filtered out:', item);
+                            }
+                            return isValid;
+                          })}>
                             <defs>
                               <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor={accent} stopOpacity={1.0} />
