@@ -632,9 +632,70 @@ button:disabled {
   cursor: pointer !important;
   position: relative !important;
   z-index: 1 !important;
+  /* Add smooth transition for hover effects */
+  transition: all 0.3s ease !important;
+  /* Add subtle shadow for depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
 }
 
 .ecs-employee-sidebar .nav-item:hover {
   pointer-events: auto !important;
   cursor: pointer !important;
+  /* Hover animation effects */
+  transform: translateX(4px) !important;
+  box-shadow: 0 4px 12px rgba(253, 104, 14, 0.15) !important;
+  /* Add subtle background color on hover */
+  background: rgba(253, 104, 14, 0.08) !important;
+  /* Add border highlight */
+  border-left: 3px solid #fd680e !important;
+  margin-left: -3px !important;
+  padding-left: 13px !important;
+}
+
+/* Active state styling */
+.ecs-employee-sidebar .nav-item.active {
+  /* Ensure active state has proper styling */
+  background: #fd680e !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(253, 104, 14, 0.25) !important;
+  border-left: 3px solid #fd680e !important;
+  margin-left: -3px !important;
+  padding-left: 13px !important;
+}
+
+/* Icon hover animation */
+.ecs-employee-sidebar .nav-item:hover i {
+  transform: scale(1.1) !important;
+  transition: transform 0.3s ease !important;
+}
+
+/* Active icon styling */
+.ecs-employee-sidebar .nav-item.active i {
+  transform: scale(1.05) !important;
+}
+
+/* Sidebar header hover effects */
+.ecs-employee-sidebar .sidebar-header {
+  transition: all 0.3s ease !important;
+}
+
+.ecs-employee-sidebar .sidebar-header:hover {
+  background: rgba(253, 104, 14, 0.05) !important;
+}
+
+/* Section title hover effects */
+.ecs-employee-sidebar .nav-section-title {
+  transition: all 0.3s ease !important;
+}
+
+.ecs-employee-sidebar .nav-section:hover .nav-section-title {
+  color: #fd680e !important;
+  transform: translateX(2px) !important;
+}
+
+/* Logout button special styling */
+.ecs-employee-sidebar .nav-item:last-child:hover {
+  background: rgba(220, 53, 69, 0.1) !important;
+  border-left: 3px solid #dc3545 !important;
+  color: #dc3545 !important;
 }

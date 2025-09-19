@@ -713,6 +713,9 @@ const ECSEmployeeDashboard = () => {
     window.scrollTo(0, 0);
   };
 
+  // Add hover state management for better UX
+  const [hoveredTab, setHoveredTab] = useState(null);
+
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -795,6 +798,8 @@ const ECSEmployeeDashboard = () => {
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
                 onClick={() => handleTabChange('dashboard')}
+                onMouseEnter={() => setHoveredTab('dashboard')}
+                onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
@@ -805,7 +810,7 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.3s ease'
                 }}
               >
                 <i className="bi bi-house-door me-3" data-aos="none"></i>
@@ -817,6 +822,8 @@ const ECSEmployeeDashboard = () => {
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'associate-requests' ? 'active' : ''}`}
                 onClick={() => handleTabChange('associate-requests')}
+                onMouseEnter={() => setHoveredTab('associate-requests')}
+                onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
@@ -827,7 +834,7 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
@@ -841,6 +848,8 @@ const ECSEmployeeDashboard = () => {
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'freelancer-requests' ? 'active' : ''}`}
                 onClick={() => handleTabChange('freelancer-requests')}
+                onMouseEnter={() => setHoveredTab('freelancer-requests')}
+                onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
@@ -851,7 +860,7 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
@@ -888,6 +897,8 @@ const ECSEmployeeDashboard = () => {
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
                 onClick={() => handleTabChange('settings')}
+                onMouseEnter={() => setHoveredTab('settings')}
+                onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
@@ -898,7 +909,7 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
@@ -912,6 +923,8 @@ const ECSEmployeeDashboard = () => {
                 <button
                 className="nav-item w-100 text-start"
                 onClick={logout}
+                onMouseEnter={() => setHoveredTab('logout')}
+                onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
@@ -922,7 +935,7 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
