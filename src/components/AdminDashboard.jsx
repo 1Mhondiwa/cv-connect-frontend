@@ -37,6 +37,9 @@ const ESCAdminDashboard = () => {
   
   // Enhanced freelancer management
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associates', 'freelancers'
+  
+  // Add hover state management for better UX
+  const [hoveredTab, setHoveredTab] = useState(null);
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
@@ -1681,6 +1684,8 @@ const ESCAdminDashboard = () => {
                   setActiveTab('dashboard');
                   window.scrollTo(0, 0);
                 }}
+                onMouseEnter={() => setHoveredTab('dashboard')}
+                onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -1690,7 +1695,7 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.3s ease'
                 }}
               >
                 <i className="bi bi-speedometer2 me-3"></i>
@@ -1719,6 +1724,8 @@ const ESCAdminDashboard = () => {
                   setActiveTab('analytics');
                   window.scrollTo(0, 0);
                 }}
+                onMouseEnter={() => setHoveredTab('analytics')}
+                onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -1728,7 +1735,7 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
@@ -1745,6 +1752,8 @@ const ESCAdminDashboard = () => {
                   setActiveTab('reports');
                   window.scrollTo(0, 0);
                 }}
+                onMouseEnter={() => setHoveredTab('reports')}
+                onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -1754,7 +1763,7 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
@@ -1791,6 +1800,8 @@ const ESCAdminDashboard = () => {
                   setActiveTab('settings');
                   window.scrollTo(0, 0);
                 }}
+                onMouseEnter={() => setHoveredTab('settings')}
+                onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -1800,7 +1811,7 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
@@ -1812,8 +1823,10 @@ const ESCAdminDashboard = () => {
               </button>
               
                 <button
-                className="nav-item w-100 text-start"
+                className="nav-item w-100 text-start logout-button"
                 onClick={logout}
+                onMouseEnter={() => setHoveredTab('logout')}
+                onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -1823,7 +1836,7 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.3s ease',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',

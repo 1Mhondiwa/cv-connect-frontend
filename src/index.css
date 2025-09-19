@@ -707,3 +707,72 @@ button:disabled {
   border-left: 3px solid #dc3545 !important;
   color: #dc3545 !important;
 }
+
+/* Admin Dashboard Sidebar Hover Effects */
+/* Ensure admin sidebar buttons are clickable and have proper interaction */
+.admin-dashboard .sidebar .nav-item {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 1 !important;
+  /* Add smooth transition for hover effects */
+  transition: all 0.3s ease !important;
+  /* Add subtle shadow for depth */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Default orange hover effects for all admin navigation buttons */
+.admin-dashboard .sidebar .nav-item:hover {
+  background: rgba(253, 104, 14, 0.08) !important;
+  border-left: 3px solid #fd680e !important;
+  transform: translateX(4px) !important;
+  box-shadow: 0 4px 12px rgba(253, 104, 14, 0.15) !important;
+}
+
+/* Active state styling for admin sidebar */
+.admin-dashboard .sidebar .nav-item.active {
+  /* Ensure active state has proper styling */
+  background: #fd680e !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(253, 104, 14, 0.25) !important;
+  border-left: 3px solid #fd680e !important;
+  margin-left: -3px !important;
+  padding-left: 13px !important;
+}
+
+/* Icon hover animation for admin sidebar */
+.admin-dashboard .sidebar .nav-item:hover i {
+  transform: scale(1.1) !important;
+  transition: transform 0.3s ease !important;
+}
+
+/* Active icon styling for admin sidebar */
+.admin-dashboard .sidebar .nav-item.active i {
+  transform: scale(1.05) !important;
+}
+
+/* Admin sidebar header hover effects */
+.admin-dashboard .sidebar .sidebar-header {
+  transition: all 0.3s ease !important;
+}
+
+.admin-dashboard .sidebar .sidebar-header:hover {
+  background: rgba(253, 104, 14, 0.05) !important;
+}
+
+/* Section title hover effects for admin sidebar */
+.admin-dashboard .sidebar .nav-section-title {
+  transition: all 0.3s ease !important;
+}
+
+.admin-dashboard .sidebar .nav-section:hover .nav-section-title {
+  color: #fd680e !important;
+  transform: translateX(2px) !important;
+}
+
+/* Override with red effects only for admin logout button */
+.admin-dashboard .sidebar .nav-item.logout-button:hover {
+  background: rgba(220, 53, 69, 0.1) !important;
+  border-left: 3px solid #dc3545 !important;
+  color: #dc3545 !important;
+}
