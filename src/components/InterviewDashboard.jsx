@@ -19,6 +19,28 @@ const InterviewDashboard = ({ userType }) => {
     fetchInterviews();
   }, [filter]);
 
+  // Disable AOS animations for this component to prevent unwanted spinning
+  useEffect(() => {
+    const disableAOS = () => {
+      // Disable AOS for this component and its children
+      const component = document.querySelector('.interview-dashboard');
+      if (component) {
+        component.setAttribute('data-aos', 'none');
+        // Also disable for all child elements
+        const children = component.querySelectorAll('*');
+        children.forEach(child => {
+          child.setAttribute('data-aos', 'none');
+        });
+      }
+    };
+
+    // Run immediately and after a short delay to ensure DOM is ready
+    disableAOS();
+    const timeoutId = setTimeout(disableAOS, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   // Set up polling for real-time updates when there are active interviews
   useEffect(() => {
     const hasActiveInterviews = interviews.some(interview => 
@@ -180,9 +202,9 @@ const InterviewDashboard = ({ userType }) => {
   }
 
   return (
-    <div className="interview-dashboard">
+    <div className="interview-dashboard" data-aos="none">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-4" data-aos="none">
         <div>
           <h4 className="mb-1">
             <i className="bi bi-calendar-event me-2"></i>

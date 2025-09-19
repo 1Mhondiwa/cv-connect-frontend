@@ -587,3 +587,15 @@ button:disabled {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* Disable AOS animations for interview dashboard to prevent spinning issues */
+.interview-dashboard,
+.interview-dashboard *,
+.interview-dashboard [data-aos],
+.interview-dashboard [data-aos] * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
