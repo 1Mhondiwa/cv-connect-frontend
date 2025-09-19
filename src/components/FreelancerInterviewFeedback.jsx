@@ -33,6 +33,28 @@ const FreelancerInterviewFeedback = () => {
     fetchMyFeedback();
   }, [fetchMyFeedback]);
 
+  // Disable AOS animations for this component to prevent unwanted spinning
+  useEffect(() => {
+    const disableAOS = () => {
+      // Disable AOS for this component and its children
+      const component = document.querySelector('.freelancer-interview-feedback');
+      if (component) {
+        component.setAttribute('data-aos', 'none');
+        // Also disable for all child elements
+        const children = component.querySelectorAll('*');
+        children.forEach(child => {
+          child.setAttribute('data-aos', 'none');
+        });
+      }
+    };
+
+    // Run immediately and after a short delay to ensure DOM is ready
+    disableAOS();
+    const timeoutId = setTimeout(disableAOS, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -120,46 +142,46 @@ const FreelancerInterviewFeedback = () => {
   const { interviews, summary } = feedbackData;
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid freelancer-interview-feedback" data-aos="none">
       {/* Summary Section */}
-      <div className="row g-3 mb-4">
-        <div className="col-md-3 col-6">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body text-center p-3">
-              <div className="h4 mb-1" style={{ color: accent }}>
+      <div className="row g-3 mb-4" data-aos="none">
+        <div className="col-md-3 col-6" data-aos="none">
+          <div className="card border-0 shadow-sm h-100" data-aos="none">
+            <div className="card-body text-center p-3" data-aos="none">
+              <div className="h4 mb-1" style={{ color: accent }} data-aos="none">
                 {summary.totalInterviews}
               </div>
-              <div className="small text-muted">Total Interviews</div>
+              <div className="small text-muted" data-aos="none">Total Interviews</div>
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-6">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body text-center p-3">
-              <div className="h4 mb-1" style={{ color: getRatingColor(summary.averageRating) }}>
+        <div className="col-md-3 col-6" data-aos="none">
+          <div className="card border-0 shadow-sm h-100" data-aos="none">
+            <div className="card-body text-center p-3" data-aos="none">
+              <div className="h4 mb-1" style={{ color: getRatingColor(summary.averageRating) }} data-aos="none">
                 {summary.averageRating || 'N/A'}
               </div>
-              <div className="small text-muted">Average Rating</div>
+              <div className="small text-muted" data-aos="none">Average Rating</div>
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-6">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body text-center p-3">
-              <div className="h4 mb-1 text-success">
+        <div className="col-md-3 col-6" data-aos="none">
+          <div className="card border-0 shadow-sm h-100" data-aos="none">
+            <div className="card-body text-center p-3" data-aos="none">
+              <div className="h4 mb-1 text-success" data-aos="none">
                 {summary.hireRecommendations}
               </div>
-              <div className="small text-muted">Hire Recommendations</div>
+              <div className="small text-muted" data-aos="none">Hire Recommendations</div>
             </div>
           </div>
         </div>
-        <div className="col-md-3 col-6">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body text-center p-3">
-              <div className="h4 mb-1" style={{ color: '#17a2b8' }}>
+        <div className="col-md-3 col-6" data-aos="none">
+          <div className="card border-0 shadow-sm h-100" data-aos="none">
+            <div className="card-body text-center p-3" data-aos="none">
+              <div className="h4 mb-1" style={{ color: '#17a2b8' }} data-aos="none">
                 {summary.feedbackReceived}
               </div>
-              <div className="small text-muted">Feedback Received</div>
+              <div className="small text-muted" data-aos="none">Feedback Received</div>
             </div>
           </div>
         </div>
