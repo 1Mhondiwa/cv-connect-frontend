@@ -2204,28 +2204,6 @@ const ESCAdminDashboard = () => {
                               <small className="text-muted">Debug: filteredChartData = {JSON.stringify(filteredChartData)}</small>
                             </div>
                           </div>
-                        ) : filteredChartData.length === 1 ? (
-                          <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
-                            <div className="text-center">
-                              <div className="mb-3">
-                                <h4 style={{ color: accent }}>{filteredChartData[0].desktop + filteredChartData[0].mobile}</h4>
-                                <p className="text-muted mb-2">Total Visitors</p>
-                                <div className="d-flex justify-content-center gap-4">
-                                  <div>
-                                    <div className="h5 mb-0" style={{ color: accent }}>{filteredChartData[0].desktop}</div>
-                                    <small className="text-muted">Desktop</small>
-                                  </div>
-                                  <div>
-                                    <div className="h5 mb-0" style={{ color: '#007bff' }}>{filteredChartData[0].mobile}</div>
-                                    <small className="text-muted">Mobile</small>
-                                  </div>
-                                </div>
-                              </div>
-                              <small className="text-muted">{filteredChartData[0].formattedDate}</small>
-                              <br />
-                              <small className="text-muted">More data will appear as visitors are tracked</small>
-                            </div>
-                          </div>
                         ) : !filteredChartData[0] || typeof filteredChartData[0].mobile === 'undefined' || typeof filteredChartData[0].desktop === 'undefined' ? (
                           <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
                             <div className="text-center text-muted">
