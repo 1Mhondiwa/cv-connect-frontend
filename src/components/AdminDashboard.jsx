@@ -176,6 +176,68 @@ const ESCAdminDashboard = () => {
 
 
 
+  // Fetch visitor data for dashboard chart
+  const fetchVisitorData = useCallback(async () => {
+    console.log('🚀 fetchVisitorData called with timeRange:', timeRange);
+    setVisitorDataLoading(true);
+    try {
+      // Calculate days based on time range
+      const getDaysFromTimeRange = (range) => {
+        switch (range) {
+          case '7d': return 7;
+          case '30d': return 30;
+          case '90d': return 90;
+          default: return 90;
+        }
+      };
+      
+      const days = getDaysFromTimeRange(timeRange);
+      console.log(`📅 Fetching visitor data for last ${days} days (timeRange: ${timeRange})`);
+      const response = await api.get(`/admin/analytics/visitor-data?days=${days}`);
+      
+      if (response.data.success) {
+        // Format the data for the chart with proper validation
+        const formattedData = response.data.data.map(item => ({
+          ...item,
+          // Ensure required properties exist with fallback values
+          mobile: Number(item.mobile) || 0,
+          desktop: Number(item.desktop) || 0,
+          date: item.date || new Date().toISOString(),
+          // Format the date for display
+          formattedDate: new Date(item.date || new Date()).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric' 
+          })
+        }));
+        
+        console.log('📊 Visitor data structure:', response.data.data);
+        console.log('📊 Formatted chart data:', formattedData);
+        setVisitorData(formattedData);
+        setFilteredChartData(formattedData); // Update the chart data
+      } else {
+        console.error('Failed to fetch visitor data:', response.data.message);
+        // Set fallback data if API fails
+        const fallbackData = [
+          { date: new Date().toISOString(), mobile: 0, desktop: 0, formattedDate: 'Today' },
+          { date: new Date(Date.now() - 86400000).toISOString(), mobile: 0, desktop: 0, formattedDate: 'Yesterday' }
+        ];
+        setVisitorData(fallbackData);
+        setFilteredChartData(fallbackData);
+      }
+    } catch (error) {
+      console.error('Error fetching visitor data:', error);
+      // Set fallback data if API fails
+      const fallbackData = [
+        { date: new Date().toISOString(), mobile: 0, desktop: 0, formattedDate: 'Today' },
+        { date: new Date(Date.now() - 86400000).toISOString(), mobile: 0, desktop: 0, formattedDate: 'Yesterday' }
+      ];
+      setVisitorData(fallbackData);
+      setFilteredChartData(fallbackData);
+    } finally {
+      setVisitorDataLoading(false);
+    }
+  }, [timeRange]);
+
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -914,67 +976,6 @@ const ESCAdminDashboard = () => {
 
 
 
-  // Fetch visitor data for dashboard chart
-  const fetchVisitorData = useCallback(async () => {
-    console.log('🚀 fetchVisitorData called with timeRange:', timeRange);
-    setVisitorDataLoading(true);
-    try {
-      // Calculate days based on time range
-      const getDaysFromTimeRange = (range) => {
-        switch (range) {
-          case '7d': return 7;
-          case '30d': return 30;
-          case '90d': return 90;
-          default: return 90;
-        }
-      };
-      
-      const days = getDaysFromTimeRange(timeRange);
-      console.log(`📅 Fetching visitor data for last ${days} days (timeRange: ${timeRange})`);
-      const response = await api.get(`/admin/analytics/visitor-data?days=${days}`);
-      
-      if (response.data.success) {
-        // Format the data for the chart with proper validation
-        const formattedData = response.data.data.map(item => ({
-          ...item,
-          // Ensure required properties exist with fallback values
-          mobile: Number(item.mobile) || 0,
-          desktop: Number(item.desktop) || 0,
-          date: item.date || new Date().toISOString(),
-          // Format the date for display
-          formattedDate: new Date(item.date || new Date()).toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric' 
-          })
-        }));
-        
-        console.log('📊 Visitor data structure:', response.data.data);
-        console.log('📊 Formatted chart data:', formattedData);
-        setVisitorData(formattedData);
-        setFilteredChartData(formattedData); // Update the chart data
-      } else {
-        console.error('Failed to fetch visitor data:', response.data.message);
-        // Set fallback data if API fails
-        const fallbackData = [
-          { date: new Date().toISOString(), mobile: 0, desktop: 0, formattedDate: 'Today' },
-          { date: new Date(Date.now() - 86400000).toISOString(), mobile: 0, desktop: 0, formattedDate: 'Yesterday' }
-        ];
-        setVisitorData(fallbackData);
-        setFilteredChartData(fallbackData);
-      }
-    } catch (error) {
-      console.error('Error fetching visitor data:', error);
-      // Set fallback data if API fails
-      const fallbackData = [
-        { date: new Date().toISOString(), mobile: 0, desktop: 0, formattedDate: 'Today' },
-        { date: new Date(Date.now() - 86400000).toISOString(), mobile: 0, desktop: 0, formattedDate: 'Yesterday' }
-      ];
-      setVisitorData(fallbackData);
-      setFilteredChartData(fallbackData);
-    } finally {
-      setVisitorDataLoading(false);
-    }
-  }, [timeRange]);
 
   // Comprehensive Reports Functions
   const generateComprehensiveReport = async () => {
