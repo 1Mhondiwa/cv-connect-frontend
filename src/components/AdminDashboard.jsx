@@ -203,10 +203,12 @@ const ESCAdminDashboard = () => {
 
   // Fetch visitor data when time range changes
   useEffect(() => {
+    console.log('🔄 TimeRange useEffect triggered:', { activeTab, timeRange });
     if (activeTab === 'dashboard') {
+      console.log('📊 Fetching visitor data for timeRange:', timeRange);
       fetchVisitorData();
     }
-  }, [timeRange]);
+  }, [timeRange, activeTab]);
 
   // Fetch CV upload data when analytics tab is opened or filter changes
   useEffect(() => {
@@ -905,6 +907,7 @@ const ESCAdminDashboard = () => {
 
   // Fetch visitor data for dashboard chart
   const fetchVisitorData = async () => {
+    console.log('🚀 fetchVisitorData called with timeRange:', timeRange);
     setVisitorDataLoading(true);
     try {
       // Calculate days based on time range
@@ -918,6 +921,7 @@ const ESCAdminDashboard = () => {
       };
       
       const days = getDaysFromTimeRange(timeRange);
+      console.log(`📅 Fetching visitor data for last ${days} days (timeRange: ${timeRange})`);
       const response = await api.get(`/admin/analytics/visitor-data?days=${days}`);
       
       if (response.data.success) {
@@ -2084,7 +2088,10 @@ const ESCAdminDashboard = () => {
                             <button
                               type="button"
                               className={`btn btn-sm ${timeRange === '90d' ? '' : ''}`}
-                              onClick={() => setTimeRange('90d')}
+                              onClick={() => {
+                                console.log('🔄 Last 3 months button clicked');
+                                setTimeRange('90d');
+                              }}
                               style={{ 
                                 fontSize: '12px', 
                                 padding: '6px 12px',
@@ -2099,7 +2106,10 @@ const ESCAdminDashboard = () => {
                             <button
                               type="button"
                               className={`btn btn-sm ${timeRange === '30d' ? '' : ''}`}
-                              onClick={() => setTimeRange('30d')}
+                              onClick={() => {
+                                console.log('🔄 Last 30 days button clicked');
+                                setTimeRange('30d');
+                              }}
                               style={{ 
                                 fontSize: '12px', 
                                 padding: '6px 12px',
@@ -2114,7 +2124,10 @@ const ESCAdminDashboard = () => {
                             <button
                               type="button"
                               className={`btn btn-sm ${timeRange === '7d' ? '' : ''}`}
-                              onClick={() => setTimeRange('7d')}
+                              onClick={() => {
+                                console.log('🔄 Last 7 days button clicked');
+                                setTimeRange('7d');
+                              }}
                               style={{ 
                                 fontSize: '12px', 
                                 padding: '6px 12px',
