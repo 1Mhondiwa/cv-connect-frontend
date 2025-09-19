@@ -611,3 +611,15 @@ button:disabled {
   opacity: 1 !important;
   visibility: visible !important;
 }
+
+/* Disable AOS animations for ECS Employee sidebar to prevent spinning issues */
+.ecs-employee-sidebar,
+.ecs-employee-sidebar *,
+.ecs-employee-sidebar [data-aos],
+.ecs-employee-sidebar [data-aos] * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}

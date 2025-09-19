@@ -116,6 +116,28 @@ const ECSEmployeeDashboard = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Disable AOS animations for this component to prevent unwanted spinning
+  useEffect(() => {
+    const disableAOS = () => {
+      // Disable AOS for the sidebar and all its children
+      const sidebar = document.querySelector('.ecs-employee-sidebar');
+      if (sidebar) {
+        sidebar.setAttribute('data-aos', 'none');
+        // Also disable for all child elements
+        const children = sidebar.querySelectorAll('*');
+        children.forEach(child => {
+          child.setAttribute('data-aos', 'none');
+        });
+      }
+    };
+
+    // Run immediately and after a short delay to ensure DOM is ready
+    disableAOS();
+    const timeoutId = setTimeout(disableAOS, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   // Load user data on component mount
   useEffect(() => {
     const loadUserData = async () => {
@@ -702,7 +724,7 @@ const ECSEmployeeDashboard = () => {
   return (
     <div className="admin-dashboard">
       {/* Professional Sidebar */}
-      <div className="sidebar" style={{ 
+      <div className="sidebar ecs-employee-sidebar" data-aos="none" style={{ 
         width: '280px', 
         height: '100vh', 
         position: 'fixed', 
@@ -714,15 +736,16 @@ const ECSEmployeeDashboard = () => {
         zIndex: 1000
       }}>
         {/* Sidebar Header */}
-        <div className="sidebar-header" style={{ 
+        <div className="sidebar-header" data-aos="none" style={{ 
           padding: '24px', 
           borderBottom: '1px solid #e5e7eb',
           background: '#fafafa'
         }}>
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center" data-aos="none">
             <img 
               src="/assets/img/cv-connect_logo.png" 
               alt="CV-Connect Logo" 
+              data-aos="none"
               style={{
                 width: '32px', 
                 height: '32px', 
@@ -730,24 +753,24 @@ const ECSEmployeeDashboard = () => {
                 marginRight: '12px'
               }}
             />
-        <div>
-              <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }}>
+        <div data-aos="none">
+              <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }} data-aos="none">
                 CV-Connect
               </h5>
-              <small className="text-muted">ECS Employee Portal</small>
+              <small className="text-muted" data-aos="none">ECS Employee Portal</small>
           </div>
           </div>
         </div>
 
         {/* Sidebar Content */}
-        <div className="sidebar-content" style={{ 
+        <div className="sidebar-content" data-aos="none" style={{ 
           padding: '16px', 
           display: 'flex', 
           flexDirection: 'column', 
           height: 'calc(100vh - 120px)' 
         }}>
           {/* Main Navigation */}
-          <div className="nav-section mb-4">
+          <div className="nav-section mb-4" data-aos="none">
             <h6 className="nav-section-title" style={{ 
               color: '#6b7280', 
               fontSize: '12px', 
@@ -755,13 +778,14 @@ const ECSEmployeeDashboard = () => {
               textTransform: 'uppercase',
               marginBottom: '8px',
               paddingLeft: '8px'
-            }}>
+            }} data-aos="none">
               Main Navigation
             </h6>
-            <div className="nav-items">
+            <div className="nav-items" data-aos="none">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
                 onClick={() => handleTabChange('dashboard')}
+                data-aos="none"
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -774,7 +798,7 @@ const ECSEmployeeDashboard = () => {
                   transition: 'all 0.2s ease'
                 }}
               >
-                <i className="bi bi-house-door me-3"></i>
+                <i className="bi bi-house-door me-3" data-aos="none"></i>
                 Home
         </button>
               
@@ -783,6 +807,7 @@ const ECSEmployeeDashboard = () => {
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'associate-requests' ? 'active' : ''}`}
                 onClick={() => handleTabChange('associate-requests')}
+                data-aos="none"
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -799,13 +824,14 @@ const ECSEmployeeDashboard = () => {
                   alignItems: 'center'
                 }}
               >
-                <i className="bi bi-person-plus me-3"></i>
+                <i className="bi bi-person-plus me-3" data-aos="none"></i>
                 Associate Requests
                 </button>
 
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'freelancer-requests' ? 'active' : ''}`}
                 onClick={() => handleTabChange('freelancer-requests')}
+                data-aos="none"
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -822,7 +848,7 @@ const ECSEmployeeDashboard = () => {
                   alignItems: 'center'
                 }}
               >
-                <i className="bi bi-people-fill me-3"></i>
+                <i className="bi bi-people-fill me-3" data-aos="none"></i>
                 Associate Freelancer Requests
                 </button>
 
@@ -837,7 +863,7 @@ const ECSEmployeeDashboard = () => {
 
           {/* Bottom Section - Settings and Logout */}
           {/* System */}
-          <div className="nav-section">
+          <div className="nav-section" data-aos="none">
             <h6 className="nav-section-title" style={{ 
               color: '#6b7280', 
               fontSize: '12px', 
@@ -845,13 +871,14 @@ const ECSEmployeeDashboard = () => {
               textTransform: 'uppercase',
               marginBottom: '8px',
               paddingLeft: '8px'
-            }}>
+            }} data-aos="none">
               System
             </h6>
-            <div className="nav-items">
+            <div className="nav-items" data-aos="none">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
                 onClick={() => handleTabChange('settings')}
+                data-aos="none"
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -868,13 +895,14 @@ const ECSEmployeeDashboard = () => {
                   alignItems: 'center'
                 }}
               >
-                <i className="bi bi-gear me-3"></i>
+                <i className="bi bi-gear me-3" data-aos="none"></i>
                 Settings
               </button>
               
                 <button
                 className="nav-item w-100 text-start"
                 onClick={logout}
+                data-aos="none"
                 style={{
                   padding: '12px 16px',
                   border: 'none',
@@ -891,7 +919,7 @@ const ECSEmployeeDashboard = () => {
                   alignItems: 'center'
                 }}
               >
-                <i className="bi bi-box-arrow-right me-3"></i>
+                <i className="bi bi-box-arrow-right me-3" data-aos="none"></i>
                 Logout
                 </button>
             </div>
