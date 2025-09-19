@@ -2061,7 +2061,9 @@ const ESCAdminDashboard = () => {
                             Total Visitors
                           </h6>
                           <p className="card-text text-muted small mb-0">
-                            Total for the last 3 months
+                            {timeRange === '7d' ? 'Total for the last 7 days' : 
+                             timeRange === '30d' ? 'Total for the last 30 days' : 
+                             'Total for the last 3 months'}
                           </p>
                         </div>
                         <div className="d-flex gap-2 mt-2">
