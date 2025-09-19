@@ -177,8 +177,8 @@ const ESCAdminDashboard = () => {
 
 
   // Fetch visitor data for dashboard chart
-  const fetchVisitorData = useCallback(async () => {
-    console.log('🚀 fetchVisitorData called with timeRange:', timeRange);
+  const fetchVisitorData = useCallback(async (forceRefresh = false) => {
+    console.log('🚀 fetchVisitorData called with timeRange:', timeRange, 'forceRefresh:', forceRefresh);
     setVisitorDataLoading(true);
     try {
       // Calculate days based on time range
@@ -193,7 +193,15 @@ const ESCAdminDashboard = () => {
       
       const days = getDaysFromTimeRange(timeRange);
       console.log(`📅 Fetching visitor data for last ${days} days (timeRange: ${timeRange})`);
-      const response = await api.get(`/admin/analytics/visitor-data?days=${days}`);
+      
+      // Add cache busting parameter to ensure fresh data
+      const cacheBuster = forceRefresh ? Date.now() : Math.floor(Date.now() / 1000); // Use seconds for normal calls, milliseconds for force refresh
+      const response = await api.get(`/admin/analytics/visitor-data?days=${days}&_t=${cacheBuster}`, {
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
       
       if (response.data.success) {
         // Format the data for the chart with proper validation
@@ -212,8 +220,13 @@ const ESCAdminDashboard = () => {
         
         console.log('📊 Visitor data structure:', response.data.data);
         console.log('📊 Formatted chart data:', formattedData);
+        console.log('🔄 Updating chart with fresh data:', formattedData.length, 'records');
         setVisitorData(formattedData);
-        setFilteredChartData(formattedData); // Update the chart data
+        setFilteredChartData(formattedData); // Update the chart data immediately
+        
+        if (forceRefresh) {
+          console.log('✅ Data refreshed successfully with force refresh');
+        }
       } else {
         console.error('Failed to fetch visitor data:', response.data.message);
         // Set fallback data if API fails
@@ -2055,7 +2068,7 @@ const ESCAdminDashboard = () => {
                           {/* Refresh Button */}
                           <button 
                             className="btn btn-sm me-2"
-                            onClick={fetchVisitorData}
+                            onClick={() => fetchVisitorData(true)}
                             disabled={visitorDataLoading}
                             style={{ 
                               fontSize: '12px', 
