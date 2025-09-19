@@ -305,6 +305,13 @@ const ESCAdminDashboard = () => {
     }
   }, [timeRange, fetchVisitorData]);
 
+  // Debug filteredChartData changes
+  useEffect(() => {
+    console.log('🔍 filteredChartData state changed:', {
+      length: filteredChartData.length
+    });
+  }, [filteredChartData]);
+
   // Fetch CV upload data when analytics tab is opened or filter changes
   useEffect(() => {
     console.log('🔄 CV Upload useEffect triggered:', { 
@@ -2192,6 +2199,9 @@ const ESCAdminDashboard = () => {
                             <div className="text-center text-muted">
                               <i className="bi bi-graph-up display-4"></i>
                               <p className="mt-2">No visitor data available for the selected time period</p>
+                              <small className="text-muted">Debug: filteredChartData.length = {filteredChartData.length}</small>
+                              <br />
+                              <small className="text-muted">Debug: filteredChartData = {JSON.stringify(filteredChartData)}</small>
                             </div>
                           </div>
                         ) : !filteredChartData[0] || typeof filteredChartData[0].mobile === 'undefined' || typeof filteredChartData[0].desktop === 'undefined' ? (
@@ -2213,10 +2223,6 @@ const ESCAdminDashboard = () => {
                               item.date &&
                               !isNaN(item.mobile) &&
                               !isNaN(item.desktop);
-                            
-                            if (!isValid) {
-                              console.log('❌ Invalid chart item filtered out:', item);
-                            }
                             return isValid;
                           })}>
                             <defs>
