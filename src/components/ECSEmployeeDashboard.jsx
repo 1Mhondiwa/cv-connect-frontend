@@ -123,10 +123,18 @@ const ECSEmployeeDashboard = () => {
       const sidebar = document.querySelector('.ecs-employee-sidebar');
       if (sidebar) {
         sidebar.setAttribute('data-aos', 'none');
-        // Also disable for all child elements
-        const children = sidebar.querySelectorAll('*');
+        // Also disable for all child elements, but be more careful with buttons
+        const children = sidebar.querySelectorAll('*:not(button):not(.nav-item)');
         children.forEach(child => {
           child.setAttribute('data-aos', 'none');
+        });
+        // For buttons, only disable AOS but preserve functionality
+        const buttons = sidebar.querySelectorAll('button');
+        buttons.forEach(button => {
+          button.setAttribute('data-aos', 'none');
+          // Ensure buttons remain interactive
+          button.style.pointerEvents = 'auto';
+          button.style.cursor = 'pointer';
         });
       }
     };
@@ -694,11 +702,13 @@ const ECSEmployeeDashboard = () => {
   };
 
   const handleLogout = () => {
+    console.log('🚪 Logout requested');
     logout();
     navigate('/');
   };
 
   const handleTabChange = (tab) => {
+    console.log('🔄 Tab change requested:', tab);
     setActiveTab(tab);
     window.scrollTo(0, 0);
   };
