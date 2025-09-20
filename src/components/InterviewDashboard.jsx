@@ -237,15 +237,6 @@ const InterviewDashboard = ({ userType }) => {
         </div>
       </div>
       
-      {/* Debug info */}
-      <div className="mb-3 p-2 bg-light rounded">
-        <small className="text-muted">
-          Debug: {interviews.length} interviews found, userType: {userType}
-          {interviews.length > 0 && (
-            <span> | First interview status: {interviews[0].status}</span>
-          )}
-        </small>
-      </div>
       
       {/* Interviews List */}
       {interviews.length === 0 ? (
