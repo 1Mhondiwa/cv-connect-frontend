@@ -138,6 +138,7 @@ const InterviewDashboard = ({ userType }) => {
   };
 
   const openInterviewDetails = (interview) => {
+    console.log('🔍 Opening interview details for:', interview);
     setSelectedInterview(interview);
     setShowDetails(true);
   };
@@ -163,6 +164,7 @@ const InterviewDashboard = ({ userType }) => {
   };
 
   const startVideoCall = (interview) => {
+    console.log('🎥 Starting video call for interview:', interview);
     if (interview.interview_type === 'video') {
       // Open our custom video call modal
       setSelectedInterviewForCall(interview);
@@ -234,7 +236,17 @@ const InterviewDashboard = ({ userType }) => {
           </ul>
         </div>
       </div>
-
+      
+      {/* Debug info */}
+      <div className="mb-3 p-2 bg-light rounded">
+        <small className="text-muted">
+          Debug: {interviews.length} interviews found, userType: {userType}
+          {interviews.length > 0 && (
+            <span> | First interview status: {interviews[0].status}</span>
+          )}
+        </small>
+      </div>
+      
       {/* Interviews List */}
       {interviews.length === 0 ? (
         <div className="text-center py-5">

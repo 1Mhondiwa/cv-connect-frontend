@@ -594,10 +594,22 @@ button:disabled {
 .interview-dashboard [data-aos],
 .interview-dashboard [data-aos] * {
   animation: none !important;
-  transition: none !important;
+  /* Allow basic transitions for button interactions but disable AOS transforms */
   transform: none !important;
   opacity: 1 !important;
   visibility: visible !important;
+  /* Ensure pointer events work */
+  pointer-events: auto !important;
+}
+
+/* Ensure interview dashboard buttons are clickable and have proper interaction */
+.interview-dashboard .btn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 1 !important;
+  /* Allow button transitions for hover effects */
+  transition: all 0.3s ease !important;
 }
 
 /* Disable AOS animations for freelancer interview feedback to prevent spinning issues */
