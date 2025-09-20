@@ -25,20 +25,37 @@ const InterviewDashboard = ({ userType }) => {
       // Disable AOS for this component and its children
       const component = document.querySelector('.interview-dashboard');
       if (component) {
+        // Remove any existing AOS attributes and disable animations
+        component.removeAttribute('data-aos');
         component.setAttribute('data-aos', 'none');
+        
         // Also disable for all child elements
         const children = component.querySelectorAll('*');
         children.forEach(child => {
+          child.removeAttribute('data-aos');
           child.setAttribute('data-aos', 'none');
+          // Force remove any animation classes
+          child.classList.remove('aos-init', 'aos-animate');
         });
+        
+        // If AOS is loaded globally, refresh it to apply the changes
+        if (window.AOS) {
+          window.AOS.refresh();
+        }
       }
     };
 
-    // Run immediately and after a short delay to ensure DOM is ready
+    // Run immediately and with multiple delays to ensure DOM is ready
     disableAOS();
-    const timeoutId = setTimeout(disableAOS, 100);
+    const timeoutId1 = setTimeout(disableAOS, 50);
+    const timeoutId2 = setTimeout(disableAOS, 100);
+    const timeoutId3 = setTimeout(disableAOS, 200);
     
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
+    };
   }, []);
 
   // Set up polling for real-time updates when there are active interviews
@@ -206,13 +223,13 @@ const InterviewDashboard = ({ userType }) => {
   return (
     <div className="interview-dashboard" data-aos="none">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-4" data-aos="none">
-        <div>
-          <h4 className="mb-1">
-            <i className="bi bi-calendar-event me-2"></i>
+      <div className="d-flex justify-content-between align-items-center mb-4" data-aos="none" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+        <div style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+          <h4 className="mb-1" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+            <i className="bi bi-calendar-event me-2" style={{ animation: 'none', transform: 'none', opacity: 1 }}></i>
             Interview Dashboard
           </h4>
-          <p className="text-muted mb-0">
+          <p className="text-muted mb-0" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
             Manage your {userType === 'associate' ? 'scheduled' : 'upcoming'} interviews
           </p>
         </div>

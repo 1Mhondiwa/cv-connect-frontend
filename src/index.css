@@ -612,6 +612,27 @@ button:disabled {
   transition: all 0.3s ease !important;
 }
 
+/* Specifically target the interview dashboard header to prevent any spinning */
+.interview-dashboard .d-flex.justify-content-between.align-items-center.mb-4,
+.interview-dashboard .d-flex.justify-content-between.align-items-center.mb-4 * {
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Disable any spinner or loading animations on interview dashboard */
+.interview-dashboard .spinner-border,
+.interview-dashboard .spinner-grow,
+.interview-dashboard .loading,
+.interview-dashboard [class*="spinner"],
+.interview-dashboard [class*="loading"] {
+  display: none !important;
+  animation: none !important;
+}
+
 /* Disable AOS animations for freelancer interview feedback to prevent spinning issues */
 .freelancer-interview-feedback,
 .freelancer-interview-feedback *,
