@@ -479,6 +479,24 @@ const ECSEmployeeDashboard = () => {
     console.log('🔍 Fetching freelancers...');
     await fetchAvailableFreelancers();
     console.log('🔍 Freelancers fetched, modal should show data now');
+    
+    // Disable AOS animations for the modal and its contents
+    setTimeout(() => {
+      const modal = document.querySelector('.modal.show');
+      if (modal) {
+        modal.setAttribute('data-aos', 'none');
+        const cards = modal.querySelectorAll('.card');
+        cards.forEach(card => {
+          card.setAttribute('data-aos', 'none');
+          card.classList.remove('aos-init', 'aos-animate');
+        });
+        
+        // If AOS is loaded globally, refresh it to apply the changes
+        if (window.AOS) {
+          window.AOS.refresh();
+        }
+      }
+    }, 100);
   };
 
   const handleFreelancerSelection = (freelancerId, isSelected) => {
@@ -1701,11 +1719,29 @@ const ECSEmployeeDashboard = () => {
 
            {/* Recommendations Modal */}
            {showRecommendationsModal && selectedFreelancerRequest && (
-             <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1050 }}>
-               <div className="modal-dialog modal-xl">
-                 <div className="modal-content">
-                   <div className="modal-header">
-                     <h5 className="modal-title" style={{ color: accent, fontWeight: 700 }}>All Registered Freelancers</h5>
+             <div className="modal fade show" data-aos="none" style={{ 
+               display: 'block', 
+               backgroundColor: 'rgba(0,0,0,0.5)', 
+               position: 'fixed', 
+               top: 0, 
+               left: 0, 
+               width: '100%', 
+               height: '100%', 
+               zIndex: 1050,
+               animation: 'none',
+               transform: 'none',
+               opacity: 1
+             }}>
+               <div className="modal-dialog modal-xl" data-aos="none" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+                 <div className="modal-content" data-aos="none" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+                   <div className="modal-header" data-aos="none" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+                     <h5 className="modal-title" style={{ 
+                       color: accent, 
+                       fontWeight: 700,
+                       animation: 'none',
+                       transform: 'none',
+                       opacity: 1
+                     }}>All Registered Freelancers</h5>
                      <button type="button" className="btn-close" onClick={() => setShowRecommendationsModal(false)}></button>
                    </div>
                    <div className="modal-body">
@@ -1854,27 +1890,46 @@ const ECSEmployeeDashboard = () => {
                       <div className="row g-3">
                         {availableFreelancers.map((freelancer) => (
                           <div key={freelancer.freelancer_id} className="col-md-6 col-lg-4">
-                            <div className="card shadow-sm h-100 d-flex flex-column" style={{ border: '2px solid #ffd7c2' }}>
-                              <div className="card-body p-3 d-flex flex-column">
+                            <div className="card shadow-sm h-100 d-flex flex-column" style={{ 
+                              border: '2px solid #ffd7c2',
+                              animation: 'none',
+                              transform: 'none',
+                              opacity: 1,
+                              visibility: 'visible'
+                            }}>
+                              <div className="card-body p-3 d-flex flex-column" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
                                 {/* Header Section */}
-                                <div className="d-flex align-items-start mb-3">
-                                  <div className="form-check me-2">
+                                <div className="d-flex align-items-start mb-3" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+                                  <div className="form-check me-2" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
                                     <input
                                       type="checkbox"
                                       className="form-check-input"
                                       checked={selectedFreelancers.includes(freelancer.freelancer_id)}
                                       onChange={(e) => handleFreelancerSelection(freelancer.freelancer_id, e.target.checked)}
+                                      style={{ animation: 'none', transform: 'none', opacity: 1 }}
                                     />
                                   </div>
-                                  <div className="flex-grow-1">
-                                    <h6 className="card-title mb-1" style={{ color: accent, fontWeight: 600, fontSize: '14px' }}>
+                                  <div className="flex-grow-1" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+                                    <h6 className="card-title mb-1" style={{ 
+                                      color: accent, 
+                                      fontWeight: 600, 
+                                      fontSize: '14px',
+                                      animation: 'none',
+                                      transform: 'none',
+                                      opacity: 1
+                                    }}>
                                       {`${freelancer.first_name} ${freelancer.last_name}`}
                                     </h6>
                                   </div>
                                 </div>
 
                                 {/* Content Section - Fixed Height */}
-                                <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: '200px' }}>
+                                <div className="flex-grow-1 d-flex flex-column" style={{ 
+                                  minHeight: '200px',
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}>
                                   {/* Role */}
                                   <div className="mb-2">
                                     <strong>Role:</strong> 
@@ -1931,9 +1986,9 @@ const ECSEmployeeDashboard = () => {
                                   </div>
 
                                   {/* Availability */}
-                                  <div className="mb-2">
+                                  <div className="mb-2" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
                                     <strong>Availability:</strong>
-                                    <div className="mt-1">
+                                    <div className="mt-1" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
                                       <span style={{ 
                                         background: freelancer.availability_status === 'available' ? '#d4edda' : 
                                                    freelancer.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
@@ -1942,12 +1997,16 @@ const ECSEmployeeDashboard = () => {
                                         padding: '4px 8px', 
                                         borderRadius: 15,
                                         fontSize: 11,
-                                        fontWeight: 600
+                                        fontWeight: 600,
+                                        animation: 'none',
+                                        transform: 'none',
+                                        opacity: 1,
+                                        visibility: 'visible'
                                       }}>
                                         <i className={`bi ${
                                           freelancer.availability_status === 'available' ? 'bi-check-circle' :
                                           freelancer.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
-                                        } me-1`}></i>
+                                        } me-1`} style={{ animation: 'none', transform: 'none', opacity: 1 }}></i>
                                         {freelancer.availability_status === 'available' ? 'Available for Work' :
                                          freelancer.availability_status === 'busy' ? 'Busy' : 'Not Available'}
                                       </span>

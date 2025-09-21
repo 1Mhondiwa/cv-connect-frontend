@@ -633,6 +633,44 @@ button:disabled {
   animation: none !important;
 }
 
+/* Disable AOS animations for freelancer recommendation cards in ECS dashboard */
+.showRecommendationsModal .card,
+.showRecommendationsModal .card *,
+.showRecommendationsModal [data-aos],
+.showRecommendationsModal [data-aos] *,
+.modal.show .card,
+.modal.show .card *,
+.modal.show [data-aos],
+.modal.show [data-aos] * {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Specifically target freelancer cards in recommendations modal */
+.modal.show .card.shadow-sm,
+.modal.show .card.shadow-sm *,
+.modal.show .card-body,
+.modal.show .card-body * {
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Disable any spinner or loading animations on freelancer recommendation cards */
+.modal.show .spinner-border,
+.modal.show .spinner-grow,
+.modal.show .loading,
+.modal.show [class*="spinner"],
+.modal.show [class*="loading"] {
+  display: none !important;
+  animation: none !important;
+}
+
 /* Disable AOS animations for freelancer interview feedback to prevent spinning issues */
 .freelancer-interview-feedback,
 .freelancer-interview-feedback *,
