@@ -116,34 +116,104 @@ const ECSEmployeeDashboard = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Disable AOS animations for this component to prevent unwanted spinning
+  // Aggressively disable AOS animations for this component to prevent unwanted spinning
   useEffect(() => {
+    // First, override the global AOS initialization to prevent it from running
+    const originalAOSInit = window.AOS?.init;
+    if (window.AOS && originalAOSInit) {
+      window.AOS.init = function(options) {
+        // Only initialize AOS if it's not for dashboard pages
+        if (!window.location.pathname.includes('dashboard')) {
+          return originalAOSInit.call(this, options);
+        }
+        // For dashboard pages, do nothing (disable AOS completely)
+        return;
+      };
+    }
+
     const disableAOS = () => {
-      // Disable AOS for the sidebar and all its children
+      // Disable AOS for the entire document when on dashboard pages
+      if (window.location.pathname.includes('dashboard')) {
+        // Remove all AOS attributes from the entire document
+        document.querySelectorAll('[data-aos]').forEach(element => {
+          element.removeAttribute('data-aos');
+          element.setAttribute('data-aos', 'none');
+          element.classList.remove('aos-init', 'aos-animate');
+          element.style.animation = 'none';
+          element.style.transform = 'none';
+          element.style.opacity = '1';
+          element.style.visibility = 'visible';
+        });
+      }
+
+      // Specifically target the sidebar and all its children
       const sidebar = document.querySelector('.ecs-employee-sidebar');
       if (sidebar) {
+        // Remove any existing AOS attributes and disable animations
+        sidebar.removeAttribute('data-aos');
         sidebar.setAttribute('data-aos', 'none');
-        // Also disable for all child elements, but be more careful with buttons
-        const children = sidebar.querySelectorAll('*:not(button):not(.nav-item)');
+        
+        // Also disable for all child elements
+        const children = sidebar.querySelectorAll('*');
         children.forEach(child => {
+          child.removeAttribute('data-aos');
           child.setAttribute('data-aos', 'none');
+          // Force remove any animation classes
+          child.classList.remove('aos-init', 'aos-animate');
+          // Apply inline styles to prevent animations
+          child.style.animation = 'none';
+          child.style.transform = 'none';
+          child.style.opacity = '1';
+          child.style.visibility = 'visible';
         });
+        
         // For buttons, only disable AOS but preserve functionality
         const buttons = sidebar.querySelectorAll('button');
         buttons.forEach(button => {
           button.setAttribute('data-aos', 'none');
+          button.classList.remove('aos-init', 'aos-animate');
           // Ensure buttons remain interactive
           button.style.pointerEvents = 'auto';
           button.style.cursor = 'pointer';
+          button.style.animation = 'none';
+          button.style.transform = 'none';
+          button.style.opacity = '1';
         });
+        
+        // If AOS is loaded globally, refresh it to apply the changes
+        if (window.AOS) {
+          window.AOS.refresh();
+        }
       }
     };
 
-    // Run immediately and after a short delay to ensure DOM is ready
+    // Run immediately and with multiple delays to ensure DOM is ready
     disableAOS();
-    const timeoutId = setTimeout(disableAOS, 100);
+    const timeoutId1 = setTimeout(disableAOS, 50);
+    const timeoutId2 = setTimeout(disableAOS, 100);
+    const timeoutId3 = setTimeout(disableAOS, 200);
+    const timeoutId4 = setTimeout(disableAOS, 500);
+    const timeoutId5 = setTimeout(disableAOS, 1000);
     
-    return () => clearTimeout(timeoutId);
+    // Also run on window load to override the global AOS init
+    const handleLoad = () => {
+      disableAOS();
+    };
+    window.addEventListener('load', handleLoad);
+    
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
+      clearTimeout(timeoutId4);
+      clearTimeout(timeoutId5);
+      window.removeEventListener('load', handleLoad);
+      
+      // Restore original AOS init function
+      if (window.AOS && originalAOSInit) {
+        window.AOS.init = originalAOSInit;
+      }
+    };
   }, []);
 
   // Load user data on component mount
@@ -764,20 +834,37 @@ const ECSEmployeeDashboard = () => {
         background: '#fff', 
         borderRight: '1px solid #e5e7eb',
         overflowY: 'auto',
-        zIndex: 1000
+        zIndex: 1000,
+        animation: 'none',
+        transform: 'none',
+        opacity: 1,
+        visibility: 'visible'
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" data-aos="none" style={{ 
           padding: '24px', 
           borderBottom: '1px solid #e5e7eb',
-          background: '#fafafa'
+          background: '#fafafa',
+          animation: 'none',
+          transform: 'none',
+          opacity: 1,
+          visibility: 'visible'
         }}>
-          <div className="d-flex align-items-center" data-aos="none">
+          <div className="d-flex align-items-center" data-aos="none" style={{ 
+            animation: 'none',
+            transform: 'none',
+            opacity: 1,
+            visibility: 'visible'
+          }}>
             <img 
               src="/assets/img/cv-connect_logo.png" 
-              alt="CV-Connect Logo" 
+              alt="CV-Connect Logo"
               data-aos="none"
-              style={{
+              style={{ 
+                animation: 'none',
+                transform: 'none',
+                opacity: 1,
+                visibility: 'visible',
                 width: '32px', 
                 height: '32px', 
                 borderRadius: '8px',
@@ -812,7 +899,12 @@ const ECSEmployeeDashboard = () => {
             }} data-aos="none">
               Main Navigation
             </h6>
-            <div className="nav-items" data-aos="none">
+            <div className="nav-items" data-aos="none" style={{ 
+              animation: 'none',
+              transform: 'none',
+              opacity: 1,
+              visibility: 'visible'
+            }}>
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
                 onClick={() => handleTabChange('dashboard')}
@@ -825,6 +917,10 @@ const ECSEmployeeDashboard = () => {
                   background: activeTab === 'dashboard' ? accent : 'transparent',
                   color: activeTab === 'dashboard' ? '#fff' : '#374151',
                   borderRadius: '8px',
+                  animation: 'none',
+                  transform: 'none',
+                  opacity: 1,
+                  visibility: 'visible',
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
@@ -849,6 +945,10 @@ const ECSEmployeeDashboard = () => {
                   background: activeTab === 'associate-requests' ? accent : 'transparent',
                   color: activeTab === 'associate-requests' ? '#fff' : '#374151',
                   borderRadius: '8px',
+                  animation: 'none',
+                  transform: 'none',
+                  opacity: 1,
+                  visibility: 'visible',
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
@@ -875,6 +975,10 @@ const ECSEmployeeDashboard = () => {
                   background: activeTab === 'freelancer-requests' ? accent : 'transparent',
                   color: activeTab === 'freelancer-requests' ? '#fff' : '#374151',
                   borderRadius: '8px',
+                  animation: 'none',
+                  transform: 'none',
+                  opacity: 1,
+                  visibility: 'visible',
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
@@ -911,7 +1015,12 @@ const ECSEmployeeDashboard = () => {
             }} data-aos="none">
               System
             </h6>
-            <div className="nav-items" data-aos="none">
+            <div className="nav-items" data-aos="none" style={{ 
+              animation: 'none',
+              transform: 'none',
+              opacity: 1,
+              visibility: 'visible'
+            }}>
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
                 onClick={() => handleTabChange('settings')}
@@ -924,6 +1033,10 @@ const ECSEmployeeDashboard = () => {
                   background: activeTab === 'settings' ? accent : 'transparent',
                   color: activeTab === 'settings' ? '#fff' : '#374151',
                   borderRadius: '8px',
+                  animation: 'none',
+                  transform: 'none',
+                  opacity: 1,
+                  visibility: 'visible',
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
@@ -950,6 +1063,10 @@ const ECSEmployeeDashboard = () => {
                   background: 'transparent',
                   color: '#dc3545',
                   borderRadius: '8px',
+                  animation: 'none',
+                  transform: 'none',
+                  opacity: 1,
+                  visibility: 'visible',
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,

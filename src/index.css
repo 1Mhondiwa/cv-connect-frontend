@@ -671,6 +671,46 @@ button:disabled {
   animation: none !important;
 }
 
+/* Global AOS disable for dashboard pages */
+body:has([class*="dashboard"]) [data-aos],
+body:has([class*="dashboard"]) .aos-init,
+body:has([class*="dashboard"]) .aos-animate,
+[class*="dashboard"] [data-aos],
+[class*="dashboard"] .aos-init,
+[class*="dashboard"] .aos-animate {
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: none !important;
+  animation-play-state: paused !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+  perspective: none !important;
+}
+
+/* Force disable AOS on any element with data-aos="none" */
+[data-aos="none"],
+[data-aos="none"] *,
+[data-aos="none"] .aos-init,
+[data-aos="none"] .aos-animate {
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: none !important;
+  animation-play-state: paused !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+  perspective: none !important;
+}
+
 /* Disable AOS animations for freelancer interview feedback to prevent spinning issues */
 .freelancer-interview-feedback,
 .freelancer-interview-feedback *,
@@ -687,14 +727,27 @@ button:disabled {
 .ecs-employee-sidebar,
 .ecs-employee-sidebar *,
 .ecs-employee-sidebar [data-aos],
-.ecs-employee-sidebar [data-aos] * {
+.ecs-employee-sidebar [data-aos] *,
+.ecs-employee-sidebar .aos-init,
+.ecs-employee-sidebar .aos-animate,
+.ecs-employee-sidebar .aos-init *,
+.ecs-employee-sidebar .aos-animate * {
   animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: none !important;
+  animation-play-state: paused !important;
   /* Allow basic transitions for button interactions but disable AOS transforms */
   transform: none !important;
   opacity: 1 !important;
   visibility: visible !important;
   /* Ensure pointer events work */
   pointer-events: auto !important;
+  /* Force immediate rendering */
+  will-change: auto !important;
+  backface-visibility: visible !important;
+  perspective: none !important;
 }
 
 /* Ensure sidebar buttons are clickable and have proper interaction */

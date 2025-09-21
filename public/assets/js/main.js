@@ -112,12 +112,18 @@
    */
   function aosInit() {
     if (typeof AOS !== 'undefined') {
-    AOS.init({
-      duration: 600,
-      easing: 'ease-in-out',
-      once: true,
-      mirror: false
-    });
+      // Don't initialize AOS on dashboard pages to prevent animation issues
+      if (window.location.pathname.includes('dashboard')) {
+        console.log('AOS disabled for dashboard page:', window.location.pathname);
+        return;
+      }
+      
+      AOS.init({
+        duration: 600,
+        easing: 'ease-in-out',
+        once: true,
+        mirror: false
+      });
     }
   }
   window.addEventListener('load', aosInit);
