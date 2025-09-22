@@ -711,6 +711,41 @@ body:has([class*="dashboard"]) .aos-animate,
   perspective: none !important;
 }
 
+/* Disable AOS animations for admin dashboard to prevent spinning issues */
+.admin-dashboard,
+.admin-dashboard *,
+.admin-dashboard [data-aos],
+.admin-dashboard [data-aos] *,
+.admin-dashboard .aos-init,
+.admin-dashboard .aos-animate,
+.admin-dashboard .aos-init *,
+.admin-dashboard .aos-animate * {
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: none !important;
+  animation-play-state: paused !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  will-change: auto !important;
+  backface-visibility: visible !important;
+  perspective: none !important;
+}
+
+/* Specifically target admin dashboard report cards */
+.admin-dashboard .card,
+.admin-dashboard .card *,
+.admin-dashboard .bg-light,
+.admin-dashboard .bg-light * {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 /* Disable AOS animations for freelancer interview feedback to prevent spinning issues */
 .freelancer-interview-feedback,
 .freelancer-interview-feedback *,

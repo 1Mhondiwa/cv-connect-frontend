@@ -13,6 +13,106 @@ const ESCAdminDashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Aggressively disable AOS animations for this component to prevent unwanted spinning
+  useEffect(() => {
+    // First, override the global AOS initialization to prevent it from running
+    const originalAOSInit = window.AOS?.init;
+    if (window.AOS && originalAOSInit) {
+      window.AOS.init = function(options) {
+        // Only initialize AOS if it's not for dashboard pages
+        if (!window.location.pathname.includes('dashboard')) {
+          return originalAOSInit.call(this, options);
+        }
+        // For dashboard pages, do nothing (disable AOS completely)
+        return;
+      };
+    }
+
+    const disableAOS = () => {
+      // Disable AOS for the entire document when on dashboard pages
+      if (window.location.pathname.includes('dashboard')) {
+        // Remove all AOS attributes from the entire document
+        document.querySelectorAll('[data-aos]').forEach(element => {
+          element.removeAttribute('data-aos');
+          element.setAttribute('data-aos', 'none');
+          element.classList.remove('aos-init', 'aos-animate');
+          element.style.animation = 'none';
+          element.style.transform = 'none';
+          element.style.opacity = '1';
+          element.style.visibility = 'visible';
+        });
+      }
+
+      // Specifically target admin dashboard elements
+      const adminDashboard = document.querySelector('.admin-dashboard');
+      if (adminDashboard) {
+        // Remove any existing AOS attributes and disable animations
+        adminDashboard.removeAttribute('data-aos');
+        adminDashboard.setAttribute('data-aos', 'none');
+        
+        // Also disable for all child elements
+        const children = adminDashboard.querySelectorAll('*');
+        children.forEach(child => {
+          child.removeAttribute('data-aos');
+          child.setAttribute('data-aos', 'none');
+          // Force remove any animation classes
+          child.classList.remove('aos-init', 'aos-animate');
+          // Apply inline styles to prevent animations
+          child.style.animation = 'none';
+          child.style.transform = 'none';
+          child.style.opacity = '1';
+          child.style.visibility = 'visible';
+        });
+        
+        // For buttons, only disable AOS but preserve functionality
+        const buttons = adminDashboard.querySelectorAll('button');
+        buttons.forEach(button => {
+          button.setAttribute('data-aos', 'none');
+          button.classList.remove('aos-init', 'aos-animate');
+          // Ensure buttons remain interactive
+          button.style.pointerEvents = 'auto';
+          button.style.cursor = 'pointer';
+          button.style.animation = 'none';
+          button.style.transform = 'none';
+          button.style.opacity = '1';
+        });
+        
+        // If AOS is loaded globally, refresh it to apply the changes
+        if (window.AOS) {
+          window.AOS.refresh();
+        }
+      }
+    };
+
+    // Run immediately and with multiple delays to ensure DOM is ready
+    disableAOS();
+    const timeoutId1 = setTimeout(disableAOS, 50);
+    const timeoutId2 = setTimeout(disableAOS, 100);
+    const timeoutId3 = setTimeout(disableAOS, 200);
+    const timeoutId4 = setTimeout(disableAOS, 500);
+    const timeoutId5 = setTimeout(disableAOS, 1000);
+    
+    // Also run on window load to override the global AOS init
+    const handleLoad = () => {
+      disableAOS();
+    };
+    window.addEventListener('load', handleLoad);
+    
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
+      clearTimeout(timeoutId4);
+      clearTimeout(timeoutId5);
+      window.removeEventListener('load', handleLoad);
+      
+      // Restore original AOS init function
+      if (window.AOS && originalAOSInit) {
+        window.AOS.init = originalAOSInit;
+      }
+    };
+  }, []);
   
 
   
@@ -1664,7 +1764,12 @@ const ESCAdminDashboard = () => {
   }
 
   return (
-    <div className="admin-dashboard">
+    <div className="admin-dashboard" data-aos="none" style={{ 
+      animation: 'none',
+      transform: 'none',
+      opacity: 1,
+      visibility: 'visible'
+    }}>
       {/* Professional Sidebar */}
       <div className="sidebar" style={{ 
         width: '280px', 
@@ -4145,26 +4250,78 @@ const ESCAdminDashboard = () => {
 
               {/* Report Content */}
               {activeReportSection && (
-                <div className="mt-3">
+                <div className="mt-3" data-aos="none" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
                   {activeReportSection === 'performance' && (
-                    <div className="bg-light rounded-3 p-4" style={{ border: `2px solid ${accent}`, backgroundColor: '#fff8f0' }}>
-                      <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h6 style={{ color: accent, fontWeight: 600 }}>System Performance Report</h6>
-                        <small className="text-muted">
-                          <i className="bi bi-clock me-1"></i>
+                    <div className="bg-light rounded-3 p-4" style={{ 
+                      border: `2px solid ${accent}`, 
+                      backgroundColor: '#fff8f0',
+                      animation: 'none',
+                      transform: 'none',
+                      opacity: 1,
+                      visibility: 'visible'
+                    }}>
+                      <div className="d-flex justify-content-between align-items-center mb-4" data-aos="none" style={{ 
+                        animation: 'none',
+                        transform: 'none',
+                        opacity: 1,
+                        visibility: 'visible'
+                      }}>
+                        <h6 style={{ 
+                          color: accent, 
+                          fontWeight: 600,
+                          animation: 'none',
+                          transform: 'none',
+                          opacity: 1
+                        }}>System Performance Report</h6>
+                        <small className="text-muted" style={{ 
+                          animation: 'none',
+                          transform: 'none',
+                          opacity: 1
+                        }}>
+                          <i className="bi bi-clock me-1" style={{ animation: 'none', transform: 'none', opacity: 1 }}></i>
                           {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
                         </small>
                       </div>
                       
                       {reportsData.performance ? (
-                        <div className="row g-3">
+                        <div className="row g-3" data-aos="none" style={{ 
+                          animation: 'none',
+                          transform: 'none',
+                          opacity: 1,
+                          visibility: 'visible'
+                        }}>
                           {/* System Health Overview */}
-                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3">
-                            <div className="card border-0 shadow-sm h-100">
-                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                                <h6 className="mb-0"><i className="bi bi-heart-pulse me-2"></i>System Health</h6>
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3" style={{ 
+                            animation: 'none',
+                            transform: 'none',
+                            opacity: 1,
+                            visibility: 'visible'
+                          }}>
+                            <div className="card border-0 shadow-sm h-100" data-aos="none" style={{ 
+                              animation: 'none',
+                              transform: 'none',
+                              opacity: 1,
+                              visibility: 'visible'
+                            }}>
+                              <div className="card-header text-white" style={{ 
+                                backgroundColor: accent,
+                                animation: 'none',
+                                transform: 'none',
+                                opacity: 1,
+                                visibility: 'visible'
+                              }}>
+                                <h6 className="mb-0" style={{ 
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}><i className="bi bi-heart-pulse me-2" style={{ animation: 'none', transform: 'none', opacity: 1 }}></i>System Health</h6>
                               </div>
-                              <div className="card-body">
+                              <div className="card-body" style={{ 
+                                animation: 'none',
+                                transform: 'none',
+                                opacity: 1,
+                                visibility: 'visible'
+                              }}>
                                 <div className="row text-center">
                                   <div className="col-6 col-sm-6 mb-3">
                                     <div className="mb-2">
