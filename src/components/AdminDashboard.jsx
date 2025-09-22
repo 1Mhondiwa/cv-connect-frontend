@@ -4,7 +4,6 @@ import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import visitorTracker from '../utils/visitorTracking';
-import SiteHeader from './SiteHeader';
 
 const accent = '#fd680e';
 
@@ -14,106 +13,6 @@ const ESCAdminDashboard = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Aggressively disable AOS animations for this component to prevent unwanted spinning
-  useEffect(() => {
-    // First, override the global AOS initialization to prevent it from running
-    const originalAOSInit = window.AOS?.init;
-    if (window.AOS && originalAOSInit) {
-      window.AOS.init = function(options) {
-        // Only initialize AOS if it's not for dashboard pages
-        if (!window.location.pathname.includes('dashboard')) {
-          return originalAOSInit.call(this, options);
-        }
-        // For dashboard pages, do nothing (disable AOS completely)
-        return;
-      };
-    }
-
-    const disableAOS = () => {
-      // Disable AOS for the entire document when on dashboard pages
-      if (window.location.pathname.includes('dashboard')) {
-        // Remove all AOS attributes from the entire document
-        document.querySelectorAll('[data-aos]').forEach(element => {
-          element.removeAttribute('data-aos');
-          element.setAttribute('data-aos', 'none');
-          element.classList.remove('aos-init', 'aos-animate');
-          element.style.animation = 'none';
-          element.style.transform = 'none';
-          element.style.opacity = '1';
-          element.style.visibility = 'visible';
-        });
-      }
-
-      // Specifically target admin dashboard elements
-      const adminDashboard = document.querySelector('.admin-dashboard');
-      if (adminDashboard) {
-        // Remove any existing AOS attributes and disable animations
-        adminDashboard.removeAttribute('data-aos');
-        adminDashboard.setAttribute('data-aos', 'none');
-        
-        // Also disable for all child elements
-        const children = adminDashboard.querySelectorAll('*');
-        children.forEach(child => {
-          child.removeAttribute('data-aos');
-          child.setAttribute('data-aos', 'none');
-          // Force remove any animation classes
-          child.classList.remove('aos-init', 'aos-animate');
-          // Apply inline styles to prevent animations
-          child.style.animation = 'none';
-          child.style.transform = 'none';
-          child.style.opacity = '1';
-          child.style.visibility = 'visible';
-        });
-        
-        // For buttons, only disable AOS but preserve functionality
-        const buttons = adminDashboard.querySelectorAll('button');
-        buttons.forEach(button => {
-          button.setAttribute('data-aos', 'none');
-          button.classList.remove('aos-init', 'aos-animate');
-          // Ensure buttons remain interactive
-          button.style.pointerEvents = 'auto';
-          button.style.cursor = 'pointer';
-          button.style.animation = 'none';
-          button.style.transform = 'none';
-          button.style.opacity = '1';
-        });
-        
-        // If AOS is loaded globally, refresh it to apply the changes
-        if (window.AOS) {
-          window.AOS.refresh();
-        }
-      }
-    };
-
-    // Run immediately and with multiple delays to ensure DOM is ready
-    disableAOS();
-    const timeoutId1 = setTimeout(disableAOS, 50);
-    const timeoutId2 = setTimeout(disableAOS, 100);
-    const timeoutId3 = setTimeout(disableAOS, 200);
-    const timeoutId4 = setTimeout(disableAOS, 500);
-    const timeoutId5 = setTimeout(disableAOS, 1000);
-    
-    // Also run on window load to override the global AOS init
-    const handleLoad = () => {
-      disableAOS();
-    };
-    window.addEventListener('load', handleLoad);
-    
-    return () => {
-      clearTimeout(timeoutId1);
-      clearTimeout(timeoutId2);
-      clearTimeout(timeoutId3);
-      clearTimeout(timeoutId4);
-      clearTimeout(timeoutId5);
-      window.removeEventListener('load', handleLoad);
-      
-      // Restore original AOS init function
-      if (window.AOS && originalAOSInit) {
-        window.AOS.init = originalAOSInit;
-      }
-    };
-  }, []);
   
 
   
@@ -142,21 +41,6 @@ const ESCAdminDashboard = () => {
   
   // Add hover state management for better UX
   const [hoveredTab, setHoveredTab] = useState(null);
-  
-  // Sidebar toggle state
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  
-  // Sidebar toggle function
-  const handleSidebarToggle = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
-  };
-  
-  // Settings handler
-  const handleSettingsClick = () => {
-    setActiveTab('settings');
-    window.scrollTo(0, 0);
-  };
-  
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
@@ -1780,15 +1664,10 @@ const ESCAdminDashboard = () => {
   }
 
   return (
-    <div className="admin-dashboard" data-aos="none" style={{ 
-      animation: 'none',
-      transform: 'none',
-      opacity: 1,
-      visibility: 'visible'
-    }}>
+    <div className="admin-dashboard">
       {/* Professional Sidebar */}
       <div className="sidebar" style={{ 
-        width: sidebarCollapsed ? '60px' : '280px', 
+        width: '280px', 
         height: '100vh', 
         position: 'fixed', 
         left: 0, 
@@ -1796,39 +1675,32 @@ const ESCAdminDashboard = () => {
         background: '#fff', 
         borderRight: '1px solid #e5e7eb',
         overflowY: 'auto',
-        overflowX: 'hidden',
-        zIndex: 1000,
-        transition: 'width 0.3s ease',
-        opacity: sidebarCollapsed ? 0 : 1,
-        visibility: sidebarCollapsed ? 'hidden' : 'visible'
+        zIndex: 1000
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" style={{ 
-          padding: sidebarCollapsed ? '16px 12px' : '24px', 
+          padding: '24px', 
           borderBottom: '1px solid #e5e7eb',
-          background: '#fafafa',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
+          background: '#fafafa'
         }}>
-          <img 
-            src="/assets/img/cv-connect_logo.png" 
-            alt="CV-Connect Logo" 
-            style={{
-              width: '32px', 
-              height: '32px', 
-              borderRadius: '8px',
-              marginRight: sidebarCollapsed ? '0' : '12px'
-            }}
-          />
-          {!sidebarCollapsed && (
-            <div>
+          <div className="d-flex align-items-center">
+            <img 
+              src="/assets/img/cv-connect_logo.png" 
+              alt="CV-Connect Logo" 
+              style={{
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '8px',
+                marginRight: '12px'
+              }}
+            />
+        <div>
               <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }}>
                 CV-Connect
               </h5>
               <small className="text-muted">Admin Portal</small>
-            </div>
-          )}
+          </div>
+          </div>
         </div>
 
         {/* Sidebar Content */}
@@ -1840,18 +1712,16 @@ const ESCAdminDashboard = () => {
         }}>
           {/* Main Navigation */}
           <div className="nav-section mb-4">
-            {!sidebarCollapsed && (
-              <h6 className="nav-section-title" style={{ 
-                color: '#6b7280', 
-                fontSize: '12px', 
-                fontWeight: 600, 
-                textTransform: 'uppercase',
-                marginBottom: '8px',
-                paddingLeft: '8px'
-              }}>
-                Main Navigation
-              </h6>
-            )}
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              Main Navigation
+            </h6>
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
@@ -1862,7 +1732,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('dashboard')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: sidebarCollapsed ? '12px 8px' : '12px 16px',
+                  padding: '12px 16px',
                   border: 'none',
                   background: activeTab === 'dashboard' ? accent : 'transparent',
                   color: activeTab === 'dashboard' ? '#fff' : '#374151',
@@ -1870,15 +1740,11 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.3s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
+                  transition: 'all 0.3s ease'
                 }}
-                title={sidebarCollapsed ? 'Dashboard' : ''}
               >
-                <i className={`bi bi-speedometer2 ${!sidebarCollapsed ? 'me-3' : ''}`}></i>
-                {!sidebarCollapsed && 'Dashboard'}
+                <i className="bi bi-speedometer2 me-3"></i>
+                Dashboard
                 </button>
               
         </div>
@@ -1886,18 +1752,16 @@ const ESCAdminDashboard = () => {
 
           {/* Management Tools */}
           <div className="nav-section mb-4">
-            {!sidebarCollapsed && (
-              <h6 className="nav-section-title" style={{ 
-                color: '#6b7280', 
-                fontSize: '12px', 
-                fontWeight: 600, 
-                textTransform: 'uppercase',
-                marginBottom: '8px',
-                paddingLeft: '8px'
-              }}>
-                Management Tools
-              </h6>
-            )}
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              Management Tools
+            </h6>
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'analytics' ? 'active' : ''}`}
@@ -1908,7 +1772,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('analytics')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: sidebarCollapsed ? '12px 8px' : '12px 16px',
+                  padding: '12px 16px',
                   border: 'none',
                   background: activeTab === 'analytics' ? accent : 'transparent',
                   color: activeTab === 'analytics' ? '#fff' : '#374151',
@@ -1920,13 +1784,11 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
+                  alignItems: 'center'
                 }}
-                title={sidebarCollapsed ? 'Analytics' : ''}
               >
-                <i className={`bi bi-graph-up ${!sidebarCollapsed ? 'me-3' : ''}`}></i>
-                {!sidebarCollapsed && 'Analytics'}
+                <i className="bi bi-graph-up me-3"></i>
+                Analytics
               </button>
               
               <button
@@ -1938,7 +1800,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('reports')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: sidebarCollapsed ? '12px 8px' : '12px 16px',
+                  padding: '12px 16px',
                   border: 'none',
                   background: activeTab === 'reports' ? accent : 'transparent',
                   color: activeTab === 'reports' ? '#fff' : '#374151',
@@ -1950,13 +1812,11 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
+                  alignItems: 'center'
                 }}
-                title={sidebarCollapsed ? 'System Monitor' : ''}
               >
-                <i className={`bi bi-file-earmark-text ${!sidebarCollapsed ? 'me-3' : ''}`}></i>
-                {!sidebarCollapsed && 'System Monitor'}
+                <i className="bi bi-file-earmark-text me-3"></i>
+                System Monitor
           </button>
               
 
@@ -1968,26 +1828,52 @@ const ESCAdminDashboard = () => {
 
           {/* Bottom Section - Settings and Logout */}
           <div className="nav-section">
-            {!sidebarCollapsed && (
-              <h6 className="nav-section-title" style={{ 
-                color: '#6b7280', 
-                fontSize: '12px', 
-                fontWeight: 600, 
-                textTransform: 'uppercase',
-                marginBottom: '8px',
-                paddingLeft: '8px'
-              }}>
-                System
-              </h6>
-            )}
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              System
+            </h6>
             <div className="nav-items">
+              <button
+                className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab('settings');
+                  window.scrollTo(0, 0);
+                }}
+                onMouseEnter={() => setHoveredTab('settings')}
+                onMouseLeave={() => setHoveredTab(null)}
+                style={{
+                  padding: '12px 16px',
+                  border: 'none',
+                  background: activeTab === 'settings' ? accent : 'transparent',
+                  color: activeTab === 'settings' ? '#fff' : '#374151',
+                  borderRadius: '8px',
+                  marginBottom: '4px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'all 0.3s ease',
+                  height: '48px',
+                  lineHeight: '24px',
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                <i className="bi bi-gear me-3"></i>
+                Settings
+              </button>
+              
                 <button
                 className="nav-item w-100 text-start logout-button"
                 onClick={logout}
                 onMouseEnter={() => setHoveredTab('logout')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: sidebarCollapsed ? '12px 8px' : '12px 16px',
+                  padding: '12px 16px',
                   border: 'none',
                   background: 'transparent',
                   color: '#dc3545',
@@ -1999,37 +1885,26 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
+                  alignItems: 'center'
                 }}
-                title={sidebarCollapsed ? 'Logout' : ''}
               >
-                <i className={`bi bi-box-arrow-right ${!sidebarCollapsed ? 'me-3' : ''}`}></i>
-                {!sidebarCollapsed && 'Logout'}
+                <i className="bi bi-box-arrow-right me-3"></i>
+                Logout
                 </button>
             </div>
           </div>
                 </div>
               </div>
 
-      {/* Site Header */}
-      <SiteHeader 
-        onSidebarToggle={handleSidebarToggle}
-        currentTab={activeTab}
-        onSettingsClick={handleSettingsClick}
-        user={user}
-      />
-
       {/* Main Content Area */}
       <div className="main-content flex-grow-1" style={{ 
-        marginLeft: sidebarCollapsed ? '60px' : '280px',
+        marginLeft: '300px',
         padding: '20px',
-        minHeight: 'calc(100vh - 64px)', // Account for header height
+        minHeight: '100vh',
         background: '#f9fafb',
-        width: sidebarCollapsed ? 'calc(100% - 60px)' : 'calc(100% - 280px)',
+        width: 'calc(100% - 300px)',
         maxWidth: '100%',
-        overflowX: 'hidden',
-        transition: 'all 0.3s ease'
+        overflowX: 'hidden'
       }}>
         {/* Page Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
@@ -4270,9 +4145,9 @@ const ESCAdminDashboard = () => {
 
               {/* Report Content */}
               {activeReportSection && (
-                <div className="mt-3" data-aos="none" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
+                <div className="mt-3">
                   {activeReportSection === 'performance' && (
-                    <div className="bg-light rounded-3 p-4" style={{ 
+                    <div className="bg-light rounded-3 p-4" data-aos="none" style={{ 
                       border: `2px solid ${accent}`, 
                       backgroundColor: '#fff8f0',
                       animation: 'none',
@@ -4298,7 +4173,11 @@ const ESCAdminDashboard = () => {
                           transform: 'none',
                           opacity: 1
                         }}>
-                          <i className="bi bi-clock me-1" style={{ animation: 'none', transform: 'none', opacity: 1 }}></i>
+                          <i className="bi bi-clock me-1" style={{ 
+                            animation: 'none',
+                            transform: 'none',
+                            opacity: 1
+                          }}></i>
                           {lastReportUpdate ? `Last updated: ${lastReportUpdate.toLocaleTimeString()}` : 'Not generated yet'}
                         </small>
                       </div>
@@ -4311,7 +4190,7 @@ const ESCAdminDashboard = () => {
                           visibility: 'visible'
                         }}>
                           {/* System Health Overview */}
-                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3" style={{ 
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3" data-aos="none" style={{ 
                             animation: 'none',
                             transform: 'none',
                             opacity: 1,
@@ -4323,7 +4202,7 @@ const ESCAdminDashboard = () => {
                               opacity: 1,
                               visibility: 'visible'
                             }}>
-                              <div className="card-header text-white" style={{ 
+                              <div className="card-header text-white" data-aos="none" style={{ 
                                 backgroundColor: accent,
                                 animation: 'none',
                                 transform: 'none',
@@ -4334,9 +4213,13 @@ const ESCAdminDashboard = () => {
                                   animation: 'none',
                                   transform: 'none',
                                   opacity: 1
-                                }}><i className="bi bi-heart-pulse me-2" style={{ animation: 'none', transform: 'none', opacity: 1 }}></i>System Health</h6>
+                                }}><i className="bi bi-heart-pulse me-2" style={{ 
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}></i>System Health</h6>
                               </div>
-                              <div className="card-body" style={{ 
+                              <div className="card-body" data-aos="none" style={{ 
                                 animation: 'none',
                                 transform: 'none',
                                 opacity: 1,
@@ -4378,12 +4261,41 @@ const ESCAdminDashboard = () => {
                           </div>
 
                           {/* System Resources */}
-                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3">
-                            <div className="card border-0 shadow-sm h-100">
-                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                                <h6 className="mb-0"><i className="bi bi-cpu me-2"></i>System Resources</h6>
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3" data-aos="none" style={{ 
+                            animation: 'none',
+                            transform: 'none',
+                            opacity: 1,
+                            visibility: 'visible'
+                          }}>
+                            <div className="card border-0 shadow-sm h-100" data-aos="none" style={{ 
+                              animation: 'none',
+                              transform: 'none',
+                              opacity: 1,
+                              visibility: 'visible'
+                            }}>
+                              <div className="card-header text-white" data-aos="none" style={{ 
+                                backgroundColor: accent,
+                                animation: 'none',
+                                transform: 'none',
+                                opacity: 1,
+                                visibility: 'visible'
+                              }}>
+                                <h6 className="mb-0" style={{ 
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}><i className="bi bi-cpu me-2" style={{ 
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}></i>System Resources</h6>
                               </div>
-                              <div className="card-body">
+                              <div className="card-body" data-aos="none" style={{ 
+                                animation: 'none',
+                                transform: 'none',
+                                opacity: 1,
+                                visibility: 'visible'
+                              }}>
                                 <div className="row text-center">
                                   <div className="col-6 col-sm-6 mb-3">
                                     <div className="mb-2">
@@ -4415,12 +4327,41 @@ const ESCAdminDashboard = () => {
                           </div>
 
                           {/* Performance Metrics */}
-                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3">
-                            <div className="card border-0 shadow-sm h-100">
-                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                                <h6 className="mb-0"><i className="bi bi-speedometer2 me-2"></i>Performance Metrics</h6>
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3" data-aos="none" style={{ 
+                            animation: 'none',
+                            transform: 'none',
+                            opacity: 1,
+                            visibility: 'visible'
+                          }}>
+                            <div className="card border-0 shadow-sm h-100" data-aos="none" style={{ 
+                              animation: 'none',
+                              transform: 'none',
+                              opacity: 1,
+                              visibility: 'visible'
+                            }}>
+                              <div className="card-header text-white" data-aos="none" style={{ 
+                                backgroundColor: accent,
+                                animation: 'none',
+                                transform: 'none',
+                                opacity: 1,
+                                visibility: 'visible'
+                              }}>
+                                <h6 className="mb-0" style={{ 
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}><i className="bi bi-speedometer2 me-2" style={{ 
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}></i>Performance Metrics</h6>
                               </div>
-                              <div className="card-body">
+                              <div className="card-body" data-aos="none" style={{ 
+                                animation: 'none',
+                                transform: 'none',
+                                opacity: 1,
+                                visibility: 'visible'
+                              }}>
                                 {reportsData.performance.performanceMetrics.map((metric, index) => (
                                   <div key={index} className="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
                                     <span className="small fw-medium">{metric.metric}</span>
@@ -4434,12 +4375,41 @@ const ESCAdminDashboard = () => {
                           </div>
 
                           {/* User Activity Insights */}
-                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3">
-                            <div className="card border-0 shadow-sm h-100">
-                              <div className="card-header text-white" style={{ backgroundColor: accent }}>
-                                <h6 className="mb-0"><i className="bi bi-people me-2"></i>User Activity</h6>
+                          <div className="col-xl-6 col-lg-6 col-md-12 mb-3" data-aos="none" style={{ 
+                            animation: 'none',
+                            transform: 'none',
+                            opacity: 1,
+                            visibility: 'visible'
+                          }}>
+                            <div className="card border-0 shadow-sm h-100" data-aos="none" style={{ 
+                              animation: 'none',
+                              transform: 'none',
+                              opacity: 1,
+                              visibility: 'visible'
+                            }}>
+                              <div className="card-header text-white" data-aos="none" style={{ 
+                                backgroundColor: accent,
+                                animation: 'none',
+                                transform: 'none',
+                                opacity: 1,
+                                visibility: 'visible'
+                              }}>
+                                <h6 className="mb-0" style={{ 
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}><i className="bi bi-people me-2" style={{ 
+                                  animation: 'none',
+                                  transform: 'none',
+                                  opacity: 1
+                                }}></i>User Activity</h6>
                               </div>
-                              <div className="card-body">
+                              <div className="card-body" data-aos="none" style={{ 
+                                animation: 'none',
+                                transform: 'none',
+                                opacity: 1,
+                                visibility: 'visible'
+                              }}>
                                 <div className="row text-center">
                                   <div className="col-6 col-sm-6 mb-3">
                                     <div className="mb-2">
@@ -5722,7 +5692,6 @@ const ESCAdminDashboard = () => {
             marginLeft: 0 !important;
             width: 100% !important;
             padding: 16px !important;
-            min-height: calc(100vh - 64px) !important;
           }
           
           .admin-dashboard {
@@ -5732,8 +5701,8 @@ const ESCAdminDashboard = () => {
         
         /* Force layout fixes */
         .main-content {
-          margin-left: 280px !important;
-          width: calc(100% - 280px) !important;
+          margin-left: 300px !important;
+          width: calc(100% - 300px) !important;
         }
         
         .row {
