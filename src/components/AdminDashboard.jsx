@@ -4,6 +4,7 @@ import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import visitorTracker from '../utils/visitorTracking';
+import SiteHeader from './SiteHeader';
 
 const accent = '#fd680e';
 
@@ -141,6 +142,15 @@ const ESCAdminDashboard = () => {
   
   // Add hover state management for better UX
   const [hoveredTab, setHoveredTab] = useState(null);
+  
+  // Sidebar toggle state
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
+  // Sidebar toggle function
+  const handleSidebarToggle = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+  
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
@@ -1772,7 +1782,7 @@ const ESCAdminDashboard = () => {
     }}>
       {/* Professional Sidebar */}
       <div className="sidebar" style={{ 
-        width: '280px', 
+        width: sidebarCollapsed ? '0px' : '280px', 
         height: '100vh', 
         position: 'fixed', 
         left: 0, 
@@ -1780,7 +1790,11 @@ const ESCAdminDashboard = () => {
         background: '#fff', 
         borderRight: '1px solid #e5e7eb',
         overflowY: 'auto',
-        zIndex: 1000
+        overflowX: 'hidden',
+        zIndex: 1000,
+        transition: 'width 0.3s ease',
+        opacity: sidebarCollapsed ? 0 : 1,
+        visibility: sidebarCollapsed ? 'hidden' : 'visible'
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" style={{ 
@@ -2001,15 +2015,22 @@ const ESCAdminDashboard = () => {
                 </div>
               </div>
 
+      {/* Site Header */}
+      <SiteHeader 
+        onSidebarToggle={handleSidebarToggle}
+        currentTab={activeTab}
+      />
+
       {/* Main Content Area */}
       <div className="main-content flex-grow-1" style={{ 
-        marginLeft: '300px',
+        marginLeft: sidebarCollapsed ? '0px' : '280px',
         padding: '20px',
-        minHeight: '100vh',
+        minHeight: 'calc(100vh - 64px)', // Account for header height
         background: '#f9fafb',
-        width: 'calc(100% - 300px)',
+        width: sidebarCollapsed ? '100%' : 'calc(100% - 280px)',
         maxWidth: '100%',
-        overflowX: 'hidden'
+        overflowX: 'hidden',
+        transition: 'all 0.3s ease'
       }}>
         {/* Page Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
@@ -5702,6 +5723,7 @@ const ESCAdminDashboard = () => {
             marginLeft: 0 !important;
             width: 100% !important;
             padding: 16px !important;
+            min-height: calc(100vh - 64px) !important;
           }
           
           .admin-dashboard {
@@ -5711,8 +5733,8 @@ const ESCAdminDashboard = () => {
         
         /* Force layout fixes */
         .main-content {
-          margin-left: 300px !important;
-          width: calc(100% - 300px) !important;
+          margin-left: 280px !important;
+          width: calc(100% - 280px) !important;
         }
         
         .row {
