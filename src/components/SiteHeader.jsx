@@ -1,7 +1,15 @@
 import React from 'react';
 
-const SiteHeader = ({ onSidebarToggle, currentTab }) => {
+const SiteHeader = ({ onSidebarToggle, currentTab = 'dashboard' }) => {
   const accent = '#fd680e';
+  
+  // Debug logging
+  console.log('SiteHeader props:', { onSidebarToggle, currentTab });
+  
+  // Ensure we have a function for sidebar toggle
+  const handleSidebarToggle = onSidebarToggle || (() => {
+    console.log('Sidebar toggle clicked but no handler provided');
+  });
   
   // Get the current page title based on active tab
   const getPageTitle = () => {
@@ -25,21 +33,51 @@ const SiteHeader = ({ onSidebarToggle, currentTab }) => {
 
   return (
     <header 
-      className="flex shrink-0 items-center gap-2 border-b transition-all ease-linear site-header"
       style={{
-        height: '64px'
+        height: '64px',
+        backgroundColor: '#fff',
+        borderBottom: '1px solid #e5e7eb',
+        position: 'sticky',
+        top: 0,
+        zIndex: 999,
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%'
       }}
     >
       <div 
-        className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6"
-        style={{ padding: '0 24px' }}
+        style={{ 
+          padding: '0 24px',
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          gap: '8px'
+        }}
       >
         {/* Sidebar Trigger Button */}
         <button
-          onClick={onSidebarToggle}
-          className="sidebar-toggle-btn"
+          onClick={handleSidebarToggle}
           style={{
-            marginLeft: '-8px'
+            marginLeft: '-8px',
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: '#6b7280',
+            padding: '8px',
+            borderRadius: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s ease',
+            cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#f3f4f6';
+            e.target.style.color = accent;
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+            e.target.style.color = '#6b7280';
           }}
           aria-label="Toggle sidebar"
         >
@@ -81,24 +119,52 @@ const SiteHeader = ({ onSidebarToggle, currentTab }) => {
             style={{ color: accent, fontSize: '14px' }}
           ></i>
           {getPageTitle()}
+          <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '8px' }}>
+            (Tab: {currentTab || 'unknown'})
+          </span>
         </h1>
 
         {/* Right side content */}
         <div 
-          className="ml-auto flex items-center gap-2"
-          style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}
+          style={{ 
+            marginLeft: 'auto', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px' 
+          }}
         >
           {/* Admin User Info */}
-          <div className="admin-status-indicator">
-            <div className="admin-status-dot" />
-            <span className="admin-status-text">
+          <div 
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 8px',
+              borderRadius: '6px',
+              backgroundColor: '#f9fafb'
+            }}
+          >
+            <div 
+              style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#10b981'
+              }}
+            />
+            <span 
+              style={{
+                fontSize: '12px',
+                color: '#6b7280',
+                fontWeight: '500'
+              }}
+            >
               Admin
             </span>
           </div>
 
           {/* GitHub Link Button */}
           <button
-            className="btn btn-outline-secondary btn-sm"
             style={{
               display: 'none', // Hidden by default, can be shown if needed
               border: 'none',
