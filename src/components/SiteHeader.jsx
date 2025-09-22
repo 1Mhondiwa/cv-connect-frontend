@@ -1,14 +1,16 @@
 import React from 'react';
 
-const SiteHeader = ({ onSidebarToggle, currentTab = 'dashboard' }) => {
+const SiteHeader = ({ onSidebarToggle, currentTab = 'dashboard', onSettingsClick, user }) => {
   const accent = '#fd680e';
-  
-  // Debug logging
-  console.log('SiteHeader props:', { onSidebarToggle, currentTab });
   
   // Ensure we have a function for sidebar toggle
   const handleSidebarToggle = onSidebarToggle || (() => {
     console.log('Sidebar toggle clicked but no handler provided');
+  });
+  
+  // Handle settings click
+  const handleSettingsClick = onSettingsClick || (() => {
+    console.log('Settings clicked but no handler provided');
   });
   
   // Get the current page title based on active tab
@@ -24,8 +26,6 @@ const SiteHeader = ({ onSidebarToggle, currentTab = 'dashboard' }) => {
         return 'Analytics';
       case 'reports':
         return 'System Reports';
-      case 'settings':
-        return 'System Settings';
       default:
         return 'Admin Portal';
     }
@@ -113,15 +113,11 @@ const SiteHeader = ({ onSidebarToggle, currentTab = 'dashboard' }) => {
               currentTab === 'freelancers' ? 'bi-person-badge' :
               currentTab === 'analytics' ? 'bi-graph-up' :
               currentTab === 'reports' ? 'bi-file-earmark-bar-graph' :
-              currentTab === 'settings' ? 'bi-gear' :
               'bi-house'
             }`}
             style={{ color: accent, fontSize: '14px' }}
           ></i>
           {getPageTitle()}
-          <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '8px' }}>
-            (Tab: {currentTab || 'unknown'})
-          </span>
         </h1>
 
         {/* Right side content */}
@@ -130,50 +126,51 @@ const SiteHeader = ({ onSidebarToggle, currentTab = 'dashboard' }) => {
             marginLeft: 'auto', 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '8px' 
+            gap: '12px' 
           }}
         >
-          {/* Admin User Info */}
+          {/* Avatar */}
           <div 
             style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: accent,
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              padding: '4px 8px',
-              borderRadius: '6px',
-              backgroundColor: '#f9fafb'
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.05)';
+              e.target.style.boxShadow = '0 2px 8px rgba(253, 104, 14, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.boxShadow = 'none';
             }}
           >
-            <div 
-              style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: '#10b981'
-              }}
-            />
-            <span 
-              style={{
-                fontSize: '12px',
-                color: '#6b7280',
-                fontWeight: '500'
-              }}
-            >
-              Admin
-            </span>
+            {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
           </div>
 
-          {/* GitHub Link Button */}
+          {/* Settings Button */}
           <button
+            onClick={handleSettingsClick}
             style={{
-              display: 'none', // Hidden by default, can be shown if needed
               border: 'none',
               backgroundColor: 'transparent',
               color: '#6b7280',
-              padding: '6px 12px',
+              padding: '8px',
               borderRadius: '6px',
-              fontSize: '12px',
-              transition: 'all 0.2s ease'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer'
             }}
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = '#f3f4f6';
@@ -183,9 +180,9 @@ const SiteHeader = ({ onSidebarToggle, currentTab = 'dashboard' }) => {
               e.target.style.backgroundColor = 'transparent';
               e.target.style.color = '#6b7280';
             }}
+            aria-label="Settings"
           >
-            <i className="bi bi-github me-1"></i>
-            GitHub
+            <i className="bi bi-gear" style={{ fontSize: '16px' }}></i>
           </button>
         </div>
       </div>

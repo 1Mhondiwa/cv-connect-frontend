@@ -151,6 +151,12 @@ const ESCAdminDashboard = () => {
     setSidebarCollapsed(!sidebarCollapsed);
   };
   
+  // Settings handler
+  const handleSettingsClick = () => {
+    setActiveTab('settings');
+    window.scrollTo(0, 0);
+  };
+  
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
@@ -1782,7 +1788,7 @@ const ESCAdminDashboard = () => {
     }}>
       {/* Professional Sidebar */}
       <div className="sidebar" style={{ 
-        width: sidebarCollapsed ? '0px' : '280px', 
+        width: sidebarCollapsed ? '60px' : '280px', 
         height: '100vh', 
         position: 'fixed', 
         left: 0, 
@@ -1798,28 +1804,31 @@ const ESCAdminDashboard = () => {
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" style={{ 
-          padding: '24px', 
+          padding: sidebarCollapsed ? '16px 12px' : '24px', 
           borderBottom: '1px solid #e5e7eb',
-          background: '#fafafa'
+          background: '#fafafa',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
         }}>
-          <div className="d-flex align-items-center">
-            <img 
-              src="/assets/img/cv-connect_logo.png" 
-              alt="CV-Connect Logo" 
-              style={{
-                width: '32px', 
-                height: '32px', 
-                borderRadius: '8px',
-                marginRight: '12px'
-              }}
-            />
-        <div>
+          <img 
+            src="/assets/img/cv-connect_logo.png" 
+            alt="CV-Connect Logo" 
+            style={{
+              width: '32px', 
+              height: '32px', 
+              borderRadius: '8px',
+              marginRight: sidebarCollapsed ? '0' : '12px'
+            }}
+          />
+          {!sidebarCollapsed && (
+            <div>
               <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }}>
                 CV-Connect
               </h5>
               <small className="text-muted">Admin Portal</small>
-          </div>
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar Content */}
@@ -1831,16 +1840,18 @@ const ESCAdminDashboard = () => {
         }}>
           {/* Main Navigation */}
           <div className="nav-section mb-4">
-            <h6 className="nav-section-title" style={{ 
-              color: '#6b7280', 
-              fontSize: '12px', 
-              fontWeight: 600, 
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-              paddingLeft: '8px'
-            }}>
-              Main Navigation
-            </h6>
+            {!sidebarCollapsed && (
+              <h6 className="nav-section-title" style={{ 
+                color: '#6b7280', 
+                fontSize: '12px', 
+                fontWeight: 600, 
+                textTransform: 'uppercase',
+                marginBottom: '8px',
+                paddingLeft: '8px'
+              }}>
+                Main Navigation
+              </h6>
+            )}
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
@@ -1851,7 +1862,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('dashboard')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: '12px 16px',
+                  padding: sidebarCollapsed ? '12px 8px' : '12px 16px',
                   border: 'none',
                   background: activeTab === 'dashboard' ? accent : 'transparent',
                   color: activeTab === 'dashboard' ? '#fff' : '#374151',
@@ -1859,11 +1870,15 @@ const ESCAdminDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
                 }}
+                title={sidebarCollapsed ? 'Dashboard' : ''}
               >
-                <i className="bi bi-speedometer2 me-3"></i>
-                Dashboard
+                <i className={`bi bi-speedometer2 ${!sidebarCollapsed ? 'me-3' : ''}`}></i>
+                {!sidebarCollapsed && 'Dashboard'}
                 </button>
               
         </div>
@@ -1871,16 +1886,18 @@ const ESCAdminDashboard = () => {
 
           {/* Management Tools */}
           <div className="nav-section mb-4">
-            <h6 className="nav-section-title" style={{ 
-              color: '#6b7280', 
-              fontSize: '12px', 
-              fontWeight: 600, 
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-              paddingLeft: '8px'
-            }}>
-              Management Tools
-            </h6>
+            {!sidebarCollapsed && (
+              <h6 className="nav-section-title" style={{ 
+                color: '#6b7280', 
+                fontSize: '12px', 
+                fontWeight: 600, 
+                textTransform: 'uppercase',
+                marginBottom: '8px',
+                paddingLeft: '8px'
+              }}>
+                Management Tools
+              </h6>
+            )}
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'analytics' ? 'active' : ''}`}
@@ -1891,7 +1908,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('analytics')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: '12px 16px',
+                  padding: sidebarCollapsed ? '12px 8px' : '12px 16px',
                   border: 'none',
                   background: activeTab === 'analytics' ? accent : 'transparent',
                   color: activeTab === 'analytics' ? '#fff' : '#374151',
@@ -1903,11 +1920,13 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
                 }}
+                title={sidebarCollapsed ? 'Analytics' : ''}
               >
-                <i className="bi bi-graph-up me-3"></i>
-                Analytics
+                <i className={`bi bi-graph-up ${!sidebarCollapsed ? 'me-3' : ''}`}></i>
+                {!sidebarCollapsed && 'Analytics'}
               </button>
               
               <button
@@ -1919,7 +1938,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('reports')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: '12px 16px',
+                  padding: sidebarCollapsed ? '12px 8px' : '12px 16px',
                   border: 'none',
                   background: activeTab === 'reports' ? accent : 'transparent',
                   color: activeTab === 'reports' ? '#fff' : '#374151',
@@ -1931,11 +1950,13 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
                 }}
+                title={sidebarCollapsed ? 'System Monitor' : ''}
               >
-                <i className="bi bi-file-earmark-text me-3"></i>
-                System Monitor
+                <i className={`bi bi-file-earmark-text ${!sidebarCollapsed ? 'me-3' : ''}`}></i>
+                {!sidebarCollapsed && 'System Monitor'}
           </button>
               
 
@@ -1947,52 +1968,26 @@ const ESCAdminDashboard = () => {
 
           {/* Bottom Section - Settings and Logout */}
           <div className="nav-section">
-            <h6 className="nav-section-title" style={{ 
-              color: '#6b7280', 
-              fontSize: '12px', 
-              fontWeight: 600, 
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-              paddingLeft: '8px'
-            }}>
-              System
-            </h6>
+            {!sidebarCollapsed && (
+              <h6 className="nav-section-title" style={{ 
+                color: '#6b7280', 
+                fontSize: '12px', 
+                fontWeight: 600, 
+                textTransform: 'uppercase',
+                marginBottom: '8px',
+                paddingLeft: '8px'
+              }}>
+                System
+              </h6>
+            )}
             <div className="nav-items">
-              <button
-                className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
-                onClick={() => {
-                  setActiveTab('settings');
-                  window.scrollTo(0, 0);
-                }}
-                onMouseEnter={() => setHoveredTab('settings')}
-                onMouseLeave={() => setHoveredTab(null)}
-                style={{
-                  padding: '12px 16px',
-                  border: 'none',
-                  background: activeTab === 'settings' ? accent : 'transparent',
-                  color: activeTab === 'settings' ? '#fff' : '#374151',
-                  borderRadius: '8px',
-                  marginBottom: '4px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  transition: 'all 0.3s ease',
-                  height: '48px',
-                  lineHeight: '24px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <i className="bi bi-gear me-3"></i>
-                Settings
-              </button>
-              
                 <button
                 className="nav-item w-100 text-start logout-button"
                 onClick={logout}
                 onMouseEnter={() => setHoveredTab('logout')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: '12px 16px',
+                  padding: sidebarCollapsed ? '12px 8px' : '12px 16px',
                   border: 'none',
                   background: 'transparent',
                   color: '#dc3545',
@@ -2004,11 +1999,13 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
                 }}
+                title={sidebarCollapsed ? 'Logout' : ''}
               >
-                <i className="bi bi-box-arrow-right me-3"></i>
-                Logout
+                <i className={`bi bi-box-arrow-right ${!sidebarCollapsed ? 'me-3' : ''}`}></i>
+                {!sidebarCollapsed && 'Logout'}
                 </button>
             </div>
           </div>
@@ -2019,15 +2016,17 @@ const ESCAdminDashboard = () => {
       <SiteHeader 
         onSidebarToggle={handleSidebarToggle}
         currentTab={activeTab}
+        onSettingsClick={handleSettingsClick}
+        user={user}
       />
 
       {/* Main Content Area */}
       <div className="main-content flex-grow-1" style={{ 
-        marginLeft: sidebarCollapsed ? '0px' : '280px',
+        marginLeft: sidebarCollapsed ? '60px' : '280px',
         padding: '20px',
         minHeight: 'calc(100vh - 64px)', // Account for header height
         background: '#f9fafb',
-        width: sidebarCollapsed ? '100%' : 'calc(100% - 280px)',
+        width: sidebarCollapsed ? 'calc(100% - 60px)' : 'calc(100% - 280px)',
         maxWidth: '100%',
         overflowX: 'hidden',
         transition: 'all 0.3s ease'
