@@ -480,6 +480,16 @@ const ESCAdminDashboard = () => {
     }
   }, [activeReportSection]);
 
+  // Ensure page scrolls to top when System Monitor tab is activated
+  useEffect(() => {
+    if (activeTab === 'reports') {
+      // Use setTimeout to ensure scroll happens after content renders
+      setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      }, 50);
+    }
+  }, [activeTab]);
+
   // Auto-load performance metrics when performance tab is activated
 
 
@@ -1727,7 +1737,10 @@ const ESCAdminDashboard = () => {
                 className={`nav-item w-100 text-start ${activeTab === 'dashboard' ? 'active' : ''}`}
                 onClick={() => {
                   setActiveTab('dashboard');
-                  window.scrollTo(0, 0);
+                  // Ensure scroll happens after state update and content renders
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                  }, 100);
                 }}
                 onMouseEnter={() => setHoveredTab('dashboard')}
                 onMouseLeave={() => setHoveredTab(null)}
@@ -1767,7 +1780,10 @@ const ESCAdminDashboard = () => {
                 className={`nav-item w-100 text-start ${activeTab === 'analytics' ? 'active' : ''}`}
                 onClick={() => {
                   setActiveTab('analytics');
-                  window.scrollTo(0, 0);
+                  // Ensure scroll happens after state update and content renders
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                  }, 100);
                 }}
                 onMouseEnter={() => setHoveredTab('analytics')}
                 onMouseLeave={() => setHoveredTab(null)}
@@ -1795,7 +1811,10 @@ const ESCAdminDashboard = () => {
                 className={`nav-item w-100 text-start ${activeTab === 'reports' ? 'active' : ''}`}
                 onClick={() => {
                   setActiveTab('reports');
-                  window.scrollTo(0, 0);
+                  // Ensure scroll happens after state update and content renders
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                  }, 100);
                 }}
                 onMouseEnter={() => setHoveredTab('reports')}
                 onMouseLeave={() => setHoveredTab(null)}
@@ -1843,7 +1862,10 @@ const ESCAdminDashboard = () => {
                 className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
                 onClick={() => {
                   setActiveTab('settings');
-                  window.scrollTo(0, 0);
+                  // Ensure scroll happens after state update and content renders
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                  }, 100);
                 }}
                 onMouseEnter={() => setHoveredTab('settings')}
                 onMouseLeave={() => setHoveredTab(null)}
