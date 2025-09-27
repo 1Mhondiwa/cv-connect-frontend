@@ -1758,8 +1758,8 @@ const AssociateDashboard = () => {
                                 <p className="card-text text-muted small mb-2">
                                   {rec.headline}
                                 </p>
-                                {rec.hourly_rate && (
-                                  <div className="mb-2">
+                                <div className="mb-2 d-flex gap-2 flex-wrap">
+                                  {rec.hourly_rate && (
                                     <span style={{ 
                                       background: '#fff3cd', 
                                       color: '#856404', 
@@ -1771,13 +1771,11 @@ const AssociateDashboard = () => {
                                       <i className="bi bi-currency-exchange me-1"></i>
                                       R{rec.hourly_rate}/hour
                                     </span>
-                                  </div>
-                                )}
-                                {rec.completed_jobs && rec.completed_jobs.length > 0 && (
-                                  <div className="mb-2">
+                                  )}
+                                  {rec.completed_jobs && rec.completed_jobs.length > 0 && (
                                     <span style={{ 
-                                      background: '#d1ecf1', 
-                                      color: '#0c5460', 
+                                      background: '#d4edda', 
+                                      color: '#155724', 
                                       padding: '4px 8px', 
                                       borderRadius: 12,
                                       fontSize: 11,
@@ -1786,8 +1784,8 @@ const AssociateDashboard = () => {
                                       <i className="bi bi-briefcase me-1"></i>
                                       {rec.completed_jobs.length} Job{rec.completed_jobs.length !== 1 ? 's' : ''} Completed
                                     </span>
-                                  </div>
-                                )}
+                                  )}
+                                </div>
                               </div>
                               <div className="text-end">
                                 <span style={{ 
