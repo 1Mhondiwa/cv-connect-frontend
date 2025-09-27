@@ -373,7 +373,6 @@ const AssociateDashboard = () => {
     try {
       const response = await api.get(`/associate/freelancer-requests/${requestId}/recommendations`);
       if (response.data.success) {
-        console.log('📊 Recommendations data received:', response.data.recommendations);
         setRecommendations(response.data.recommendations);
         
         // Find the full request object from the requests array
@@ -1786,18 +1785,6 @@ const AssociateDashboard = () => {
                                       {rec.completed_jobs.length} Job{rec.completed_jobs.length !== 1 ? 's' : ''} Completed
                                     </span>
                                   )}
-                                  {/* Debug: Always show completed jobs count */}
-                                  <span style={{ 
-                                    background: '#ffc107', 
-                                    color: '#000', 
-                                    padding: '2px 6px', 
-                                    borderRadius: 8,
-                                    fontSize: 10,
-                                    fontWeight: 600,
-                                    marginLeft: '4px'
-                                  }}>
-                                    DEBUG: {rec.completed_jobs ? rec.completed_jobs.length : 'null'}
-                                  </span>
                                 </div>
                               </div>
                               <div className="text-end">
