@@ -2089,15 +2089,6 @@ const ECSEmployeeDashboard = () => {
                                     <span className="text-muted small">{freelancer.experience_years || 0} years</span>
                                   </div>
 
-                                  {/* Jobs Completed - Only show if > 0 */}
-                                  {freelancer.completed_jobs && freelancer.completed_jobs.length > 0 && (
-                                    <div className="mb-2">
-                                      <strong>Jobs Completed:</strong> 
-                                      <span className="badge bg-primary ms-1" style={{ fontSize: '10px' }}>
-                                        {freelancer.completed_jobs.length}
-                                      </span>
-                                    </div>
-                                  )}
 
                                   {/* Contact Info */}
                                   <div className="mb-2">
