@@ -449,6 +449,24 @@ const FreelancerProfile = () => {
                         )}
                       </div>
                     </div>
+                    {/* Jobs Completed Badge - Top Right */}
+                    <div className="text-end">
+                      {profile.completed_jobs && profile.completed_jobs.length > 0 && (
+                        <span style={{ 
+                          background: '#d4edda', 
+                          color: '#155724', 
+                          padding: '8px 16px', 
+                          borderRadius: 20,
+                          fontSize: 16,
+                          fontWeight: 700,
+                          display: 'inline-block',
+                          boxShadow: '0 2px 8px rgba(21, 87, 36, 0.15)'
+                        }}>
+                          <i className="bi bi-briefcase me-2"></i>
+                          {profile.completed_jobs.length} Job{profile.completed_jobs.length !== 1 ? 's' : ''} Completed
+                        </span>
+                      )}
+                    </div>
                    {/* <Link
                       to="/freelancer/edit-profile"
                       className="btn"
