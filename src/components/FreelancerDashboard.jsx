@@ -1029,9 +1029,13 @@ const FreelancerDashboard = () => {
                             Active
                           </span>
                         </div>
-                        <div className="d-flex justify-content-between">
+                        <div className="d-flex justify-content-between mb-2">
                           <span style={{ color: '#666' }}>Skills Listed:</span>
                           <span className="badge" style={{ background: accent }}>{profile?.skills?.length || 0}</span>
+                        </div>
+                        <div className="d-flex justify-content-between">
+                          <span style={{ color: '#666' }}>Jobs Completed:</span>
+                          <span className="badge bg-primary">{profile?.completed_jobs?.length || 0}</span>
                         </div>
                       </div>
                     </div>

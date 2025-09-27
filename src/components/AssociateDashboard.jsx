@@ -1773,6 +1773,21 @@ const AssociateDashboard = () => {
                                     </span>
                                   </div>
                                 )}
+                                {rec.completed_jobs && rec.completed_jobs.length > 0 && (
+                                  <div className="mb-2">
+                                    <span style={{ 
+                                      background: '#d1ecf1', 
+                                      color: '#0c5460', 
+                                      padding: '4px 8px', 
+                                      borderRadius: 12,
+                                      fontSize: 11,
+                                      fontWeight: 600
+                                    }}>
+                                      <i className="bi bi-briefcase me-1"></i>
+                                      {rec.completed_jobs.length} Job{rec.completed_jobs.length !== 1 ? 's' : ''} Completed
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                               <div className="text-end">
                                 <span style={{ 
