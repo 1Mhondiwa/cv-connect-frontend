@@ -2289,26 +2289,44 @@ const ECSEmployeeDashboard = () => {
                                   />
                                 );
                               })()}
-                              <div className="mt-2 d-flex gap-2 flex-wrap">
-                                <span className={`badge ${
-                                  selectedFreelancerProfile.availability_status === 'available' ? 'bg-success' :
-                                  selectedFreelancerProfile.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
-                                }`} style={{ fontSize: '12px' }}>
-                                  <i className={`bi ${
-                                    selectedFreelancerProfile.availability_status === 'available' ? 'bi-check-circle' :
-                                    selectedFreelancerProfile.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
-                                  } me-1`}></i>
-                                  {selectedFreelancerProfile.availability_status === 'available' ? 'Available for Work' :
-                                   selectedFreelancerProfile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
-                                </span>
-                                {selectedFreelancerProfile.hourly_rate && (
-                                  <span className="badge" style={{ 
-                                    backgroundColor: '#fff3cd', 
-                                    color: '#856404', 
-                                    fontSize: '12px' 
+                              <div className="mt-2 d-flex gap-2 flex-wrap justify-content-between align-items-center">
+                                <div className="d-flex gap-2 flex-wrap">
+                                  <span className={`badge ${
+                                    selectedFreelancerProfile.availability_status === 'available' ? 'bg-success' :
+                                    selectedFreelancerProfile.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
+                                  }`} style={{ fontSize: '12px' }}>
+                                    <i className={`bi ${
+                                      selectedFreelancerProfile.availability_status === 'available' ? 'bi-check-circle' :
+                                      selectedFreelancerProfile.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                    } me-1`}></i>
+                                    {selectedFreelancerProfile.availability_status === 'available' ? 'Available for Work' :
+                                     selectedFreelancerProfile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                                  </span>
+                                  {selectedFreelancerProfile.hourly_rate && (
+                                    <span className="badge" style={{ 
+                                      backgroundColor: '#fff3cd', 
+                                      color: '#856404', 
+                                      fontSize: '12px' 
+                                    }}>
+                                      <i className="bi bi-currency-exchange me-1"></i>
+                                      R{selectedFreelancerProfile.hourly_rate}/hour
+                                    </span>
+                                  )}
+                                </div>
+                                {/* Jobs Completed Badge - Top Right */}
+                                {selectedFreelancerProfile.completed_jobs && selectedFreelancerProfile.completed_jobs.length > 0 && (
+                                  <span style={{ 
+                                    background: '#d4edda', 
+                                    color: '#155724', 
+                                    padding: '8px 16px', 
+                                    borderRadius: 20,
+                                    fontSize: 14,
+                                    fontWeight: 700,
+                                    display: 'inline-block',
+                                    boxShadow: '0 2px 8px rgba(21, 87, 36, 0.15)'
                                   }}>
-                                    <i className="bi bi-currency-exchange me-1"></i>
-                                    R{selectedFreelancerProfile.hourly_rate}/hour
+                                    <i className="bi bi-briefcase me-2"></i>
+                                    {selectedFreelancerProfile.completed_jobs.length} Job{selectedFreelancerProfile.completed_jobs.length !== 1 ? 's' : ''} Completed
                                   </span>
                                 )}
                               </div>
