@@ -869,7 +869,7 @@ const ECSEmployeeDashboard = () => {
           visibility: 'visible',
           transition: 'padding 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
-          <div className="d-flex align-items-center" data-aos="none" style={{ 
+          <div className="d-flex align-items-center justify-content-center" data-aos="none" style={{ 
             animation: 'none',
             transform: 'none',
             opacity: 1,
@@ -887,15 +887,17 @@ const ECSEmployeeDashboard = () => {
                 width: '32px', 
                 height: '32px', 
                 borderRadius: '8px',
-                marginRight: '12px'
+                marginRight: isSidebarCollapsed ? '0' : '12px'
               }}
             />
-        <div data-aos="none">
-              <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }} data-aos="none">
-                CV-Connect
-              </h5>
-              <small className="text-muted" data-aos="none">ECS Employee Portal</small>
-          </div>
+            {!isSidebarCollapsed && (
+              <div data-aos="none">
+                <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }} data-aos="none">
+                  CV-Connect
+                </h5>
+                <small className="text-muted" data-aos="none">ECS Employee Portal</small>
+              </div>
+            )}
           </div>
         </div>
 
