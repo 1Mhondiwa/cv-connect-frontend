@@ -852,18 +852,19 @@ const ECSEmployeeDashboard = () => {
         transform: 'none',
         opacity: 1,
         visibility: 'visible',
-        transition: 'width 0.3s ease',
+        transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         boxShadow: '2px 0 6px rgba(253, 104, 14, 0.1)'
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" data-aos="none" style={{ 
-          padding: '24px', 
+          padding: isSidebarCollapsed ? '12px' : '24px', 
           borderBottom: '1px solid #e5e7eb',
           background: '#fafafa',
           animation: 'none',
           transform: 'none',
           opacity: 1,
-          visibility: 'visible'
+          visibility: 'visible',
+          transition: 'padding 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
           <div className="d-flex align-items-center" data-aos="none" style={{ 
             animation: 'none',
@@ -1114,7 +1115,7 @@ const ECSEmployeeDashboard = () => {
         marginLeft: isSidebarCollapsed ? '60px' : '280px',
         padding: '20px',
         paddingTop: '80px', // Account for fixed header height (60px + 20px spacing)
-        transition: 'margin-left 0.3s ease, width 0.3s ease',
+        transition: 'margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         minHeight: '100vh',
         background: '#f9fafb',
         width: isSidebarCollapsed ? 'calc(100% - 60px)' : 'calc(100% - 280px)',

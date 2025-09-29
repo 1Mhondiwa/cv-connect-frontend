@@ -1699,7 +1699,7 @@ const ESCAdminDashboard = () => {
         borderRight: '2px solid rgba(253, 104, 14, 0.2)',
         overflowY: 'auto',
         zIndex: 1000,
-        transition: 'width 0.3s ease',
+        transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         boxShadow: '2px 0 6px rgba(253, 104, 14, 0.1)'
       }}>
         {/* Sidebar Header */}
@@ -1707,7 +1707,7 @@ const ESCAdminDashboard = () => {
           padding: isSidebarCollapsed ? '12px' : '24px', 
           borderBottom: '1px solid #e5e7eb',
           background: '#fafafa',
-          transition: 'padding 0.3s ease'
+          transition: 'padding 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
         }}>
           <div className="d-flex align-items-center justify-content-center">
             <img 
@@ -1965,7 +1965,7 @@ const ESCAdminDashboard = () => {
         marginLeft: isSidebarCollapsed ? '60px' : '280px',
         padding: '20px',
         paddingTop: '80px', // Account for fixed header height (60px + 20px spacing)
-        transition: 'margin-left 0.3s ease, width 0.3s ease',
+        transition: 'margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease',
         minHeight: '100vh',
         background: '#f9fafb',
         width: isSidebarCollapsed ? 'calc(100% - 60px)' : 'calc(100% - 280px)',
