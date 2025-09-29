@@ -1696,7 +1696,7 @@ const ESCAdminDashboard = () => {
         left: 0, 
         top: 0, 
         background: '#fff', 
-        borderRight: '1px solid #e5e7eb',
+        borderRight: '2px solid #fd680e',
         overflowY: 'auto',
         zIndex: 1000,
         transition: 'width 0.3s ease'
@@ -1776,7 +1776,8 @@ const ESCAdminDashboard = () => {
                   transition: 'all 0.3s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: activeTab === 'dashboard' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
                 }}
                 title={isSidebarCollapsed ? 'Dashboard' : ''}
               >
@@ -1789,16 +1790,18 @@ const ESCAdminDashboard = () => {
 
           {/* Management Tools */}
           <div className="nav-section mb-4">
-            <h6 className="nav-section-title" style={{ 
-              color: '#6b7280', 
-              fontSize: '12px', 
-              fontWeight: 600, 
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-              paddingLeft: '8px'
-            }}>
-              Management Tools
-            </h6>
+            {!isSidebarCollapsed && (
+              <h6 className="nav-section-title" style={{ 
+                color: '#6b7280', 
+                fontSize: '12px', 
+                fontWeight: 600, 
+                textTransform: 'uppercase',
+                marginBottom: '8px',
+                paddingLeft: '8px'
+              }}>
+                Management Tools
+              </h6>
+            )}
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'analytics' ? 'active' : ''}`}
@@ -1812,7 +1815,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('analytics')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: '12px 16px',
+                  padding: isSidebarCollapsed ? '12px' : '12px 16px',
                   border: 'none',
                   background: activeTab === 'analytics' ? accent : 'transparent',
                   color: activeTab === 'analytics' ? '#fff' : '#374151',
@@ -1824,11 +1827,14 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: activeTab === 'analytics' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
                 }}
+                title={isSidebarCollapsed ? 'Analytics' : ''}
               >
-                <i className="bi bi-graph-up me-3"></i>
-                Analytics
+                <i className={`bi bi-graph-up ${!isSidebarCollapsed ? 'me-3' : ''}`}></i>
+                {!isSidebarCollapsed && 'Analytics'}
               </button>
               
               <button
@@ -1843,7 +1849,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('reports')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: '12px 16px',
+                  padding: isSidebarCollapsed ? '12px' : '12px 16px',
                   border: 'none',
                   background: activeTab === 'reports' ? accent : 'transparent',
                   color: activeTab === 'reports' ? '#fff' : '#374151',
@@ -1855,11 +1861,14 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: activeTab === 'reports' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
                 }}
+                title={isSidebarCollapsed ? 'System Monitor' : ''}
               >
-                <i className="bi bi-file-earmark-text me-3"></i>
-                System Monitor
+                <i className={`bi bi-file-earmark-text ${!isSidebarCollapsed ? 'me-3' : ''}`}></i>
+                {!isSidebarCollapsed && 'System Monitor'}
           </button>
               
 
@@ -1871,16 +1880,18 @@ const ESCAdminDashboard = () => {
 
           {/* Bottom Section - Settings and Logout */}
           <div className="nav-section">
-            <h6 className="nav-section-title" style={{ 
-              color: '#6b7280', 
-              fontSize: '12px', 
-              fontWeight: 600, 
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-              paddingLeft: '8px'
-            }}>
-              System
-            </h6>
+            {!isSidebarCollapsed && (
+              <h6 className="nav-section-title" style={{ 
+                color: '#6b7280', 
+                fontSize: '12px', 
+                fontWeight: 600, 
+                textTransform: 'uppercase',
+                marginBottom: '8px',
+                paddingLeft: '8px'
+              }}>
+                System
+              </h6>
+            )}
             <div className="nav-items">
               <button
                 className={`nav-item w-100 text-start ${activeTab === 'settings' ? 'active' : ''}`}
@@ -1894,7 +1905,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('settings')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: '12px 16px',
+                  padding: isSidebarCollapsed ? '12px' : '12px 16px',
                   border: 'none',
                   background: activeTab === 'settings' ? accent : 'transparent',
                   color: activeTab === 'settings' ? '#fff' : '#374151',
@@ -1906,11 +1917,14 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: activeTab === 'settings' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
                 }}
+                title={isSidebarCollapsed ? 'Settings' : ''}
               >
-                <i className="bi bi-gear me-3"></i>
-                Settings
+                <i className={`bi bi-gear ${!isSidebarCollapsed ? 'me-3' : ''}`}></i>
+                {!isSidebarCollapsed && 'Settings'}
               </button>
               
                 <button
@@ -1919,7 +1933,7 @@ const ESCAdminDashboard = () => {
                 onMouseEnter={() => setHoveredTab('logout')}
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
-                  padding: '12px 16px',
+                  padding: isSidebarCollapsed ? '12px' : '12px 16px',
                   border: 'none',
                   background: 'transparent',
                   color: '#dc3545',
@@ -1931,11 +1945,14 @@ const ESCAdminDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: '0 2px 8px rgba(253, 104, 14, 0.15)'
                 }}
+                title={isSidebarCollapsed ? 'Logout' : ''}
               >
-                <i className="bi bi-box-arrow-right me-3"></i>
-                Logout
+                <i className={`bi bi-box-arrow-right ${!isSidebarCollapsed ? 'me-3' : ''}`}></i>
+                {!isSidebarCollapsed && 'Logout'}
                 </button>
             </div>
           </div>

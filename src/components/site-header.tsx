@@ -10,7 +10,7 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
         right: 0,
         height: '60px',
         backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e5e7eb',
+        borderBottom: '2px solid #fd680e',
         display: 'flex',
         alignItems: 'center',
         padding: '0 24px',
@@ -28,7 +28,7 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
               padding: '8px',
               borderRadius: '6px',
               border: '1px solid #e5e7eb',
-              backgroundColor: '#000000',
+              backgroundColor: '#fd680e',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -38,11 +38,11 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
               transition: 'all 0.2s ease'
             }}
             onMouseOver={(e) => {
-              (e.target as HTMLElement).style.backgroundColor = '#333333';
+              (e.target as HTMLElement).style.backgroundColor = '#e55a00';
               (e.target as HTMLElement).style.transform = 'scale(1.05)';
             }}
             onMouseOut={(e) => {
-              (e.target as HTMLElement).style.backgroundColor = '#000000';
+              (e.target as HTMLElement).style.backgroundColor = '#fd680e';
               (e.target as HTMLElement).style.transform = 'scale(1)';
             }}
           >
