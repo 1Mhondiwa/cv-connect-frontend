@@ -2137,7 +2137,7 @@ const ESCAdminDashboard = () => {
               <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)', border: '2px solid rgba(253, 104, 14, 0.2)', maxWidth: 1200, margin: '0 auto' }}>
                 {/* Interactive Chart Component */}
                 <div className="chart-container">
-                  <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                  <div className="card border-0 shadow-sm">
                     <div className="card-header bg-transparent border-0 pb-0">
                       <div className="d-flex justify-content-between align-items-start flex-wrap">
                         <div>
@@ -2534,7 +2534,7 @@ const ESCAdminDashboard = () => {
                   {/* Skills Supply vs Demand - Bar Chart (TOP PRIORITY) */}
                   <div className="row g-4 mb-4">
                     <div className="col-md-12">
-                      <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                      <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                         <div className="card-header bg-transparent border-0">
                           <div className="d-flex justify-content-between align-items-center">
                             <div>
@@ -2991,7 +2991,7 @@ const ESCAdminDashboard = () => {
                   {/* Hired Freelancers Trends - Area Chart (SECOND PRIORITY) */}
                   <div className="row g-4 mb-4">
                     <div className="col-12">
-                      <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                      <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                         <div className="card-header bg-transparent border-0">
                           <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                             <i className="bi bi-briefcase me-2"></i>Hired Freelancers Trends
@@ -3110,7 +3110,7 @@ const ESCAdminDashboard = () => {
                   {/* User Distribution and Activity - Pie Charts (THIRD & FOURTH PRIORITY) */}
               <div className="row g-4 mb-4">
                 <div className="col-md-6">
-                  <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                  <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                     <div className="card-header bg-transparent border-0">
                       <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                         <i className="bi bi-pie-chart me-2"></i>User Type Distribution
@@ -3195,7 +3195,7 @@ const ESCAdminDashboard = () => {
                   </div>
                 </div>
                 <div className="col-md-6">
-                  <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                  <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                     <div className="card-header bg-transparent border-0">
                       <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                         <i className="bi bi-activity me-2"></i>User Activity Status
@@ -3277,9 +3277,9 @@ const ESCAdminDashboard = () => {
               </div>
 
                   {/* CV Upload Trends - Line Chart (FIFTH PRIORITY) */}
-              <div className="row g-4 mb-4">
+                  <div className="row g-4 mb-4">
                 <div className="col-12">
-                      <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                  <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                     <div className="card-header bg-transparent border-0">
                       <div className="d-flex justify-content-between align-items-center">
                         <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
@@ -3451,7 +3451,7 @@ const ESCAdminDashboard = () => {
                   {/* Interview Feedback Analytics Section (SIXTH PRIORITY) */}
               <div className="row g-4 mb-4">
                     <div className="col-12">
-                  <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                  <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                     <div className="card-header bg-transparent border-0">
                           <div className="d-flex justify-content-between align-items-center">
                             <div>
@@ -3673,7 +3673,7 @@ const ESCAdminDashboard = () => {
                   {/* Communication Trends - Line Chart (SEVENTH PRIORITY) */}
               <div className="row g-4 mb-4">
                 <div className="col-12">
-                  <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                  <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                     <div className="card-header bg-transparent border-0">
                       <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                         <i className="bi bi-chat-dots me-2"></i>Communication Trends
@@ -3779,7 +3779,7 @@ const ESCAdminDashboard = () => {
                   {/* User Communication Activity - Bar Chart (EIGHTH PRIORITY) */}
               <div className="row g-4 mb-4">
                 <div className="col-12">
-                  <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                  <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                     <div className="card-header bg-transparent border-0">
                       <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                         <i className="bi bi-people me-2"></i>User Communication Activity
@@ -3898,7 +3898,7 @@ const ESCAdminDashboard = () => {
                   {/* Registration Trends - Line Chart */}
                   <div className="row g-4 mb-4">
                 <div className="col-12">
-                  <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                  <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                     <div className="card-header bg-transparent border-0">
                           <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                             <i className="bi bi-graph-up me-2"></i>User Registration Trends
@@ -4508,7 +4508,7 @@ const ESCAdminDashboard = () => {
 
                           {/* System Issues & Alerts */}
                           <div className="col-12 mb-3">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>System Issues & Alerts</h6>
                               </div>
@@ -4567,7 +4567,7 @@ const ESCAdminDashboard = () => {
                         <div className="row g-4">
                           {/* User Growth */}
                           <div className="col-md-6">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-people me-2"></i>User Growth</h6>
                               </div>
@@ -4604,7 +4604,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Matching Efficiency */}
                           <div className="col-md-6">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-link me-2"></i>Matching Efficiency</h6>
                               </div>
@@ -4641,7 +4641,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Business Metrics */}
                           <div className="col-12">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-graph-up me-2"></i>Business Metrics</h6>
                               </div>
@@ -4694,7 +4694,7 @@ const ESCAdminDashboard = () => {
                         <div className="row g-4">
                           {/* Security Overview */}
                           <div className="col-md-6">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-shield-check me-2"></i>Security Overview</h6>
                               </div>
@@ -4736,7 +4736,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Communication Monitoring */}
                           <div className="col-md-6">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-chat-dots me-2"></i>Communication Monitoring</h6>
                               </div>
@@ -4778,7 +4778,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Real-Time Metrics */}
                           <div className="col-12">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-activity me-2"></i>Real-Time Activity Metrics</h6>
                               </div>
@@ -4820,7 +4820,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Audit Trail Summary */}
                           <div className="col-12">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-clipboard-data me-2"></i>Audit Trail Summary</h6>
                               </div>
@@ -4857,7 +4857,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Recent Security Alerts */}
                           <div className="col-12">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-bell me-2"></i>Recent Security Alerts</h6>
                               </div>
@@ -4906,7 +4906,7 @@ const ESCAdminDashboard = () => {
 
                           {/* All Communicating Users - Accountability Section */}
                           <div className="col-12">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-people me-2"></i>All Communicating Users - Accountability</h6>
                                 <small className="text-white-50">Complete audit trail for legal and compliance purposes</small>
@@ -5019,7 +5019,7 @@ const ESCAdminDashboard = () => {
                         <div className="row g-4">
                           {/* Workflow Efficiency */}
                           <div className="col-md-6">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-gear me-2"></i>Workflow Efficiency</h6>
                               </div>
@@ -5056,7 +5056,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Quality Metrics */}
                           <div className="col-md-6">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-award me-2"></i>Quality Metrics</h6>
                               </div>
@@ -5093,7 +5093,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Real-Time Activity Metrics */}
                           <div className="col-12">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-activity me-2"></i>Real-Time Activity Metrics</h6>
                               </div>
@@ -5137,7 +5137,7 @@ const ESCAdminDashboard = () => {
 
                           {/* Areas for Improvement */}
                           <div className="col-12">
-                            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+                            <div className="card border-0 shadow-sm">
                               <div className="card-header text-white" style={{ backgroundColor: accent }}>
                                 <h6 className="mb-0"><i className="bi bi-lightbulb me-2"></i>Areas for Improvement</h6>
                               </div>
@@ -5790,7 +5790,7 @@ const ESCAdminDashboard = () => {
         <div className="row g-4">
           {/* Real-time Security Metrics */}
           <div className="col-md-6">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-danger text-white">
                 <h6 className="mb-0"><i className="bi bi-shield-check me-2"></i>Real-time Security Metrics</h6>
               </div>
@@ -5835,7 +5835,7 @@ const ESCAdminDashboard = () => {
 
           {/* Communication Threats */}
           <div className="col-md-6">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-warning text-dark">
                 <h6 className="mb-0"><i className="bi bi-chat-dots me-2"></i>Communication Threats (24h)</h6>
               </div>
@@ -5880,7 +5880,7 @@ const ESCAdminDashboard = () => {
 
           {/* Recent Login Attempts */}
           <div className="col-12">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-info text-white">
                 <h6 className="mb-0"><i className="bi bi-person-check me-2"></i>Recent Login Attempts</h6>
               </div>
@@ -5933,7 +5933,7 @@ const ESCAdminDashboard = () => {
         <div className="row g-4">
           {/* Communication Patterns */}
           <div className="col-md-8">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-primary text-white">
                 <h6 className="mb-0"><i className="bi bi-graph-up me-2"></i>Communication Patterns</h6>
               </div>
@@ -5988,7 +5988,7 @@ const ESCAdminDashboard = () => {
 
           {/* Top Communicators */}
           <div className="col-md-4">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-success text-white">
                 <h6 className="mb-0"><i className="bi bi-people me-2"></i>Top Communicators</h6>
               </div>
@@ -6023,7 +6023,7 @@ const ESCAdminDashboard = () => {
 
           {/* Flagged Messages */}
           <div className="col-12">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-warning text-dark">
                 <h6 className="mb-0"><i className="bi bi-flag me-2"></i>Flagged Messages for Review</h6>
               </div>
@@ -6091,7 +6091,7 @@ const ESCAdminDashboard = () => {
       {/* Audit Log Component */}
         {
           activeSecuritySection === 'audit' && (
-        <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+        <div className="card border-0 shadow-sm">
           <div className="card-header bg-dark text-white">
             <h6 className="mb-0"><i className="bi bi-journal-text me-2"></i>System Audit Log</h6>
           </div>
@@ -6151,7 +6151,7 @@ const ESCAdminDashboard = () => {
         <div className="row g-4">
           {/* Message Threats */}
           <div className="col-md-6">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-danger text-white">
                 <h6 className="mb-0"><i className="bi bi-exclamation-triangle me-2"></i>Message Threats (7 days)</h6>
               </div>
@@ -6196,7 +6196,7 @@ const ESCAdminDashboard = () => {
 
           {/* IP Threats */}
           <div className="col-md-6">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-warning text-dark">
                 <h6 className="mb-0"><i className="bi bi-globe me-2"></i>IP-based Threats</h6>
               </div>
@@ -6235,7 +6235,7 @@ const ESCAdminDashboard = () => {
 
           {/* Recommendations */}
           <div className="col-12">
-            <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+            <div className="card border-0 shadow-sm">
               <div className="card-header bg-info text-white">
                 <h6 className="mb-0"><i className="bi bi-lightbulb me-2"></i>Security Recommendations</h6>
               </div>

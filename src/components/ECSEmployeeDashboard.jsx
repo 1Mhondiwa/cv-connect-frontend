@@ -1523,7 +1523,7 @@ const ECSEmployeeDashboard = () => {
           {/* Associates Tab */}
           {activeTab === 'associates' && (
             <div className="associates-tab">
-              <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+              <div className="card border-0 shadow-sm">
                 <div className="card-header bg-transparent border-0">
                   <h5 className="card-title mb-0">Associates</h5>
                 </div>
@@ -1587,7 +1587,7 @@ const ECSEmployeeDashboard = () => {
           {/* Freelancers Tab */}
           {activeTab === 'freelancers' && (
             <div className="freelancers-tab">
-              <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
+              <div className="card border-0 shadow-sm">
                 <div className="card-header bg-transparent border-0">
                   <h5 className="card-title mb-0">Freelancers</h5>
                 </div>
