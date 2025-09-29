@@ -836,6 +836,8 @@ const ECSEmployeeDashboard = () => {
         title="CV-Connect ECS Employee Portal" 
         onToggleSidebar={toggleSidebar}
         isSidebarCollapsed={isSidebarCollapsed}
+        userName="ECS Employee"
+        userRole="Employee"
       />
       {/* Professional Sidebar */}
       <div className="sidebar ecs-employee-sidebar" data-aos="none" style={{ 
@@ -846,7 +848,8 @@ const ECSEmployeeDashboard = () => {
         top: 0, 
         background: '#fff', 
         borderRight: '2px solid rgba(253, 104, 14, 0.2)',
-        overflowY: 'auto',
+        overflowY: isSidebarCollapsed ? 'hidden' : 'auto',
+        overflowX: 'hidden',
         zIndex: 1000,
         animation: 'none',
         transform: 'none',
@@ -930,7 +933,7 @@ const ECSEmployeeDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
-                  padding: '12px 16px',
+                  padding: isSidebarCollapsed ? '12px' : '12px 16px',
                   border: activeTab === 'dashboard' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'dashboard' ? accent : 'transparent',
                   color: activeTab === 'dashboard' ? '#fff' : '#374151',
@@ -942,12 +945,16 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
                   boxShadow: activeTab === 'dashboard' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
+                title={isSidebarCollapsed ? 'Home' : ''}
               >
-                <i className="bi bi-house-door me-3" data-aos="none"></i>
-                Home
+                <i className={`bi bi-house-door ${!isSidebarCollapsed ? 'me-3' : ''}`} data-aos="none"></i>
+                {!isSidebarCollapsed && 'Home'}
         </button>
               
 
@@ -959,7 +966,7 @@ const ECSEmployeeDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
-                  padding: '12px 16px',
+                  padding: isSidebarCollapsed ? '12px' : '12px 16px',
                   border: activeTab === 'associate-requests' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'associate-requests' ? accent : 'transparent',
                   color: activeTab === 'associate-requests' ? '#fff' : '#374151',
@@ -971,16 +978,18 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
                   boxShadow: activeTab === 'associate-requests' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
+                title={isSidebarCollapsed ? 'Associate Requests' : ''}
               >
-                <i className="bi bi-person-plus me-3" data-aos="none"></i>
-                Associate Requests
+                <i className={`bi bi-person-plus ${!isSidebarCollapsed ? 'me-3' : ''}`} data-aos="none"></i>
+                {!isSidebarCollapsed && 'Associate Requests'}
                 </button>
 
               <button
@@ -990,7 +999,7 @@ const ECSEmployeeDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
-                  padding: '12px 16px',
+                  padding: isSidebarCollapsed ? '12px' : '12px 16px',
                   border: activeTab === 'freelancer-requests' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'freelancer-requests' ? accent : 'transparent',
                   color: activeTab === 'freelancer-requests' ? '#fff' : '#374151',
@@ -1002,16 +1011,18 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
                   boxShadow: activeTab === 'freelancer-requests' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
+                title={isSidebarCollapsed ? 'Associate Freelancer Requests' : ''}
               >
-                <i className="bi bi-people-fill me-3" data-aos="none"></i>
-                Associate Freelancer Requests
+                <i className={`bi bi-people-fill ${!isSidebarCollapsed ? 'me-3' : ''}`} data-aos="none"></i>
+                {!isSidebarCollapsed && 'Associate Freelancer Requests'}
                 </button>
 
 
@@ -1051,7 +1062,7 @@ const ECSEmployeeDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 data-aos="none"
                 style={{
-                  padding: '12px 16px',
+                  padding: isSidebarCollapsed ? '12px' : '12px 16px',
                   border: activeTab === 'settings' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'settings' ? accent : 'transparent',
                   color: activeTab === 'settings' ? '#fff' : '#374151',
@@ -1063,16 +1074,18 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
                   boxShadow: activeTab === 'settings' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
+                title={isSidebarCollapsed ? 'Settings' : ''}
               >
-                <i className="bi bi-gear me-3" data-aos="none"></i>
-                Settings
+                <i className={`bi bi-gear ${!isSidebarCollapsed ? 'me-3' : ''}`} data-aos="none"></i>
+                {!isSidebarCollapsed && 'Settings'}
               </button>
               
                 <button

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCollapsed = false }) {
+export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCollapsed = false, userName = "Admin User", userRole = "Administrator" }) {
   return (
     <header 
       style={{
@@ -123,11 +123,11 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
                 fontSize: '14px',
                 fontWeight: 600,
                 color: '#111827'
-              }}>Admin User</span>
+              }}>{userName}</span>
               <span style={{
                 fontSize: '12px',
                 color: '#6b7280'
-              }}>Administrator</span>
+              }}>{userRole}</span>
             </div>
 
             {/* User Avatar */}
