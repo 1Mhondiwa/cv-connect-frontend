@@ -1146,7 +1146,7 @@ const ECSEmployeeDashboard = () => {
               {/* Welcome Section */}
               <div className="row mb-4">
                 <div className="col-12">
-                  <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                  <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)', border: '2px solid rgba(253, 104, 14, 0.2)' }}>
                     <div className="d-flex align-items-center justify-content-between">
                       <div>
                         <h4 className="mb-2" style={{ color: accent, fontWeight: 600 }}>
@@ -1176,7 +1176,7 @@ const ECSEmployeeDashboard = () => {
               {/* Quick Actions Row */}
               <div className="row g-4 mb-4">
                 <div className="col-lg-4 col-md-6">
-                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)', border: '2px solid rgba(253, 104, 14, 0.2)' }}>
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-envelope"></i>
@@ -1205,7 +1205,7 @@ const ECSEmployeeDashboard = () => {
                 </div>
 
                 <div className="col-lg-4 col-md-6">
-                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)', border: '2px solid rgba(253, 104, 14, 0.2)' }}>
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-people-fill"></i>
@@ -1234,7 +1234,7 @@ const ECSEmployeeDashboard = () => {
                 </div>
 
                 <div className="col-lg-4 col-md-6">
-                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                  <div className="bg-white rounded-4 shadow-sm p-4 text-center" style={{ boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)', border: '2px solid rgba(253, 104, 14, 0.2)' }}>
                     <div className="mb-3">
                       <div style={{ fontSize: 32, color: accent, marginBottom: 8 }}>
                         <i className="bi bi-briefcase"></i>
@@ -1266,7 +1266,7 @@ const ECSEmployeeDashboard = () => {
               {/* Recent Hires - Associate Responses */}
               <div className="row g-4">
                 <div className="col-12">
-                  <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+                  <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)', border: '2px solid rgba(253, 104, 14, 0.2)' }}>
                     <div className="d-flex justify-content-between align-items-center mb-3">
                       <h5 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                         <i className="bi bi-briefcase me-2"></i>
@@ -1343,7 +1343,7 @@ const ECSEmployeeDashboard = () => {
 
           {/* Associate Requests Tab */}
           {activeTab === 'associate-requests' && (
-            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+            <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)', border: '2px solid rgba(253, 104, 14, 0.2)', maxWidth: 1200, margin: '0 auto' }}>
               <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>Associate Requests</h5>
               
               {/* Success and Error Messages */}
@@ -1523,7 +1523,7 @@ const ECSEmployeeDashboard = () => {
           {/* Associates Tab */}
           {activeTab === 'associates' && (
             <div className="associates-tab">
-              <div className="card border-0 shadow-sm">
+              <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                 <div className="card-header bg-transparent border-0">
                   <h5 className="card-title mb-0">Associates</h5>
                 </div>
@@ -1587,7 +1587,7 @@ const ECSEmployeeDashboard = () => {
           {/* Freelancers Tab */}
           {activeTab === 'freelancers' && (
             <div className="freelancers-tab">
-              <div className="card border-0 shadow-sm">
+              <div className="card border-0 shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                 <div className="card-header bg-transparent border-0">
                   <h5 className="card-title mb-0">Freelancers</h5>
                 </div>
@@ -1652,7 +1652,7 @@ const ECSEmployeeDashboard = () => {
 
                      {/* Freelancer Requests Tab */}
            {activeTab === 'freelancer-requests' && (
-             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', maxWidth: 1200, margin: '0 auto' }}>
+             <div className="bg-white rounded-4 shadow-sm p-4" style={{ boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)', border: '2px solid rgba(253, 104, 14, 0.2)', maxWidth: 1200, margin: '0 auto' }}>
                <h5 style={{ color: accent, fontWeight: 700, marginBottom: 18 }}>ECS Employee Freelancer Request Management</h5>
                <p style={{ color: '#666', fontSize: 14, marginBottom: 24 }}>Review associate requests for freelancer services and provide curated recommendations</p>
                
