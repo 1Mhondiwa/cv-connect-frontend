@@ -1696,11 +1696,11 @@ const ESCAdminDashboard = () => {
         left: 0, 
         top: 0, 
         background: '#fff', 
-        borderRight: '2px solid #fd680e',
+        borderRight: '2px solid rgba(253, 104, 14, 0.2)',
         overflowY: 'auto',
         zIndex: 1000,
         transition: 'width 0.3s ease',
-        boxShadow: '2px 0 8px 0 rgba(253, 104, 14, 0.15)'
+        boxShadow: '2px 0 6px rgba(253, 104, 14, 0.1)'
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" style={{ 
