@@ -930,7 +930,7 @@ const ECSEmployeeDashboard = () => {
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
-                  border: 'none',
+                  border: activeTab === 'dashboard' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'dashboard' ? accent : 'transparent',
                   color: activeTab === 'dashboard' ? '#fff' : '#374151',
                   borderRadius: '8px',
@@ -941,7 +941,8 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.3s ease',
+                  boxShadow: activeTab === 'dashboard' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
               >
                 <i className="bi bi-house-door me-3" data-aos="none"></i>
@@ -958,7 +959,7 @@ const ECSEmployeeDashboard = () => {
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
-                  border: 'none',
+                  border: activeTab === 'associate-requests' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'associate-requests' ? accent : 'transparent',
                   color: activeTab === 'associate-requests' ? '#fff' : '#374151',
                   borderRadius: '8px',
@@ -973,7 +974,8 @@ const ECSEmployeeDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  boxShadow: activeTab === 'associate-requests' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
               >
                 <i className="bi bi-person-plus me-3" data-aos="none"></i>
@@ -988,7 +990,7 @@ const ECSEmployeeDashboard = () => {
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
-                  border: 'none',
+                  border: activeTab === 'freelancer-requests' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'freelancer-requests' ? accent : 'transparent',
                   color: activeTab === 'freelancer-requests' ? '#fff' : '#374151',
                   borderRadius: '8px',
@@ -1003,7 +1005,8 @@ const ECSEmployeeDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  boxShadow: activeTab === 'freelancer-requests' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
               >
                 <i className="bi bi-people-fill me-3" data-aos="none"></i>
@@ -1048,7 +1051,7 @@ const ECSEmployeeDashboard = () => {
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
-                  border: 'none',
+                  border: activeTab === 'settings' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'settings' ? accent : 'transparent',
                   color: activeTab === 'settings' ? '#fff' : '#374151',
                   borderRadius: '8px',
@@ -1063,7 +1066,8 @@ const ECSEmployeeDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  boxShadow: activeTab === 'settings' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
               >
                 <i className="bi bi-gear me-3" data-aos="none"></i>
@@ -1078,7 +1082,7 @@ const ECSEmployeeDashboard = () => {
                 data-aos="none"
                 style={{
                   padding: '12px 16px',
-                  border: 'none',
+                  border: '2px solid rgba(220, 53, 69, 0.2)',
                   background: 'transparent',
                   color: '#dc3545',
                   borderRadius: '8px',
@@ -1093,7 +1097,8 @@ const ECSEmployeeDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  boxShadow: '0 2px 6px rgba(220, 53, 69, 0.1)'
                 }}
               >
                 <i className="bi bi-box-arrow-right me-3" data-aos="none"></i>

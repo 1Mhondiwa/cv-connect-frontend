@@ -1767,7 +1767,7 @@ const ESCAdminDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: isSidebarCollapsed ? '12px' : '12px 16px',
-                  border: 'none',
+                  border: activeTab === 'dashboard' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'dashboard' ? accent : 'transparent',
                   color: activeTab === 'dashboard' ? '#fff' : '#374151',
                   borderRadius: '8px',
@@ -1777,7 +1777,8 @@ const ESCAdminDashboard = () => {
                   transition: 'all 0.3s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: activeTab === 'dashboard' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
                 title={isSidebarCollapsed ? 'Dashboard' : ''}
               >
@@ -1816,7 +1817,7 @@ const ESCAdminDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: isSidebarCollapsed ? '12px' : '12px 16px',
-                  border: 'none',
+                  border: activeTab === 'analytics' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'analytics' ? accent : 'transparent',
                   color: activeTab === 'analytics' ? '#fff' : '#374151',
                   borderRadius: '8px',
@@ -1828,7 +1829,8 @@ const ESCAdminDashboard = () => {
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: activeTab === 'analytics' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
                 title={isSidebarCollapsed ? 'Analytics' : ''}
               >
@@ -1849,7 +1851,7 @@ const ESCAdminDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: isSidebarCollapsed ? '12px' : '12px 16px',
-                  border: 'none',
+                  border: activeTab === 'reports' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'reports' ? accent : 'transparent',
                   color: activeTab === 'reports' ? '#fff' : '#374151',
                   borderRadius: '8px',
@@ -1861,7 +1863,8 @@ const ESCAdminDashboard = () => {
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: activeTab === 'reports' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
                 title={isSidebarCollapsed ? 'System Monitor' : ''}
               >
@@ -1904,7 +1907,7 @@ const ESCAdminDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: isSidebarCollapsed ? '12px' : '12px 16px',
-                  border: 'none',
+                  border: activeTab === 'settings' ? `2px solid ${accent}` : '2px solid rgba(253, 104, 14, 0.2)',
                   background: activeTab === 'settings' ? accent : 'transparent',
                   color: activeTab === 'settings' ? '#fff' : '#374151',
                   borderRadius: '8px',
@@ -1916,7 +1919,8 @@ const ESCAdminDashboard = () => {
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: activeTab === 'settings' ? '0 4px 12px rgba(253, 104, 14, 0.25)' : '0 2px 6px rgba(253, 104, 14, 0.1)'
                 }}
                 title={isSidebarCollapsed ? 'Settings' : ''}
               >
@@ -1931,7 +1935,7 @@ const ESCAdminDashboard = () => {
                 onMouseLeave={() => setHoveredTab(null)}
                 style={{
                   padding: isSidebarCollapsed ? '12px' : '12px 16px',
-                  border: 'none',
+                  border: '2px solid rgba(220, 53, 69, 0.2)',
                   background: 'transparent',
                   color: '#dc3545',
                   borderRadius: '8px',
@@ -1943,7 +1947,8 @@ const ESCAdminDashboard = () => {
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+                  boxShadow: '0 2px 6px rgba(220, 53, 69, 0.1)'
                 }}
                 title={isSidebarCollapsed ? 'Logout' : ''}
               >
