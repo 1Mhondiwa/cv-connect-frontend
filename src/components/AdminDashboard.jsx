@@ -4,6 +4,7 @@ import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { AreaChart, Area, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import visitorTracker from '../utils/visitorTracking';
+import { SiteHeader } from './site-header';
 
 const accent = '#fd680e';
 
@@ -1675,6 +1676,7 @@ const ESCAdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
+      <SiteHeader />
       {/* Professional Sidebar */}
       <div className="sidebar" style={{ 
         width: '280px', 

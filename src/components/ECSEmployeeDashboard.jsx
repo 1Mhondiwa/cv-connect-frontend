@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
+import { SiteHeader } from './site-header';
 
 
 const accent = '#fd680e';
@@ -824,6 +825,7 @@ const ECSEmployeeDashboard = () => {
 
   return (
     <div className="admin-dashboard">
+      <SiteHeader />
       {/* Professional Sidebar */}
       <div className="sidebar ecs-employee-sidebar" data-aos="none" style={{ 
         width: '280px', 
