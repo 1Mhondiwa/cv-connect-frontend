@@ -1,12 +1,12 @@
 import React from 'react'
 
-export function SiteHeader({ title = "CV-Connect" }) {
+export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCollapsed = false }) {
   return (
     <header 
       style={{
         position: 'fixed',
         top: 0,
-        left: '280px', // Account for sidebar width
+        left: isSidebarCollapsed ? '60px' : '280px', // Account for sidebar width
         right: 0,
         height: '60px',
         backgroundColor: '#ffffff',
@@ -22,22 +22,39 @@ export function SiteHeader({ title = "CV-Connect" }) {
         <div className="flex items-center gap-3">
           <button 
             type="button" 
-            aria-label="Menu" 
+            aria-label="Toggle Sidebar" 
+            onClick={onToggleSidebar}
             style={{
               padding: '8px',
               borderRadius: '6px',
-              border: 'none',
-              backgroundColor: 'transparent',
+              border: '1px solid #e5e7eb',
+              backgroundColor: '#000000',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              transition: 'all 0.2s ease'
             }}
-            onMouseOver={(e) => (e.target as HTMLElement).style.backgroundColor = '#f3f4f6'}
-            onMouseOut={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+            onMouseOver={(e) => {
+              (e.target as HTMLElement).style.backgroundColor = '#333333';
+              (e.target as HTMLElement).style.transform = 'scale(1.05)';
+            }}
+            onMouseOut={(e) => {
+              (e.target as HTMLElement).style.backgroundColor = '#000000';
+              (e.target as HTMLElement).style.transform = 'scale(1)';
+            }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 6H21M3 12H21M3 18H21" stroke="#374151" strokeWidth="2" strokeLinecap="round"/>
+            {/* Sidebar toggle icon based on collapsed state */}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {isSidebarCollapsed ? (
+                // Right arrow icon when collapsed (to expand)
+                <path d="M9 18L15 12L9 6" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              ) : (
+                // Left arrow icon when expanded (to collapse)
+                <path d="M15 18L9 12L15 6" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              )}
             </svg>
           </button>
           {/* vertical divider retained for spacing */}

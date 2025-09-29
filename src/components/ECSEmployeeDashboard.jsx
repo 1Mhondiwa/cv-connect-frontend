@@ -48,6 +48,13 @@ const ECSEmployeeDashboard = () => {
   
   // Enhanced freelancer management
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associate-requests', 'associates', 'freelancers'
+  
+  // Sidebar collapse state
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
@@ -825,10 +832,14 @@ const ECSEmployeeDashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      <SiteHeader title="CV-Connect ECS Employee Portal" />
+      <SiteHeader 
+        title="CV-Connect ECS Employee Portal" 
+        onToggleSidebar={toggleSidebar}
+        isSidebarCollapsed={isSidebarCollapsed}
+      />
       {/* Professional Sidebar */}
       <div className="sidebar ecs-employee-sidebar" data-aos="none" style={{ 
-        width: '280px', 
+        width: isSidebarCollapsed ? '60px' : '280px', 
         height: '100vh', 
         position: 'fixed', 
         left: 0, 
@@ -840,7 +851,8 @@ const ECSEmployeeDashboard = () => {
         animation: 'none',
         transform: 'none',
         opacity: 1,
-        visibility: 'visible'
+        visibility: 'visible',
+        transition: 'width 0.3s ease'
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" data-aos="none" style={{ 
@@ -1089,12 +1101,13 @@ const ECSEmployeeDashboard = () => {
 
       {/* Main Content Area */}
       <div className="main-content flex-grow-1" style={{ 
-        marginLeft: '300px',
+        marginLeft: isSidebarCollapsed ? '80px' : '300px',
         padding: '20px',
         paddingTop: '80px', // Account for fixed header height (60px + 20px spacing)
+        transition: 'margin-left 0.3s ease',
         minHeight: '100vh',
         background: '#f9fafb',
-        width: 'calc(100% - 300px)',
+        width: isSidebarCollapsed ? 'calc(100% - 80px)' : 'calc(100% - 300px)',
         maxWidth: '100%',
         overflowX: 'hidden'
       }}>
