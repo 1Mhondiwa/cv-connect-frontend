@@ -69,7 +69,7 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
               position: 'relative',
               padding: '8px',
               borderRadius: '6px',
-              border: '1px solid #e5e7eb',
+              border: '2px solid rgba(253, 104, 14, 0.2)',
               backgroundColor: 'transparent',
               cursor: 'pointer',
               display: 'flex',
@@ -77,10 +77,11 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
               justifyContent: 'center',
               width: '36px',
               height: '36px',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)'
             }}
             onMouseOver={(e) => {
-              (e.currentTarget as HTMLElement).style.backgroundColor = '#f3f4f6';
+              (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(253, 104, 14, 0.05)';
             }}
             onMouseOut={(e) => {
               (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
@@ -138,28 +139,35 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
                 height: '40px',
                 borderRadius: '50%',
                 border: '2px solid rgba(253, 104, 14, 0.2)',
-                backgroundColor: '#fd680e',
+                backgroundColor: '#ffffff',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.2s ease',
-                boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)'
+                boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)',
+                overflow: 'hidden',
+                padding: 0
               }}
               onMouseOver={(e) => {
-                (e.currentTarget as HTMLElement).style.backgroundColor = '#e55a00';
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(253, 104, 14, 0.25)';
                 (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
               }}
               onMouseOut={(e) => {
-                (e.currentTarget as HTMLElement).style.backgroundColor = '#fd680e';
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 6px rgba(253, 104, 14, 0.1)';
                 (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
               }}
             >
-              {/* User Avatar Icon */}
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <circle cx="12" cy="7" r="4" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              {/* Cartoon Avatar Image */}
+              <img 
+                src="https://api.dicebear.com/7.x/avataaars/svg?seed=AdminUser&backgroundColor=fd680e" 
+                alt="Admin User Avatar"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
             </button>
           </div>
         </div>
