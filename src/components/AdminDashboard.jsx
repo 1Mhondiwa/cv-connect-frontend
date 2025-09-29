@@ -1699,7 +1699,8 @@ const ESCAdminDashboard = () => {
         borderRight: '2px solid #fd680e',
         overflowY: 'auto',
         zIndex: 1000,
-        transition: 'width 0.3s ease'
+        transition: 'width 0.3s ease',
+        boxShadow: '2px 0 8px 0 rgba(253, 104, 14, 0.15)'
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" style={{ 
@@ -1776,8 +1777,7 @@ const ESCAdminDashboard = () => {
                   transition: 'all 0.3s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                  boxShadow: activeTab === 'dashboard' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
                 }}
                 title={isSidebarCollapsed ? 'Dashboard' : ''}
               >
@@ -1828,8 +1828,7 @@ const ESCAdminDashboard = () => {
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                  boxShadow: activeTab === 'analytics' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
                 }}
                 title={isSidebarCollapsed ? 'Analytics' : ''}
               >
@@ -1862,8 +1861,7 @@ const ESCAdminDashboard = () => {
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                  boxShadow: activeTab === 'reports' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
                 }}
                 title={isSidebarCollapsed ? 'System Monitor' : ''}
               >
@@ -1918,8 +1916,7 @@ const ESCAdminDashboard = () => {
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                  boxShadow: activeTab === 'settings' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
                 }}
                 title={isSidebarCollapsed ? 'Settings' : ''}
               >
@@ -1946,8 +1943,7 @@ const ESCAdminDashboard = () => {
                   lineHeight: '24px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                  boxShadow: '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
                 }}
                 title={isSidebarCollapsed ? 'Logout' : ''}
               >

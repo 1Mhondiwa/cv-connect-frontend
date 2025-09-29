@@ -10,12 +10,12 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
         right: 0,
         height: '60px',
         backgroundColor: '#ffffff',
-        borderBottom: '2px solid #fd680e',
+        borderBottom: '1px solid #fd680e',
         display: 'flex',
         alignItems: 'center',
         padding: '0 24px',
         zIndex: 1000,
-        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+        boxShadow: '0 2px 8px 0 rgba(253, 104, 14, 0.15)'
       }}
     >
       <div className="flex w-full items-center justify-between">

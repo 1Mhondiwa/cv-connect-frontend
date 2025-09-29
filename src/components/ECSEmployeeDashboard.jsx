@@ -852,7 +852,8 @@ const ECSEmployeeDashboard = () => {
         transform: 'none',
         opacity: 1,
         visibility: 'visible',
-        transition: 'width 0.3s ease'
+        transition: 'width 0.3s ease',
+        boxShadow: '2px 0 8px 0 rgba(253, 104, 14, 0.15)'
       }}>
         {/* Sidebar Header */}
         <div className="sidebar-header" data-aos="none" style={{ 
@@ -940,8 +941,7 @@ const ECSEmployeeDashboard = () => {
                   marginBottom: '4px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  transition: 'all 0.3s ease',
-                  boxShadow: activeTab === 'dashboard' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  transition: 'all 0.3s ease'
                 }}
               >
                 <i className="bi bi-house-door me-3" data-aos="none"></i>
@@ -973,8 +973,7 @@ const ECSEmployeeDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center',
-                  boxShadow: activeTab === 'associate-requests' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-person-plus me-3" data-aos="none"></i>
@@ -1004,8 +1003,7 @@ const ECSEmployeeDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center',
-                  boxShadow: activeTab === 'freelancer-requests' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-people-fill me-3" data-aos="none"></i>
@@ -1065,8 +1063,7 @@ const ECSEmployeeDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center',
-                  boxShadow: activeTab === 'settings' ? '0 4px 12px rgba(253, 104, 14, 0.3)' : '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-gear me-3" data-aos="none"></i>
@@ -1096,8 +1093,7 @@ const ECSEmployeeDashboard = () => {
                   height: '48px',
                   lineHeight: '24px',
                   display: 'flex',
-                  alignItems: 'center',
-                  boxShadow: '0 2px 8px rgba(253, 104, 14, 0.15)'
+                  alignItems: 'center'
                 }}
               >
                 <i className="bi bi-box-arrow-right me-3" data-aos="none"></i>
