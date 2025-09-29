@@ -1944,13 +1944,13 @@ const ESCAdminDashboard = () => {
 
       {/* Main Content Area */}
       <div className="main-content flex-grow-1" style={{ 
-        marginLeft: isSidebarCollapsed ? '80px' : '300px',
+        marginLeft: isSidebarCollapsed ? '60px' : '280px',
         padding: '20px',
         paddingTop: '80px', // Account for fixed header height (60px + 20px spacing)
-        transition: 'margin-left 0.3s ease',
+        transition: 'margin-left 0.3s ease, width 0.3s ease',
         minHeight: '100vh',
         background: '#f9fafb',
-        width: isSidebarCollapsed ? 'calc(100% - 80px)' : 'calc(100% - 300px)',
+        width: isSidebarCollapsed ? 'calc(100% - 60px)' : 'calc(100% - 280px)',
         maxWidth: '100%',
         overflowX: 'hidden'
       }}>
@@ -5747,11 +5747,7 @@ const ESCAdminDashboard = () => {
           }
         }
         
-        /* Force layout fixes */
-        .main-content {
-          margin-left: 300px !important;
-          width: calc(100% - 300px) !important;
-        }
+        /* Force layout fixes - removed to allow dynamic sidebar behavior */
         
         .row {
           margin-left: 0 !important;
