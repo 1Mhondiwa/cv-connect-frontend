@@ -57,8 +57,6 @@ export function SiteHeader({ title = "CV-Connect", onToggleSidebar, isSidebarCol
               )}
             </svg>
           </button>
-          {/* vertical divider retained for spacing */}
-          <div style={{ height: '20px', width: '1px', backgroundColor: '#d1d5db' }} />
         </div>
         <div className="flex items-center gap-2" />
       </div>
