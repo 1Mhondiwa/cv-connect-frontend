@@ -40,35 +40,10 @@ export function SiteHeader({ title = "CV-Connect" }) {
               <path d="M3 6H21M3 12H21M3 18H21" stroke="#374151" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </button>
+          {/* vertical divider retained for spacing */}
           <div style={{ height: '20px', width: '1px', backgroundColor: '#d1d5db' }} />
-          <h1 style={{ 
-            fontSize: '16px', 
-            fontWeight: '600', 
-            color: '#111827',
-            margin: 0
-          }}>
-            {title}
-          </h1>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            style={{
-              padding: '8px 16px',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#374151',
-              backgroundColor: 'transparent',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              textDecoration: 'none'
-            }}
-            onMouseOver={(e) => (e.target as HTMLElement).style.backgroundColor = '#f3f4f6'}
-            onMouseOut={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
-          >
-            Dashboard
-          </button>
-        </div>
+        <div className="flex items-center gap-2" />
       </div>
     </header>
   )
