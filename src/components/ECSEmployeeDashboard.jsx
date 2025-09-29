@@ -825,7 +825,7 @@ const ECSEmployeeDashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      <SiteHeader />
+      <SiteHeader title="CV-Connect ECS Employee Portal" />
       {/* Professional Sidebar */}
       <div className="sidebar ecs-employee-sidebar" data-aos="none" style={{ 
         width: '280px', 
@@ -1091,6 +1091,7 @@ const ECSEmployeeDashboard = () => {
       <div className="main-content flex-grow-1" style={{ 
         marginLeft: '300px',
         padding: '20px',
+        paddingTop: '80px', // Account for fixed header height (60px + 20px spacing)
         minHeight: '100vh',
         background: '#f9fafb',
         width: 'calc(100% - 300px)',

@@ -1676,7 +1676,7 @@ const ESCAdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      <SiteHeader />
+      <SiteHeader title="CV-Connect Admin Portal" />
       {/* Professional Sidebar */}
       <div className="sidebar" style={{ 
         width: '280px', 
@@ -1924,6 +1924,7 @@ const ESCAdminDashboard = () => {
       <div className="main-content flex-grow-1" style={{ 
         marginLeft: '300px',
         padding: '20px',
+        paddingTop: '80px', // Account for fixed header height (60px + 20px spacing)
         minHeight: '100vh',
         background: '#f9fafb',
         width: 'calc(100% - 300px)',

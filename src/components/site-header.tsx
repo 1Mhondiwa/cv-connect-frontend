@@ -1,25 +1,73 @@
 import React from 'react'
 
-export function SiteHeader() {
+export function SiteHeader({ title = "CV-Connect" }) {
   return (
-    <header className="flex items-center gap-2 border-b bg-white">
-      <div className="flex w-full items-center gap-2 px-4 lg:px-6" style={{ minHeight: 56 }}>
-        <div className="flex items-center gap-2">
-          <button type="button" aria-label="Open sidebar" className="p-2 rounded hover:bg-gray-100">
+    <header 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: '280px', // Account for sidebar width
+        right: 0,
+        height: '60px',
+        backgroundColor: '#ffffff',
+        borderBottom: '1px solid #e5e7eb',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 24px',
+        zIndex: 1000,
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+      }}
+    >
+      <div className="flex w-full items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button 
+            type="button" 
+            aria-label="Menu" 
+            style={{
+              padding: '8px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: 'transparent',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            onMouseOver={(e) => (e.target as HTMLElement).style.backgroundColor = '#f3f4f6'}
+            onMouseOut={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
+          >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 6H21M3 12H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M3 6H21M3 12H21M3 18H21" stroke="#374151" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </button>
-          <div className="h-4 w-px bg-gray-200" />
-          <h1 className="text-base font-medium">CV-Connect</h1>
+          <div style={{ height: '20px', width: '1px', backgroundColor: '#d1d5db' }} />
+          <h1 style={{ 
+            fontSize: '16px', 
+            fontWeight: '600', 
+            color: '#111827',
+            margin: 0
+          }}>
+            {title}
+          </h1>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <a
-            href="/"
-            className="hidden sm:inline-block text-sm px-2 py-1 rounded hover:bg-gray-100"
+        <div className="flex items-center gap-2">
+          <button
+            style={{
+              padding: '8px 16px',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: '#374151',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              textDecoration: 'none'
+            }}
+            onMouseOver={(e) => (e.target as HTMLElement).style.backgroundColor = '#f3f4f6'}
+            onMouseOut={(e) => (e.target as HTMLElement).style.backgroundColor = 'transparent'}
           >
-            Home
-          </a>
+            Dashboard
+          </button>
         </div>
       </div>
     </header>
