@@ -129,6 +129,17 @@ const ESCAdminDashboard = () => {
   const [visitorData, setVisitorData] = useState([]);
   const [visitorDataLoading, setVisitorDataLoading] = useState(false);
 
+  // Hired Freelancers Trends local filtering state (per-graph, real-time)
+  const [hiredFilter, setHiredFilter] = useState({
+    type: 'days', // 'days' | 'custom'
+    days: 90,
+    startDate: '',
+    endDate: ''
+  });
+  const [hiredSeries, setHiredSeries] = useState({ total: true, active: true, completed: true });
+  const [hiredDataRaw, setHiredDataRaw] = useState([]);
+  const [hiredFilterLoading, setHiredFilterLoading] = useState(false);
+
   // Chart data will be populated from real-time API calls
   const chartData = [];
 
@@ -970,6 +981,8 @@ const ESCAdminDashboard = () => {
       });
       
       setAnalyticsData(analyticsData);
+      // Store raw hired data for per-graph filtering without refetching
+      setHiredDataRaw(analyticsData.hiredFreelancersTrends || []);
       setLastAnalyticsUpdate(new Date());
       setAnalyticsDataReady(true);
       console.log('✅ Analytics data updated successfully');
@@ -2992,10 +3005,50 @@ const ESCAdminDashboard = () => {
                   <div className="row g-4 mb-4">
                     <div className="col-12">
                       <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
-                        <div className="card-header bg-transparent border-0">
+                        <div className="card-header bg-transparent border-0 d-flex align-items-center justify-content-between">
                           <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                             <i className="bi bi-briefcase me-2"></i>Hired Freelancers Trends
                           </h6>
+                          <div className="d-flex align-items-center gap-2">
+                            <select
+                              value={hiredFilter.type}
+                              onChange={(e) => setHiredFilter(prev => ({ ...prev, type: e.target.value }))}
+                              className="form-select form-select-sm"
+                              style={{ width: 120 }}
+                            >
+                              <option value="days">Last days</option>
+                              <option value="custom">Custom</option>
+                            </select>
+                            {hiredFilter.type === 'days' ? (
+                              <select
+                                value={hiredFilter.days}
+                                onChange={(e) => setHiredFilter(prev => ({ ...prev, days: Number(e.target.value) }))}
+                                className="form-select form-select-sm"
+                                style={{ width: 110 }}
+                              >
+                                <option value={30}>30 days</option>
+                                <option value={60}>60 days</option>
+                                <option value={90}>90 days</option>
+                              </select>
+                            ) : (
+                              <>
+                                <input type="date" className="form-control form-control-sm" value={hiredFilter.startDate} onChange={(e) => setHiredFilter(prev => ({ ...prev, startDate: e.target.value }))} />
+                                <input type="date" className="form-control form-control-sm" value={hiredFilter.endDate} onChange={(e) => setHiredFilter(prev => ({ ...prev, endDate: e.target.value }))} />
+                              </>
+                            )}
+                            <div className="form-check form-check-inline">
+                              <input className="form-check-input" type="checkbox" id="chkTotal" checked={hiredSeries.total} onChange={(e) => setHiredSeries(prev => ({ ...prev, total: e.target.checked }))} />
+                              <label className="form-check-label" htmlFor="chkTotal">Total</label>
+                            </div>
+                            <div className="form-check form-check-inline">
+                              <input className="form-check-input" type="checkbox" id="chkActive" checked={hiredSeries.active} onChange={(e) => setHiredSeries(prev => ({ ...prev, active: e.target.checked }))} />
+                              <label className="form-check-label" htmlFor="chkActive">Active</label>
+                            </div>
+                            <div className="form-check form-check-inline">
+                              <input className="form-check-input" type="checkbox" id="chkCompleted" checked={hiredSeries.completed} onChange={(e) => setHiredSeries(prev => ({ ...prev, completed: e.target.checked }))} />
+                              <label className="form-check-label" htmlFor="chkCompleted">Completed</label>
+                            </div>
+                          </div>
                         </div>
                         <div className="card-body">
                               {(() => {
@@ -3060,10 +3113,35 @@ const ESCAdminDashboard = () => {
                                   );
                                 }
 
-                                console.log('🔍 Hired Freelancers Chart - About to render with data:', validData);
+                                // Apply local real-time filtering
+                                let filtered = [...validData];
+                                const todayStr = new Date().toISOString().split('T')[0];
+                                const toDate = new Date(hiredFilter.type === 'custom' && hiredFilter.endDate ? hiredFilter.endDate : todayStr);
+                                let fromDate;
+                                if (hiredFilter.type === 'days') {
+                                  const d = new Date(toDate);
+                                  d.setDate(d.getDate() - (hiredFilter.days - 1));
+                                  fromDate = d;
+                                } else {
+                                  fromDate = hiredFilter.startDate ? new Date(hiredFilter.startDate) : new Date(toDate);
+                                }
+
+                                filtered = filtered.filter(item => {
+                                  const d = new Date(item.date);
+                                  return d >= fromDate && d <= toDate;
+                                });
+
+                                const seriesFiltered = filtered.map(item => ({
+                                  date: item.date,
+                                  hires: hiredSeries.total ? item.hires : 0,
+                                  active_hires: hiredSeries.active ? item.active_hires : 0,
+                                  completed_hires: hiredSeries.completed ? item.completed_hires : 0
+                                }));
+
+                                console.log('🔍 Hired Freelancers Chart - About to render with data:', seriesFiltered);
                                 return (
                                   <ResponsiveContainer width="100%" height={300}>
-                                    <AreaChart data={validData}>
+                                    <AreaChart data={seriesFiltered}>
                                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                       <XAxis dataKey="date" stroke="#666" />
                                       <YAxis stroke="#666" />
