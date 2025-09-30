@@ -4,6 +4,22 @@ import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { SiteHeader } from './site-header';
 
+// Add CSS animations
+const rippleKeyframes = `
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+`;
+
+// Inject the CSS
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = rippleKeyframes;
+  document.head.appendChild(style);
+}
 
 const accent = '#fd680e';
 
@@ -891,12 +907,12 @@ const ECSEmployeeDashboard = () => {
               }}
             />
             {!isSidebarCollapsed && (
-              <div data-aos="none">
-                <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }} data-aos="none">
-                  CV-Connect
-                </h5>
-                <small className="text-muted" data-aos="none">ECS Employee Portal</small>
-              </div>
+        <div data-aos="none">
+              <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }} data-aos="none">
+                CV-Connect
+              </h5>
+              <small className="text-muted" data-aos="none">ECS Employee Portal</small>
+          </div>
             )}
           </div>
         </div>
@@ -911,16 +927,16 @@ const ECSEmployeeDashboard = () => {
           {/* Main Navigation */}
           <div className="nav-section mb-4" data-aos="none">
             {!isSidebarCollapsed && (
-              <h6 className="nav-section-title" style={{ 
-                color: '#6b7280', 
-                fontSize: '12px', 
-                fontWeight: 600, 
-                textTransform: 'uppercase',
-                marginBottom: '8px',
-                paddingLeft: '8px'
-              }} data-aos="none">
-                Main Navigation
-              </h6>
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }} data-aos="none">
+              Main Navigation
+            </h6>
             )}
             <div className="nav-items" data-aos="none" style={{ 
               animation: 'none',
@@ -1040,16 +1056,16 @@ const ECSEmployeeDashboard = () => {
           {/* System */}
           <div className="nav-section" data-aos="none">
             {!isSidebarCollapsed && (
-              <h6 className="nav-section-title" style={{ 
-                color: '#6b7280', 
-                fontSize: '12px', 
-                fontWeight: 600, 
-                textTransform: 'uppercase',
-                marginBottom: '8px',
-                paddingLeft: '8px'
-              }} data-aos="none">
-                System
-              </h6>
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }} data-aos="none">
+              System
+            </h6>
             )}
             <div className="nav-items" data-aos="none" style={{ 
               animation: 'none',
@@ -1783,11 +1799,65 @@ const ECSEmployeeDashboard = () => {
                               style={{ 
                                 background: (request.recommendation_count && request.recommendation_count > 0) ? '#28a745' : accent, 
                                 color: '#fff', 
-                                borderRadius: 20 
+                                borderRadius: 20,
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                transform: 'translateY(0)',
+                                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                                border: 'none',
+                                position: 'relative',
+                                overflow: 'hidden'
                               }}
-                              onClick={() => openRecommendationsModal(request)}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                                e.currentTarget.style.background = (request.recommendation_count && request.recommendation_count > 0) ? '#218838' : '#e55a00';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                                e.currentTarget.style.background = (request.recommendation_count && request.recommendation_count > 0) ? '#28a745' : accent;
+                              }}
+                              onMouseDown={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+                              }}
+                              onMouseUp={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+                              }}
+                              onClick={(e) => {
+                                // Add ripple effect
+                                const ripple = document.createElement('span');
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const size = Math.max(rect.width, rect.height);
+                                const x = e.clientX - rect.left - size / 2;
+                                const y = e.clientY - rect.top - size / 2;
+                                
+                                ripple.style.cssText = `
+                                  position: absolute;
+                                  width: ${size}px;
+                                  height: ${size}px;
+                                  left: ${x}px;
+                                  top: ${y}px;
+                                  background: rgba(255, 255, 255, 0.3);
+                                  border-radius: 50%;
+                                  transform: scale(0);
+                                  animation: ripple 0.6s linear;
+                                  pointer-events: none;
+                                `;
+                                
+                                e.currentTarget.appendChild(ripple);
+                                
+                                setTimeout(() => {
+                                  ripple.remove();
+                                }, 600);
+                                
+                                // Call the original function
+                                openRecommendationsModal(request);
+                              }}
                             >
-                              <i className="bi bi-star me-1"></i>
+                              <i className="bi bi-star me-1" style={{ 
+                                transition: 'transform 0.3s ease',
+                                display: 'inline-block'
+                              }}></i>
                               {(request.recommendation_count && request.recommendation_count > 0) ? 'Update Recommendations' : 'Provide Recommendations'}
                             </button>
                   </div>
@@ -1862,12 +1932,68 @@ const ECSEmployeeDashboard = () => {
                 <button 
                   type="button" 
                          className="btn btn-primary"
-                         onClick={() => {
+                         style={{
+                           background: accent,
+                           border: 'none',
+                           borderRadius: '8px',
+                           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                           transform: 'translateY(0)',
+                           boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                           position: 'relative',
+                           overflow: 'hidden'
+                         }}
+                         onMouseEnter={(e) => {
+                           e.currentTarget.style.transform = 'translateY(-2px)';
+                           e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                           e.currentTarget.style.background = '#e55a00';
+                         }}
+                         onMouseLeave={(e) => {
+                           e.currentTarget.style.transform = 'translateY(0)';
+                           e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                           e.currentTarget.style.background = accent;
+                         }}
+                         onMouseDown={(e) => {
+                           e.currentTarget.style.transform = 'translateY(0) scale(0.98)';
+                         }}
+                         onMouseUp={(e) => {
+                           e.currentTarget.style.transform = 'translateY(-2px) scale(1)';
+                         }}
+                         onClick={(e) => {
+                           // Add ripple effect
+                           const ripple = document.createElement('span');
+                           const rect = e.currentTarget.getBoundingClientRect();
+                           const size = Math.max(rect.width, rect.height);
+                           const x = e.clientX - rect.left - size / 2;
+                           const y = e.clientY - rect.top - size / 2;
+                           
+                           ripple.style.cssText = `
+                             position: absolute;
+                             width: ${size}px;
+                             height: ${size}px;
+                             left: ${x}px;
+                             top: ${y}px;
+                             background: rgba(255, 255, 255, 0.3);
+                             border-radius: 50%;
+                             transform: scale(0);
+                             animation: ripple 0.6s linear;
+                             pointer-events: none;
+                           `;
+                           
+                           e.currentTarget.appendChild(ripple);
+                           
+                           setTimeout(() => {
+                             ripple.remove();
+                           }, 600);
+                           
+                           // Call the original function
                            setShowFreelancerRequestDetailsModal(false);
                            openRecommendationsModal(selectedFreelancerRequest);
                          }}
                        >
-                         <i className="bi bi-star me-1"></i>Provide Recommendations
+                         <i className="bi bi-star me-1" style={{ 
+                           transition: 'transform 0.3s ease',
+                           display: 'inline-block'
+                         }}></i>Provide Recommendations
                 </button>
                      )}
                    </div>
@@ -2333,25 +2459,25 @@ const ECSEmployeeDashboard = () => {
                               })()}
                               <div className="mt-2 d-flex gap-2 flex-wrap justify-content-between align-items-center">
                                 <div className="d-flex gap-2 flex-wrap">
-                                  <span className={`badge ${
-                                    selectedFreelancerProfile.availability_status === 'available' ? 'bg-success' :
-                                    selectedFreelancerProfile.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
-                                  }`} style={{ fontSize: '12px' }}>
-                                    <i className={`bi ${
-                                      selectedFreelancerProfile.availability_status === 'available' ? 'bi-check-circle' :
-                                      selectedFreelancerProfile.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
-                                    } me-1`}></i>
-                                    {selectedFreelancerProfile.availability_status === 'available' ? 'Available for Work' :
-                                     selectedFreelancerProfile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
-                                  </span>
-                                  {selectedFreelancerProfile.hourly_rate && (
-                                    <span className="badge" style={{ 
-                                      backgroundColor: '#fff3cd', 
-                                      color: '#856404', 
-                                      fontSize: '12px' 
-                                    }}>
-                                      <i className="bi bi-currency-exchange me-1"></i>
-                                      R{selectedFreelancerProfile.hourly_rate}/hour
+                                <span className={`badge ${
+                                  selectedFreelancerProfile.availability_status === 'available' ? 'bg-success' :
+                                  selectedFreelancerProfile.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
+                                }`} style={{ fontSize: '12px' }}>
+                                  <i className={`bi ${
+                                    selectedFreelancerProfile.availability_status === 'available' ? 'bi-check-circle' :
+                                    selectedFreelancerProfile.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                  } me-1`}></i>
+                                  {selectedFreelancerProfile.availability_status === 'available' ? 'Available for Work' :
+                                   selectedFreelancerProfile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                                </span>
+                                {selectedFreelancerProfile.hourly_rate && (
+                                  <span className="badge" style={{ 
+                                    backgroundColor: '#fff3cd', 
+                                    color: '#856404', 
+                                    fontSize: '12px' 
+                                  }}>
+                                    <i className="bi bi-currency-exchange me-1"></i>
+                                    R{selectedFreelancerProfile.hourly_rate}/hour
                                     </span>
                                   )}
                                 </div>
@@ -2513,14 +2639,51 @@ const ECSEmployeeDashboard = () => {
                               <i className="bi bi-mortarboard" style={{ color: accent }}></i>
                               Education Summary
                             </h4>
-                            <p style={{ 
-                              color: '#666', 
-                              fontSize: 16, 
-                              lineHeight: 1.6,
-                              margin: 0
-                            }}>
-                              {selectedFreelancerProfile.education_summary}
-                            </p>
+                            <div>
+                              {(() => {
+                                try {
+                                  const education = typeof selectedFreelancerProfile.education_summary === 'string' 
+                                    ? JSON.parse(selectedFreelancerProfile.education_summary) 
+                                    : selectedFreelancerProfile.education_summary;
+                                  
+                                  if (Array.isArray(education)) {
+                                    return education.map((edu, idx) => (
+                                      <div key={idx} style={{ 
+                                        marginBottom: idx < education.length - 1 ? 16 : 0,
+                                        paddingBottom: idx < education.length - 1 ? 16 : 0,
+                                        borderBottom: idx < education.length - 1 ? '1px solid #f0f0f0' : 'none'
+                                      }}>
+                                        <p style={{ 
+                                          color: '#333', 
+                                          fontSize: 16, 
+                                          fontWeight: 600,
+                                          marginBottom: 4
+                                        }}>
+                                          {edu.degree} in {edu.field}
+                                        </p>
+                                        <p style={{ 
+                                          color: '#666', 
+                                          fontSize: 14,
+                                          marginBottom: 2
+                                        }}>
+                                          {edu.institution}
+                                        </p>
+                                        <p style={{ 
+                                          color: '#999', 
+                                          fontSize: 14,
+                                          margin: 0
+                                        }}>
+                                          {edu.year}
+                                        </p>
+                                      </div>
+                                    ));
+                                  }
+                                  return <p style={{ color: '#666', fontSize: 16, margin: 0 }}>No education information available</p>;
+                                } catch (e) {
+                                  return <p style={{ color: '#666', fontSize: 16, margin: 0 }}>{String(selectedFreelancerProfile.education_summary)}</p>;
+                                }
+                              })()}
+                            </div>
                           </div>
                         )}
 
@@ -2545,14 +2708,54 @@ const ECSEmployeeDashboard = () => {
                               <i className="bi bi-briefcase" style={{ color: accent }}></i>
                               Work History
                             </h4>
-                            <p style={{ 
-                              color: '#666', 
-                              fontSize: 16, 
-                              lineHeight: 1.6,
-                              margin: 0
-                            }}>
-                              {selectedFreelancerProfile.work_history}
-                            </p>
+                            <div>
+                              {(() => {
+                                try {
+                                  const workHistory = typeof selectedFreelancerProfile.work_history === 'string' 
+                                    ? JSON.parse(selectedFreelancerProfile.work_history) 
+                                    : selectedFreelancerProfile.work_history;
+                                  
+                                  if (Array.isArray(workHistory)) {
+                                    return workHistory.map((work, idx) => (
+                                      <div key={idx} style={{ 
+                                        marginBottom: idx < workHistory.length - 1 ? 20 : 0,
+                                        paddingBottom: idx < workHistory.length - 1 ? 20 : 0,
+                                        borderBottom: idx < workHistory.length - 1 ? '1px solid #f0f0f0' : 'none'
+                                      }}>
+                                        <p style={{ 
+                                          color: '#333', 
+                                          fontSize: 16, 
+                                          fontWeight: 600,
+                                          marginBottom: 4
+                                        }}>
+                                          {work.position}
+                                        </p>
+                                        <p style={{ 
+                                          color: '#666', 
+                                          fontSize: 14,
+                                          marginBottom: 6
+                                        }}>
+                                          {work.company} • {work.duration}
+                                        </p>
+                                        {work.description && (
+                                          <p style={{ 
+                                            color: '#666', 
+                                            fontSize: 14,
+                                            lineHeight: 1.6,
+                                            margin: 0
+                                          }}>
+                                            {work.description}
+                                          </p>
+                                        )}
+                                      </div>
+                                    ));
+                                  }
+                                  return <p style={{ color: '#666', fontSize: 16, margin: 0 }}>No work history available</p>;
+                                } catch (e) {
+                                  return <p style={{ color: '#666', fontSize: 16, margin: 0 }}>{String(selectedFreelancerProfile.work_history)}</p>;
+                                }
+                              })()}
+                            </div>
                           </div>
                         )}
 
@@ -2668,23 +2871,43 @@ const ECSEmployeeDashboard = () => {
                                   <i className="bi bi-mortarboard me-2" style={{ color: accent }}></i>
                                   Education
                                 </h5>
-                                {selectedFreelancerProfile.cv.parsed_data.education.map((edu, index) => (
-                                  <div key={index} className="mb-3 p-3" style={{ 
-                                    background: '#f8f9fa', 
-                                    borderRadius: '8px',
-                                    border: '1px solid #e9ecef'
-                                  }}>
-                                    <h6 style={{ color: '#333', fontWeight: 600, marginBottom: 4 }}>
-                                      {edu.degree}
-                                    </h6>
-                                    <p style={{ color: accent, fontWeight: 500, marginBottom: 4 }}>
-                                      {edu.institution}
-                                    </p>
-                                    <small className="text-muted">
-                                      {edu.graduation_year || edu.year}
-                                    </small>
-                                  </div>
-                                ))}
+                                {(() => {
+                                  const education = selectedFreelancerProfile.cv.parsed_data.education;
+                                  
+                                  // Check if education is an array (for older CVs)
+                                  if (Array.isArray(education)) {
+                                    return education.map((edu, index) => (
+                                      <div key={index} className="mb-3 p-3" style={{ 
+                                        background: '#f8f9fa', 
+                                        borderRadius: '8px',
+                                        border: '1px solid #e9ecef'
+                                      }}>
+                                        <h6 style={{ color: '#333', fontWeight: 600, marginBottom: 4 }}>
+                                          {edu.degree}
+                                        </h6>
+                                        <p style={{ color: accent, fontWeight: 500, marginBottom: 4 }}>
+                                          {edu.institution}
+                                        </p>
+                                        <small className="text-muted">
+                                          {edu.graduation_year || edu.year}
+                                        </small>
+                                      </div>
+                                    ));
+                                  } else {
+                                    // Education is a string (for newer CVs)
+                                    return (
+                                      <div className="mb-3 p-3" style={{ 
+                                        background: '#f8f9fa', 
+                                        borderRadius: '8px',
+                                        border: '1px solid #e9ecef'
+                                      }}>
+                                        <p style={{ color: '#333', marginBottom: 0 }}>
+                                          {education}
+                                        </p>
+                                      </div>
+                                    );
+                                  }
+                                })()}
                               </div>
                             )}
                           </div>
