@@ -1745,12 +1745,12 @@ const ESCAdminDashboard = () => {
               }}
             />
             {!isSidebarCollapsed && (
-              <div>
-                <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }}>
-                  CV-Connect
-                </h5>
-                <small className="text-muted">Admin Portal</small>
-              </div>
+        <div>
+              <h5 className="mb-0" style={{ color: '#111827', fontWeight: 600, fontSize: '16px' }}>
+                CV-Connect
+              </h5>
+              <small className="text-muted">Admin Portal</small>
+          </div>
             )}
           </div>
         </div>
@@ -1765,16 +1765,16 @@ const ESCAdminDashboard = () => {
           {/* Main Navigation */}
           <div className="nav-section mb-4">
             {!isSidebarCollapsed && (
-              <h6 className="nav-section-title" style={{ 
-                color: '#6b7280', 
-                fontSize: '12px', 
-                fontWeight: 600, 
-                textTransform: 'uppercase',
-                marginBottom: '8px',
-                paddingLeft: '8px'
-              }}>
-                Main Navigation
-              </h6>
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              Main Navigation
+            </h6>
             )}
             <div className="nav-items">
               <button
@@ -1815,16 +1815,16 @@ const ESCAdminDashboard = () => {
           {/* Management Tools */}
           <div className="nav-section mb-4">
             {!isSidebarCollapsed && (
-              <h6 className="nav-section-title" style={{ 
-                color: '#6b7280', 
-                fontSize: '12px', 
-                fontWeight: 600, 
-                textTransform: 'uppercase',
-                marginBottom: '8px',
-                paddingLeft: '8px'
-              }}>
-                Management Tools
-              </h6>
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              Management Tools
+            </h6>
             )}
             <div className="nav-items">
               <button
@@ -1905,16 +1905,16 @@ const ESCAdminDashboard = () => {
           {/* Bottom Section - Settings and Logout */}
           <div className="nav-section">
             {!isSidebarCollapsed && (
-              <h6 className="nav-section-title" style={{ 
-                color: '#6b7280', 
-                fontSize: '12px', 
-                fontWeight: 600, 
-                textTransform: 'uppercase',
-                marginBottom: '8px',
-                paddingLeft: '8px'
-              }}>
-                System
-              </h6>
+            <h6 className="nav-section-title" style={{ 
+              color: '#6b7280', 
+              fontSize: '12px', 
+              fontWeight: 600, 
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              paddingLeft: '8px'
+            }}>
+              System
+            </h6>
             )}
             <div className="nav-items">
               <button
@@ -3365,7 +3365,7 @@ const ESCAdminDashboard = () => {
               </div>
 
                   {/* CV Upload Trends - Line Chart (FIFTH PRIORITY) */}
-                  <div className="row g-4 mb-4">
+              <div className="row g-4 mb-4">
                 <div className="col-12">
                   <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
                     <div className="card-header bg-transparent border-0">
@@ -4003,7 +4003,24 @@ const ESCAdminDashboard = () => {
                             return (
                               <div style={{ width: '100%', height: 300 }}>
                                 <ResponsiveContainer width="100%" height="100%">
-                                  <BarChart data={validData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                                  {(() => {
+                                    const withoutAdmins = validData.filter(item => item && typeof item.user === 'string' && !item.user.includes('@'));
+                                    const chartData = (() => {
+                                      const todayStr = new Date().toISOString().split('T')[0];
+                                      const toDate = new Date(registrationFilter.type === 'custom' && registrationFilter.endDate ? registrationFilter.endDate : todayStr);
+                                      let fromDate;
+                                      if (registrationFilter.type === 'days') {
+                                        const d = new Date(toDate);
+                                        d.setDate(d.getDate() - (registrationFilter.days - 1));
+                                        fromDate = d;
+                                      } else {
+                                        fromDate = registrationFilter.startDate ? new Date(registrationFilter.startDate) : new Date(toDate);
+                                      }
+                                      // Endpoint aggregates per-user totals; keep data but honor control consistency
+                                      return withoutAdmins.slice(0, 10);
+                                    })();
+                                    return (
+                                      <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                     <XAxis 
                                       dataKey="user" 
@@ -4034,6 +4051,8 @@ const ESCAdminDashboard = () => {
                                     <Bar dataKey="messages" fill="#fd680e" name="messages" radius={[4, 4, 0, 0]} />
                                     <Bar dataKey="conversations" fill="#10b981" name="conversations" radius={[4, 4, 0, 0]} />
                                   </BarChart>
+                                    );
+                                  })()}
                                 </ResponsiveContainer>
                               </div>
                             );

@@ -2653,9 +2653,9 @@ const ECSEmployeeDashboard = () => {
                                         paddingBottom: idx < education.length - 1 ? 16 : 0,
                                         borderBottom: idx < education.length - 1 ? '1px solid #f0f0f0' : 'none'
                                       }}>
-                                        <p style={{ 
+                            <p style={{ 
                                           color: '#333', 
-                                          fontSize: 16, 
+                              fontSize: 16, 
                                           fontWeight: 600,
                                           marginBottom: 4
                                         }}>
@@ -2671,8 +2671,8 @@ const ECSEmployeeDashboard = () => {
                                         <p style={{ 
                                           color: '#999', 
                                           fontSize: 14,
-                                          margin: 0
-                                        }}>
+                              margin: 0
+                            }}>
                                           {edu.year}
                                         </p>
                                       </div>
@@ -2722,9 +2722,9 @@ const ECSEmployeeDashboard = () => {
                                         paddingBottom: idx < workHistory.length - 1 ? 20 : 0,
                                         borderBottom: idx < workHistory.length - 1 ? '1px solid #f0f0f0' : 'none'
                                       }}>
-                                        <p style={{ 
+                            <p style={{ 
                                           color: '#333', 
-                                          fontSize: 16, 
+                              fontSize: 16, 
                                           fontWeight: 600,
                                           marginBottom: 4
                                         }}>
@@ -2741,9 +2741,9 @@ const ECSEmployeeDashboard = () => {
                                           <p style={{ 
                                             color: '#666', 
                                             fontSize: 14,
-                                            lineHeight: 1.6,
-                                            margin: 0
-                                          }}>
+                              lineHeight: 1.6,
+                              margin: 0
+                            }}>
                                             {work.description}
                                           </p>
                                         )}
@@ -2877,21 +2877,21 @@ const ECSEmployeeDashboard = () => {
                                   // Check if education is an array (for older CVs)
                                   if (Array.isArray(education)) {
                                     return education.map((edu, index) => (
-                                      <div key={index} className="mb-3 p-3" style={{ 
-                                        background: '#f8f9fa', 
-                                        borderRadius: '8px',
-                                        border: '1px solid #e9ecef'
-                                      }}>
-                                        <h6 style={{ color: '#333', fontWeight: 600, marginBottom: 4 }}>
-                                          {edu.degree}
-                                        </h6>
-                                        <p style={{ color: accent, fontWeight: 500, marginBottom: 4 }}>
-                                          {edu.institution}
-                                        </p>
-                                        <small className="text-muted">
-                                          {edu.graduation_year || edu.year}
-                                        </small>
-                                      </div>
+                                  <div key={index} className="mb-3 p-3" style={{ 
+                                    background: '#f8f9fa', 
+                                    borderRadius: '8px',
+                                    border: '1px solid #e9ecef'
+                                  }}>
+                                    <h6 style={{ color: '#333', fontWeight: 600, marginBottom: 4 }}>
+                                      {edu.degree}
+                                    </h6>
+                                    <p style={{ color: accent, fontWeight: 500, marginBottom: 4 }}>
+                                      {edu.institution}
+                                    </p>
+                                    <small className="text-muted">
+                                      {edu.graduation_year || edu.year}
+                                    </small>
+                                  </div>
                                     ));
                                   } else {
                                     // Education is a string (for newer CVs)
