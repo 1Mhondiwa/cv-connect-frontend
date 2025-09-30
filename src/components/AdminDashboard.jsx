@@ -147,6 +147,8 @@ const ESCAdminDashboard = () => {
     startDate: '',
     endDate: ''
   });
+  // Communication Trends series toggles
+  const [commSeries, setCommSeries] = useState({ messages: true, conversations: true });
 
   // Chart data will be populated from real-time API calls
   const chartData = [];
@@ -3792,11 +3794,11 @@ const ESCAdminDashboard = () => {
                           </>
                         )}
                         <div className="form-check form-check-inline">
-                          <input className="form-check-input" type="checkbox" id="chkMessages" defaultChecked />
+                          <input className="form-check-input" type="checkbox" id="chkMessages" checked={commSeries.messages} onChange={(e) => setCommSeries(prev => ({ ...prev, messages: e.target.checked }))} />
                           <label className="form-check-label" htmlFor="chkMessages">Messages</label>
                         </div>
                         <div className="form-check form-check-inline">
-                          <input className="form-check-input" type="checkbox" id="chkConversations" defaultChecked />
+                          <input className="form-check-input" type="checkbox" id="chkConversations" checked={commSeries.conversations} onChange={(e) => setCommSeries(prev => ({ ...prev, conversations: e.target.checked }))} />
                           <label className="form-check-label" htmlFor="chkConversations">Conversations</label>
                         </div>
                       </div>
@@ -3876,10 +3878,17 @@ const ESCAdminDashboard = () => {
                               return d >= fromDate && d <= toDate;
                             });
 
-                            console.log('🔍 Communication Trends Chart - About to render with data:', filtered);
+                            // Apply series toggles by zeroing disabled series
+                            const seriesFiltered = filtered.map(item => ({
+                              date: item.date,
+                              messages: commSeries.messages ? item.messages : 0,
+                              conversations: commSeries.conversations ? item.conversations : 0
+                            }));
+
+                            console.log('🔍 Communication Trends Chart - About to render with data:', seriesFiltered);
                           return (
                             <ResponsiveContainer width="100%" height={300}>
-                                <AreaChart data={filtered}>
+                                <AreaChart data={seriesFiltered}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                 <XAxis dataKey="date" stroke="#666" />
                                 <YAxis stroke="#666" />
