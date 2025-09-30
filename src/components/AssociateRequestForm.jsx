@@ -147,7 +147,7 @@ const AssociateRequestForm = () => {
       <div className="container" data-aos="fade-up">
         <div className="row gy-4">
           <div className="col-lg-8 mx-auto">
-            <div className="bg-white rounded-4 shadow-sm p-5" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)' }}>
+            <div className="bg-white rounded-4 shadow-sm p-5" style={{ boxShadow: '0 2px 16px rgba(253,104,14,0.08)', border: '2px solid rgba(253, 104, 14, 0.2)' }}>
               <div className="text-center mb-5">
                 <h2 style={{ color: accent, fontWeight: 700, marginBottom: 16 }}>Become an Associate Company</h2>
                 <p style={{ fontSize: 18, color: '#666' }}>
