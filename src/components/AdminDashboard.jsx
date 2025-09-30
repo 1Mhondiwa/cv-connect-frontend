@@ -140,6 +140,14 @@ const ESCAdminDashboard = () => {
   const [hiredDataRaw, setHiredDataRaw] = useState([]);
   const [hiredFilterLoading, setHiredFilterLoading] = useState(false);
 
+  // Registration Trends local filtering state
+  const [registrationFilter, setRegistrationFilter] = useState({
+    type: 'days', // 'days' | 'custom'
+    days: 90,
+    startDate: '',
+    endDate: ''
+  });
+
   // Chart data will be populated from real-time API calls
   const chartData = [];
 
@@ -3977,10 +3985,38 @@ const ESCAdminDashboard = () => {
                   <div className="row g-4 mb-4">
                 <div className="col-12">
                   <div className="card shadow-sm" style={{ border: '2px solid rgba(253, 104, 14, 0.2)', boxShadow: '0 2px 6px rgba(253, 104, 14, 0.1)' }}>
-                    <div className="card-header bg-transparent border-0">
+                    <div className="card-header bg-transparent border-0 d-flex align-items-center justify-content-between">
                           <h6 className="mb-0" style={{ color: accent, fontWeight: 600 }}>
                             <i className="bi bi-graph-up me-2"></i>User Registration Trends
                           </h6>
+                          <div className="d-flex align-items-center gap-2">
+                            <select
+                              value={registrationFilter.type}
+                              onChange={(e) => setRegistrationFilter(prev => ({ ...prev, type: e.target.value }))}
+                              className="form-select form-select-sm"
+                              style={{ width: 120 }}
+                            >
+                              <option value="days">Last days</option>
+                              <option value="custom">Custom</option>
+                            </select>
+                            {registrationFilter.type === 'days' ? (
+                              <select
+                                value={registrationFilter.days}
+                                onChange={(e) => setRegistrationFilter(prev => ({ ...prev, days: Number(e.target.value) }))}
+                                className="form-select form-select-sm"
+                                style={{ width: 110 }}
+                              >
+                                <option value={30}>30 days</option>
+                                <option value={60}>60 days</option>
+                                <option value={90}>90 days</option>
+                              </select>
+                            ) : (
+                              <>
+                                <input type="date" className="form-control form-control-sm" value={registrationFilter.startDate} onChange={(e) => setRegistrationFilter(prev => ({ ...prev, startDate: e.target.value }))} />
+                                <input type="date" className="form-control form-control-sm" value={registrationFilter.endDate} onChange={(e) => setRegistrationFilter(prev => ({ ...prev, endDate: e.target.value }))} />
+                              </>
+                            )}
+                          </div>
                     </div>
                     <div className="card-body">
                           {analyticsLoading ? (
@@ -4011,10 +4047,27 @@ const ESCAdminDashboard = () => {
                                   );
                                 }
 
-                                console.log('🔍 Registration Trends Chart - Rendering with data:', validData);
+                                // Apply local real-time filtering
+                                const todayStr = new Date().toISOString().split('T')[0];
+                                const toDate = new Date(registrationFilter.type === 'custom' && registrationFilter.endDate ? registrationFilter.endDate : todayStr);
+                                let fromDate;
+                                if (registrationFilter.type === 'days') {
+                                  const d = new Date(toDate);
+                                  d.setDate(d.getDate() - (registrationFilter.days - 1));
+                                  fromDate = d;
+                                } else {
+                                  fromDate = registrationFilter.startDate ? new Date(registrationFilter.startDate) : new Date(toDate);
+                                }
+
+                                const filtered = validData.filter(item => {
+                                  const d = new Date(item.date);
+                                  return d >= fromDate && d <= toDate;
+                                });
+
+                                console.log('🔍 Registration Trends Chart - Rendering with data:', filtered);
                                 return (
                                   <ResponsiveContainer width="100%" height={300}>
-                                    <LineChart data={validData}>
+                                    <LineChart data={filtered}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                                       <XAxis dataKey="date" stroke="#666" />
                                       <YAxis stroke="#666" />
