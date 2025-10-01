@@ -5829,6 +5829,23 @@ const ESCAdminDashboard = () => {
                                   </div>
                                 </div>
                                 
+                                {/* Completed Jobs Count */}
+                                <div className="mb-2">
+                                  <small className="text-muted">
+                                    <i className="bi bi-check-circle me-1" style={{ color: freelancer.completed_jobs_count > 0 ? '#28a745' : '#6c757d' }}></i>
+                                    <strong>Jobs Completed:</strong> 
+                                    <span style={{ 
+                                      color: freelancer.completed_jobs_count > 0 ? '#28a745' : '#6c757d',
+                                      fontWeight: freelancer.completed_jobs_count > 0 ? '600' : 'normal'
+                                    }}>
+                                      {freelancer.completed_jobs_count || 0} projects
+                                    </span>
+                                    {freelancer.completed_jobs_count > 0 && (
+                                      <i className="bi bi-star-fill ms-1" style={{ color: '#ffc107', fontSize: '10px' }}></i>
+                                    )}
+                                  </small>
+                                </div>
+                                
                                 {/* Contact Information */}
                                 <p className="text-muted small mb-1">
                                   <i className="bi bi-envelope me-1"></i>{freelancer.email}

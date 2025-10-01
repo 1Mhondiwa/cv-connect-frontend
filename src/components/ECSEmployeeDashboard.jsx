@@ -738,6 +738,7 @@ const ECSEmployeeDashboard = () => {
     
     let filtered = [...allFreelancers];
     console.log('🔍 Starting with all freelancers:', filtered.length);
+    console.log('🔍 Filter conditions - Skills:', searchSkills, 'Experience:', searchExperience, 'Status:', searchStatus);
     
     // Filter by skills
     if (searchSkills && searchSkills.trim()) {
@@ -776,11 +777,11 @@ const ECSEmployeeDashboard = () => {
       if (!isNaN(minExp)) {
         filtered = filtered.filter(f => {
           const experience = f.experience_years || 0;
-          const matches = experience === minExp;
+          const matches = experience >= minExp;
           
           console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
             experience,
-            exactRequired: minExp,
+            minRequired: minExp,
             matches
           });
           
@@ -811,6 +812,13 @@ const ECSEmployeeDashboard = () => {
     setAvailableFreelancers(filtered);
     console.log('🔍 Final filtered results:', filtered.length);
     console.log('🔍 Filtered freelancers:', filtered.map(f => `${f.first_name} ${f.last_name}`));
+    console.log('🔍 Final filter summary:', {
+      originalCount: allFreelancers.length,
+      finalCount: filtered.length,
+      skillsFilter: searchSkills,
+      experienceFilter: searchExperience,
+      statusFilter: searchStatus
+    });
   };
 
   const handleLogout = () => {
@@ -2250,6 +2258,20 @@ const ECSEmployeeDashboard = () => {
                                   <div className="mb-2">
                                     <strong>Experience:</strong> 
                                     <span className="text-muted small">{freelancer.experience_years || 0} years</span>
+                                  </div>
+
+                                  {/* Completed Jobs Count */}
+                                  <div className="mb-2">
+                                    <strong>Jobs Completed:</strong> 
+                                    <span className="text-muted small" style={{ 
+                                      color: freelancer.completed_jobs_count > 0 ? '#28a745' : '#6c757d',
+                                      fontWeight: freelancer.completed_jobs_count > 0 ? '600' : 'normal'
+                                    }}>
+                                      {freelancer.completed_jobs_count || 0} projects
+                                    </span>
+                                    {freelancer.completed_jobs_count > 0 && (
+                                      <i className="bi bi-star-fill ms-1" style={{ color: '#ffc107', fontSize: '12px' }}></i>
+                                    )}
                                   </div>
 
 
