@@ -421,18 +421,15 @@ const FreelancerProfile = () => {
                           {profile.years_experience || 0} years experience
                         </span>
                         <span style={{ 
-                          background: profile.availability_status === 'available' ? '#d4edda' : 
-                                   profile.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
-                          color: profile.availability_status === 'available' ? '#155724' : 
-                                 profile.availability_status === 'busy' ? '#856404' : '#721c24',
+                          background: profile.availability_status === 'available' ? '#d4edda' : '#f8d7da',
+                          color: profile.availability_status === 'available' ? '#155724' : '#721c24',
                           padding: '4px 12px', 
                           borderRadius: 15,
                           fontSize: 14,
                           fontWeight: 600
                         }}>
                           <i className="bi bi-geo-alt me-1"></i>
-                          {profile.availability_status === 'available' ? 'Available for Work' : 
-                           profile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                          {profile.availability_status === 'available' ? 'Available for Work' : 'Not Available'}
                         </span>
                         {profile.hourly_rate && (
                           <span style={{ 

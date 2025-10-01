@@ -231,7 +231,7 @@ const AssociateRequestForm = () => {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label">Website (Optional)</label>
+                    <label className="form-label">Website</label>
                     <input 
                       type="url" 
                       name="website" 
@@ -243,7 +243,7 @@ const AssociateRequestForm = () => {
                   </div>
 
                   <div className="col-12">
-                    <label className="form-label">Company Address (Optional)</label>
+                    <label className="form-label">Company Address</label>
                     <textarea 
                       name="address" 
                       className="form-control" 
@@ -255,7 +255,7 @@ const AssociateRequestForm = () => {
                   </div>
 
                   <div className="col-12">
-                    <label className="form-label">Why do you want to join CV-Connect? (Optional)</label>
+                    <label className="form-label">Why do you want to join CV-Connect?</label>
                     <textarea 
                       name="request_reason" 
                       className="form-control" 

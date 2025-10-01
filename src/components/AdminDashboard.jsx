@@ -5519,7 +5519,7 @@ const ESCAdminDashboard = () => {
                   </div>
                   <div className="col-md-6">
                     <h6 style={{ color: accent, fontWeight: 600 }}>Additional Details</h6>
-                    <p><strong>Budget Range:</strong> {selectedFreelancerRequest.budget_range || 'Not specified'}</p>
+                    <p><strong>Offered Salary:</strong> {selectedFreelancerRequest.budget_range || 'Not specified'}</p>
                     <p><strong>Urgency Level:</strong> {selectedFreelancerRequest.urgency_level}</p>
                     <p><strong>Preferred Location:</strong> {selectedFreelancerRequest.preferred_location || 'Any'}</p>
                     <p><strong>Status:</strong> 
@@ -5632,8 +5632,7 @@ const ESCAdminDashboard = () => {
                         </div>
                         <div className="col-md-3">
                           <small className="text-muted">
-                            <i className="bi bi-currency-dollar me-1"></i>
-                                <strong>Budget:</strong><br />
+                                <strong>Offered Salary:</strong><br />
                             {selectedFreelancerRequest.budget_range || 'Not specified'}
                           </small>
                         </div>
@@ -5827,23 +5826,6 @@ const ESCAdminDashboard = () => {
                                       <small className="ms-1 text-muted">({freelancer.admin_rating || 0}/5)</small>
                                     </div>
                                   </div>
-                                </div>
-                                
-                                {/* Completed Jobs Count */}
-                                <div className="mb-2">
-                                  <small className="text-muted">
-                                    <i className="bi bi-check-circle me-1" style={{ color: freelancer.completed_jobs_count > 0 ? '#28a745' : '#6c757d' }}></i>
-                                    <strong>Jobs Completed:</strong> 
-                                    <span style={{ 
-                                      color: freelancer.completed_jobs_count > 0 ? '#28a745' : '#6c757d',
-                                      fontWeight: freelancer.completed_jobs_count > 0 ? '600' : 'normal'
-                                    }}>
-                                      {freelancer.completed_jobs_count || 0} projects
-                                    </span>
-                                    {freelancer.completed_jobs_count > 0 && (
-                                      <i className="bi bi-star-fill ms-1" style={{ color: '#ffc107', fontSize: '10px' }}></i>
-                                    )}
-                                  </small>
                                 </div>
                                 
                                 {/* Contact Information */}

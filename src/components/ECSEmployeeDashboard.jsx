@@ -1777,8 +1777,7 @@ const ECSEmployeeDashboard = () => {
                 </div>
                             <div className="col-md-3">
                               <small className="text-muted">
-                                <i className="bi bi-currency-dollar me-1"></i>
-                                <strong>Budget:</strong> {request.budget_range || 'Not specified'}
+                                <strong>Offered Salary:</strong> {request.budget_range || 'Not specified'}
                               </small>
                             </div>
                             <div className="col-md-3">
@@ -1893,7 +1892,7 @@ const ECSEmployeeDashboard = () => {
                          <p><strong>Minimum Experience:</strong> {selectedFreelancerRequest.min_experience} years</p>
                   </div>
                        <div className="col-md-6">
-                         <p><strong>Budget Range:</strong> {selectedFreelancerRequest.budget_range || 'Not specified'}</p>
+                         <p><strong>Offered Salary:</strong> {selectedFreelancerRequest.budget_range || 'Not specified'}</p>
                          <p><strong>Urgency Level:</strong> {selectedFreelancerRequest.urgency_level}</p>
                          <p><strong>Preferred Location:</strong> {selectedFreelancerRequest.preferred_location || 'Any'}</p>
                 </div>
@@ -2260,20 +2259,6 @@ const ECSEmployeeDashboard = () => {
                                     <span className="text-muted small">{freelancer.experience_years || 0} years</span>
                                   </div>
 
-                                  {/* Completed Jobs Count */}
-                                  <div className="mb-2">
-                                    <strong>Jobs Completed:</strong> 
-                                    <span className="text-muted small" style={{ 
-                                      color: freelancer.completed_jobs_count > 0 ? '#28a745' : '#6c757d',
-                                      fontWeight: freelancer.completed_jobs_count > 0 ? '600' : 'normal'
-                                    }}>
-                                      {freelancer.completed_jobs_count || 0} projects
-                                    </span>
-                                    {freelancer.completed_jobs_count > 0 && (
-                                      <i className="bi bi-star-fill ms-1" style={{ color: '#ffc107', fontSize: '12px' }}></i>
-                                    )}
-                                  </div>
-
 
                                   {/* Contact Info */}
                                   <div className="mb-2">
@@ -2293,10 +2278,8 @@ const ECSEmployeeDashboard = () => {
                                     <strong>Availability:</strong>
                                     <div className="mt-1" style={{ animation: 'none', transform: 'none', opacity: 1 }}>
                                       <span style={{ 
-                                        background: freelancer.availability_status === 'available' ? '#d4edda' : 
-                                                   freelancer.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
-                                        color: freelancer.availability_status === 'available' ? '#155724' : 
-                                               freelancer.availability_status === 'busy' ? '#856404' : '#721c24',
+                                        background: freelancer.availability_status === 'available' ? '#d4edda' : '#f8d7da',
+                                        color: freelancer.availability_status === 'available' ? '#155724' : '#721c24',
                                         padding: '4px 8px', 
                                         borderRadius: 15,
                                         fontSize: 11,
@@ -2307,11 +2290,9 @@ const ECSEmployeeDashboard = () => {
                                         visibility: 'visible'
                                       }}>
                                         <i className={`bi ${
-                                          freelancer.availability_status === 'available' ? 'bi-check-circle' :
-                                          freelancer.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                          freelancer.availability_status === 'available' ? 'bi-check-circle' : 'bi-x-circle'
                                         } me-1`} style={{ animation: 'none', transform: 'none', opacity: 1 }}></i>
-                                        {freelancer.availability_status === 'available' ? 'Available for Work' :
-                                         freelancer.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                                        {freelancer.availability_status === 'available' ? 'Available for Work' : 'Not Available'}
                                       </span>
                                     </div>
                                   </div>
@@ -2477,15 +2458,12 @@ const ECSEmployeeDashboard = () => {
                               <div className="mt-2 d-flex gap-2 flex-wrap justify-content-between align-items-center">
                                 <div className="d-flex gap-2 flex-wrap">
                                 <span className={`badge ${
-                                  selectedFreelancerProfile.availability_status === 'available' ? 'bg-success' :
-                                  selectedFreelancerProfile.availability_status === 'busy' ? 'bg-warning' : 'bg-secondary'
+                                  selectedFreelancerProfile.availability_status === 'available' ? 'bg-success' : 'bg-secondary'
                                 }`} style={{ fontSize: '12px' }}>
                                   <i className={`bi ${
-                                    selectedFreelancerProfile.availability_status === 'available' ? 'bi-check-circle' :
-                                    selectedFreelancerProfile.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                    selectedFreelancerProfile.availability_status === 'available' ? 'bi-check-circle' : 'bi-x-circle'
                                   } me-1`}></i>
-                                  {selectedFreelancerProfile.availability_status === 'available' ? 'Available for Work' :
-                                   selectedFreelancerProfile.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                                  {selectedFreelancerProfile.availability_status === 'available' ? 'Available for Work' : 'Not Available'}
                                 </span>
                                 {selectedFreelancerProfile.hourly_rate && (
                                   <span className="badge" style={{ 

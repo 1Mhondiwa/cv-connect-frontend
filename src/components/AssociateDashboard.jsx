@@ -1789,21 +1789,17 @@ const AssociateDashboard = () => {
                               </div>
                               <div className="text-end">
                                 <span style={{ 
-                                  background: rec.availability_status === 'available' ? '#d4edda' : 
-                                             rec.availability_status === 'busy' ? '#fff3cd' : '#f8d7da',
-                                  color: rec.availability_status === 'available' ? '#155724' : 
-                                         rec.availability_status === 'busy' ? '#856404' : '#721c24',
+                                  background: rec.availability_status === 'available' ? '#d4edda' : '#f8d7da',
+                                  color: rec.availability_status === 'available' ? '#155724' : '#721c24',
                                   padding: '6px 12px', 
                                   borderRadius: 15,
                                   fontSize: 12,
                                   fontWeight: 600
                                 }}>
                                   <i className={`bi ${
-                                    rec.availability_status === 'available' ? 'bi-check-circle' :
-                                    rec.availability_status === 'busy' ? 'bi-clock' : 'bi-x-circle'
+                                    rec.availability_status === 'available' ? 'bi-check-circle' : 'bi-x-circle'
                                   } me-1`}></i>
-                                  {rec.availability_status === 'available' ? 'Available for Work' : 
-                                   rec.availability_status === 'busy' ? 'Busy' : 'Not Available'}
+                                  {rec.availability_status === 'available' ? 'Available for Work' : 'Not Available'}
                                 </span>
                               </div>
                             </div>
