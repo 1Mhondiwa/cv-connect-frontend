@@ -1788,12 +1788,7 @@ const ECSEmployeeDashboard = () => {
                           </div>
 
                           <div className="d-flex justify-content-between align-items-center">
-                <div>
-                              <small className="text-muted">
-                                <i className="bi bi-calendar me-1"></i>
-                                <strong>Submitted:</strong> {new Date(request.created_at).toLocaleDateString()}
-                              </small>
-                            </div>
+                            <div></div>
                             <button
                               className="btn btn-sm"
                               style={{ 
