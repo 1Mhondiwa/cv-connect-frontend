@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axios';
 
 const accent = '#fd680e';
 
@@ -126,7 +126,7 @@ const Register = () => {
         phone: form.countryCode + form.phone.replace(/\s/g, ''),
         password: form.password
       };
-      const response = await axios.post('/api/auth/register', payload);
+      const response = await api.post('/auth/register', payload);
       if (response.data.success) {
         setSuccess('Registration successful! Redirecting to login...');
         setForm({ first_name: '', last_name: '', email: '', countryCode: '+27', phone: '', password: '', confirmPassword: '' });
