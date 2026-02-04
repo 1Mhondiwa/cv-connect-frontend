@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CVTemplate from './CVTemplate';
+import api from '../utils/axios';
 import './CVTemplateExample.css';
 
 const CVTemplateExample = () => {
@@ -21,13 +22,14 @@ const CVTemplateExample = () => {
       formData.append('cv', file);
 
       // Upload to backend for parsing
-      const response = await fetch('/api/upload-cv', {
-        method: 'POST',
-        body: formData,
+      const response = await api.post('/freelancer/cv/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      if (response.ok) {
-        const result = await response.json();
+      if (response.status === 200) {
+        const result = response.data;
         setParsingResult(result);
       } else {
         throw new Error('Failed to parse CV');
@@ -50,13 +52,14 @@ const CVTemplateExample = () => {
       formDataUpload.append('cv', file);
 
       // Upload to backend for parsing
-      const response = await fetch('/api/upload-cv', {
-        method: 'POST',
-        body: formDataUpload,
+      const response = await api.post('/freelancer/cv/upload', formDataUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      if (response.ok) {
-        const result = await response.json();
+      if (response.status === 200) {
+        const result = response.data;
         setParsingResult(result);
         setShowTemplate(false);
       } else {
