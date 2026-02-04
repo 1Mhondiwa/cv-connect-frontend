@@ -267,6 +267,9 @@ const Register = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="password" style={{ fontWeight: 500, color: '#444', marginBottom: 4 }}>Password</label>
+                  <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>
+                    Password must contain: 8+ chars, 1 uppercase, 1 lowercase, 1 number, 1 special character, no sequential patterns (123, abc)
+                  </div>
                   <div className="position-relative">
                     <input 
                       type={showPassword ? "text" : "password"}

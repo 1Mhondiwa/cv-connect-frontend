@@ -31,7 +31,7 @@ class WebVisitorTracker {
 
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`${this.baseURL}/track-web`, {
+      const response = await fetch(`${this.baseURL}/track`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
