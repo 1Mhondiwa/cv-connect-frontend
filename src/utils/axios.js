@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Get API URL from environment or fallback to local
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+// Force backend URL for production
+const API_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
 
 // Debug: Log the API URL
 console.log('=== Frontend API Configuration Debug ===');
