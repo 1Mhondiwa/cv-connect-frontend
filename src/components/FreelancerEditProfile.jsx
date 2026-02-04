@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/axios';
@@ -73,10 +72,7 @@ const FreelancerEditProfile = () => {
       setLoading(true);
       setError("");
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("/api/freelancer/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await api.get("/freelancer/profile");
         if (response.data.success) {
           setForm({
             ...form,
@@ -339,20 +335,16 @@ const FreelancerEditProfile = () => {
         return;
       }
 
-      const token = localStorage.getItem("token");
       console.log("Updating work experience:", workId, editingWorkData);
       
-      const response = await axios.put(
-        `/api/freelancer/work-experience/${workId}`,
+      const response = await api.put(
+        `/freelancer/work-experience/${workId}`,
         {
           title: editingWorkData.title.trim(),
           company: editingWorkData.company.trim(),
           start_date: editingWorkData.start_date || "",
           end_date: editingWorkData.end_date || "",
           description: editingWorkData.description || ""
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       
@@ -380,14 +372,10 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       console.log("Deleting work experience:", workId);
       
-      const response = await axios.delete(
-        `/api/freelancer/work-experience/${workId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const response = await api.delete(
+        `/freelancer/work-experience/${workId}`
       );
       
       console.log("Delete work experience response:", response.data);
@@ -499,19 +487,15 @@ const FreelancerEditProfile = () => {
         return;
       }
 
-      const token = localStorage.getItem("token");
       console.log("Updating education:", editingEducation, editingEducationData);
       
-      const response = await axios.put(
-        `/api/freelancer/education/${editingEducation}`,
+      const response = await api.put(
+        `/freelancer/education/${editingEducation}`,
         {
           degree: editingEducationData.degree.trim(),
           institution: editingEducationData.institution.trim(),
           field: editingEducationData.field || "",
           year: editingEducationData.year || ""
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       
@@ -539,14 +523,10 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       console.log("Deleting education:", educationId);
       
-      const response = await axios.delete(
-        `/api/freelancer/education/${educationId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const response = await api.delete(
+        `/freelancer/education/${educationId}`
       );
       
       console.log("Delete education response:", response.data);
@@ -593,27 +573,21 @@ const FreelancerEditProfile = () => {
       };
       
       // Update profile data
-      const response = await axios.put(
-        "/api/freelancer/profile",
-        payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const response = await api.put(
+        "/freelancer/profile",
+        payload
       );
       
       if (response.data.success) {
         // Update CV parsed data if there are changes
         if (cvData.work_experience.length > 0) {
           try {
-            const cvResponse = await axios.put(
-              "/api/freelancer/cv/parsed-data",
+            const cvResponse = await api.put(
+              "/freelancer/cv/parsed-data",
               {
                 parsed_data: {
                   work_experience: cvData.work_experience
                 }
-              },
-              {
-                headers: { Authorization: `Bearer ${token}` },
               }
             );
             

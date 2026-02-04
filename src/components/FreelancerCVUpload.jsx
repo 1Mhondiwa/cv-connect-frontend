@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import api from '../utils/axios';
 
 const accent = '#fd680e';
 
@@ -32,15 +32,13 @@ const FreelancerCVUpload = () => {
     formData.append("cv", file);
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "/api/freelancer/cv/upload",
+      const response = await api.post(
+        "/freelancer/cv/upload",
         formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
+            "Content-Type": "multipart/form-data"
+          }
         }
       );
       setMessage(response.data.message || "Upload successful!");

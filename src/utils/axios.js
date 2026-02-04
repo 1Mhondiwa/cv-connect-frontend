@@ -1,14 +1,16 @@
 import axios from 'axios';
 
-// Force backend URL for production with /api prefix
-const API_URL = (import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com') + '/api';
+// Determine the backend URL - try environment variable first, then fallback
+const BACKEND_BASE = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
+const API_URL = BACKEND_BASE + '/api';
 
-// Debug: Log the API URL
+// Debug: Log the API URL configuration
 console.log('=== Frontend API Configuration Debug ===');
-console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
-console.log('API_URL:', API_URL);
+console.log('VITE_API_URL env var:', import.meta.env.VITE_API_URL);
+console.log('BACKEND_BASE:', BACKEND_BASE);
+console.log('API_URL (baseURL):', API_URL);
 console.log('Current origin:', window.location.origin);
-console.log('Full baseURL:', API_URL);
+console.log('NODE_ENV:', import.meta.env.MODE);
 console.log('=====================================');
 
 // Create axios instance with base configuration
