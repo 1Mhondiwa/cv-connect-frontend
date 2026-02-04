@@ -2429,7 +2429,7 @@ const ECSEmployeeDashboard = () => {
                           <div className="row align-items-center">
                             <div className="col-md-3 text-center">
                               {(() => {
-                                const BACKEND_URL = "http://localhost:5000";
+                                const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
                                 let imgUrl = "";
                                 const hasCustomImage = !!selectedFreelancerProfile?.profile_picture_url;
                                 if (hasCustomImage) {

@@ -268,7 +268,7 @@ const ContractsList = ({ contracts, loading, error, onRetry, onUploadSuccess }) 
   );
 };
 
-const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
 const accent = '#fd680e';
 
 const FreelancerDashboard = () => {

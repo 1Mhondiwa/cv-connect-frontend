@@ -643,7 +643,7 @@ const AssociateDashboard = () => {
   };
 
   const getAssociateAvatarUrl = () => {
-    const BACKEND_URL = "http://localhost:5000";
+    const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
     if (associateProfile?.profile_picture_url) {
       if (associateProfile.profile_picture_url.startsWith('http')) {
         return associateProfile.profile_picture_url;
@@ -1984,7 +1984,7 @@ const AssociateDashboard = () => {
                             src={freelancer.profile_picture_url ? 
                               (freelancer.profile_picture_url.startsWith('http') ? 
                                 freelancer.profile_picture_url : 
-                                `http://localhost:5000${freelancer.profile_picture_url}`) : 
+                                `${import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com'}${freelancer.profile_picture_url}`) : 
                               `https://ui-avatars.com/api/?name=${encodeURIComponent(freelancer.first_name + ' ' + freelancer.last_name)}&background=eee&color=555&size=40&bold=true`
                             }
                             alt="Profile"
@@ -2048,7 +2048,7 @@ const AssociateDashboard = () => {
                                 onClick={() => {
                                   const fullUrl = freelancer.contract_pdf_path.startsWith('http') ? 
                                     freelancer.contract_pdf_path : 
-                                    `http://localhost:5000${freelancer.contract_pdf_path}`;
+                                    `${import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com'}${freelancer.contract_pdf_path}`;
                                   window.open(fullUrl, '_blank');
                                 }}
                               >
@@ -2072,7 +2072,7 @@ const AssociateDashboard = () => {
                                   onClick={() => {
                                     const fullUrl = freelancer.signed_contract_pdf_path.startsWith('http') ? 
                                       freelancer.signed_contract_pdf_path : 
-                                      `http://localhost:5000${freelancer.signed_contract_pdf_path}`;
+                                      `${import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com'}${freelancer.signed_contract_pdf_path}`;
                                     window.open(fullUrl, '_blank');
                                   }}
                                 >
