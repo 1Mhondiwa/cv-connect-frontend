@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
       if (token && storedUser) {
         try {
           // Verify token is still valid by making a request
-          const response = await api.get('/auth/verify');
+          const response = await api.get('/api/auth/verify');
           if (response.data.success) {
             setUser(JSON.parse(storedUser));
             setIsAuthenticated(true);
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+      const response = await api.post('/api/auth/login', { email, password });
       
       if (response.data.success) {
         const { token, user: userData } = response.data;
