@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+// Get API URL from environment or fallback to local
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_URL,
   timeout: 10000,
 });
 
@@ -54,4 +57,4 @@ api.interceptors.response.use(
   }
 );
 
-export default api; 
+export default api;
