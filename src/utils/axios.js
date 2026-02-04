@@ -3,6 +3,13 @@ import axios from 'axios';
 // Get API URL from environment or fallback to local
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
+// Debug: Log the API URL
+console.log('=== Frontend API Configuration Debug ===');
+console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('API_URL:', API_URL);
+console.log('Current origin:', window.location.origin);
+console.log('=====================================');
+
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: API_URL,
