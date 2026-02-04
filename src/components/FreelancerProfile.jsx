@@ -111,7 +111,8 @@ const FreelancerProfile = () => {
 
     // Set up real-time availability updates using SSE
     const backendURL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
-    const eventSource = new EventSource(`${backendURL}/api/freelancer/availability/stream`, {
+    const token = localStorage.getItem('token');
+    const eventSource = new EventSource(`${backendURL}/api/freelancer/availability/stream?token=${token}`, {
       withCredentials: true
     });
 

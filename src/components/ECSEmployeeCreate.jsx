@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axios';
 
 const ECSEmployeeCreate = () => {
   const navigate = useNavigate();
@@ -117,7 +117,7 @@ const ECSEmployeeCreate = () => {
         secretKey: formData.secretKey
       };
 
-      const response = await axios.post('/api/auth/create-ecs-employee', requestData);
+      const response = await api.post('/auth/create-ecs-employee', requestData);
 
       if (response.data.success) {
         setSuccessMessage('ECS Employee account created successfully! You can now log in with your email and password. Redirecting to login page...');

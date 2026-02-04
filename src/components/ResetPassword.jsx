@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axios';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -97,7 +97,7 @@ const ResetPassword = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.post('/api/auth/reset-password', { token: token.trim(), password });
+      const response = await api.post('/auth/reset-password', { token: token.trim(), password });
       if (response.data.success) {
         setSuccessMessage('Password updated successfully! You can now log in.');
         setPassword('');

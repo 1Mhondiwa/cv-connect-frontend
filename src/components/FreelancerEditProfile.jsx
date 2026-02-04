@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
+import api from '../utils/axios';
 
 const accent = '#fd680e';
+const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
 
 const FreelancerEditProfile = () => {
   const [form, setForm] = useState({
@@ -134,18 +136,14 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       console.log("Adding skill:", newSkill);
       
-      const response = await axios.post(
-        "/api/freelancer/skills",
+      const response = await api.post(
+        "/freelancer/skills",
         {
           skill_name: newSkill.skill_name.trim(),
           proficiency_level: newSkill.proficiency_level,
           years_experience: parseInt(newSkill.years_experience) || 0
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       
@@ -171,10 +169,7 @@ const FreelancerEditProfile = () => {
 
   const refreshSkills = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("/api/freelancer/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/freelancer/profile");
       if (response.data.success) {
         setSkills(response.data.profile.skills || []);
       }
@@ -193,17 +188,13 @@ const FreelancerEditProfile = () => {
 
   const handleUpdateSkill = async (skillId) => {
     try {
-      const token = localStorage.getItem("token");
       console.log("Updating skill:", skillId, editingSkillData);
       
-      const response = await axios.put(
-        `/api/freelancer/skills/${skillId}`,
+      const response = await api.put(
+        `/freelancer/skills/${skillId}`,
         {
           proficiency_level: editingSkillData.proficiency_level,
           years_experience: parseInt(editingSkillData.years_experience) || 0
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       
@@ -230,14 +221,10 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       console.log("Deleting skill:", skillId);
       
-      const response = await axios.delete(
-        `/api/freelancer/skills/${skillId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const response = await api.delete(
+        `/freelancer/skills/${skillId}`
       );
       
       console.log("Delete skill response:", response.data);
@@ -247,7 +234,7 @@ const FreelancerEditProfile = () => {
         setSkillsSuccess("Skill deleted successfully!");
         setTimeout(() => setSkillsSuccess(""), 3000);
       } else {
-        setSkillsError(err.response?.data?.message || "Failed to delete skill.");
+        setSkillsError(response.data.message || "Failed to delete skill.");
       }
     } catch (err) {
       console.error("Delete skill error:", err);
@@ -277,20 +264,16 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       console.log("Adding work experience:", newWork);
       
-      const response = await axios.post(
-        "/api/freelancer/work-experience",
+      const response = await api.post(
+        "/freelancer/work-experience",
         {
           title: newWork.title.trim(),
           company: newWork.company.trim(),
           start_date: newWork.start_date || "",
           end_date: newWork.end_date || "",
           description: newWork.description || ""
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       
@@ -318,10 +301,7 @@ const FreelancerEditProfile = () => {
 
   const refreshWorkExperience = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("/api/freelancer/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/freelancer/profile");
       if (response.data.success) {
         // Update CV data with fresh work experience - preserve original data exactly
         if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
@@ -447,19 +427,15 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       console.log("Adding education:", newEducation);
       
-      const response = await axios.post(
-        "/api/freelancer/education",
+      const response = await api.post(
+        "/freelancer/education",
         {
           degree: newEducation.degree.trim(),
           institution: newEducation.institution.trim(),
           field: newEducation.field || "",
           year: newEducation.year || ""
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       
@@ -486,10 +462,7 @@ const FreelancerEditProfile = () => {
 
   const refreshEducation = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("/api/freelancer/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get("/freelancer/profile");
       if (response.data.success) {
         // Update CV data with fresh education - preserve original data exactly
         if (response.data.profile.cv && response.data.profile.cv.parsed_data) {

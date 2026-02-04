@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axios';
 
 const AdminCreate = () => {
   const navigate = useNavigate();
@@ -88,7 +88,7 @@ const AdminCreate = () => {
         secretKey: formData.secretKey
       };
 
-      const response = await axios.post('/api/auth/create-admin', requestData);
+      const response = await api.post('/auth/create-admin', requestData);
 
       if (response.data.success) {
         setSuccessMessage('Admin account created successfully! Redirecting to login...');

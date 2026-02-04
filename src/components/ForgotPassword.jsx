@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/axios';
 
 const accent = '#fd680e';
 
@@ -21,7 +21,7 @@ const ForgotPassword = () => {
     }
     setLoading(true);
     try {
-      const response = await axios.post('/api/auth/request-reset', { email: email.trim() });
+      const response = await api.post('/auth/request-reset', { email: email.trim() });
       if (response.data.success) {
         setSuccessMessage(response.data.message || 'If your email exists, you will receive a password reset link.');
         setEmail('');
