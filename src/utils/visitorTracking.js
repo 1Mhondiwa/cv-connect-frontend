@@ -1,9 +1,15 @@
 // Frontend visitor tracking utility
 class WebVisitorTracker {
   constructor() {
-    this.baseURL = '/api/visitor';
+    this.baseURL = `${import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com'}/api/visitor`;
     this.sessionId = this.getOrCreateSessionId();
     this.isTracking = false;
+    
+    // Debug: Log the visitor tracking URL
+    console.log('=== Visitor Tracking Debug ===');
+    console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+    console.log('Visitor baseURL:', this.baseURL);
+    console.log('==============================');
   }
 
   getOrCreateSessionId() {
