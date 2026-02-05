@@ -4,15 +4,6 @@ import axios from 'axios';
 const BACKEND_BASE = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
 const API_URL = BACKEND_BASE + '/api';
 
-// Debug: Log the API URL configuration
-console.log('=== Frontend API Configuration Debug ===');
-console.log('VITE_API_URL env var:', import.meta.env.VITE_API_URL);
-console.log('BACKEND_BASE:', BACKEND_BASE);
-console.log('API_URL (baseURL):', API_URL);
-console.log('Current origin:', window.location.origin);
-console.log('NODE_ENV:', import.meta.env.MODE);
-console.log('=====================================');
-
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: API_URL,
