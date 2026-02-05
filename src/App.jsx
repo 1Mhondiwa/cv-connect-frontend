@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { LoadingProvider, useLoading } from './contexts/LoadingContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import PageLoading from './components/PageLoading';
 import Navbar from './components/Navbar';
 import MainPage from './components/MainPage';
 import About from './components/About';
@@ -69,6 +71,16 @@ function ScrollTopButton() {
 
 function AppRoutes() {
   const location = useLocation();
+  const { isLoading, setIsLoading } = useLoading();
+  
+  // Show loading when route changes
+  useEffect(() => {
+    setIsLoading(true);
+    // Hide loading after a short delay (faster than old method)
+    const timer = setTimeout(() => setIsLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, [location, setIsLoading]);
+
   // Hide Navbar on dashboard pages, freelancer upload, freelancer profile, and freelancer edit profile page
   const hideNavbar =
     location.pathname.startsWith('/freelancer-dashboard') ||
@@ -83,6 +95,7 @@ function AppRoutes() {
 
   return (
     <>
+      {isLoading && <PageLoading />}
       <ScrollToTop />
       {!hideNavbar && <Navbar />}
       <Routes>
@@ -129,9 +142,11 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-    <Router>
-      <AppRoutes />
-    </Router>
+      <LoadingProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </LoadingProvider>
     </AuthProvider>
   );
 }
