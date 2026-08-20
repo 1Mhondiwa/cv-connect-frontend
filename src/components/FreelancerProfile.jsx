@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import api from "../utils/axios";
+import { API_BASE_URL } from "../utils/axios";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 
@@ -110,9 +111,8 @@ const FreelancerProfile = () => {
     fetchProfile();
 
     // Set up real-time availability updates using SSE
-    const backendURL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
     const token = localStorage.getItem('token');
-    const eventSource = new EventSource(`${backendURL}/api/freelancer/availability/stream?token=${token}`);
+    const eventSource = new EventSource(`${API_BASE_URL}/api/freelancer/availability/stream?token=${token}`);
 
     eventSource.onmessage = (event) => {
       try {
@@ -300,7 +300,7 @@ const FreelancerProfile = () => {
               <div className="row align-items-center">
                 <div className="col-md-3 text-center">
         {(() => {
-          const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
+          const BACKEND_URL = API_BASE_URL;
           let imgUrl = "";
           const hasCustomImage = !!profile?.profile_picture_url;
           if (hasCustomImage) {

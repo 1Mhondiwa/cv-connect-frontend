@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Determine the backend URL - try environment variable first, then fallback
-const BACKEND_BASE = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
-const API_URL = BACKEND_BASE + '/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
+const API_URL = API_BASE_URL + '/api';
 
 // Create axios instance with base configuration
 const api = axios.create({

@@ -1,7 +1,9 @@
 // Frontend visitor tracking utility
+import { API_BASE_URL } from './axios';
+
 class WebVisitorTracker {
   constructor() {
-    this.baseURL = `${import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com'}/api/visitor`;
+    this.baseURL = `${API_BASE_URL}/api/visitor`;
     this.sessionId = this.getOrCreateSessionId();
     this.isTracking = false;
   }

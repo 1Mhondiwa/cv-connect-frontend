@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/axios';
+import { API_BASE_URL } from '../utils/axios';
 import ActivityTable from "./ActivityTable";
 import { useAuth } from '../contexts/AuthContext';
 import InterviewDashboard from './InterviewDashboard';
@@ -268,7 +269,7 @@ const ContractsList = ({ contracts, loading, error, onRetry, onUploadSuccess }) 
   );
 };
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
+const BACKEND_URL = API_BASE_URL;
 const accent = '#fd680e';
 
 const FreelancerDashboard = () => {

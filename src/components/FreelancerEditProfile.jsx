@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext';
 import api from '../utils/axios';
+import { API_BASE_URL } from '../utils/axios';
 
 const accent = '#fd680e';
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
+const BACKEND_URL = API_BASE_URL;
 
 const FreelancerEditProfile = () => {
   const [form, setForm] = useState({
