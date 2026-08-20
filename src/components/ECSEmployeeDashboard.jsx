@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
+import { API_BASE_URL } from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
 import { SiteHeader } from './site-header';
 
@@ -2429,7 +2430,7 @@ const ECSEmployeeDashboard = () => {
                           <div className="row align-items-center">
                             <div className="col-md-3 text-center">
                               {(() => {
-                                const BACKEND_URL = import.meta.env.VITE_API_URL || 'https://cv-connect-backend-1r7p.onrender.com';
+                                const BACKEND_URL = API_BASE_URL;
                                 let imgUrl = "";
                                 const hasCustomImage = !!selectedFreelancerProfile?.profile_picture_url;
                                 if (hasCustomImage) {
