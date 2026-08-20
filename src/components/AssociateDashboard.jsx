@@ -444,11 +444,6 @@ const AssociateDashboard = () => {
 
   // Hiring functions
   const openHiringModal = (freelancer) => {
-    console.log('Opening hiring modal for freelancer:', freelancer);
-    console.log('Current selectedRequest:', selectedRequest);
-    console.log('selectedRequest type:', typeof selectedRequest);
-    console.log('selectedRequest properties:', selectedRequest ? Object.keys(selectedRequest) : 'null');
-    
     if (!selectedRequest || !selectedRequest.request_id) {
       console.error('No valid request selected for hiring!');
       setToast({ 
@@ -460,7 +455,6 @@ const AssociateDashboard = () => {
     
     setSelectedFreelancerForHiring(freelancer);
     setShowHiringModal(true);
-    console.log('Modal state set to true');
   };
 
   const closeHiringModal = () => {
