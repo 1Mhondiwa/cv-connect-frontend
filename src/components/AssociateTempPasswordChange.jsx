@@ -96,9 +96,7 @@ const AssociateTempPasswordChange = () => {
         oldPassword: form.oldPassword,
         newPassword: form.newPassword
       };
-      
-      console.log('🔍 Sending password change request:', requestData);
-      
+
       const response = await api.post('/associate/change-password', requestData, {
         headers: { Authorization: `Bearer ${token}` }
       });

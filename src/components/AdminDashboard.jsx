@@ -903,16 +903,7 @@ const ESCAdminDashboard = () => {
     
     try {
       console.log('🚀 Fetching analytics data...');
-      
-      // Debug authentication
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
-      console.log('🔐 Auth Debug:', { 
-        hasToken: !!token, 
-        tokenLength: token ? token.length : 0,
-        user: user ? JSON.parse(user) : null 
-      });
-      
+
       // Calculate days based on time range
       const getDaysFromTimeRange = (range) => {
         switch (range) {
