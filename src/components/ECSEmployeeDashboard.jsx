@@ -510,46 +510,23 @@ const ECSEmployeeDashboard = () => {
 
   const fetchAvailableFreelancers = async () => {
     try {
-      console.log('🔍 Starting to fetch freelancers...');
-      console.log('🔍 API URL: /admin/freelancers?availability_status=all&approval_status=all');
-      
       // Get ALL freelancers for comprehensive recommendations
       const res = await api.get('/admin/freelancers?availability_status=all&approval_status=all');
-      console.log('🔍 API Response Status:', res.status);
-      console.log('🔍 API Response Data:', res.data);
-      
+
       if (res.data.success) {
         const freelancers = res.data.freelancers || [];
-        console.log('🔍 Fetched Freelancers:', freelancers.length);
-        
-        if (freelancers.length > 0) {
-          console.log('🔍 Sample Freelancer:', freelancers[0]);
-          console.log('🔍 Sample Freelancer Skills:', freelancers[0].skills);
-          if (freelancers[0].skills && freelancers[0].skills.length > 0) {
-            console.log('🔍 Sample Skill Structure:', freelancers[0].skills[0]);
-            console.log('🔍 Skills Array Type:', Array.isArray(freelancers[0].skills));
-            console.log('🔍 Skills Array Length:', freelancers[0].skills.length);
-          }
-          console.log('🔍 Sample Freelancer Experience:', freelancers[0].experience_years);
-          console.log('🔍 Sample Freelancer Rating:', freelancers[0].admin_rating);
-        } else {
-          console.log('🔍 No freelancers returned from API');
-        }
-        
         setAllFreelancers(freelancers);
         setAvailableFreelancers(freelancers);
-        console.log('🔍 State updated - allFreelancers:', freelancers.length);
-        console.log('🔍 State updated - availableFreelancers:', freelancers.length);
       } else {
-        console.error('🔍 API returned success: false:', res.data);
-        console.error('🔍 Error message:', res.data.message);
+        console.error('API returned success: false:', res.data);
+        console.error('Error message:', res.data.message);
       }
     } catch (err) {
-      console.error('❌ Error fetching available freelancers:', err);
-      console.error('❌ Error details:', err.response?.data);
-      console.error('❌ Error status:', err.response?.status);
-      console.error('❌ Error message:', err.message);
-      
+      console.error('Error fetching available freelancers:', err);
+      console.error('Error details:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      console.error('Error message:', err.message);
+
       // Set empty arrays to prevent UI errors
       setAllFreelancers([]);
       setAvailableFreelancers([]);
@@ -725,101 +702,41 @@ const ECSEmployeeDashboard = () => {
 
     // Simple search function
   const handleSearch = () => {
-    console.log('🔍 Search function called with:', { searchSkills, searchExperience, searchStatus });
-    console.log('🔍 allFreelancers count:', allFreelancers.length);
-    if (allFreelancers.length > 0) {
-      console.log('🔍 Sample freelancer data:', allFreelancers[0]);
-      console.log('🔍 Sample freelancer skills:', allFreelancers[0].skills);
-      if (allFreelancers[0].skills && allFreelancers[0].skills.length > 0) {
-        console.log('🔍 Sample skill details:', allFreelancers[0].skills[0]);
-      }
-      console.log('🔍 Sample freelancer experience_years:', allFreelancers[0].experience_years);
-      console.log('🔍 Sample freelancer is_available:', allFreelancers[0].is_available);
-    }
-    
     let filtered = [...allFreelancers];
-    console.log('🔍 Starting with all freelancers:', filtered.length);
-    console.log('🔍 Filter conditions - Skills:', searchSkills, 'Experience:', searchExperience, 'Status:', searchStatus);
-    
+
     // Filter by skills
     if (searchSkills && searchSkills.trim()) {
-      console.log('🔍 Filtering by skills:', searchSkills);
       filtered = filtered.filter(f => {
-        // Check if skills array contains the search term
         const hasSkills = f.skills?.some(skill => {
           const skillName = skill.skill_name || skill;
           return skillName && skillName.toLowerCase().includes(searchSkills.toLowerCase());
         });
-        // Also check headline and current_status
         const hasHeadline = f.headline?.toLowerCase().includes(searchSkills.toLowerCase());
         const hasCurrentStatus = f.current_status?.toLowerCase().includes(searchSkills.toLowerCase());
-        const matches = hasSkills || hasHeadline || hasCurrentStatus;
-        
-        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
-          skills: f.skills,
-          headline: f.headline,
-          current_status: f.current_status,
-          searchTerm: searchSkills,
-          hasSkills,
-          hasHeadline,
-          hasCurrentStatus,
-          matches
-        });
-        
-        return matches;
+        return hasSkills || hasHeadline || hasCurrentStatus;
       });
-      console.log('🔍 After skills filter:', filtered.length);
     }
-    
+
     // Filter by experience
     if (searchExperience && searchExperience.trim()) {
-      console.log('🔍 Filtering by experience:', searchExperience);
       const minExp = parseInt(searchExperience);
       if (!isNaN(minExp)) {
         filtered = filtered.filter(f => {
           const experience = f.experience_years || 0;
-          const matches = experience >= minExp;
-          
-          console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
-            experience,
-            minRequired: minExp,
-            matches
-          });
-          
-          return matches;
+          return experience >= minExp;
         });
-        console.log('🔍 After experience filter:', filtered.length);
       }
     }
-    
+
     // Filter by status
     if (searchStatus && searchStatus !== 'all') {
-      console.log('🔍 Filtering by status:', searchStatus);
       filtered = filtered.filter(f => {
         const status = f.availability_status || 'available';
-        const matches = status === searchStatus;
-        
-        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
-          status,
-          searchTerm: searchStatus,
-          matches
-        });
-        
-        return matches;
+        return status === searchStatus;
       });
-      console.log('🔍 After status filter:', filtered.length);
     }
-    
+
     setAvailableFreelancers(filtered);
-    console.log('🔍 Final filtered results:', filtered.length);
-    console.log('🔍 Filtered freelancers:', filtered.map(f => `${f.first_name} ${f.last_name}`));
-    console.log('🔍 Final filter summary:', {
-      originalCount: allFreelancers.length,
-      finalCount: filtered.length,
-      skillsFilter: searchSkills,
-      experienceFilter: searchExperience,
-      statusFilter: searchStatus
-    });
   };
 
   const handleLogout = () => {

@@ -1277,28 +1277,14 @@ const ESCAdminDashboard = () => {
 
   const fetchAvailableFreelancers = async () => {
     try {
-      console.log('🔍 Starting to fetch freelancers...');
-      console.log('🔍 API URL: /admin/freelancers?availability_status=all&approval_status=all');
-      
       // Get ALL freelancers for comprehensive recommendations
       const res = await api.get('/admin/freelancers?availability_status=all&approval_status=all');
-      console.log('🔍 API Response:', res);
-      console.log('🔍 Response Status:', res.status);
-      console.log('🔍 Response Data:', res.data);
-      
+
       if (res.data.success) {
-        console.log('🔍 Fetched Freelancers:', res.data.freelancers.length);
-        if (res.data.freelancers.length > 0) {
-          console.log('🔍 Sample Freelancer:', res.data.freelancers[0]);
-        } else {
-          console.log('🔍 No freelancers returned from API');
-        }
         setAllFreelancers(res.data.freelancers);
         setAvailableFreelancers(res.data.freelancers);
-        console.log('🔍 State updated - allFreelancers:', res.data.freelancers.length);
-        console.log('🔍 State updated - availableFreelancers:', res.data.freelancers.length);
       } else {
-        console.error('🔍 API returned success: false:', res.data);
+        console.error('API returned success: false:', res.data);
       }
     } catch (err) {
       console.error('Error fetching available freelancers:', err);
@@ -1401,31 +1387,14 @@ const ESCAdminDashboard = () => {
 
   // Simple search function
   const handleSearch = () => {
-    console.log('🔍 Search function called with:', { searchSkills, searchExperience, searchStatus });
-    console.log('🔍 allFreelancers count:', allFreelancers.length);
-    console.log('🔍 Sample freelancer data:', allFreelancers[0]);
-    
     let filtered = [...allFreelancers];
-    console.log('🔍 Starting with all freelancers:', filtered.length);
-    
+
     // Filter by skills
     if (searchSkills.trim()) {
-      console.log('🔍 Filtering by skills:', searchSkills);
       filtered = filtered.filter(f => {
         const hasSkills = f.skills?.some(skill => skill.toLowerCase().includes(searchSkills.toLowerCase()));
         const hasHeadline = f.headline?.toLowerCase().includes(searchSkills.toLowerCase());
-        const matches = hasSkills || hasHeadline;
-        
-        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
-          skills: f.skills,
-          headline: f.headline,
-          searchTerm: searchSkills,
-          hasSkills,
-          hasHeadline,
-          matches
-        });
-        
-        return matches;
+        return hasSkills || hasHeadline;
       });
       console.log('🔍 After skills filter:', filtered.length);
     }
