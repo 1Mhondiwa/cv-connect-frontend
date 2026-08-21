@@ -318,11 +318,9 @@ const FreelancerDashboard = () => {
     
     const fetchProfileData = async () => {
       try {
-        console.log('Fetching freelancer profile...');
         const response = await api.get('/freelancer/profile');
 
         if (response.data.success) {
-          console.log('Profile fetched successfully:', response.data.profile);
           if (isMounted) {
             setProfile(response.data.profile);
           }
@@ -391,19 +389,16 @@ const FreelancerDashboard = () => {
   }, [activeTab]);
 
 
-  const fetchContracts = async () => {
+const fetchContracts = async () => {
     try {
       setContractsLoading(true);
       setContractsError('');
-      console.log('🔍 Fetching contracts for freelancer...');
       const response = await api.get('/freelancer/hiring/history');
-      console.log('📄 Contracts response:', response.data);
-      
+
       if (response.data.success) {
         setContracts(response.data.hiring_history || []);
-        console.log('✅ Contracts loaded:', response.data.hiring_history?.length || 0);
       } else {
-        console.error('❌ Contracts fetch failed:', response.data.message);
+        console.error('Contracts fetch failed:', response.data.message);
         setContractsError(response.data.message || 'Failed to fetch contracts');
       }
     } catch (err) {

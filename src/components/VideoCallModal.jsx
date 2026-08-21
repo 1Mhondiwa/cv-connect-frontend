@@ -92,12 +92,11 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
         localVideoRef.current.srcObject = stream;
       }
 
-      // Simulate connection for demo purposes
+// Simulate connection for demo purposes
       console.log('Video call started successfully');
-      
+
       // Simulate freelancer joining after a delay
       setTimeout(() => {
-        console.log('Simulating freelancer joining...');
         setIsConnected(true);
         startTimeRef.current = Date.now();
         
