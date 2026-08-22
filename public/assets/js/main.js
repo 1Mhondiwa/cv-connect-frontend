@@ -6,6 +6,8 @@
 * License: https://bootstrapmade.com/license/
 */
 
+/* global AOS */
+
 (function() {
   "use strict";
 

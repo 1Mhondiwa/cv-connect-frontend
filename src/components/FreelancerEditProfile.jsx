@@ -386,7 +386,7 @@ const FreelancerEditProfile = () => {
         setWorkSuccess("Work experience deleted successfully!");
         setTimeout(() => setWorkSuccess(""), 3000);
       } else {
-        setWorkError(err.response?.data?.message || "Failed to delete work experience.");
+        setWorkError(response.data?.message || "Failed to delete work experience.");
       }
     } catch (err) {
       console.error("Delete work experience error:", err);

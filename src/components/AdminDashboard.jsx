@@ -193,7 +193,6 @@ const ESCAdminDashboard = () => {
 
   const [recommendationNotes, setRecommendationNotes] = useState('');
   const [submittingRecommendations, setSubmittingRecommendations] = useState(false);
-  const [dataTableData, setDataTableData] = useState([]);
   const [showDataModal, setShowDataModal] = useState(false);
   const [selectedDataItem, setSelectedDataItem] = useState(null);
 
@@ -1630,15 +1629,6 @@ const ESCAdminDashboard = () => {
     } finally {
       setNotesLoading(false);
     }
-  };
-
-
-
-  const handleDataUpdate = (updatedItem) => {
-    setDataTableData(prev => prev.map(item => 
-      item.id === updatedItem.id ? updatedItem : item
-    ));
-    closeDataModal();
   };
 
 
