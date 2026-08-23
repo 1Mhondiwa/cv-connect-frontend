@@ -45,7 +45,7 @@ class WebVisitorTracker {
       } else {
         // Failed to track visitor - silently continue
       }
-    } catch (error) {
+    } catch {
       // Visitor tracking error - silently continue
     }
   }

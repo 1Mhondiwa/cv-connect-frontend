@@ -558,7 +558,6 @@ const FreelancerEditProfile = () => {
     }
     
     try {
-      const token = localStorage.getItem("token");
       const payload = {
         first_name: form.first_name,
         last_name: form.last_name,

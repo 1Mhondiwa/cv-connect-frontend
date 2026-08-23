@@ -42,7 +42,7 @@ const CVTemplateExample = () => {
     }
   };
 
-  const handleCreateCV = async (file, formData) => {
+  const handleCreateCV = async (file) => {
     setIsUploading(true);
     setUploadedCV(file);
 

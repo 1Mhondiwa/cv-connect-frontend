@@ -293,7 +293,6 @@ const FreelancerDashboard = () => {
   const [messagingLoading, setMessagingLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'messages', 'contracts', or 'feedback'
   const [globalUnread, setGlobalUnread] = useState(0);
-  const messagesEndRef = useRef(null);
 
   // Recent Activity state
   const [activities, setActivities] = useState([]);
@@ -352,8 +351,8 @@ const FreelancerDashboard = () => {
         if (isMounted) {
           setActivities(res.data.activities || []);
         }
-      } catch (err) {
-        if (isMounted) {
+    } catch {
+      if (isMounted) {
           setActivities([]);
         }
       } finally {
@@ -427,7 +426,7 @@ const fetchContracts = async () => {
       if (response.data.success) {
         setGlobalUnread(response.data.total_unread);
       }
-    } catch (error) {
+    } catch {
       setGlobalUnread(0);
     }
   };
@@ -475,14 +474,9 @@ const fetchContracts = async () => {
     try {
       await api.delete(`/message/messages/${messageId}`);
       if (selectedConversation) await loadConversation(selectedConversation);
-    } catch (error) {
+    } catch {
       alert('Failed to delete message.');
     }
-  };
-
-  const handleLogout = () => {
-    // This will be handled by the auth context
-    navigate('/');
   };
 
   // Profile image upload handler
@@ -513,7 +507,7 @@ const fetchContracts = async () => {
       } else {
         setUploadError(response.data.message || 'Failed to upload image.');
       }
-    } catch (err) {
+    } catch {
       setUploadError('Failed to upload image. Please try again.');
     } finally {
       setUploading(false);
@@ -533,12 +527,6 @@ const fetchContracts = async () => {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=eee&color=555&size=120&bold=true`;
   };
 
-
-  // Interview functions
-  const openInterviewFeedbackModal = (interview) => {
-    setSelectedInterviewForFeedback(interview);
-    setShowInterviewFeedbackModal(true);
-  };
 
   const closeInterviewFeedbackModal = () => {
     setShowInterviewFeedbackModal(false);

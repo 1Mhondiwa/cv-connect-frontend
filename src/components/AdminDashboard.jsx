@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { useAuth } from '../contexts/AuthContext';
@@ -11,27 +11,12 @@ const accent = '#fd680e';
 const ESCAdminDashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [user, setUser] = useState(null);
+  const [, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
 
   
-  // Legacy associate management (keeping for backward compatibility)
-  const [associateFormData, setAssociateFormData] = useState({
-    email: '',
-    password: '',
-    confirm_password: '',
-    industry: '',
-    contact_person: '',
-    phone: '',
-    address: '',
-    website: ''
-  });
-  const [associateErrors, setAssociateErrors] = useState({});
-  const [associateLoading, setAssociateLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
   const [associates, setAssociates] = useState([]);
   const [associatesLoading, setAssociatesLoading] = useState(false);
   const [associatesError, setAssociatesError] = useState('');
@@ -41,7 +26,7 @@ const ESCAdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associates', 'freelancers'
   
   // Add hover state management for better UX
-  const [hoveredTab, setHoveredTab] = useState(null);
+  const [, setHoveredTab] = useState(null);
   
   // Sidebar collapse state
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -49,18 +34,16 @@ const ESCAdminDashboard = () => {
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
-  const [freelancers, setFreelancers] = useState([]);
-  const [freelancersLoading, setFreelancersLoading] = useState(false);
-  const [freelancersError, setFreelancersError] = useState('');
-  const [freelancerFilters, setFreelancerFilters] = useState({
+  const [, setFreelancers] = useState([]);
+  const [, setFreelancersLoading] = useState(false);
+  const [, setFreelancersError] = useState('');
+  const [freelancerFilters] = useState({
     availability_status: 'all',
     approval_status: 'all',
     page: 1,
     limit: 10
   });
-  const [availabilityUpdateLoading, setAvailabilityUpdateLoading] = useState({});
-  const [approvalLoading, setApprovalLoading] = useState({});
-  const [selectedFreelancerForNotes, setSelectedFreelancerForNotes] = useState(null);
+  const [selectedFreelancerForNotes] = useState(null);
   const [freelancerNotesModal, setFreelancerNotesModal] = useState(false);
   const [freelancerNotes, setFreelancerNotes] = useState('');
   const [notesLoading, setNotesLoading] = useState(false);
@@ -69,13 +52,7 @@ const ESCAdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsError, setStatsError] = useState('');
-  
-  // Admin profile management
-  const [adminImage, setAdminImage] = useState(null);
-  const [adminImageUploading, setAdminImageUploading] = useState(false);
-  const [adminImageError, setAdminImageError] = useState('');
-  const [adminImageSuccess, setAdminImageSuccess] = useState('');
-  const adminImageInputRef = useRef(null);
+
 
 
   const [selectedFreelancerRequest, setSelectedFreelancerRequest] = useState(null);
@@ -126,7 +103,7 @@ const ESCAdminDashboard = () => {
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState('');
   const [lastAnalyticsUpdate, setLastAnalyticsUpdate] = useState(null);
-  const [visitorData, setVisitorData] = useState([]);
+  const [, setVisitorData] = useState([]);
   const [visitorDataLoading, setVisitorDataLoading] = useState(false);
 
   // Hired Freelancers Trends local filtering state (per-graph, real-time)
@@ -137,8 +114,7 @@ const ESCAdminDashboard = () => {
     endDate: ''
   });
   const [hiredSeries, setHiredSeries] = useState({ total: true, active: true, completed: true });
-  const [hiredDataRaw, setHiredDataRaw] = useState([]);
-  const [hiredFilterLoading, setHiredFilterLoading] = useState(false);
+  const [, setHiredDataRaw] = useState([]);
 
   // Registration Trends local filtering state
   const [registrationFilter, setRegistrationFilter] = useState({
@@ -151,7 +127,6 @@ const ESCAdminDashboard = () => {
   const [commSeries, setCommSeries] = useState({ messages: true, conversations: true });
 
   // Chart data will be populated from real-time API calls
-  const chartData = [];
 
   // Reports system state
   const [activeReportSection, setActiveReportSection] = useState(null);
@@ -162,39 +137,31 @@ const ESCAdminDashboard = () => {
     security: null,
     operations: null
   });
-  const [reportsError, setReportsError] = useState('');
+  const [, setReportsError] = useState('');
   const [lastReportUpdate, setLastReportUpdate] = useState(null);
 
   // Enhanced Security Monitoring state
-  const [activeSecuritySection, setActiveSecuritySection] = useState(null);
+  const [activeSecuritySection] = useState(null);
   const [securityData, setSecurityData] = useState({
     dashboard: null,
     communications: null,
     audit: null,
     threats: null
   });
-  const [securityLoading, setSecurityLoading] = useState(false);
-  const [securityError, setSecurityError] = useState('');
-  const [lastSecurityUpdate, setLastSecurityUpdate] = useState(null);
+  const [, setSecurityLoading] = useState(false);
+  const [, setSecurityError] = useState('');
+  const [, setLastSecurityUpdate] = useState(null);
 
   // Hired freelancers tracking state
   const [hiredFreelancersCount, setHiredFreelancersCount] = useState(0);
   const [hiredFreelancersLoading, setHiredFreelancersLoading] = useState(false);
-  const [lastHiredFreelancersUpdate, setLastHiredFreelancersUpdate] = useState(null);
-
-  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
-  const [refreshInterval, setRefreshInterval] = useState(30000); // 30 seconds
+  const [, setLastHiredFreelancersUpdate] = useState(null);
 
   // Interview Feedback Analytics state
   const [interviewAnalytics, setInterviewAnalytics] = useState(null);
   const [interviewAnalyticsLoading, setInterviewAnalyticsLoading] = useState(false);
   const [interviewAnalyticsError, setInterviewAnalyticsError] = useState('');
   const [interviewTimeRange, setInterviewTimeRange] = useState('30');
-
-  const [recommendationNotes, setRecommendationNotes] = useState('');
-  const [submittingRecommendations, setSubmittingRecommendations] = useState(false);
-  const [showDataModal, setShowDataModal] = useState(false);
-  const [selectedDataItem, setSelectedDataItem] = useState(null);
 
 
 
@@ -489,13 +456,6 @@ const ESCAdminDashboard = () => {
     };
   }, [activeTab]);
 
-  // Fetch admin image on user load
-  useEffect(() => {
-    if (user && user.profile_picture_url) {
-      setAdminImage(user.profile_picture_url);
-    }
-  }, [user]);
-
   // Auto-generate reports when report section changes
   useEffect(() => {
     console.log('🔄 useEffect triggered - activeReportSection:', activeReportSection);
@@ -523,68 +483,6 @@ const ESCAdminDashboard = () => {
 
 
 
-  // Helper to get image URL
-  const getAdminImageUrl = () => {
-    if (adminImage) {
-      if (adminImage.startsWith('http')) return adminImage;
-      return adminImage;
-    }
-    return null;
-  };
-
-  // Upload handler
-  const handleAdminImageChange = async (e) => {
-    setAdminImageError('');
-    setAdminImageSuccess('');
-    const file = e.target.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setAdminImageError('Please select a valid image file.');
-      return;
-    }
-    setAdminImageUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-      const res = await api.post('/admin/profile-image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      if (res.data.success) {
-        setAdminImage(res.data.image_url);
-        setAdminImageSuccess('Profile picture updated!');
-        setUser((prev) => ({ ...prev, profile_picture_url: res.data.image_url }));
-      } else {
-        setAdminImageError(res.data.message || 'Failed to upload image.');
-      }
-    } catch (err) {
-      setAdminImageError(err.response?.data?.message || 'Failed to upload image.');
-    } finally {
-      setAdminImageUploading(false);
-      if (adminImageInputRef.current) adminImageInputRef.current.value = '';
-    }
-  };
-
-  // Delete handler
-  const handleDeleteAdminImage = async () => {
-    setAdminImageError('');
-    setAdminImageSuccess('');
-    setAdminImageUploading(true);
-    try {
-      const res = await api.delete('/admin/profile-image');
-      if (res.data.success) {
-        setAdminImage(null);
-        setAdminImageSuccess('Profile picture deleted.');
-        setUser((prev) => ({ ...prev, profile_picture_url: null }));
-      } else {
-        setAdminImageError(res.data.message || 'Failed to delete image.');
-      }
-    } catch (err) {
-      setAdminImageError(err.response?.data?.message || 'Failed to delete image.');
-    } finally {
-      setAdminImageUploading(false);
-    }
-  };
-
   const checkAuth = () => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -604,141 +502,10 @@ const ESCAdminDashboard = () => {
       }
       setUser(parsedUser);
       setLoading(false);
-    } catch (error) {
+    } catch {
       setError('Invalid user data');
       setLoading(false);
     }
-  };
-
-  const handleAssociateChange = (e) => {
-    const { name, value } = e.target;
-    setAssociateFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error when user starts typing
-    if (associateErrors[name]) {
-      setAssociateErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const validateAssociateForm = () => {
-    const newErrors = {};
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!associateFormData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(associateFormData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    // Password validation
-    if (!associateFormData.password) {
-      newErrors.password = 'Password is required';
-    } else if (associateFormData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters long';
-    }
-
-    // Confirm password validation
-    if (!associateFormData.confirm_password) {
-      newErrors.confirm_password = 'Please confirm your password';
-    } else if (associateFormData.password !== associateFormData.confirm_password) {
-      newErrors.confirm_password = 'Passwords do not match';
-    }
-
-    // Required fields validation
-    if (!associateFormData.industry) {
-      newErrors.industry = 'Industry is required';
-    }
-    if (!associateFormData.contact_person) {
-      newErrors.contact_person = 'Contact person is required';
-    }
-    if (!associateFormData.phone) {
-      newErrors.phone = 'Phone number is required';
-    }
-
-    setAssociateErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleAssociateSubmit = async (e) => {
-    e.preventDefault();
-    setErrorMessage('');
-    setSuccessMessage('');
-
-    if (!validateAssociateForm()) {
-      return;
-    }
-
-    setAssociateLoading(true);
-
-    try {
-      const token = localStorage.getItem('token');
-      const requestData = {
-        email: associateFormData.email.trim(),
-        password: associateFormData.password,
-        industry: associateFormData.industry.trim(),
-        contact_person: associateFormData.contact_person.trim(),
-        phone: associateFormData.phone.trim(),
-        address: associateFormData.address.trim() || null,
-        website: associateFormData.website.trim() || null
-      };
-
-      const response = await api.post('/auth/add-associate', requestData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      if (response.data.success) {
-        setSuccessMessage('Associate added successfully!');
-        
-        // Clear form
-        setAssociateFormData({
-          email: '',
-          password: '',
-          confirm_password: '',
-          industry: '',
-          contact_person: '',
-          phone: '',
-          address: '',
-          website: ''
-        });
-        
-        // Clear success message after 5 seconds
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 5000);
-      } else {
-        setErrorMessage(response.data.message || 'Failed to add associate');
-      }
-    } catch (error) {
-      console.error('Add associate error:', error);
-      if (error.response?.data?.message) {
-        setErrorMessage(error.response.data.message);
-      } else if (error.response?.data?.errors) {
-        // Handle validation errors from backend
-        const backendErrors = {};
-        error.response.data.errors.forEach(err => {
-          backendErrors[err.path] = err.msg;
-        });
-        setAssociateErrors(backendErrors);
-      } else {
-        setErrorMessage('Failed to add associate. Please try again.');
-      }
-    } finally {
-      setAssociateLoading(false);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/');
   };
 
   const fetchAssociates = async () => {
@@ -772,23 +539,6 @@ const ESCAdminDashboard = () => {
       alert(err.response?.data?.message || 'Failed to toggle status');
     } finally {
       setToggleLoading((prev) => ({ ...prev, [userId]: false }));
-    }
-  };
-
-  const fetchFreelancers = async () => {
-    setFreelancersLoading(true);
-    setFreelancersError('');
-    try {
-      const res = await api.get('/admin/freelancers');
-      if (res.data.success) {
-        setFreelancers(res.data.freelancers);
-      } else {
-        setFreelancersError(res.data.message || 'Failed to fetch freelancers');
-      }
-    } catch (err) {
-      setFreelancersError(err.response?.data?.message || 'Failed to fetch freelancers');
-    } finally {
-      setFreelancersLoading(false);
     }
   };
 
@@ -1293,12 +1043,6 @@ const ESCAdminDashboard = () => {
     }
   };
 
-  const openFreelancerRequestDetails = async (request) => {
-    setSelectedFreelancerRequest(request);
-    setShowFreelancerRequestDetailsModal(true);
-    await fetchAvailableFreelancers();
-  };
-
   const openRecommendationsModal = async (request) => {
     console.log('🔍 Opening recommendations modal for request:', request);
     setSelectedFreelancerRequest(request);
@@ -1363,24 +1107,6 @@ const ESCAdminDashboard = () => {
       alert(err.response?.data?.message || 'Failed to submit recommendations');
     } finally {
       setRecommendationsLoading(false);
-    }
-  };
-
-  const updateRequestStatus = async (requestId, status, notes = '') => {
-    try {
-      const res = await api.put(`/admin/associate-requests/${requestId}/status`, {
-        status,
-        admin_notes: notes
-      });
-
-      if (res.data.success) {
-        alert('Request status updated successfully!');
-      } else {
-        alert(res.data.message || 'Failed to update request status');
-      }
-    } catch (err) {
-      console.error('Error updating request status:', err);
-      alert(err.response?.data?.message || 'Failed to update request status');
     }
   };
 
@@ -1493,111 +1219,6 @@ const ESCAdminDashboard = () => {
     } finally {
       setFreelancersLoading(false);
     }
-  };
-
-  const updateFreelancerAvailability = async (freelancerId, availabilityStatus) => {
-    setAvailabilityUpdateLoading(prev => ({ ...prev, [freelancerId]: true }));
-    try {
-      const res = await api.put(`/admin/freelancers/${freelancerId}/availability`, {
-        is_available: availabilityStatus === 'available'
-      });
-      if (res.data.success) {
-        // Update freelancer in state
-        setFreelancers(prev => prev.map(f => 
-          f.freelancer_id === freelancerId 
-            ? { ...f, is_available: availabilityStatus === 'available' }
-            : f
-        ));
-        alert(`Freelancer availability updated to ${availabilityStatus}`);
-      } else {
-        alert(res.data.message || 'Failed to update availability');
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update availability');
-    } finally {
-      setAvailabilityUpdateLoading(prev => ({ ...prev, [freelancerId]: false }));
-    }
-  };
-
-  const approveFreelancer = async (freelancerId) => {
-    setApprovalLoading(prev => ({ ...prev, [freelancerId]: true }));
-    try {
-      const res = await api.put(`/admin/freelancers/${freelancerId}/approve`);
-      if (res.data.success) {
-        // Update freelancer in state
-        setFreelancers(prev => prev.map(f => 
-          f.freelancer_id === freelancerId 
-            ? { 
-                ...f, 
-                is_approved: true, 
-                approval_date: new Date().toISOString(),
-                approved_by: user.user_id,
-                last_admin_review: new Date().toISOString()
-              }
-            : f
-        ));
-        alert('Freelancer approved successfully!');
-      } else {
-        alert(res.data.message || 'Failed to approve freelancer');
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to approve freelancer');
-    } finally {
-      setApprovalLoading(prev => ({ ...prev, [freelancerId]: false }));
-    }
-  };
-
-  const rejectFreelancer = async (freelancerId) => {
-    setApprovalLoading(prev => ({ ...prev, [freelancerId]: true }));
-    try {
-      const res = await api.put(`/admin/freelancers/${freelancerId}/reject`);
-      if (res.data.success) {
-        // Update freelancer in state
-        setFreelancers(prev => prev.map(f => 
-          f.freelancer_id === freelancerId 
-            ? { 
-                ...f, 
-                is_approved: false, 
-                approval_date: null,
-                approved_by: null,
-                last_admin_review: new Date().toISOString()
-              }
-            : f
-        ));
-        alert('Freelancer rejected successfully!');
-      } else {
-        alert(res.data.message || 'Failed to reject freelancer');
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to reject freelancer');
-    } finally {
-      setApprovalLoading(prev => ({ ...prev, [freelancerId]: false }));
-    }
-  };
-
-  const updateFreelancerRating = async (freelancerId, rating) => {
-    try {
-      const res = await api.put(`/admin/freelancers/${freelancerId}/rating`, { rating });
-      if (res.data.success) {
-        // Update freelancer in state
-        setFreelancers(prev => prev.map(f => 
-          f.freelancer_id === freelancerId 
-            ? { ...f, admin_rating: rating, last_admin_review: new Date().toISOString() }
-            : f
-        ));
-      } else {
-        alert(res.data.message || 'Failed to update rating');
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update rating');
-    }
-  };
-
-  const openFreelancerNotes = (freelancerId) => {
-    const freelancer = freelancers.find(f => f.freelancer_id === freelancerId);
-    setSelectedFreelancerForNotes(freelancer);
-    setFreelancerNotes(freelancer?.admin_notes || '');
-    setFreelancerNotesModal(true);
   };
 
   const saveFreelancerNotes = async () => {
@@ -2604,7 +2225,7 @@ const ESCAdminDashboard = () => {
                                     
                                     // Try to find matching skill in supply data
                                     let matchedSkill = null;
-                                    for (const [existingSkill, data] of skillMap.entries()) {
+                                    for (const [existingSkill] of skillMap.entries()) {
                                       if (skill === existingSkill || 
                                           skill.includes(existingSkill) || 
                                           existingSkill.includes(skill) ||
@@ -3955,20 +3576,8 @@ const ESCAdminDashboard = () => {
                                 <ResponsiveContainer width="100%" height="100%">
                                   {(() => {
                                     const withoutAdmins = validData.filter(item => item && typeof item.user === 'string' && !item.user.includes('@'));
-                                    const chartData = (() => {
-                                      const todayStr = new Date().toISOString().split('T')[0];
-                                      const toDate = new Date(registrationFilter.type === 'custom' && registrationFilter.endDate ? registrationFilter.endDate : todayStr);
-                                      let fromDate;
-                                      if (registrationFilter.type === 'days') {
-                                        const d = new Date(toDate);
-                                        d.setDate(d.getDate() - (registrationFilter.days - 1));
-                                        fromDate = d;
-                                      } else {
-                                        fromDate = registrationFilter.startDate ? new Date(registrationFilter.startDate) : new Date(toDate);
-                                      }
-                                      // Endpoint aggregates per-user totals; keep data but honor control consistency
-                                      return withoutAdmins.slice(0, 10);
-                                    })();
+                                    // Endpoint aggregates per-user totals; no client-side date filtering is applied
+                                    const chartData = withoutAdmins.slice(0, 10);
                                     return (
                                       <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

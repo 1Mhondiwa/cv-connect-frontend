@@ -56,9 +56,9 @@ const Login = () => {
                 // Fallback: if profile fetch fails, go to dashboard
                 navigate('/freelancer-dashboard');
               }
-            } catch (profileErr) {
-              // Fallback: if profile fetch fails, go to dashboard
-            navigate('/freelancer-dashboard');
+} catch {
+        // Fallback: if profile fetch fails, go to dashboard
+        navigate('/freelancer-dashboard');
             }
           } else if (result.user.user_type === 'associate') {
             // Check if associate needs to change temporary password
@@ -78,8 +78,8 @@ const Login = () => {
       } else {
         setError(result.message || 'Login failed');
       }
-    } catch (err) {
-        setError('Login failed. Please check your credentials and try again.');
+} catch {
+      setError('Login failed. Please check your credentials and try again.');
     } finally {
       setLoading(false);
     }

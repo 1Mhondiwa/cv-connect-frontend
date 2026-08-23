@@ -167,60 +167,6 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
     }
   };
 
-  const simulateRemoteVideoFeed = async () => {
-    try {
-      // Simulate a second camera feed (in real app, this would come from the other user)
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-      });
-      
-      // Set as remote video to simulate the other participant
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = stream;
-        setIsConnected(true);
-        startTimeRef.current = Date.now();
-      }
-      
-    } catch (err) {
-      console.error('Error simulating remote video feed:', err);
-      // Fallback to placeholder if no second camera available
-      await createPlaceholderFeed();
-    }
-  };
-
-  const createPlaceholderFeed = async () => {
-    // Create a simple placeholder that looks more like a real video call
-    const canvas = document.createElement('canvas');
-    canvas.width = 640;
-    canvas.height = 480;
-    const ctx = canvas.getContext('2d');
-    
-    // Draw a waiting state
-    const drawWaitingState = () => {
-      // Dark background
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
-      // Center text
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 24px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('Waiting for other participant...', canvas.width / 2, canvas.height / 2 - 20);
-      
-      ctx.font = '16px Arial';
-      ctx.fillStyle = '#cccccc';
-      ctx.fillText(userType === 'associate' ? 'Waiting for freelancer to join' : 'Connecting to associate...', canvas.width / 2, canvas.height / 2 + 20);
-    };
-    
-    drawWaitingState();
-    const canvasStream = canvas.captureStream(1);
-    
-    if (remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = canvasStream;
-    }
-  };
-
   const endCall = () => {
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(track => track.stop());

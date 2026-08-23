@@ -75,7 +75,7 @@ const Register = () => {
     if (/\d/.test(password)) score += 1;
 
     // Special character check
-    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+    if (/[!@#$%^&*()_+\-=\x5B\x5D{};':"\\|,.<>\x2F?]/.test(password)) score += 1;
 
     // Common password check
     const commonPasswords = ['password', '123456', 'qwerty', 'abc123'];

@@ -194,7 +194,7 @@ const FreelancerInterviewFeedback = () => {
             <i className="bi bi-journal-text me-2"></i>Interview Feedback History
           </h6>
           
-          {interviews.map((interview, index) => (
+          {interviews.map((interview) => (
             <div key={interview.interview_id} className="card border-0 shadow-sm mb-3">
               <div className="card-header bg-transparent border-0">
                 <div className="d-flex justify-content-between align-items-center">

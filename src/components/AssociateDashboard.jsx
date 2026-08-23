@@ -30,11 +30,10 @@ const AssociateDashboard = () => {
     budget_range: '',
     urgency_level: 'normal'
   });
-  const [searchResults, setSearchResults] = useState([]);
+  const [, setSearchResults] = useState([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [searchSuccess, setSearchSuccess] = useState('');
-  const [pagination, setPagination] = useState({});
   
   // Messaging state
   const [conversations, setConversations] = useState([]);
@@ -47,7 +46,6 @@ const AssociateDashboard = () => {
   // Skills for dropdown
   const [availableSkills, setAvailableSkills] = useState([]);
   const [globalUnread, setGlobalUnread] = useState(0);
-  const messagesEndRef = useRef(null);
   
   // Hired freelancers state
   const [hiredFreelancers, setHiredFreelancers] = useState([]);
@@ -72,9 +70,8 @@ const AssociateDashboard = () => {
   const assocFileInputRef = useRef(null);
 
   const [activities, setActivities] = useState([]);
-  const [activityLoading, setActivityLoading] = useState(true);
+  const [, setActivityLoading] = useState(true);
   const [toast, setToast] = useState({ message: '', type: '' });
-  const [showChangePassword, setShowChangePassword] = useState(false);
   const [changePwForm, setChangePwForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
   const [changePwError, setChangePwError] = useState('');
   const [changePwSuccess, setChangePwSuccess] = useState('');
@@ -95,7 +92,6 @@ const AssociateDashboard = () => {
   // Hiring state
   const [showHiringModal, setShowHiringModal] = useState(false);
   const [selectedFreelancerForHiring, setSelectedFreelancerForHiring] = useState(null);
-  const [hiringLoading, setHiringLoading] = useState(false);
 
   // Interview state
   const [showInterviewSchedulingModal, setShowInterviewSchedulingModal] = useState(false);
@@ -131,7 +127,7 @@ const AssociateDashboard = () => {
         if (response.data.success) {
           setAssociateProfile(response.data.profile);
         }
-      } catch (err) {
+      } catch {
         // Optionally handle error
       }
     };
@@ -193,8 +189,8 @@ const AssociateDashboard = () => {
       }
       setUser(parsedUser);
       setLoading(false);
-    } catch (error) {
-      setError('Invalid user data');
+      } catch {
+        setError('Invalid user data');
       setLoading(false);
     }
   };
@@ -229,9 +225,9 @@ const AssociateDashboard = () => {
       if (response.data.success) {
         setGlobalUnread(response.data.total_unread);
       }
-    } catch (error) {
-      setGlobalUnread(0);
-    }
+      } catch {
+        setGlobalUnread(0);
+      }
   };
 
   // Fetch hired freelancers
@@ -288,7 +284,7 @@ const AssociateDashboard = () => {
     try {
       const res = await api.get("/associate/activity");
       setActivities(res.data.activities || []);
-    } catch (err) {
+    } catch {
       setActivities([]);
     } finally {
       setActivityLoading(false);
@@ -514,11 +510,6 @@ const AssociateDashboard = () => {
     });
   };
 
-  const openInterviewFeedbackModal = (interview) => {
-    setSelectedInterviewForFeedback(interview);
-    setShowInterviewFeedbackModal(true);
-  };
-
   const closeInterviewFeedbackModal = () => {
     setShowInterviewFeedbackModal(false);
     setSelectedInterviewForFeedback(null);
@@ -554,8 +545,8 @@ const AssociateDashboard = () => {
     try {
       await api.delete(`/message/messages/${messageId}`);
       if (selectedConversation) await loadConversation(selectedConversation);
-    } catch (error) {
-      alert('Failed to delete message.');
+      } catch {
+        alert('Failed to delete message.');
     }
   };
 
@@ -612,7 +603,7 @@ const AssociateDashboard = () => {
       } else {
         setAssocUploadError(response.data.message || 'Failed to upload image.');
       }
-    } catch (err) {
+    } catch {
       setAssocUploadError('Failed to upload image. Please try again.');
     } finally {
       setAssocUploading(false);
@@ -670,7 +661,7 @@ const AssociateDashboard = () => {
     else errors.push('One number');
 
     // Special character check
-    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) score += 1;
+    if (/[!@#$%^&*()_+\-=\x5B\x5D{};':"\\|,.<>\x2F?]/.test(password)) score += 1;
     else errors.push('One special character');
 
     // Common password check

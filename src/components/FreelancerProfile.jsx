@@ -81,7 +81,7 @@ const FreelancerProfile = () => {
       } else {
         setUploadError(response.data.message || 'Failed to upload image.');
       }
-    } catch (err) {
+    } catch {
       setUploadError('Failed to upload image. Please try again.');
     } finally {
       setUploading(false);
