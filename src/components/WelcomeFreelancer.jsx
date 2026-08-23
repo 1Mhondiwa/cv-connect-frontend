@@ -53,7 +53,7 @@ const WelcomeFreelancer = () => {
     }
   };
 
-  const handleCreateCV = async (file, formData) => {
+  const handleCreateCV = async (file) => {
     setMessage("");
     setError("");
     setUploading(true);

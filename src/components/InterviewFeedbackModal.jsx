@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../utils/axios';
 
-const InterviewFeedbackModal = ({ isOpen, onClose, interview, userType, onSubmitSuccess }) => {
+const InterviewFeedbackModal = ({ isOpen, onClose, interview, onSubmitSuccess }) => {
   const [formData, setFormData] = useState({
     technical_skills_rating: '',
     communication_rating: '',
