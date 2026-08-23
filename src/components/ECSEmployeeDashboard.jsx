@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { API_BASE_URL } from '../utils/axios';
@@ -29,7 +29,7 @@ const ECSEmployeeDashboard = () => {
   const { logout } = useAuth();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error] = useState(null);
   
   // Associate request management states
   const [associateRequests, setAssociateRequests] = useState([]);
@@ -42,26 +42,12 @@ const ECSEmployeeDashboard = () => {
     review_notes: '',
     password: ''
   });
-  
-  // Legacy associate management (keeping for backward compatibility)
-  const [associateFormData, setAssociateFormData] = useState({
-    email: '',
-    password: '',
-    confirm_password: '',
-    industry: '',
-    contact_person: '',
-    phone: '',
-    address: '',
-    website: ''
-  });
-  const [associateErrors, setAssociateErrors] = useState({});
-  const [associateLoading, setAssociateLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+
   const [associates, setAssociates] = useState([]);
   const [associatesLoading, setAssociatesLoading] = useState(false);
   const [associatesError, setAssociatesError] = useState('');
-  const [toggleLoading, setToggleLoading] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   
   // Enhanced freelancer management
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'associate-requests', 'associates', 'freelancers'
@@ -75,18 +61,12 @@ const ECSEmployeeDashboard = () => {
   const [freelancers, setFreelancers] = useState([]);
   const [freelancersLoading, setFreelancersLoading] = useState(false);
   const [freelancersError, setFreelancersError] = useState('');
-  const [freelancerFilters, setFreelancerFilters] = useState({
+  const [freelancerFilters] = useState({
     availability_status: 'all',
     approval_status: 'all',
     page: 1,
     limit: 10
   });
-  const [availabilityUpdateLoading, setAvailabilityUpdateLoading] = useState({});
-  const [approvalLoading, setApprovalLoading] = useState({});
-  const [selectedFreelancerForNotes, setSelectedFreelancerForNotes] = useState(null);
-  const [freelancerNotesModal, setFreelancerNotesModal] = useState(false);
-  const [freelancerNotes, setFreelancerNotes] = useState('');
-  const [notesLoading, setNotesLoading] = useState(false);
   
   // Enhanced statistics
   const [stats, setStats] = useState(null);
@@ -96,13 +76,6 @@ const ECSEmployeeDashboard = () => {
   // Real-time monitoring states
   const [recentHires, setRecentHires] = useState([]);
   const [recentHiresLoading, setRecentHiresLoading] = useState(false);
-  
-  // ECS Employee profile management
-  const [employeeImage, setEmployeeImage] = useState(null);
-  const [employeeImageUploading, setEmployeeImageUploading] = useState(false);
-  const [employeeImageError, setEmployeeImageError] = useState('');
-  const [employeeImageSuccess, setEmployeeImageSuccess] = useState('');
-  const employeeImageInputRef = useRef(null);
 
   // Freelancer request management
   const [freelancerRequests, setFreelancerRequests] = useState([]);
@@ -427,28 +400,6 @@ const ECSEmployeeDashboard = () => {
     }
   };
 
-  const loadFreelancerRequests = async () => {
-    setFreelancerRequestsLoading(true);
-    setFreelancerRequestsError('');
-    try {
-      const response = await api.get('/admin/freelancer-requests');
-      if (response.data.success) {
-        setFreelancerRequests(response.data.requests);
-      }
-    } catch (error) {
-      console.error('Error loading freelancer requests:', error);
-      setFreelancerRequestsError('Failed to load freelancer requests');
-    } finally {
-      setFreelancerRequestsLoading(false);
-    }
-  };
-
-
-
-
-
-
-
   // Associate Request Management Functions
   const handleReviewRequest = async (requestId) => {
     setReviewLoading(true);
@@ -531,12 +482,6 @@ const ECSEmployeeDashboard = () => {
       setAllFreelancers([]);
       setAvailableFreelancers([]);
     }
-  };
-
-  const openFreelancerRequestDetails = async (request) => {
-    setSelectedFreelancerRequest(request);
-    setShowFreelancerRequestDetailsModal(true);
-    await fetchAvailableFreelancers();
   };
 
   const openRecommendationsModal = async (request) => {
@@ -681,25 +626,6 @@ const ECSEmployeeDashboard = () => {
     }
   };
 
-  const updateRequestStatus = async (requestId, status, notes = '') => {
-    try {
-      const res = await api.put(`/admin/associate-requests/${requestId}/status`, {
-        status,
-        admin_notes: notes
-      });
-
-      if (res.data.success) {
-        alert('Request status updated successfully!');
-        fetchFreelancerRequests();
-      } else {
-        alert(res.data.message || 'Failed to update request status');
-      }
-    } catch (err) {
-      console.error('Error updating request status:', err);
-      alert(err.response?.data?.message || 'Failed to update request status');
-    }
-  };
-
     // Simple search function
   const handleSearch = () => {
     let filtered = [...allFreelancers];
@@ -739,12 +665,6 @@ const ECSEmployeeDashboard = () => {
     setAvailableFreelancers(filtered);
   };
 
-  const handleLogout = () => {
-    console.log('🚪 Logout requested');
-    logout();
-    navigate('/');
-  };
-
   const handleTabChange = (tab) => {
     console.log('🔄 Tab change requested:', tab);
     setActiveTab(tab);
@@ -752,7 +672,7 @@ const ECSEmployeeDashboard = () => {
   };
 
   // Add hover state management for better UX
-  const [hoveredTab, setHoveredTab] = useState(null);
+  const [, setHoveredTab] = useState(null);
 
   if (loading) {
     return (
@@ -2592,7 +2512,7 @@ const ECSEmployeeDashboard = () => {
                                     ));
                                   }
                                   return <p style={{ color: '#666', fontSize: 16, margin: 0 }}>No education information available</p>;
-                                } catch (e) {
+                                } catch {
                                   return <p style={{ color: '#666', fontSize: 16, margin: 0 }}>{String(selectedFreelancerProfile.education_summary)}</p>;
                                 }
                               })()}
@@ -2664,7 +2584,7 @@ const ECSEmployeeDashboard = () => {
                                     ));
                                   }
                                   return <p style={{ color: '#666', fontSize: 16, margin: 0 }}>No work history available</p>;
-                                } catch (e) {
+                                } catch {
                                   return <p style={{ color: '#666', fontSize: 16, margin: 0 }}>{String(selectedFreelancerProfile.work_history)}</p>;
                                 }
                               })()}
