@@ -171,7 +171,7 @@ const Navbar = () => {
       </nav>
       {/* Mobile Nav */}
       {open && (
-        <div className="d-md-none mobile-nav-menu">
+        <div className="d-md-none mobile-nav-menu" data-testid="mobile-nav-menu">
           <ul>
             {[...navLinks, ...authLinks].map((link) => (
               <li key={link.to}>
