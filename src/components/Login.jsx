@@ -163,6 +163,7 @@ const Login = () => {
                         padding: '5px'
                       }}
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                     </button>

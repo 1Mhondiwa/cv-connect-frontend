@@ -231,11 +231,12 @@ const Register = () => {
                 <div className="mb-3">
                   <label htmlFor="phone" style={{ fontWeight: 500, color: '#444', marginBottom: 4 }}>Phone Number</label>
                   <div className="d-flex" style={{ gap: 8 }}>
-                  <select 
+<select 
                       name="countryCode"
                       className="form-select"
                       value={form.countryCode}
-                    onChange={handleChange}
+                      onChange={handleChange}
+                      aria-label="Country code"
                       style={{
                         borderRadius: 12,
                         border: '1.5px solid #eee',
@@ -295,6 +296,7 @@ const Register = () => {
                         padding: '5px'
                       }}
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Hide main password' : 'Show main password'}
                     >
                       <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                     </button>
@@ -351,6 +353,7 @@ const Register = () => {
                         padding: '5px'
                       }}
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                     >
                       <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                     </button>
