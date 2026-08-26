@@ -137,8 +137,8 @@ const ResetPassword = () => {
               <p style={{ color: '#888', fontSize: 16, marginBottom: 28, textAlign: 'left' }}>
                 Enter your new password below. If you have a reset token, it should be pre-filled.
               </p>
-              {errorMessage && <div style={{ color: '#fff', background: '#df1529', borderRadius: 8, padding: '10px 0', marginBottom: 16, textAlign: 'center', fontWeight: 500 }}>{errorMessage}</div>}
-              {successMessage && <div style={{ color: '#fff', background: '#059652', borderRadius: 8, padding: '10px 0', marginBottom: 16, textAlign: 'center', fontWeight: 500 }}>{successMessage}</div>}
+              {errorMessage && <div data-testid="error-message" style={{ color: '#fff', background: '#df1529', borderRadius: 8, padding: '10px 0', marginBottom: 16, textAlign: 'center', fontWeight: 500 }}>{errorMessage}</div>}
+              {successMessage && <div data-testid="success-message" style={{ color: '#fff', background: '#059652', borderRadius: 8, padding: '10px 0', marginBottom: 16, textAlign: 'center', fontWeight: 500 }}>{successMessage}</div>}
               <form onSubmit={handleSubmit} autoComplete="off">
                 <div className="mb-3">
                   <label htmlFor="token" style={{ fontWeight: 500, color: '#444', marginBottom: 4 }}>Reset Token</label>
@@ -184,6 +184,7 @@ const ResetPassword = () => {
                       }}
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={loading}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       <i className={`bi ${showPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                     </button>
@@ -242,6 +243,7 @@ const ResetPassword = () => {
                       }}
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       disabled={loading}
+                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                     >
                       <i className={`bi ${showConfirmPassword ? 'bi-eye-slash' : 'bi-eye'}`}></i>
                     </button>
