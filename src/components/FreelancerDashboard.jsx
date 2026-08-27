@@ -382,7 +382,6 @@ const FreelancerDashboard = () => {
     } else if (activeTab === 'contracts') {
       fetchContracts();
     }
-     
   }, [activeTab]);
 
 
