@@ -45,7 +45,6 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
   const startCall = async () => {
     try {
       setError('');
-      console.log('Starting video call...');
       
       // Check if getUserMedia is supported
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -68,9 +67,7 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
       let lastError;
       for (let i = 0; i < mediaConfigs.length; i++) {
         try {
-          console.log(`Trying media config ${i + 1}:`, mediaConfigs[i]);
           stream = await navigator.mediaDevices.getUserMedia(mediaConfigs[i]);
-          console.log('Successfully got media stream:', stream);
           break;
         } catch (err) {
           console.warn(`Media config ${i + 1} failed:`, err);
@@ -93,7 +90,6 @@ const VideoCallModal = ({ isOpen, onClose, interview, userType }) => {
       }
 
 // Simulate connection for demo purposes
-      console.log('Video call started successfully');
 
       // Simulate freelancer joining after a delay
       setTimeout(() => {

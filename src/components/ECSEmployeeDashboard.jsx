@@ -249,7 +249,6 @@ const ECSEmployeeDashboard = () => {
     
     if (activeTab === 'dashboard') {
       intervalId = setInterval(() => {
-        console.log('🔄 Auto-refreshing home tab data...');
         fetchRecentHires();
         fetchPendingFreelancerRequestsCount(); // Refresh pending freelancer requests count
       }, 2 * 60 * 1000); // 2 minutes
@@ -404,14 +403,7 @@ const ECSEmployeeDashboard = () => {
   const handleReviewRequest = async (requestId) => {
     setReviewLoading(true);
     try {
-      console.log('🔍 Sending review request:', {
-        url: `/associate-request/requests/${requestId}/review`,
-        data: reviewFormData,
-        requestId
-      });
-      
       const res = await api.put(`/associate-request/requests/${requestId}/review`, reviewFormData);
-      console.log('✅ Review response:', res.data);
       
       if (res.data.success) {
         // Refresh the requests list
@@ -485,7 +477,6 @@ const ECSEmployeeDashboard = () => {
   };
 
   const openRecommendationsModal = async (request) => {
-    console.log('🔍 Opening recommendations modal for request:', request);
     setSelectedFreelancerRequest(request);
     setShowRecommendationsModal(true);
     setSelectedFreelancers([]);
@@ -493,9 +484,7 @@ const ECSEmployeeDashboard = () => {
     setAdminNotes('');
     
     // Fetch all freelancers when opening recommendations modal
-    console.log('🔍 Fetching freelancers...');
     await fetchAvailableFreelancers();
-    console.log('🔍 Freelancers fetched, modal should show data now');
     
     // Disable AOS animations for the modal and its contents
     setTimeout(() => {
@@ -517,17 +506,14 @@ const ECSEmployeeDashboard = () => {
   };
 
   const handleFreelancerSelection = (freelancerId, isSelected) => {
-    console.log('🔍 handleFreelancerSelection called:', { freelancerId, isSelected });
     if (isSelected) {
       setSelectedFreelancers(prev => {
         const newSelection = [...prev, freelancerId];
-        console.log('🔍 Added freelancer to selection:', newSelection);
         return newSelection;
       });
     } else {
       setSelectedFreelancers(prev => {
         const newSelection = prev.filter(id => id !== freelancerId);
-        console.log('🔍 Removed freelancer from selection:', newSelection);
         return newSelection;
       });
     }
@@ -549,7 +535,6 @@ const ECSEmployeeDashboard = () => {
     // Fetch detailed profile data
     setFreelancerProfileLoading(true);
     try {
-      console.log('🔍 Fetching detailed profile for freelancer:', freelancer.freelancer_id);
       const res = await api.get(`/admin/freelancers/${freelancer.freelancer_id}/profile`);
       if (res.data.success) {
         setSelectedFreelancerProfile(res.data.freelancer);
@@ -589,13 +574,6 @@ const ECSEmployeeDashboard = () => {
 
     setRecommendationsLoading(true);
     try {
-      console.log('🔍 Submitting recommendations:', {
-        requestId: selectedFreelancerRequest.request_id,
-        freelancerIds: selectedFreelancers,
-        adminNotes: adminNotes,
-        highlightedFreelancers: highlightedFreelancers
-      });
-
       const res = await api.post(`/admin/associate-requests/${selectedFreelancerRequest.request_id}/recommendations`, {
         freelancer_ids: selectedFreelancers,
         admin_notes: adminNotes,
@@ -603,7 +581,6 @@ const ECSEmployeeDashboard = () => {
       });
 
       if (res.data.success) {
-        console.log('✅ Recommendations submitted successfully:', res.data);
         setRecommendationSuccessMessage(`Successfully submitted ${selectedFreelancers.length} recommendation${selectedFreelancers.length !== 1 ? 's' : ''}!`);
         setShowRecommendationsModal(false);
         setSelectedFreelancers([]);
@@ -666,7 +643,6 @@ const ECSEmployeeDashboard = () => {
   };
 
   const handleTabChange = (tab) => {
-    console.log('🔄 Tab change requested:', tab);
     setActiveTab(tab);
     window.scrollTo(0, 0);
   };
@@ -1909,7 +1885,6 @@ const ECSEmployeeDashboard = () => {
                             placeholder="e.g., React, Node.js"
                             value={searchSkills}
                             onChange={(e) => {
-                              console.log('🔍 Skills search input changed:', e.target.value);
                               setSearchSkills(e.target.value);
                             }}
                           />
@@ -1922,7 +1897,6 @@ const ECSEmployeeDashboard = () => {
                             placeholder="e.g., 3"
                             value={searchExperience}
                             onChange={(e) => {
-                              console.log('🔍 Experience search input changed:', e.target.value);
                               setSearchExperience(e.target.value);
                             }}
                             min="0"
@@ -1934,7 +1908,6 @@ const ECSEmployeeDashboard = () => {
                             className="form-select"
                             value={searchStatus}
                             onChange={(e) => {
-                              console.log('🔍 Status search input changed:', e.target.value);
                               setSearchStatus(e.target.value);
                             }}
                           >
@@ -1967,7 +1940,6 @@ const ECSEmployeeDashboard = () => {
                                 setTimeout(() => {
                                   e.target.style.transform = 'scale(1)';
                                 }, 100);
-                                console.log('🔍 Search button clicked');
                                 handleSearch();
                               }}
                             >
@@ -1997,7 +1969,6 @@ const ECSEmployeeDashboard = () => {
                                 setSearchExperience('');
                                 setSearchStatus('all');
                                 setAvailableFreelancers(allFreelancers);
-                                console.log('🔄 Search reset - showing all freelancers:', allFreelancers.length);
                               }}
                             >
                               <i className="bi bi-arrow-clockwise"></i>

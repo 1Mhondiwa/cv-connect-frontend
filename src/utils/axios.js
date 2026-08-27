@@ -35,13 +35,10 @@ api.interceptors.response.use(
       // Don't clear tokens for other 401 errors (like permission denied)
       const errorMessage = error.response?.data?.message || '';
       
-      console.log('401 Error received:', errorMessage);
-      
       if (errorMessage.includes('Token expired') || 
           errorMessage.includes('Invalid token') || 
           errorMessage.includes('Authentication required')) {
         
-        console.log('Clearing tokens due to authentication error');
         // Token expired or invalid
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -50,8 +47,6 @@ api.interceptors.response.use(
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
-      } else {
-        console.log('401 error but not clearing tokens:', errorMessage);
       }
     }
     return Promise.reject(error);

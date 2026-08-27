@@ -174,7 +174,6 @@ const ESCAdminDashboard = () => {
 
   // Fetch visitor data for dashboard chart
   const fetchVisitorData = useCallback(async (forceRefresh = false) => {
-    console.log('🚀 fetchVisitorData called with timeRange:', timeRange, 'forceRefresh:', forceRefresh);
     setVisitorDataLoading(true);
     try {
       // Calculate days based on time range
@@ -188,7 +187,6 @@ const ESCAdminDashboard = () => {
       };
       
       const days = getDaysFromTimeRange(timeRange);
-      console.log(`📅 Fetching visitor data for last ${days} days (timeRange: ${timeRange})`);
       
       // Add cache busting parameter to ensure fresh data
       const cacheBuster = forceRefresh ? Date.now() : Math.floor(Date.now() / 1000); // Use seconds for normal calls, milliseconds for force refresh
@@ -220,15 +218,9 @@ const ESCAdminDashboard = () => {
           };
         });
         
-        console.log('📊 Visitor data structure:', response.data.data);
-        console.log('📊 Formatted chart data:', formattedData);
-        console.log('🔄 Updating chart with fresh data:', formattedData.length, 'records');
         setVisitorData(formattedData);
         setFilteredChartData(formattedData); // Update the chart data immediately
         
-        if (forceRefresh) {
-          console.log('✅ Data refreshed successfully with force refresh');
-        }
       } else {
         console.error('Failed to fetch visitor data:', response.data.message);
         // Set fallback data if API fails
@@ -284,52 +276,33 @@ const ESCAdminDashboard = () => {
 
   // Fetch visitor data when dashboard tab is activated
   useEffect(() => {
-    console.log('🔄 Dashboard tab useEffect triggered:', { activeTab });
     if (activeTab === 'dashboard') {
-      console.log('📊 Dashboard tab activated, fetching visitor data');
       fetchVisitorData();
     }
   }, [activeTab, fetchVisitorData]);
 
   // Refetch visitor data when time range changes
   useEffect(() => {
-    console.log('🔄 TimeRange useEffect triggered:', { activeTab, timeRange });
     if (activeTab === 'dashboard') {
-      console.log('📊 Time range changed, fetching visitor data for timeRange:', timeRange);
       fetchVisitorData();
     }
   }, [timeRange, fetchVisitorData]);
 
   // Debug filteredChartData changes
   useEffect(() => {
-    console.log('🔍 filteredChartData state changed:', {
-      length: filteredChartData.length
-    });
   }, [filteredChartData]);
 
   // Fetch CV upload data when analytics tab is opened or filter changes
   useEffect(() => {
-    console.log('🔄 CV Upload useEffect triggered:', { 
-      activeTab, 
-      startDate: cvUploadDateFilter.startDate, 
-      endDate: cvUploadDateFilter.endDate 
-    });
     if (activeTab === 'analytics') {
       if (cvUploadDateFilter.startDate && cvUploadDateFilter.endDate) {
-        console.log('🚀 Auto-fetching CV upload data...');
         fetchCVUploadData();
-      } else {
-        console.log('⚠️ CV upload filter not initialized yet');
       }
     }
   }, [cvUploadDateFilter, activeTab]);
 
   // Debug CV upload trends data changes
   useEffect(() => {
-    console.log('📊 CV Upload Trends data changed:', {
-      length: analyticsData.cvUploadTrends?.length,
-      data: analyticsData.cvUploadTrends
-    });
   }, [analyticsData.cvUploadTrends]);
 
   // Fetch associates on mount
@@ -337,7 +310,7 @@ const ESCAdminDashboard = () => {
     if (!loading && !error) {
       fetchAssociates();
     }
-    // eslint-disable-next-line
+     
   }, [loading, error]);
 
   // Fetch freelancers when freelancers tab is activated
@@ -377,7 +350,6 @@ const ESCAdminDashboard = () => {
     if (activeTab === 'analytics') {
       // Set up auto-refresh every 5 minutes (300,000 milliseconds)
       intervalId = setInterval(() => {
-        console.log('🔄 Auto-refreshing analytics data...');
         fetchAnalyticsData();
       }, 5 * 60 * 1000);
     }
@@ -413,7 +385,6 @@ const ESCAdminDashboard = () => {
     if (activeTab === 'dashboard') {
       // Set up auto-refresh every 5 minutes (300,000 milliseconds)
       intervalId = setInterval(() => {
-        console.log('🔄 Auto-refreshing visitor data...');
         fetchVisitorData();
       }, 5 * 60 * 1000);
     }
@@ -433,7 +404,7 @@ const ESCAdminDashboard = () => {
       fetchHiredFreelancersCount(); // Add hired freelancers count
       // Note: fetchVisitorData() is handled by the timeRange useEffect to avoid conflicts
     }
-    // eslint-disable-next-line
+     
   }, [activeTab]);
 
   // Auto-refresh hired freelancers count every 2 minutes when dashboard tab is active
@@ -443,7 +414,6 @@ const ESCAdminDashboard = () => {
     if (activeTab === 'dashboard') {
       // Set up auto-refresh every 2 minutes (120,000 milliseconds)
       intervalId = setInterval(() => {
-        console.log('🔄 Auto-refreshing hired freelancers count...');
         fetchHiredFreelancersCount();
       }, 2 * 60 * 1000);
     }
@@ -458,13 +428,8 @@ const ESCAdminDashboard = () => {
 
   // Auto-generate reports when report section changes
   useEffect(() => {
-    console.log('🔄 useEffect triggered - activeReportSection:', activeReportSection);
-    console.log('🔄 Current reportsData:', reportsData);
     if (activeReportSection && !reportsData[activeReportSection]) {
-      console.log('🔄 Generating report for section:', activeReportSection);
       generateComprehensiveReport();
-    } else {
-      console.log('🔄 Report data already exists for section:', activeReportSection);
     }
   }, [activeReportSection]);
 
@@ -586,37 +551,28 @@ const ESCAdminDashboard = () => {
   const fetchCVUploadData = async () => {
     setCvUploadFilterLoading(true);
     try {
-      console.log('🔍 Fetching CV upload data with filter:', cvUploadDateFilter);
       
       let queryParams = '';
       if (cvUploadDateFilter.type === 'custom' && cvUploadDateFilter.startDate && cvUploadDateFilter.endDate) {
         queryParams = `?start_date=${cvUploadDateFilter.startDate}&end_date=${cvUploadDateFilter.endDate}`;
-        console.log('📅 Using custom date range:', cvUploadDateFilter.startDate, 'to', cvUploadDateFilter.endDate);
       } else {
         queryParams = `?days=${cvUploadDateFilter.days}`;
-        console.log('📅 Using days filter:', cvUploadDateFilter.days, 'days');
       }
       
-      console.log('🌐 Making API call to:', `/admin/analytics/cv-upload-trends${queryParams}`);
       const response = await api.get(`/admin/analytics/cv-upload-trends${queryParams}`);
       
-      console.log('📊 API Response:', response.data);
       
       if (response.data.success) {
-        console.log('📊 Raw API data:', response.data.data);
         const formattedData = formatTrendsData(response.data.data);
-        console.log('📈 Formatted data before setting state:', formattedData);
         
         setAnalyticsData(prev => {
           const newData = {
             ...prev,
             cvUploadTrends: formattedData
           };
-          console.log('🔄 Updated analytics data:', newData.cvUploadTrends);
           return newData;
         });
         
-        console.log('✅ CV upload data fetched successfully:', formattedData.length, 'records');
       } else {
         console.error('❌ CV upload data fetch failed:', response.data.message);
       }
@@ -638,10 +594,7 @@ const ESCAdminDashboard = () => {
   const applyCVUploadDateFilter = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('🔍 Apply button clicked!');
-    console.log('📅 Current filter state:', cvUploadDateFilter);
     alert('Apply button clicked! Check console for details.');
-    console.log('🚀 Starting CV upload data fetch...');
     fetchCVUploadData();
   };
 
@@ -651,7 +604,6 @@ const ESCAdminDashboard = () => {
     setAnalyticsError('');
     
     try {
-      console.log('🚀 Fetching analytics data...');
 
       // Calculate days based on time range
       const getDaysFromTimeRange = (range) => {
@@ -665,7 +617,6 @@ const ESCAdminDashboard = () => {
       };
       
       const days = getDaysFromTimeRange(timeRange);
-      console.log(`📅 Fetching data for last ${days} days`);
       
       // Fetch all analytics data in parallel
       const [
@@ -692,17 +643,6 @@ const ESCAdminDashboard = () => {
         api.get(`/admin/analytics/hired-freelancers-trends?days=${days}`)
       ]);
       
-      console.log('📊 API Responses received:', {
-        registration: registrationResponse.data.success,
-        userType: userTypeResponse.data.success,
-        userActivity: userActivityResponse.data.success,
-        cvUpload: cvUploadResponse.data.success,
-        topSkills: topSkillsResponse.data.success,
-
-        messageTrends: messageTrendsResponse.data.success,
-        communicationActivity: communicationActivityResponse.data.success,
-        hiredFreelancers: hiredFreelancersTrendsResponse.data.success
-      });
       
       // Use the shared formatTrendsData function
       
@@ -719,31 +659,14 @@ const ESCAdminDashboard = () => {
         hiredFreelancersTrends: formatTrendsData(hiredFreelancersTrendsResponse.data.data)
       };
       
-      console.log('📊 Formatted analytics data:', {
-        registrationTrends: analyticsData.registrationTrends.length,
-        cvUploadTrends: analyticsData.cvUploadTrends.length,
-        messageTrends: analyticsData.messageTrends.length,
-        hiredFreelancersTrends: analyticsData.hiredFreelancersTrends.length,
-        userTypeDistribution: analyticsData.userTypeDistribution.length,
-        topSkills: analyticsData.topSkills.length,
-
-        userCommunicationActivity: analyticsData.userCommunicationActivity.length
-      });
       
       setAnalyticsData(analyticsData);
       // Store raw hired data for per-graph filtering without refetching
       setHiredDataRaw(analyticsData.hiredFreelancersTrends || []);
       setLastAnalyticsUpdate(new Date());
       setAnalyticsDataReady(true);
-      console.log('✅ Analytics data updated successfully');
       
       // Debug registration trends data
-      console.log('🔍 Registration Trends Debug:', {
-        rawData: registrationResponse.data,
-        formattedData: analyticsData.registrationTrends,
-        sampleItem: analyticsData.registrationTrends[0],
-        dataLength: analyticsData.registrationTrends.length
-      });
       
 
       
@@ -794,8 +717,6 @@ const ESCAdminDashboard = () => {
     setReportsLoading(true);
     setReportsError('');
     try {
-      console.log('📊 Generating comprehensive report...');
-      console.log('📊 Current activeReportSection:', activeReportSection);
       
       // Fetch all report data in parallel
       const [performanceRes, businessRes, securityRes, operationsRes] = await Promise.all([
@@ -805,12 +726,6 @@ const ESCAdminDashboard = () => {
         api.get('/admin/reports/operations')
       ]);
 
-      console.log('📊 API Responses:', {
-        performance: performanceRes.data,
-        business: businessRes.data,
-        security: securityRes.data,
-        operations: operationsRes.data
-      });
 
       // Update reports data
       setReportsData({
@@ -821,13 +736,6 @@ const ESCAdminDashboard = () => {
       });
 
       setLastReportUpdate(new Date());
-      console.log('✅ Comprehensive report generated successfully');
-      console.log('✅ Updated reportsData:', {
-        performance: performanceRes.data.success ? performanceRes.data.data : null,
-        business: businessRes.data.success ? businessRes.data.data : null,
-        security: securityRes.data.success ? securityRes.data.data : null,
-        operations: operationsRes.data.success ? operationsRes.data.data : null
-      });
     } catch (error) {
       console.error('❌ Error generating comprehensive report:', error);
       setReportsError('Failed to generate comprehensive report. Please try again.');
@@ -841,7 +749,6 @@ const ESCAdminDashboard = () => {
       };
       
       setReportsData(fallbackData);
-      console.log('✅ Fallback data set:', fallbackData);
     } finally {
       setReportsLoading(false);
     }
@@ -868,7 +775,6 @@ const ESCAdminDashboard = () => {
       link.click();
       URL.revokeObjectURL(url);
       
-      console.log('✅ Report data exported successfully');
     } catch (error) {
       console.error('❌ Error exporting report data:', error);
       alert('Failed to export report data. Please try again.');
@@ -881,13 +787,11 @@ const ESCAdminDashboard = () => {
     setInterviewAnalyticsError('');
 
     try {
-      console.log(`🎯 Fetching interview feedback analytics for last ${interviewTimeRange} days`);
       
       const response = await api.get(`/admin/analytics/interview-feedback?timeRange=${interviewTimeRange}`);
       
       if (response.data.success) {
         setInterviewAnalytics(response.data.data);
-        console.log('✅ Interview analytics fetched successfully:', response.data.data);
       } else {
         setInterviewAnalyticsError('Failed to fetch interview analytics data');
       }
@@ -904,7 +808,6 @@ const ESCAdminDashboard = () => {
     setSecurityLoading(true);
     setSecurityError('');
     try {
-      console.log(`🔒 Fetching security data for section: ${section}`);
       
       let response;
       switch (section) {
@@ -930,7 +833,6 @@ const ESCAdminDashboard = () => {
           [section]: response.data.data
         }));
         setLastSecurityUpdate(new Date());
-        console.log(`✅ Security data fetched for ${section}`);
       } else {
         throw new Error(response.data.message || 'Failed to fetch security data');
       }
@@ -952,7 +854,6 @@ const ESCAdminDashboard = () => {
 
   const flagMessage = async (messageId, flagReason, adminNotes) => {
     try {
-      console.log(`🚩 Flagging message ${messageId} with reason: ${flagReason}`);
       
       const response = await api.post('/admin/security/flag-message', {
         messageId,
@@ -961,7 +862,6 @@ const ESCAdminDashboard = () => {
       });
 
       if (response.data.success) {
-        console.log('✅ Message flagged successfully');
         // Refresh communications data
         if (activeSecuritySection === 'communications') {
           fetchSecurityData('communications');
@@ -981,22 +881,14 @@ const ESCAdminDashboard = () => {
   const fetchHiredFreelancersCount = async () => {
     try {
       setHiredFreelancersLoading(true);
-      console.log('🔍 Fetching hired freelancers count...');
       
       const response = await api.get('/hiring/stats');
       
-      console.log('🔍 API Response:', response.data);
-      console.log('🔍 Response structure:', {
-        success: response.data.success,
-        stats: response.data.stats,
-        total_hires: response.data.stats?.total_hires
-      });
       
       if (response.data.success) {
         const count = response.data.stats.total_hires || 0;
         setHiredFreelancersCount(count);
         setLastHiredFreelancersUpdate(new Date());
-        console.log('✅ Hired freelancers count updated:', count);
       } else {
         console.error('❌ Failed to fetch hired freelancers count:', response.data.message);
         setHiredFreelancersCount(0);
@@ -1044,7 +936,6 @@ const ESCAdminDashboard = () => {
   };
 
   const openRecommendationsModal = async (request) => {
-    console.log('🔍 Opening recommendations modal for request:', request);
     setSelectedFreelancerRequest(request);
     setShowRecommendationsModal(true);
     setSelectedFreelancers([]);
@@ -1052,23 +943,18 @@ const ESCAdminDashboard = () => {
     setAdminNotes('');
     
     // Fetch all freelancers when opening recommendations modal
-    console.log('🔍 Fetching freelancers...');
     await fetchAvailableFreelancers();
-    console.log('🔍 Freelancers fetched, modal should show data now');
   };
 
   const handleFreelancerSelection = (freelancerId, isSelected) => {
-    console.log('🔍 handleFreelancerSelection called:', { freelancerId, isSelected });
     if (isSelected) {
       setSelectedFreelancers(prev => {
         const newSelection = [...prev, freelancerId];
-        console.log('🔍 Added freelancer to selection:', newSelection);
         return newSelection;
       });
     } else {
       setSelectedFreelancers(prev => {
         const newSelection = prev.filter(id => id !== freelancerId);
-        console.log('🔍 Removed freelancer from selection:', newSelection);
         return newSelection;
       });
     }
@@ -1121,65 +1007,37 @@ const ESCAdminDashboard = () => {
         const hasHeadline = f.headline?.toLowerCase().includes(searchSkills.toLowerCase());
         return hasSkills || hasHeadline;
       });
-      console.log('🔍 After skills filter:', filtered.length);
     }
     
     // Filter by experience
     if (searchExperience.trim()) {
-      console.log('🔍 Filtering by experience:', searchExperience);
       const minExp = parseInt(searchExperience);
       if (!isNaN(minExp)) {
         filtered = filtered.filter(f => {
           const experience = f.experience_years || 0;
           const matches = experience >= minExp;
           
-          console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
-            experience,
-            minRequired: minExp,
-            matches
-          });
           
           return matches;
         });
-        console.log('🔍 After experience filter:', filtered.length);
       }
     }
     
     // Filter by status
     if (searchStatus === 'available') {
-      console.log('🔍 Filtering by status: available');
       filtered = filtered.filter(f => {
         const matches = f.is_available;
-        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
-          is_available: f.is_available,
-          matches
-        });
         return matches;
       });
-      console.log('🔍 After status filter (available):', filtered.length);
     } else if (searchStatus === 'approved') {
-      console.log('🔍 Filtering by status: approved');
       filtered = filtered.filter(f => {
         const matches = f.is_approved;
-        console.log(`🔍 Freelancer ${f.first_name} ${f.last_name}:`, {
-          is_approved: f.is_approved,
-          matches
-        });
         return matches;
       });
-      console.log('🔍 After status filter (approved):', filtered.length);
     }
     
-    console.log('🔍 Final filtered results:', filtered.length);
-    console.log('🔍 Sample filtered results:', filtered.slice(0, 3));
     
     setAvailableFreelancers(filtered);
-    console.log('🔍 Search completed:', { 
-      skills: searchSkills, 
-      experience: searchExperience, 
-      status: searchStatus, 
-      results: filtered.length 
-    });
   };
 
   // Reset search to show all freelancers
@@ -1188,7 +1046,6 @@ const ESCAdminDashboard = () => {
     setSearchExperience('');
     setSearchStatus('');
     setAvailableFreelancers(allFreelancers);
-    console.log('🔍 Search reset - showing all freelancers');
   };
 
 
@@ -1792,7 +1649,6 @@ const ESCAdminDashboard = () => {
                               type="button"
                               className={`btn btn-sm ${timeRange === '90d' ? '' : ''}`}
                               onClick={() => {
-                                console.log('🔄 Last 3 months button clicked, setting timeRange to 90d');
                                 setTimeRange('90d');
                               }}
                               style={{ 
@@ -1810,7 +1666,6 @@ const ESCAdminDashboard = () => {
                               type="button"
                               className={`btn btn-sm ${timeRange === '30d' ? '' : ''}`}
                               onClick={() => {
-                                console.log('🔄 Last 30 days button clicked, setting timeRange to 30d');
                                 setTimeRange('30d');
                               }}
                               style={{ 
@@ -1828,7 +1683,6 @@ const ESCAdminDashboard = () => {
                               type="button"
                               className={`btn btn-sm ${timeRange === '7d' ? '' : ''}`}
                               onClick={() => {
-                                console.log('🔄 Last 7 days button clicked, setting timeRange to 7d');
                                 setTimeRange('7d');
                               }}
                               style={{ 
@@ -2123,7 +1977,6 @@ const ESCAdminDashboard = () => {
                             {/* Analytics Content - Only show when data is ready */}
               {analyticsDataReady && (
                 <>
-                  {console.log('🔍 RENDERING ANALYTICS SECTION - REACHED THIS POINT')}
                   
                   {/* Skills Supply vs Demand - Bar Chart (TOP PRIORITY) */}
                   <div className="row g-4 mb-4">
@@ -2175,14 +2028,6 @@ const ESCAdminDashboard = () => {
                                 const supplyData = analyticsData.topSkills || [];
                                 const demandData = analyticsData.skillsDemand || [];
 
-                                console.log('🔍 Skills Data:', {
-                                  supply: supplyData.length,
-                                  demand: demandData.length,
-                                  supplySample: supplyData[0],
-                                  demandSample: demandData[0],
-                                  supplyData: supplyData,
-                                  demandData: demandData
-                                });
 
                                 // Check if we have any data
                                 if (supplyData.length === 0 && demandData.length === 0) {
@@ -2200,12 +2045,10 @@ const ESCAdminDashboard = () => {
                                 const skillMap = new Map();
                                 
                                 // Add supply data
-                                console.log('🔍 Processing Supply Data:', supplyData);
                                 supplyData.forEach(item => {
                                   if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
                                     const skill = item.skill.toLowerCase();
                                     const count = parseInt(item.count);
-                                    console.log(`🔍 Adding supply skill: "${skill}" with count: ${count}`);
                                     skillMap.set(skill, {
                                       skill: item.skill,
                                       supply: count,
@@ -2216,12 +2059,10 @@ const ESCAdminDashboard = () => {
                                 });
 
                                 // Add demand data
-                                console.log('🔍 Processing Demand Data:', demandData);
                                 demandData.forEach(item => {
                                   if (item && item.skill && (typeof item.count === 'number' || !isNaN(parseInt(item.count)))) {
                                     const skill = item.skill.toLowerCase();
                                     const count = parseInt(item.count);
-                                    console.log(`🔍 Processing demand skill: "${skill}" with count: ${count}`);
                                     
                                     // Try to find matching skill in supply data
                                     let matchedSkill = null;
@@ -2231,7 +2072,6 @@ const ESCAdminDashboard = () => {
                                           existingSkill.includes(skill) ||
                                           skill.replace(/[^a-z]/g, '') === existingSkill.replace(/[^a-z]/g, '')) {
                                         matchedSkill = existingSkill;
-                                        console.log(`🔍 Matched skill: "${skill}" -> "${existingSkill}"`);
                                         break;
                                       }
                                     }
@@ -2239,7 +2079,6 @@ const ESCAdminDashboard = () => {
                                     if (matchedSkill) {
                                       skillMap.get(matchedSkill).demand = count;
                                     } else {
-                                      console.log(`🔍 No match found for skill: "${skill}", adding as new skill`);
                                       skillMap.set(skill, {
                                         skill: item.skill,
                                         supply: 0,
@@ -2273,11 +2112,6 @@ const ESCAdminDashboard = () => {
                                   .sort((a, b) => b.total - a.total)
                                   .slice(0, skillsLimit);
 
-                                console.log('🔍 Combined Skills Data:', combinedData);
-                                console.log('🔍 Skill Map Entries:', Array.from(skillMap.entries()));
-                                console.log('🔍 Filtered Data Before Limit:', filteredData);
-                                console.log('🔍 Skills Filter:', skillsFilter);
-                                console.log('🔍 Skills Limit:', skillsLimit);
 
                                 if (combinedData.length === 0) {
                               return (
@@ -2327,9 +2161,6 @@ const ESCAdminDashboard = () => {
                                     demandColor: '#10b981'
                                   }));
 
-                                console.log('🔍 Supply Chart Data:', supplyChartData);
-                                console.log('🔍 Demand Chart Data:', allDemandSkills);
-                                console.log('🔍 Balanced Skills Data:', balancedSkillsData);
                                 
                                 // Calculate summary statistics
                                 const totalSupply = Array.from(skillMap.values()).reduce((sum, item) => sum + item.supply, 0);
@@ -2337,13 +2168,6 @@ const ESCAdminDashboard = () => {
                                 const totalSkills = Array.from(skillMap.values()).length;
                                 const balancedSkills = Array.from(skillMap.values()).filter(item => item.supply > 0 && item.demand > 0).length;
                                 
-                                console.log('📊 Summary Statistics:', {
-                                  totalSupply,
-                                  totalDemand,
-                                  totalSkills,
-                                  balancedSkills,
-                                  skillsShown: Math.min(totalSkills, skillsLimit)
-                                });
 
                                 return (
                                   <div>
@@ -2634,12 +2458,6 @@ const ESCAdminDashboard = () => {
                         <div className="card-body">
                               {(() => {
                                 // Debug: Log the actual data structure
-                                console.log('🔍 Hired Freelancers Trends Data:', {
-                                  exists: !!analyticsData.hiredFreelancersTrends,
-                                  length: analyticsData.hiredFreelancersTrends?.length,
-                                  sample: analyticsData.hiredFreelancersTrends?.[0],
-                                  allData: analyticsData.hiredFreelancersTrends
-                                });
 
                                 // Validate data structure
                                 if (!analyticsData.hiredFreelancersTrends || analyticsData.hiredFreelancersTrends.length === 0) {
@@ -2676,11 +2494,6 @@ const ESCAdminDashboard = () => {
                                   item.completed_hires !== null
                                 );
 
-                                console.log('🔍 Valid Hired Freelancers Data:', {
-                                  originalLength: analyticsData.hiredFreelancersTrends.length,
-                                  validLength: validData.length,
-                                  validData: validData
-                                });
 
                                 if (validData.length === 0) {
                                   return (
@@ -2719,7 +2532,6 @@ const ESCAdminDashboard = () => {
                                   completed_hires: hiredSeries.completed ? item.completed_hires : 0
                                 }));
 
-                                console.log('🔍 Hired Freelancers Chart - About to render with data:', seriesFiltered);
                                 return (
                                   <ResponsiveContainer width="100%" height={300}>
                                     <AreaChart data={seriesFiltered}>
@@ -2778,12 +2590,6 @@ const ESCAdminDashboard = () => {
                     <div className="card-body">
                           {(() => {
                             // Debug: Log the actual data structure
-                            console.log('🔍 User Type Distribution Data:', {
-                              exists: !!analyticsData.userTypeDistribution,
-                              length: analyticsData.userTypeDistribution?.length,
-                              sample: analyticsData.userTypeDistribution?.[0],
-                              allData: analyticsData.userTypeDistribution
-                            });
 
                             // Validate data structure
                             if (!analyticsData.userTypeDistribution || analyticsData.userTypeDistribution.length === 0) {
@@ -2810,11 +2616,6 @@ const ESCAdminDashboard = () => {
                               item.count !== null
                             );
 
-                            console.log('🔍 Valid User Type Data:', {
-                              originalLength: analyticsData.userTypeDistribution.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
 
                             if (validData.length === 0) {
                               return (
@@ -2828,7 +2629,6 @@ const ESCAdminDashboard = () => {
                               );
                             }
 
-                            console.log('🔍 FINAL User Type Distribution Data for Chart:', validData);
                             return (
                         <ResponsiveContainer width="100%" height={250}>
                           <PieChart>
@@ -2863,12 +2663,6 @@ const ESCAdminDashboard = () => {
                     <div className="card-body">
                           {(() => {
                             // Debug: Log the actual data structure
-                            console.log('🔍 User Activity Status Data:', {
-                              exists: !!analyticsData.userActivityStatus,
-                              length: analyticsData.userActivityStatus?.length,
-                              sample: analyticsData.userActivityStatus?.[0],
-                              allData: analyticsData.userActivityStatus
-                            });
 
                             // Validate data structure
                             if (!analyticsData.userActivityStatus || analyticsData.userActivityStatus.length === 0) {
@@ -2891,11 +2685,6 @@ const ESCAdminDashboard = () => {
                               item.count >= 0
                             );
 
-                            console.log('🔍 Valid User Activity Data:', {
-                              originalLength: analyticsData.userActivityStatus.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
 
                             if (validData.length === 0) {
                               return (
@@ -3057,11 +2846,6 @@ const ESCAdminDashboard = () => {
                               item.uploads !== null
                             );
                           
-                            console.log('🔍 Valid CV Upload Data:', {
-                              originalLength: analyticsData.cvUploadTrends.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
 
                             if (validData.length === 0) {
                               return (
@@ -3075,9 +2859,6 @@ const ESCAdminDashboard = () => {
                               );
                           }
                           
-                                                      console.log('🔍 CV Upload Chart - About to render with data:', validData);
-                            console.log('🔍 Chart data keys:', validData.length > 0 ? Object.keys(validData[0]) : 'No data');
-                            console.log('🔍 First data item:', validData[0]);
                           return (
                             <ResponsiveContainer width="100%" height={300}>
                                 <AreaChart data={validData} key={validData.length}>
@@ -3377,12 +3158,6 @@ const ESCAdminDashboard = () => {
                     <div className="card-body">
                       {(() => {
                             // Debug: Log the actual data structure
-                            console.log('🔍 Communication Trends Data:', {
-                              exists: !!analyticsData.messageTrends,
-                              length: analyticsData.messageTrends?.length,
-                              sample: analyticsData.messageTrends?.[0],
-                              allData: analyticsData.messageTrends
-                            });
 
                             // Validate data structure
                             if (!analyticsData.messageTrends || analyticsData.messageTrends.length === 0) {
@@ -3414,11 +3189,6 @@ const ESCAdminDashboard = () => {
                               item.conversations !== null
                             );
 
-                            console.log('🔍 Valid Communication Trends Data:', {
-                              originalLength: analyticsData.messageTrends.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
 
                             if (validData.length === 0) {
                           return (
@@ -3456,7 +3226,6 @@ const ESCAdminDashboard = () => {
                               conversations: commSeries.conversations ? item.conversations : 0
                             }));
 
-                            console.log('🔍 Communication Trends Chart - About to render with data:', seriesFiltered);
                           return (
                             <ResponsiveContainer width="100%" height={300}>
                                 <AreaChart data={seriesFiltered}>
@@ -3507,12 +3276,6 @@ const ESCAdminDashboard = () => {
                     <div className="card-body">
                       {(() => {
                             // Debug: Log the actual data structure
-                            console.log('🔍 User Communication Activity Data:', {
-                              exists: !!analyticsData.userCommunicationActivity,
-                              length: analyticsData.userCommunicationActivity?.length,
-                              sample: analyticsData.userCommunicationActivity?.[0],
-                              allData: analyticsData.userCommunicationActivity
-                            });
 
                             // Validate data structure
                             if (!analyticsData.userCommunicationActivity || analyticsData.userCommunicationActivity.length === 0) {
@@ -3544,11 +3307,6 @@ const ESCAdminDashboard = () => {
                               item.conversations !== null
                             );
 
-                            console.log('🔍 Valid User Communication Activity Data:', {
-                              originalLength: analyticsData.userCommunicationActivity.length,
-                              validLength: validData.length,
-                              validData: validData
-                            });
 
                             if (validData.length === 0) {
                           return (
@@ -3562,14 +3320,6 @@ const ESCAdminDashboard = () => {
                           );
                         }
                           
-                                                      console.log('🔍 User Communication Activity Chart - About to render with data:', validData);
-                            console.log('🔍 Chart data structure check:', validData.map(item => ({
-                              user: item.user,
-                              messages: item.messages,
-                              conversations: item.conversations,
-                              messagesType: typeof item.messages,
-                              conversationsType: typeof item.conversations
-                            })));
                             
                             return (
                               <div style={{ width: '100%', height: 300 }}>
@@ -3597,7 +3347,6 @@ const ESCAdminDashboard = () => {
                                         borderRadius: '8px'
                                       }}
                                       formatter={(value, name) => {
-                                        console.log('🔍 Tooltip formatter - name:', name, 'value:', value);
                                         if (name === 'messages') {
                                           return [`${value} messages`, 'Messages'];
                                         } else if (name === 'conversations') {
@@ -3704,7 +3453,6 @@ const ESCAdminDashboard = () => {
                                   return d >= fromDate && d <= toDate;
                                 });
 
-                                console.log('🔍 Registration Trends Chart - Rendering with data:', filtered);
                                 return (
                                   <ResponsiveContainer width="100%" height={300}>
                                     <LineChart data={filtered}>
@@ -3873,7 +3621,6 @@ const ESCAdminDashboard = () => {
                           boxShadow: '0 2px 4px rgba(253,104,14,0.2)'
                         }}
                         onClick={() => {
-                          console.log('🔍 Performance report clicked');
                           setActiveReportSection('performance');
                         }}
                       >
@@ -3905,7 +3652,6 @@ const ESCAdminDashboard = () => {
                           boxShadow: '0 2px 4px rgba(253,104,14,0.2)'
                         }}
                         onClick={() => {
-                          console.log('🔍 Business report clicked');
                           setActiveReportSection('business');
                         }}
                       >
@@ -3937,7 +3683,6 @@ const ESCAdminDashboard = () => {
                           boxShadow: '0 2px 4px rgba(253,104,14,0.2)'
                         }}
                         onClick={() => {
-                          console.log('🔍 Security report clicked');
                           setActiveReportSection('security');
                         }}
                       >
@@ -3969,7 +3714,6 @@ const ESCAdminDashboard = () => {
                           boxShadow: '0 2px 4px rgba(253,104,14,0.2)'
                         }}
                         onClick={() => {
-                          console.log('🔍 Operations report clicked');
                           setActiveReportSection('operations');
                         }}
                       >

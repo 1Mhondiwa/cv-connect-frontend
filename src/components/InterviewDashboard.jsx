@@ -155,7 +155,6 @@ const InterviewDashboard = ({ userType }) => {
   };
 
   const openInterviewDetails = (interview) => {
-    console.log('🔍 Opening interview details for:', interview);
     setSelectedInterview(interview);
     setShowDetails(true);
   };
@@ -181,7 +180,6 @@ const InterviewDashboard = ({ userType }) => {
   };
 
   const startVideoCall = (interview) => {
-    console.log('🎥 Starting video call for interview:', interview);
     if (interview.interview_type === 'video') {
       // Open our custom video call modal
       setSelectedInterviewForCall(interview);
