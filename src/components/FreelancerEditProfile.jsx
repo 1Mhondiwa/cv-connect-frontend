@@ -88,11 +88,9 @@ const FreelancerEditProfile = () => {
             
             // Load work experience exactly as it was parsed from CV
             const workExperience = parsedData.work_experience || [];
-            console.log('Original CV work experience:', workExperience);
             
             // Load education exactly as it was parsed from CV
             const education = parsedData.education || [];
-            console.log('Original CV education:', education);
             
             setCvData({
               work_experience: workExperience,
@@ -133,7 +131,6 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      console.log("Adding skill:", newSkill);
       
       const response = await api.post(
         "/freelancer/skills",
@@ -144,7 +141,6 @@ const FreelancerEditProfile = () => {
         }
       );
       
-      console.log("Add skill response:", response.data);
       
       if (response.data.success) {
         await refreshSkills();
@@ -185,7 +181,6 @@ const FreelancerEditProfile = () => {
 
   const handleUpdateSkill = async (skillId) => {
     try {
-      console.log("Updating skill:", skillId, editingSkillData);
       
       const response = await api.put(
         `/freelancer/skills/${skillId}`,
@@ -195,7 +190,6 @@ const FreelancerEditProfile = () => {
         }
       );
       
-      console.log("Update skill response:", response.data);
       
       if (response.data.success) {
         await refreshSkills();
@@ -218,13 +212,11 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      console.log("Deleting skill:", skillId);
       
       const response = await api.delete(
         `/freelancer/skills/${skillId}`
       );
       
-      console.log("Delete skill response:", response.data);
       
       if (response.data.success) {
         await refreshSkills();
@@ -261,7 +253,6 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      console.log("Adding work experience:", newWork);
       
       const response = await api.post(
         "/freelancer/work-experience",
@@ -274,7 +265,6 @@ const FreelancerEditProfile = () => {
         }
       );
       
-      console.log("Add work experience response:", response.data);
       
       if (response.data.success) {
         await refreshWorkExperience();
@@ -304,7 +294,6 @@ const FreelancerEditProfile = () => {
         if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
           const parsedData = response.data.profile.cv.parsed_data;
           const workExperience = parsedData.work_experience || [];
-          console.log('Refreshed work experience:', workExperience);
           
           setCvData(prev => ({
             ...prev,
@@ -336,7 +325,6 @@ const FreelancerEditProfile = () => {
         return;
       }
 
-      console.log("Updating work experience:", workId, editingWorkData);
       
       const response = await api.put(
         `/freelancer/work-experience/${workId}`,
@@ -349,7 +337,6 @@ const FreelancerEditProfile = () => {
         }
       );
       
-      console.log("Update work experience response:", response.data);
       
       if (response.data.success) {
         await refreshWorkExperience();
@@ -373,13 +360,11 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      console.log("Deleting work experience:", workId);
       
       const response = await api.delete(
         `/freelancer/work-experience/${workId}`
       );
       
-      console.log("Delete work experience response:", response.data);
       
       if (response.data.success) {
         await refreshWorkExperience();
@@ -416,7 +401,6 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      console.log("Adding education:", newEducation);
       
       const response = await api.post(
         "/freelancer/education",
@@ -428,7 +412,6 @@ const FreelancerEditProfile = () => {
         }
       );
       
-      console.log("Add education response:", response.data);
       
       if (response.data.success) {
         await refreshEducation();
@@ -457,7 +440,6 @@ const FreelancerEditProfile = () => {
         if (response.data.profile.cv && response.data.profile.cv.parsed_data) {
           const parsedData = response.data.profile.cv.parsed_data;
           const education = parsedData.education || [];
-          console.log('Refreshed education:', education);
           
           setCvData(prev => ({
             ...prev,
@@ -488,7 +470,6 @@ const FreelancerEditProfile = () => {
         return;
       }
 
-      console.log("Updating education:", editingEducation, editingEducationData);
       
       const response = await api.put(
         `/freelancer/education/${editingEducation}`,
@@ -500,7 +481,6 @@ const FreelancerEditProfile = () => {
         }
       );
       
-      console.log("Update education response:", response.data);
       
       if (response.data.success) {
         await refreshEducation();
@@ -524,13 +504,11 @@ const FreelancerEditProfile = () => {
     }
 
     try {
-      console.log("Deleting education:", educationId);
       
       const response = await api.delete(
         `/freelancer/education/${educationId}`
       );
       
-      console.log("Delete education response:", response.data);
       
       if (response.data.success) {
         await refreshEducation();
