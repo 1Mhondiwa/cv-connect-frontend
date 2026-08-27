@@ -17,7 +17,6 @@ const FreelancerInterviewFeedback = () => {
       
       if (response.data.success) {
         setFeedbackData(response.data.data);
-        console.log('✅ Freelancer feedback loaded:', response.data.data);
       } else {
         setError('Failed to load interview feedback');
       }

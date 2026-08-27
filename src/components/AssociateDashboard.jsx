@@ -475,8 +475,6 @@ const AssociateDashboard = () => {
 
   // Interview functions
   const openInterviewSchedulingModal = (freelancer) => {
-    console.log('Opening interview scheduling modal for freelancer:', freelancer);
-    console.log('Current selectedRequest:', selectedRequest);
     
     if (!selectedRequest || !selectedRequest.request_id) {
       console.error('No valid request selected for interview scheduling!');

@@ -63,7 +63,6 @@ const ContractsList = ({ contracts, loading, error, onRetry, onUploadSuccess }) 
       if (response.data.success) {
         // Refresh contracts list
         onUploadSuccess && onUploadSuccess();
-        console.log('✅ Signed contract uploaded successfully');
       } else {
         throw new Error(response.data.message || 'Upload failed');
       }
@@ -381,10 +380,9 @@ const FreelancerDashboard = () => {
       fetchConversations();
       fetchGlobalUnread();
     } else if (activeTab === 'contracts') {
-      console.log('🔄 Contracts tab activated, fetching contracts...');
       fetchContracts();
     }
-    // eslint-disable-next-line
+     
   }, [activeTab]);
 
 
@@ -535,7 +533,6 @@ const fetchContracts = async () => {
 
   const handleInterviewFeedbackSuccess = () => {
     // Show success message or refresh data if needed
-    console.log('Interview feedback submitted successfully');
   };
 
   if (loading) {
