@@ -255,23 +255,28 @@ const AssociateDashboard = () => {
     try {
       setDashboardLoading(true);
       
-      // Fetch all stats in parallel
-      const [requestsResponse, hiredResponse, unreadResponse] = await Promise.all([
+      // Fetch all stats in parallel (including interviews for upcoming count)
+      const [requestsResponse, hiredResponse, unreadResponse, interviewsResponse] = await Promise.all([
         api.get('/associate/freelancer-requests'),
         api.get('/associate/hired-freelancers'),
-        api.get('/message/unread-count')
+        api.get('/message/unread-count'),
+        api.get('/interview').catch(() => ({ data: { success: false, interviews: [] } }))
       ]);
 
       const requests = requestsResponse.data.success ? requestsResponse.data.requests : [];
       const hired = hiredResponse.data.success ? hiredResponse.data.hired_freelancers : [];
       const unreadCount = unreadResponse.data.success ? unreadResponse.data.total_unread : 0;
+      const interviews = interviewsResponse.data.success ? interviewsResponse.data.interviews : [];
+      const upcomingInterviews = interviews.filter(
+        (iv) => iv.status === 'scheduled' && new Date(iv.scheduled_date) >= new Date()
+      ).length;
 
       setDashboardStats({
         totalRequests: requests.length,
         activeRequests: requests.filter(r => r.status === 'pending' || r.status === 'reviewed').length,
         hiredFreelancers: hired.length,
         unreadMessages: unreadCount,
-        upcomingInterviews: 0 // TODO: Add interview count when interview system is ready
+        upcomingInterviews,
       });
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
