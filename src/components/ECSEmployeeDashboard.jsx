@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/axios';
 import { API_BASE_URL } from '../utils/axios';
@@ -273,21 +273,21 @@ const ECSEmployeeDashboard = () => {
     if (activeTab === 'associates') {
       loadAssociates();
     }
-  }, [activeTab]);
+  }, [activeTab, loadAssociates]);
 
   // Load freelancers
   useEffect(() => {
     if (activeTab === 'freelancers') {
       loadFreelancers();
     }
-  }, [activeTab]);
+  }, [activeTab, loadFreelancers]);
 
   // Load freelancer requests
   useEffect(() => {
     if (activeTab === 'freelancer-requests') {
       fetchFreelancerRequests();
     }
-  }, [activeTab]);
+  }, [activeTab, fetchFreelancerRequests]);
 
 
 
@@ -360,7 +360,7 @@ const ECSEmployeeDashboard = () => {
     }
   };
 
-  const loadAssociates = async () => {
+  const loadAssociates = useCallback(async () => {
     setAssociatesLoading(true);
     setAssociatesError('');
     try {
@@ -374,9 +374,9 @@ const ECSEmployeeDashboard = () => {
     } finally {
       setAssociatesLoading(false);
     }
-  };
+  }, []);
 
-  const loadFreelancers = async () => {
+  const loadFreelancers = useCallback(async () => {
     setFreelancersLoading(true);
     setFreelancersError('');
     try {
@@ -397,7 +397,7 @@ const ECSEmployeeDashboard = () => {
     } finally {
       setFreelancersLoading(false);
     }
-  };
+  }, [freelancerFilters]);
 
   // Associate Request Management Functions
   const handleReviewRequest = async (requestId) => {
@@ -434,7 +434,7 @@ const ECSEmployeeDashboard = () => {
   };
 
   // Freelancer Request Management Functions
-  const fetchFreelancerRequests = async () => {
+  const fetchFreelancerRequests = useCallback(async () => {
     setFreelancerRequestsLoading(true);
     setFreelancerRequestsError('');
     try {
@@ -449,7 +449,7 @@ const ECSEmployeeDashboard = () => {
     } finally {
       setFreelancerRequestsLoading(false);
     }
-  };
+  }, []);
 
   const fetchAvailableFreelancers = async () => {
     try {
