@@ -286,7 +286,7 @@ const ESCAdminDashboard = () => {
     if (activeTab === 'dashboard') {
       fetchVisitorData();
     }
-  }, [timeRange, fetchVisitorData]);
+  }, [timeRange, activeTab, fetchVisitorData]);
 
   // Debug filteredChartData changes
   useEffect(() => {
@@ -299,7 +299,7 @@ const ESCAdminDashboard = () => {
         fetchCVUploadData();
       }
     }
-  }, [cvUploadDateFilter, activeTab]);
+  }, [activeTab, fetchCVUploadData, cvUploadDateFilter.startDate, cvUploadDateFilter.endDate]);
 
   // Debug CV upload trends data changes
   useEffect(() => {
@@ -348,19 +348,17 @@ const ESCAdminDashboard = () => {
     let intervalId;
     
     if (activeTab === 'analytics') {
-      // Set up auto-refresh every 5 minutes (300,000 milliseconds)
       intervalId = setInterval(() => {
         fetchAnalyticsData();
       }, 5 * 60 * 1000);
     }
     
-    // Cleanup interval when component unmounts or tab changes
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
       }
     };
-  }, [activeTab]);
+  }, [activeTab, fetchAnalyticsData]);
 
   // Fetch interview analytics when analytics tab is activated
   useEffect(() => {
@@ -383,19 +381,17 @@ const ESCAdminDashboard = () => {
     let intervalId;
     
     if (activeTab === 'dashboard') {
-      // Set up auto-refresh every 5 minutes (300,000 milliseconds)
       intervalId = setInterval(() => {
         fetchVisitorData();
       }, 5 * 60 * 1000);
     }
     
-    // Cleanup interval when component unmounts or tab changes
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
       }
     };
-  }, [activeTab]);
+  }, [activeTab, fetchVisitorData]);
 
   // Fetch system stats and visitor data on dashboard tab
   useEffect(() => {
@@ -431,7 +427,7 @@ const ESCAdminDashboard = () => {
     if (activeReportSection && !reportsData[activeReportSection]) {
       generateComprehensiveReport();
     }
-  }, [activeReportSection]);
+  }, [activeReportSection, reportsData]);
 
   // Ensure page scrolls to top when System Monitor tab is activated
   useEffect(() => {
@@ -548,7 +544,7 @@ const ESCAdminDashboard = () => {
   };
 
   // CV Upload date filtering functions
-  const fetchCVUploadData = async () => {
+  const fetchCVUploadData = useCallback(async () => {
     setCvUploadFilterLoading(true);
     try {
       
@@ -582,7 +578,7 @@ const ESCAdminDashboard = () => {
     } finally {
       setCvUploadFilterLoading(false);
     }
-  };
+  }, [cvUploadDateFilter]);
 
   const handleCVUploadDateFilterChange = (field, value) => {
     setCvUploadDateFilter(prev => ({
@@ -599,7 +595,7 @@ const ESCAdminDashboard = () => {
   };
 
   // Analytics Functions
-  const fetchAnalyticsData = async () => {
+  const fetchAnalyticsData = useCallback(async () => {
     setAnalyticsLoading(true);
     setAnalyticsError('');
     
@@ -707,7 +703,7 @@ const ESCAdminDashboard = () => {
     } finally {
       setAnalyticsLoading(false);
     }
-  };
+  }, [timeRange]);
 
 
 
