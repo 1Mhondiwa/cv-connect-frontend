@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -44,7 +44,7 @@
   },
   "lint-staged": {
     "*.{js,jsx}": [
-      "eslint --fix --max-warnings 20"
+      "eslint --fix --max-warnings 0"
     ]
   }
 }
