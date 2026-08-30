@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../utils/axios';
 import InterviewFeedbackModal from './InterviewFeedbackModal';
 import VideoCallModal from './VideoCallModal';
@@ -15,9 +15,27 @@ const InterviewDashboard = ({ userType }) => {
   const [showVideoCallModal, setShowVideoCallModal] = useState(false);
   const [selectedInterviewForCall, setSelectedInterviewForCall] = useState(null);
 
+  const fetchInterviews = useCallback(async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      const params = filter !== 'all' ? `?status=${filter}` : '';
+      const response = await api.get(`/interview/${params}`);
+      
+      if (response.data.success) {
+        setInterviews(response.data.interviews);
+      }
+    } catch (error) {
+      console.error('Error fetching interviews:', error);
+      
+      if (!silent) setError('Failed to load interviews');
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }, [filter]);
+
   useEffect(() => {
     fetchInterviews();
-  }, [filter]);
+  }, [fetchInterviews]);
 
   // Disable AOS animations for this component to prevent unwanted spinning
   useEffect(() => {
@@ -66,30 +84,12 @@ const InterviewDashboard = ({ userType }) => {
 
     if (hasActiveInterviews) {
       const interval = setInterval(() => {
-        fetchInterviews(true); // Silent refresh to avoid loading spinners
-      }, 30000); // Poll every 30 seconds for active interviews (reduced from 3 seconds)
+        fetchInterviews(true);
+      }, 30000);
 
       return () => clearInterval(interval);
     }
-  }, [interviews]);
-
-  const fetchInterviews = async (silent = false) => {
-    try {
-      if (!silent) setLoading(true);
-      const params = filter !== 'all' ? `?status=${filter}` : '';
-      const response = await api.get(`/interview/${params}`);
-      
-      if (response.data.success) {
-        setInterviews(response.data.interviews);
-      }
-    } catch (error) {
-      console.error('Error fetching interviews:', error);
-      
-      if (!silent) setError('Failed to load interviews');
-    } finally {
-      if (!silent) setLoading(false);
-    }
-  };
+  }, [interviews, fetchInterviews]);
 
   const handleStatusUpdate = async (interviewId, newStatus) => {
     try {
