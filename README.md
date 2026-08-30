@@ -158,6 +158,24 @@ VITE_APP_NAME=CV-Connect
 
 ---
 
+## 🧹 Code Quality
+
+### Linting
+
+```bash
+# Check for lint errors (fails on any warning)
+npm run lint        # eslint . --max-warnings 0
+
+# Auto-fix
+npx eslint . --fix --max-warnings 0
+```
+
+- `eslint` flat config at `eslint.config.js` (React hooks + `react-refresh`, `no-unused-vars` as error)
+- Husky pre-commit runs `lint-staged` (`eslint --fix --max-warnings 0` on `*.{js,jsx}`) — commit is blocked on any warning
+- CI `.github/workflows/ci.yml` runs `npm run lint` — PRs with warnings fail
+
+---
+
 ## 🧪 Testing
 
 ```bash
