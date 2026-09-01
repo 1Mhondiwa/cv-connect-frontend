@@ -77,7 +77,10 @@ const InterviewSchedulingModal = ({ isOpen, onClose, freelancer, request, onSche
   const getMinDateTime = () => {
     const now = new Date();
     now.setMinutes(now.getMinutes() + 30); // Minimum 30 minutes from now
-    return now.toISOString().slice(0, 16);
+    // datetime-local values are interpreted as local time — format the
+    // components manually rather than using toISOString() (which is UTC)
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
   };
 
   return (
@@ -151,12 +154,13 @@ const InterviewSchedulingModal = ({ isOpen, onClose, freelancer, request, onSche
               <div className="row">
                 {/* Interview Type */}
                 <div className="col-md-6 mb-3">
-                  <label className="form-label fw-semibold">
+                  <label className="form-label fw-semibold" htmlFor="interview-type">
                     <i className="bi bi-camera-video me-1"></i>
                     Interview Type
                   </label>
                   <select
                     className="form-select"
+                    id="interview-type"
                     name="interview_type"
                     value={formData.interview_type}
                     onChange={handleInputChange}
@@ -170,12 +174,13 @@ const InterviewSchedulingModal = ({ isOpen, onClose, freelancer, request, onSche
 
                 {/* Duration */}
                 <div className="col-md-6 mb-3">
-                  <label className="form-label fw-semibold">
+                  <label className="form-label fw-semibold" htmlFor="interview-duration">
                     <i className="bi bi-clock me-1"></i>
                     Duration (minutes)
                   </label>
                   <select
                     className="form-select"
+                    id="interview-duration"
                     name="duration_minutes"
                     value={formData.duration_minutes}
                     onChange={handleInputChange}
@@ -192,13 +197,14 @@ const InterviewSchedulingModal = ({ isOpen, onClose, freelancer, request, onSche
 
               {/* Scheduled Date & Time */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="interview-date">
                   <i className="bi bi-calendar-check me-1"></i>
                   Date & Time
                 </label>
                 <input
                   type="datetime-local"
                   className="form-control"
+                  id="interview-date"
                   name="scheduled_date"
                   value={formData.scheduled_date}
                   onChange={handleInputChange}
@@ -214,13 +220,14 @@ const InterviewSchedulingModal = ({ isOpen, onClose, freelancer, request, onSche
               {/* Location (for in-person interviews) */}
               {formData.interview_type === 'in_person' && (
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">
+                  <label className="form-label fw-semibold" htmlFor="interview-location">
                     <i className="bi bi-geo-alt me-1"></i>
                     Meeting Location
                   </label>
                   <input
                     type="text"
                     className="form-control"
+                    id="interview-location"
                     name="location"
                     value={formData.location}
                     onChange={handleInputChange}
@@ -232,12 +239,13 @@ const InterviewSchedulingModal = ({ isOpen, onClose, freelancer, request, onSche
 
               {/* Interview Notes */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="interview-notes">
                   <i className="bi bi-sticky me-1"></i>
                   Interview Notes
                 </label>
                 <textarea
                   className="form-control"
+                  id="interview-notes"
                   name="interview_notes"
                   value={formData.interview_notes}
                   onChange={handleInputChange}
@@ -248,12 +256,13 @@ const InterviewSchedulingModal = ({ isOpen, onClose, freelancer, request, onSche
 
               {/* Invitation Message */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="interview-invitation">
                   <i className="bi bi-envelope me-1"></i>
                   Invitation Message
                 </label>
                 <textarea
                   className="form-control"
+                  id="interview-invitation"
                   name="invitation_message"
                   value={formData.invitation_message}
                   onChange={handleInputChange}
