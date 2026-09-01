@@ -183,10 +183,11 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
             <form onSubmit={handleSubmit}>
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Project Title *</label>
+                  <label className="form-label" htmlFor="hire-project-title">Project Title *</label>
                   <input
                     type="text"
                     className="form-control"
+                    id="hire-project-title"
                     name="project_title"
                     value={formData.project_title}
                     onChange={handleInputChange}
@@ -196,9 +197,10 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
                 </div>
                 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Rate Type</label>
+                  <label className="form-label" htmlFor="hire-rate-type">Rate Type</label>
                   <select
                     className="form-select"
+                    id="hire-rate-type"
                     name="rate_type"
                     value={formData.rate_type}
                     onChange={handleInputChange}
@@ -212,12 +214,13 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
 
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Agreed Rate (ZAR)</label>
+                  <label className="form-label" htmlFor="hire-agreed-rate">Agreed Rate (ZAR)</label>
                   <div className="input-group">
                     <span className="input-group-text">R</span>
                     <input
                       type="number"
                       className="form-control"
+                      id="hire-agreed-rate"
                       name="agreed_rate"
                       value={formData.agreed_rate}
                       onChange={handleInputChange}
@@ -229,10 +232,11 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
                 </div>
                 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Start Date</label>
+                  <label className="form-label" htmlFor="hire-start-date">Start Date</label>
                   <input
                     type="date"
                     className="form-control"
+                    id="hire-start-date"
                     name="start_date"
                     value={formData.start_date}
                     onChange={handleInputChange}
@@ -242,10 +246,11 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
 
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Expected End Date</label>
+                  <label className="form-label" htmlFor="hire-end-date">Expected End Date</label>
                   <input
                     type="date"
                     className="form-control"
+                    id="hire-end-date"
                     name="expected_end_date"
                     value={formData.expected_end_date}
                     onChange={handleInputChange}
@@ -253,9 +258,10 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
                 </div>
                 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Project Description</label>
+                  <label className="form-label" htmlFor="hire-description">Project Description</label>
                   <textarea
                     className="form-control"
+                    id="hire-description"
                     name="project_description"
                     value={formData.project_description}
                     onChange={handleInputChange}
@@ -266,10 +272,11 @@ const HiringModal = ({ isOpen, onClose, freelancer, request, onHireSuccess }) =>
               </div>
 
               <div className="mb-3">
-                <label className="form-label">Contract PDF *</label>
+                <label className="form-label" htmlFor="hire-contract-pdf">Contract PDF *</label>
                 <input
                   type="file"
                   className="form-control"
+                  id="hire-contract-pdf"
                   accept=".pdf"
                   onChange={handleFileChange}
                   required
