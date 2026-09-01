@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import HiringModal from '../src/components/HiringModal'
 
@@ -26,7 +26,7 @@ const request = {
 const pdfFile = new File(['%PDF-1.4 test'], 'contract.pdf', { type: 'application/pdf' })
 
 // The component's file input has no label association, so query by type
-const getFileInput = (container) => container.querySelector('input[type="file"]')
+
 
 const renderModal = (props = {}) =>
   render(
@@ -81,8 +81,8 @@ describe('HiringModal', () => {
   })
 
   it('rejects non-PDF files', async () => {
-    const { container } = renderModal()
-    const input = getFileInput(container)
+    renderModal()
+    const input = screen.getByLabelText('Contract PDF *')
     fireEvent.change(input, {
       target: { files: [new File(['x'], 'contract.docx', { type: 'application/msword' })] },
     })
@@ -92,10 +92,10 @@ describe('HiringModal', () => {
   })
 
   it('rejects files over 10MB', async () => {
-    const { container } = renderModal()
+    renderModal()
     const bigFile = new File([new ArrayBuffer(11 * 1024 * 1024)], 'big.pdf', { type: 'application/pdf' })
     Object.defineProperty(bigFile, 'size', { value: 11 * 1024 * 1024 })
-    const input = getFileInput(container)
+    const input = screen.getByLabelText('Contract PDF *')
     fireEvent.change(input, { target: { files: [bigFile] } })
     await waitFor(() => {
       expect(screen.getByText('File size must be less than 10MB.')).toBeInTheDocument()
@@ -103,8 +103,8 @@ describe('HiringModal', () => {
   })
 
   it('accepts a valid PDF and clears the error', async () => {
-    const { container } = renderModal()
-    const input = getFileInput(container)
+    renderModal()
+    const input = screen.getByLabelText('Contract PDF *')
     fireEvent.change(input, { target: { files: [pdfFile] } })
     await waitFor(() => {
       expect(screen.queryByText('Please upload a PDF file only.')).not.toBeInTheDocument()
@@ -113,12 +113,12 @@ describe('HiringModal', () => {
 
   it('submits the hire form with all fields', async () => {
     mockPost.mockResolvedValue({ data: { success: true, data: { hire_id: 77 } } })
-    const { container } = renderModal()
+    renderModal()
 
-    fireEvent.change(screen.getByPlaceholderText('Enter agreed rate'), {
+    fireEvent.change(screen.getByLabelText('Agreed Rate (ZAR)'), {
       target: { name: 'agreed_rate', value: '450' },
     })
-    const input = getFileInput(container)
+    const input = screen.getByLabelText('Contract PDF *')
     fireEvent.change(input, { target: { files: [pdfFile] } })
 
     fireEvent.click(screen.getByRole('button', { name: /hire freelancer/i }))
@@ -139,9 +139,9 @@ describe('HiringModal', () => {
   it('shows success and calls onHireSuccess on a successful hire', async () => {
     const onHireSuccess = vi.fn()
     mockPost.mockResolvedValue({ data: { success: true, data: { hire_id: 77 } } })
-    const { container } = renderModal({ onHireSuccess })
+    renderModal({ onHireSuccess })
 
-    const input = getFileInput(container)
+    const input = screen.getByLabelText('Contract PDF *')
     fireEvent.change(input, { target: { files: [pdfFile] } })
     fireEvent.click(screen.getByRole('button', { name: /hire freelancer/i }))
 
@@ -155,9 +155,9 @@ describe('HiringModal', () => {
     mockPost.mockRejectedValue({
       response: { data: { message: 'This freelancer was not recommended for this request' } },
     })
-    const { container } = renderModal()
+    renderModal()
 
-    const input = getFileInput(container)
+    const input = screen.getByLabelText('Contract PDF *')
     fireEvent.change(input, { target: { files: [pdfFile] } })
     fireEvent.click(screen.getByRole('button', { name: /hire freelancer/i }))
 
