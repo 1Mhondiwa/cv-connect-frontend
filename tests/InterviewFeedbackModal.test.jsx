@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+﻿import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import InterviewFeedbackModal from '../src/components/InterviewFeedbackModal'
 
@@ -93,7 +93,7 @@ describe('InterviewFeedbackModal', () => {
 
   it('selects a recommendation', () => {
     renderModal()
-    const select = screen.getByRole('combobox')
+    const select = screen.getByLabelText('Recommendation *')
     expect(select.value).toBe('')
 
     fireEvent.change(select, { target: { name: 'recommendation', value: 'hire' } })
@@ -105,10 +105,10 @@ describe('InterviewFeedbackModal', () => {
     renderModal()
 
     fillRatings()
-    fireEvent.change(screen.getByRole('combobox'), {
+    fireEvent.change(screen.getByLabelText('Recommendation *'), {
       target: { name: 'recommendation', value: 'hire' },
     })
-    fireEvent.change(screen.getByPlaceholderText(/main strengths/i), {
+    fireEvent.change(screen.getByLabelText('Strengths'), {
       target: { name: 'strengths', value: 'Strong React knowledge' },
     })
 
@@ -135,7 +135,7 @@ describe('InterviewFeedbackModal', () => {
     renderModal({ onSubmitSuccess })
 
     fillRatings()
-    fireEvent.change(screen.getByRole('combobox'), {
+    fireEvent.change(screen.getByLabelText('Recommendation *'), {
       target: { name: 'recommendation', value: 'hire' },
     })
     fireEvent.click(screen.getByRole('button', { name: /submit feedback/i }))
@@ -153,7 +153,7 @@ describe('InterviewFeedbackModal', () => {
     renderModal()
 
     fillRatings()
-    fireEvent.change(screen.getByRole('combobox'), {
+    fireEvent.change(screen.getByLabelText('Recommendation *'), {
       target: { name: 'recommendation', value: 'no_hire' },
     })
     fireEvent.click(screen.getByRole('button', { name: /submit feedback/i }))
