@@ -168,11 +168,12 @@ const InterviewFeedbackModal = ({ isOpen, onClose, interview, onSubmitSuccess })
 
               {/* Recommendation */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="feedback-recommendation">
                   Recommendation <span className="text-danger">*</span>
                 </label>
                 <select
                   className="form-select"
+                  id="feedback-recommendation"
                   name="recommendation"
                   value={formData.recommendation}
                   onChange={handleInputChange}
@@ -187,12 +188,13 @@ const InterviewFeedbackModal = ({ isOpen, onClose, interview, onSubmitSuccess })
 
               {/* Strengths */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="feedback-strengths">
                   <i className="bi bi-check-circle me-1"></i>
                   Strengths
                 </label>
                 <textarea
                   className="form-control"
+                  id="feedback-strengths"
                   name="strengths"
                   value={formData.strengths}
                   onChange={handleInputChange}
@@ -203,12 +205,13 @@ const InterviewFeedbackModal = ({ isOpen, onClose, interview, onSubmitSuccess })
 
               {/* Areas for Improvement */}
               <div className="mb-3">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="feedback-improvements">
                   <i className="bi bi-arrow-up-circle me-1"></i>
                   Areas for Improvement
                 </label>
                 <textarea
                   className="form-control"
+                  id="feedback-improvements"
                   name="areas_for_improvement"
                   value={formData.areas_for_improvement}
                   onChange={handleInputChange}
@@ -219,12 +222,13 @@ const InterviewFeedbackModal = ({ isOpen, onClose, interview, onSubmitSuccess })
 
               {/* Detailed Feedback */}
               <div className="mb-4">
-                <label className="form-label fw-semibold">
+                <label className="form-label fw-semibold" htmlFor="feedback-details">
                   <i className="bi bi-chat-text me-1"></i>
                   Detailed Feedback
                 </label>
                 <textarea
                   className="form-control"
+                  id="feedback-details"
                   name="detailed_feedback"
                   value={formData.detailed_feedback}
                   onChange={handleInputChange}
