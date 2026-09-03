@@ -32,21 +32,23 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }))
 
-// Mock localStorage
+// Mock localStorage (backed by a real store so set/get round-trip in tests)
+const localStorageStore = {}
 const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
+  getItem: vi.fn((key) => (key in localStorageStore ? localStorageStore[key] : null)),
+  setItem: vi.fn((key, value) => { localStorageStore[key] = String(value) }),
+  removeItem: vi.fn((key) => { delete localStorageStore[key] }),
+  clear: vi.fn(() => { for (const k of Object.keys(localStorageStore)) delete localStorageStore[k] }),
 }
 global.localStorage = localStorageMock
 
-// Mock sessionStorage
+// Mock sessionStorage (backed by a real store)
+const sessionStorageStore = {}
 const sessionStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
+  getItem: vi.fn((key) => (key in sessionStorageStore ? sessionStorageStore[key] : null)),
+  setItem: vi.fn((key, value) => { sessionStorageStore[key] = String(value) }),
+  removeItem: vi.fn((key) => { delete sessionStorageStore[key] }),
+  clear: vi.fn(() => { for (const k of Object.keys(sessionStorageStore)) delete sessionStorageStore[k] }),
 }
 global.sessionStorage = sessionStorageMock
 
